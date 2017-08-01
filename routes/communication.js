@@ -44,29 +44,40 @@ function SkyRTC() {
         var action = data.action;
         var playerName = data.playerName;
         var playerIndex = parseInt(getPlayerIndex(playerName, that.table.players));
-
-        if (playerIndex != -1 && that.table.checkPlayer(playerIndex)) {
-
+        if (playerIndex != that.table.currentPlayer)
+            that.table.players[playerIndex].Fold();
+        else if (playerIndex != -1 && that.table.checkPlayer(playerIndex)) {
             switch (action) {
                 case "Bet":
-                    try {
-                        var amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
-                        that.table.players[playerIndex].Bet(amount);
-                    } catch (e) {
-                        console.log(e.message);
-                        that.table.players[playerIndex].Fold();
-                    }
+                    if (that.table.isBet) {
+                        try {
+                            var amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
+                            that.table.players[playerIndex].Bet(amount);
+                        } catch (e) {
+                            console.log(e.message);
+                            that.table.players[playerIndex].Fold();
+                        }
+                    }else
+                        that.table.players[playerIndex].Call();
                     break;
                 case "Call":
-                    that.table.players[playerIndex].Call();
+                    if (that.table.isBet)
+                        that.table.players[playerIndex].Bet(that.table.smallBlind);
+                    else
+                        that.table.players[playerIndex].Call();
                     break;
                 case "Check":
                     that.table.players[playerIndex].Check();
                     break;
                 case "Raise":
-                    that.table.players[playerIndex].Raise();
+                    if (that.table.isBet)
+                        that.table.players[playerIndex].Bet(that.table.smallBlind);
+                    else
+                        that.table.players[playerIndex].Raise();
                     break;
                 case "All-in":
+                    if (that.table.isBet)
+                        that.table.isBet = false;
                     that.table.players[playerIndex].AllIn();
                     break;
                 case "Fold":

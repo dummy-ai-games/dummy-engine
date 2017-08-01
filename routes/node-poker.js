@@ -19,6 +19,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.gameLosers = [];
     this.currentPlayer = 0;
     this.raiseCount = 0;
+    this.isBet = false;
 
     //Validate acceptable value ranges.
     var err;
@@ -50,6 +51,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             progress(that);
         else {
             that.currentPlayer = that.dealer;
+            that.isBet = true;
             getNextPlayer(that);
             that.raiseCount = 0;
             takeAction(that, "__bet");
@@ -87,7 +89,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     });
 
 }
-function getNextPlayer(table){
+function getNextPlayer(table) {
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ? (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
     } while (table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn);
@@ -1584,7 +1586,10 @@ function progress(table) {
             }
         } else {
             getNextPlayer(table);
-            takeAction(table, "__turn");
+            if (table.isBet)
+                takeAction(table, "__bet");
+            else
+                takeAction(table, "__turn");
         }
     }
 }
@@ -1876,28 +1881,24 @@ Player.prototype.Raise = function () {
 };
 
 Player.prototype.Bet = function (bet) {
-    if (this.table.currentPlayer != (this.table.dealer + 1)) {
-        this.folded = true;
+    this.table.isBet = false;
+    var i;
+    if (bet < this.table.smallBlind)
+        bet = this.table.smallBlind;
+    if (this.chips > bet) {
+        for (i = 0; i < this.table.players.length; i += 1) {
+            if (this === this.table.players[i]) {
+                this.table.game.bets[i] += bet;
+                this.table.players[i].chips -= bet;
+                this.talked = true;
+            }
+        }
+        //Attemp to progress the game
+        this.turnBet = {action: "bet", playerName: this.playerName, amount: bet}
         progress(this.table);
     } else {
-        var i;
-        if (bet < this.table.smallBlind)
-            bet = this.table.smallBlind;
-        if (this.chips > bet) {
-            for (i = 0; i < this.table.players.length; i += 1) {
-                if (this === this.table.players[i]) {
-                    this.table.game.bets[i] += bet;
-                    this.table.players[i].chips -= bet;
-                    this.talked = true;
-                }
-            }
-            //Attemp to progress the game
-            this.turnBet = {action: "bet", playerName: this.playerName, amount: bet}
-            progress(this.table);
-        } else {
-            console.log('You don\'t have enought chips --> ALL IN !!!');
-            this.AllIn();
-        }
+        console.log('You don\'t have enought chips --> ALL IN !!!');
+        this.AllIn();
     }
 };
 
