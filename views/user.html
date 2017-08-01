@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="edge">
+    <title>Title</title>
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css">
+
+</head>
+<body>
+<h1 style="text-align: center" id="userName">欢迎加入，测试阶段用户id随机生成</h1>
+<div id="action" style="display: none">
+
+    <div>
+        <input class="btn btn-primary" value="Bet" id="bet" style="display: inline-block">
+        <input type="text" id="amount" placeholder="金额">
+    </div>
+    <div>
+        <input class="btn btn-primary" value="Call" id="call">
+    </div>
+    <div>
+        <input class="btn btn-primary" value="Check" id="check">
+    </div>
+    <div>
+        <input class="btn btn-primary" value="Raise" id="raise">
+    </div>
+    <div>
+        <input class="btn btn-primary" value="Fold" id="fold">
+    </div>
+
+    <div>
+        <input class="btn btn-primary" value="Allin" id="allin">
+    </div>
+
+</div>
+<div class="alert alert-warning" id="msg" style="display: none" align="center"></div>
+<script src="javascripts/jquery.min.js"></script>
+<script src="javascripts/SkyRTC-client.js"></script>
+<script type="text/javascript">
+    var self;
+    var roundBets;
+    var bets;
+    var board;
+    var minBet;
+    var raiseCount;
+    var rtc = SkyRTC();
+    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], '');
+    rtc.on("_action", function (data) {
+        $("#userName").text("用户名:"+data.player.playerName);
+        $("#bet").prop("disabled",true);
+        $("#msg").text("该回合轮到你了");
+        $("#msg").show();
+        $("#amount").val("");
+        $("#action").show();
+        self = data.player;
+        roundBets = data.game.roundBets;
+        bets = data.game.bets;
+        board = data.game.board;
+        minBet = data.game.minBet;
+        raiseCount = data.game.raiseCount;
+       /* setTimeout(function(){
+            $("#call").click();
+        },2000);*/
+
+    });
+    rtc.on("_bet", function (data) {
+        $("#msg").text("该回合轮到你首先押注,注意最小押注额");
+        $("#bet").prop("disabled",false);
+        $("#msg").show();
+        $("#amount").val("");
+        $("#action").show();
+        self = data.player;
+        roundBets = data.game.roundBets;
+        bets = data.game.bets;
+        board = data.game.board;
+        minBet = data.game.minBet;
+        raiseCount = data.game.raiseCount;
+       /* setTimeout(function(){
+            $("#amount").val("20");
+            $("#bet").click();
+        },2000);*/
+
+    });
+    $("#bet").click(function () {
+        var amount = $("#amount").val();
+        rtc.Bet(self.playerName, amount);
+        $("#msg").text("该回合您采取的是：bet" + ",押注金额是：" + amount);
+        $("#msg").show();
+        $("#action").hide();
+    });
+    $("#call").click(function () {
+        rtc.Call(self.playerName);
+        $("#msg").text("该回合您采取的是：call");
+        $("#msg").show();
+        $("#action").hide();
+    });
+    $("#check").click(function () {
+        rtc.Check(self.playerName);
+        $("#msg").text("该回合您采取的是：check");
+        $("#msg").show();
+        $("#action").hide();
+    });
+    $("#raise").click(function () {
+        rtc.Raise(self.playerName);
+        $("#msg").text("该回合您采取的是：raise");
+        $("#msg").show();
+        $("#action").hide();
+    });
+    $("#allin").click(function () {
+        rtc.AllIn(self.playerName);
+        $("#msg").text("该回合您采取的是：allin");
+        $("#msg").show();
+        $("#action").hide();
+    });
+    $("#fold").click(function () {
+        rtc.Fold(self.playerName);
+        $("#msg").text("该回合您采取的是：fold");
+        $("#msg").show();
+        $("#action").hide();
+    });
+</script>
+</body>
+</html>

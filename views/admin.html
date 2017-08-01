@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="edge">
+    <title>Title</title>
+    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css">
+
+</head>
+<body>
+<div style="position: relative;width:100%;top:50px;;">
+
+    <form action="/startGame" method="post">
+
+        <div class="form-group" id="content">
+
+        </div>
+        <input type="button" class="btn btn-primary" onclick="startGame()" value="startGame">
+
+        <div class="alert alert-warning" id="msg" style="display: none" align="center"></div>
+    </form>
+
+</div>
+<script src="javascripts/jquery.min.js"></script>
+<script src="javascripts/SkyRTC-client.js"></script>
+<script type="text/javascript">
+    var rtc = SkyRTC();
+    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], 'admin');
+    rtc.on("_new_peer", function (data) {
+        var parent = $("#content");
+        parent.empty();
+        for (var i in data) {
+            var playerName = data[i];
+            var div = $("<div/>", {
+                class: "form-group"
+            }).prependTo(parent);
+            $("<span/>").text("用户:" + playerName + "加入").appendTo(div);
+        }
+    });
+    rtc.on("_gameOver", function (data) {
+        var result = "游戏结束，胜者如下：";
+        for (var i in data) {
+            var player = data[i];
+            result += "用户:" + player.playerName + ",最终金额:" + player.chips + "\n";
+        }
+        $("#msg").text(result);
+        $("#msg").show();
+    });
+    rtc.on('startGame', function () {
+        $("#msg").text("成功开启游戏");
+        $("#msg").show();
+    });
+    rtc.on('startGameFail', function (data) {
+        $("#msg").text(data.msg);
+        $("#msg").show();
+    });
+    function startGame() {
+        rtc.startGame();
+    }
+</script>
+</body>
+</html>
