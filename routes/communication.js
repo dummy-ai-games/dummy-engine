@@ -57,7 +57,7 @@ function SkyRTC() {
                             console.log(e.message);
                             that.table.players[playerIndex].Fold();
                         }
-                    }else
+                    } else
                         that.table.players[playerIndex].Call();
                     break;
                 case "Call":
@@ -90,10 +90,7 @@ function SkyRTC() {
 
             this.emit('_receiveAction', data);
         }
-
     });
-
-
 }
 
 util.inherits(SkyRTC, events.EventEmitter);
@@ -106,6 +103,7 @@ function getPlayerIndex(playerName, players) {
     }
     return -1;
 }
+
 SkyRTC.prototype.notificationAdmin = function () {
     var that = this;
     if (that.admin) {
@@ -179,7 +177,7 @@ SkyRTC.prototype.initTable = function () {
 SkyRTC.prototype.getPlayerAction = function (message) {
     var player = message.data.player.playerName;
     var that = this;
-    console.log(message);
+    console.log(JSON.stringify(message));
     if (player)
         that.round[player].send(JSON.stringify(message), errorCb);
     /*that.timeout = setTimeout(function () {

@@ -13,7 +13,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.playersToRemove = [];
     this.playersToAdd = [];
     this.eventEmitter = new events.EventEmitter();
-    ;
     this.turnBet = {};
     this.gameWinners = [];
     this.gameLosers = [];
@@ -59,7 +58,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     });
 
     this.eventEmitter.on("gameOver", function () {
-        console.log("gameOver,胜者如下：");
+        console.log("gameOver, 胜者如下：");
         for (var i = 0; i < 3; i++) {
             that.gameWinners.push({
                 playerName: that.players[i].playerName,
@@ -87,7 +86,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         }
         that.eventEmitter.emit("__gameOver", that.gameWinners);
     });
-
 }
 function getNextPlayer(table) {
     var maxBet = getMaxBet(table.game.bets);
@@ -95,6 +93,7 @@ function getNextPlayer(table) {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ? (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
     } while (table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.currentPlayer.talked === true && table.game.bets[table.currentPlayer] == maxBet));
 }
+
 function sort(data) {
     for (var k = 0; k < 3; k++) {
         for (var p = k + 1; p < 3; p++) {
@@ -122,9 +121,9 @@ function takeAction(table, action) {
             "bets": table.game.bets,
             "board": table.game.board,
             "minBet": table.smallBlind
-        },
-
-    }
+        }
+    };
+    console.log("公共牌:" + JSON.stringify(table.game.board));
     table.eventEmitter.emit(action, data);
 }
 
