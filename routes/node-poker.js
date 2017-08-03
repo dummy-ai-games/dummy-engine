@@ -90,9 +90,10 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
 
 }
 function getNextPlayer(table) {
+    var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ? (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
-    } while (table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn);
+    } while (table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.currentPlayer.talked === true && table.game.bets[table.currentPlayer] == maxBet));
 }
 function sort(data) {
     for (var k = 0; k < 3; k++) {

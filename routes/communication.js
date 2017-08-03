@@ -160,6 +160,11 @@ SkyRTC.prototype.initTable = function () {
             "data": data
         }
         that.getPlayerAction(message);
+        var message2 = {
+            "eventName": "__deal",
+            "data": data.game.board
+        }
+        that.admin.send(JSON.stringify(message2), errorCb);
     });
 
     that.table.eventEmitter.on("__gameOver", function (data) {

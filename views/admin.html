@@ -60,6 +60,14 @@
         $("#msg").text(data.msg);
         $("#msg").show();
     });
+    rtc.on('__deal', function (data) {
+        var board = "";
+        for (var index in data) {
+            board += data[index]+",";
+        }
+        $("#msg").text("当前公共牌："+board);
+        $("#msg").show();
+    });
     function startGame() {
         rtc.startGame();
     }
