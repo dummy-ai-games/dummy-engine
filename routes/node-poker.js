@@ -123,7 +123,6 @@ function takeAction(table, action) {
             "minBet": table.smallBlind
         }
     };
-    console.log("公共牌:" + JSON.stringify(table.game.board));
     table.eventEmitter.emit(action, data);
 }
 
