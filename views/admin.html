@@ -68,6 +68,10 @@
         $("#msg").text("当前公共牌："+board);
         $("#msg").show();
     });
+    rtc.on('__newRound', function (roundCount) {
+        $("#msg").text("第"+roundCount+"轮开始");
+        $("#msg").show();
+    });
     function startGame() {
         rtc.startGame();
     }

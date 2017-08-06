@@ -39,6 +39,7 @@ function SkyRTC() {
     });
 
     this.on('_action', function (data) {
+        console.log("用户"+data.playerName+"采取动作"+data.action);
         var that = this;
         //clearTimeout(that.timeout);
         var action = data.action;
@@ -88,7 +89,6 @@ function SkyRTC() {
                     break;
             }
 
-            this.emit('_receiveAction', data);
         }
     });
 }
@@ -172,12 +172,20 @@ SkyRTC.prototype.initTable = function () {
         }
         that.admin.send(JSON.stringify(message), errorCb);
     });
+
+    that.table.eventEmitter.on("__newRound", function (data) {
+        var message = {
+            "eventName": "__newRound",
+            "data": data
+        }
+        that.admin.send(JSON.stringify(message), errorCb);
+    });
 }
 
 SkyRTC.prototype.getPlayerAction = function (message) {
     var player = message.data.player.playerName;
     var that = this;
-    console.log(JSON.stringify(message));
+    console.log("服务端轮询动作："+JSON.stringify(message));
     if (player)
         that.round[player].send(JSON.stringify(message), errorCb);
     /*that.timeout = setTimeout(function () {

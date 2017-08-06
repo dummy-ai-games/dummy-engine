@@ -19,6 +19,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.currentPlayer = 0;
     this.raiseCount = 0;
     this.isBet = false;
+    this.roundCount = 1;
 
     //Validate acceptable value ranges.
     var err;
@@ -40,13 +41,15 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     });
 
     this.eventEmitter.on("deal", function () {
-        console.log("deal");
         var end = true;
+        var surviveCount = 0;
         for (var i in that.players) {
-            if (!that.players[i].folded && !that.players[i].allIn)
+            if (!that.players[i].folded && !that.players[i].allIn) {
                 end = false;
+                surviveCount++;
+            }
         }
-        if (end)
+        if (end || surviveCount < 2)
             progress(that);
         else {
             that.currentPlayer = that.dealer;
@@ -58,33 +61,51 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     });
 
     this.eventEmitter.on("gameOver", function () {
-        console.log("gameOver, 胜者如下：");
-        for (var i = 0; i < 3; i++) {
-            that.gameWinners.push({
-                playerName: that.players[i].playerName,
-                hand: that.players[i].hand,
-                chips: that.players[i].chips
-            });
-        }
-        sort(that.gameWinners);
-        if (that.players.length > 3) {
-            for (var i = 3; i < that.players.length; i++) {
-                if (that.players[i].chips >= that.gameWinners[2].chips) {
-                    that.gameWinners[2] = {
-                        playerName: that.players[i].playerName,
-                        hand: that.players[i].hand,
-                        chips: that.players[i].chips
-                    };
-                    sort(that.gameWinners);
-                }
+        for (var i = 0; i < that.players.length; i++) {
+            if (that.players[i].chips == 0) {
+                that.players.splice(i, 1);
+                i--;
             }
         }
-
-        for (var i in that.gameWinners) {
-            var player = that.gameWinners[i];
-            console.log(player);
+        if (that.roundCount < 2 && that.players.length > 2) {
+            console.log("上轮结束，下一轮开始");
+            for (var j = 0; j < that.players.length; j++)
+                that.players[j] = new Player(that.players[j].playerName, that.players[j].chips, that);
+            that.game = new Game(that.smallBlind, that.bigBlind);
+            that.NewRound();
+            that.roundCount++;
+            that.eventEmitter.emit("__newRound", that.roundCount);
         }
-        that.eventEmitter.emit("__gameOver", that.gameWinners);
+        else {
+            console.log("gameOver, 胜者如下：");
+            var len = that.players.length >= 3 ? 3 : that.players.length;
+            for (var i = 0; i < len; i++) {
+                that.gameWinners.push({
+                    playerName: that.players[i].playerName,
+                    hand: that.players[i].hand,
+                    chips: that.players[i].chips
+                });
+            }
+            sort(that.gameWinners);
+            if (that.players.length > 3) {
+                for (var i = 3; i < that.players.length; i++) {
+                    if (that.players[i].chips >= that.gameWinners[2].chips) {
+                        that.gameWinners[2] = {
+                            playerName: that.players[i].playerName,
+                            hand: that.players[i].hand,
+                            chips: that.players[i].chips
+                        };
+                        sort(that.gameWinners);
+                    }
+                }
+            }
+
+            for (var i in that.gameWinners) {
+                var player = that.gameWinners[i];
+                console.log(player);
+            }
+            that.eventEmitter.emit("__gameOver", that.gameWinners);
+        }
     });
 }
 function getNextPlayer(table) {
@@ -95,8 +116,8 @@ function getNextPlayer(table) {
 }
 
 function sort(data) {
-    for (var k = 0; k < 3; k++) {
-        for (var p = k + 1; p < 3; p++) {
+    for (var k = 0; k < data.length; k++) {
+        for (var p = k + 1; p < data.length; p++) {
             if (data[p].chips > data[k].chips) {
                 var temp = data[k];
                 data[k] = data[p];
@@ -224,6 +245,7 @@ function getMaxBet(bets) {
 function checkForEndOfRound(table) {
     var maxBet, i, endOfRound;
     endOfRound = true;
+    var surviveCount = 0;
     maxBet = getMaxBet(table.game.bets);
     //For each player, check
     for (i = 0; i < table.players.length; i += 1) {
@@ -231,10 +253,13 @@ function checkForEndOfRound(table) {
             if (table.players[i].talked === false || table.game.bets[i] !== maxBet) {
                 if (table.players[i].allIn === false) {
                     endOfRound = false;
+                    surviveCount++;
                 }
             }
         }
     }
+    if (surviveCount < 2)
+        endOfRound = true;
     return endOfRound;
 }
 
@@ -291,13 +316,12 @@ function checkForWinner(table) {
     }
 
     for (i = 0; i < winners.length; i += 1) {
-        var winnerPrize = prize / winners.length;
+        var winnerPrize = Math.round(prize * 100 / winners.length) / 100;
         var winningPlayer = table.players[winners[i]];
         winningPlayer.chips += winnerPrize;
         if (table.game.roundBets[winners[i]] === 0) {
             winningPlayer.folded = true;
         }
-        console.log('player ' + table.players[winners[i]].playerName + ' wins !!');
     }
 
     roundEnd = true;
@@ -1750,13 +1774,7 @@ Table.prototype.NewRound = function () {
     var removeIndex = 0;
     for (var i in this.playersToAdd) {
         var temp = i;
-        if (removeIndex < this.playersToRemove.length) {
-            var index = this.playersToRemove[removeIndex];
-            this.players[index] = this.playersToAdd[i];
-            removeIndex += 1;
-        } else {
-            this.players.push(this.playersToAdd[i]);
-        }
+        this.players.push(this.playersToAdd[i]);
     }
     this.playersToRemove = [];
     this.playersToAdd = [];
@@ -1792,7 +1810,6 @@ Table.prototype.NewRound = function () {
     if (this.currentPlayer >= this.players.length) {
         this.currentPlayer -= this.players.length;
     }
-
     this.eventEmitter.emit("newRound");
 };
 
@@ -1831,8 +1848,6 @@ Player.prototype.Fold = function () {
     for (i = 0; i < this.table.players.length; i += 1) {
         if (this === this.table.players[i]) {
             bet = parseInt(this.table.game.bets[i], 10);
-            this.table.game.bets[i] = 0;
-            this.table.game.pot += bet;
             this.talked = true;
         }
     }
