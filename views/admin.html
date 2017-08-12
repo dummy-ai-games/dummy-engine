@@ -44,32 +44,35 @@
         }
     });
     rtc.on("_gameOver", function (data) {
-        var result = "游戏结束，胜者如下：";
-        for (var i in data) {
-            var player = data[i];
+        var tableNumber = data.tableNumber;
+        var result = "table " + tableNumber + " 游戏结束，胜者如下：";
+        var winners = data.winners;
+        for (var i in winners) {
+            var player = winners[i];
             result += "用户:" + player.playerName + ",最终金额:" + player.chips + "\n";
         }
-        $("#msg").text(result);
+        $("#msg").html($("#msg").html() + "<br/>" + result);
         $("#msg").show();
     });
-    rtc.on('startGame', function () {
-        $("#msg").text("成功开启游戏");
+    rtc.on('startGame', function (data) {
+        $("#msg").html($("#msg").html() + "<br/>" + data.msg);
         $("#msg").show();
     });
-    rtc.on('startGameFail', function (data) {
-        $("#msg").text(data.msg);
-        $("#msg").show();
-    });
+
     rtc.on('__deal', function (data) {
+        var tableNumber = data.tableNumber;
+        var data = data.data;
         var board = "";
         for (var index in data) {
-            board += data[index]+",";
+            board += data[index] + ",";
         }
-        $("#msg").text("当前公共牌："+board);
+        $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 当前公共牌：" + board);
         $("#msg").show();
     });
-    rtc.on('__newRound', function (roundCount) {
-        $("#msg").text("第"+roundCount+"轮开始");
+    rtc.on('__newRound', function (data) {
+        var roundCount = data.roundCount;
+        var tableNumber = data.tableNumber;
+        $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 第" + roundCount + "轮开始");
         $("#msg").show();
     });
     function startGame() {

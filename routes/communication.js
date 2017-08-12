@@ -17,19 +17,24 @@ var errorCb = function (rtc) {
 };
 
 function SkyRTC() {
-    this.table = null;
+    this.table = [];
     this.admin = null;
-    this.round = {};
+    this.players = {};
     this.timeout = null;
+    this.tablePlayerNumber = 3;
+    this.playerNumber = 0;
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
         if (playerName)
             socket.id = playerName;
+
         if (playerName == 'admin')
             that.admin = socket;
-        else
-            that.round[socket.id] = socket;
+        else {
+            that.playerNumber++;
+            that.players[socket.id] = socket;
+        }
         this.emit('new_peer', socket.id);
         that.notificationAdmin();
     });
@@ -39,55 +44,57 @@ function SkyRTC() {
     });
 
     this.on('_action', function (data) {
-        console.log("用户"+data.playerName+"采取动作"+data.action);
+        console.log("用户" + data.playerName + "采取动作" + data.action);
         var that = this;
         //clearTimeout(that.timeout);
         var action = data.action;
         var playerName = data.playerName;
-        var playerIndex = parseInt(getPlayerIndex(playerName, that.table.players));
-        if (playerIndex != that.table.currentPlayer)
-            that.table.players[playerIndex].Fold();
-        else if (playerIndex != -1 && that.table.checkPlayer(playerIndex)) {
+        var tableNum = that.players[playerName].tableNumber;
+        var playerIndex = parseInt(getPlayerIndex(playerName, that.table[tableNum].players));
+        if (playerIndex != that.table[tableNum].currentPlayer)
+            that.table[tableNum].players[playerIndex].Fold();
+        else if (playerIndex != -1 && that.table[tableNum].checkPlayer(playerIndex)) {
             switch (action) {
                 case "Bet":
-                    if (that.table.isBet) {
+                    if (that.table[tableNum].isBet) {
                         try {
                             var amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
-                            that.table.players[playerIndex].Bet(amount);
+                            that.table[tableNum].players[playerIndex].Bet(amount);
                         } catch (e) {
                             console.log(e.message);
-                            that.table.players[playerIndex].Fold();
+                            that.table[tableNum].players[playerIndex].Fold();
                         }
                     } else
-                        that.table.players[playerIndex].Call();
+                        that.table[tableNum].players[playerIndex].Call();
                     break;
                 case "Call":
-                    if (that.table.isBet)
-                        that.table.players[playerIndex].Bet(that.table.smallBlind);
+                    if (that.table[tableNum].isBet)
+                        that.table[tableNum].players[playerIndex].Bet(that.table[tableNum].smallBlind);
                     else
-                        that.table.players[playerIndex].Call();
+                        that.table[tableNum].players[playerIndex].Call();
                     break;
                 case "Check":
-                    that.table.players[playerIndex].Check();
+                    that.table[tableNum].players[playerIndex].Check();
                     break;
                 case "Raise":
-                    if (that.table.isBet)
-                        that.table.players[playerIndex].Bet(that.table.smallBlind);
+                    if (that.table[tableNum].isBet)
+                        that.table[tableNum].players[playerIndex].Bet(that.table[tableNum].smallBlind);
                     else
-                        that.table.players[playerIndex].Raise();
+                        that.table[tableNum].players[playerIndex].Raise();
                     break;
                 case "All-in":
-                    if (that.table.isBet)
-                        that.table.isBet = false;
-                    that.table.players[playerIndex].AllIn();
+                    if (that.table[tableNum].isBet)
+                        that.table[tableNum].isBet = false;
+                    that.table[tableNum].players[playerIndex].AllIn();
                     break;
                 case "Fold":
-                    that.table.players[playerIndex].Fold();
+                    that.table[tableNum].players[playerIndex].Fold();
                     break;
                 default:
-                    that.table.players[playerIndex].Fold();
+                    that.table[tableNum].players[playerIndex].Fold();
                     break;
             }
+
 
         }
     });
@@ -108,7 +115,7 @@ SkyRTC.prototype.notificationAdmin = function () {
     var that = this;
     if (that.admin) {
         var players = [];
-        for (var playerName in that.round)
+        for (var playerName in that.players)
             players.push(playerName);
         var message = {
             "eventName": "_new_peer",
@@ -121,73 +128,89 @@ SkyRTC.prototype.notificationAdmin = function () {
 SkyRTC.prototype.startGame = function () {
     var that = this;
     var message;
-    that.table = new poker.Table(50, 100, 3, 10, 100, 1000);
+    var playerNum = parseInt(that.playerNumber);
+    var tablePlayerNum = parseInt(that.tablePlayerNumber);
+    var tableNum = playerNum % tablePlayerNum == 0 ? parseInt(playerNum / tablePlayerNum) : parseInt(playerNum / tablePlayerNum) + 1;
+    that.table.splice(0, that.table.length);
+    for (var i = 0; i < tableNum; i++)
+        that.table.push(new poker.Table(50, 100, 3, 10, 100, 1000));
     that.initTable();
-    for (var player in this.round)
-        that.table.AddPlayer(player);
-    if (that.table.playersToAdd.length < that.table.minPlayers) {
-        console.log(that.table);
-        message = {
-            "eventName": "startGameFail",
-            "data": {"msg": "need at least " + that.table.minPlayers + " users to attend"}
-        }
-    } else {
-        that.table.StartGame();
-        message = {
-            "eventName": "startGame"
-        }
+    var index = 0;
+    for (var player in this.players) {
+        var belongTable = parseInt(index / tablePlayerNum);
+        that.table[belongTable].AddPlayer(player);
+        that.players[player].tableNumber = belongTable;
+        index++;
     }
-    if (that.admin)
-        that.admin.send(JSON.stringify(message), errorCb);
+    for (var i = 0; i < that.table.length; i++) {
+        if (that.table[i].playersToAdd.length < that.table[i].minPlayers) {
+            console.log(that.table);
+            message = {
+                "eventName": "startGame",
+                "data": {"msg": "table " + i + " need at least " + that.table.minPlayers + " users to attend"}
+            }
+        } else {
+            that.table[i].StartGame();
+            message = {
+                "eventName": "startGame",
+                "data": {"msg": "table " + i + " start successfully"}
+            }
+        }
+        if (that.admin)
+            that.admin.send(JSON.stringify(message), errorCb);
+    }
 
 }
 
 SkyRTC.prototype.initTable = function () {
     var that = this;
-    that.table.eventEmitter.on("__turn", function (data) {
-        var message = {
-            "eventName": "__action",
-            "data": data
-        }
-        that.getPlayerAction(message);
-    });
+    for (var i = 0; i < that.table.length; i++) {
+        that.table[i].tableNumber = i;
+        that.table[i].eventEmitter.on("__turn", function (data) {
+            var message = {
+                "eventName": "__action",
+                "data": data
+            }
+            that.getPlayerAction(message);
+        });
 
-    that.table.eventEmitter.on("__bet", function (data) {
-        var message = {
-            "eventName": "__bet",
-            "data": data
-        }
-        that.getPlayerAction(message);
-        var message2 = {
-            "eventName": "__deal",
-            "data": data.game.board
-        }
-        that.admin.send(JSON.stringify(message2), errorCb);
-    });
+        that.table[i].eventEmitter.on("__bet", function (data) {
+            var message = {
+                "eventName": "__bet",
+                "data": data
+            }
+            that.getPlayerAction(message);
+            var message2 = {
+                "eventName": "__deal",
+                "data": {"data": data.game.board, "tableNumber": data.tableNumber}
+            }
+            that.admin.send(JSON.stringify(message2), errorCb);
+        });
 
-    that.table.eventEmitter.on("__gameOver", function (data) {
-        var message = {
-            "eventName": "__gameOver",
-            "data": data
-        }
-        that.admin.send(JSON.stringify(message), errorCb);
-    });
+        that.table[i].eventEmitter.on("__gameOver", function (data, tableNumber) {
+            var message = {
+                "eventName": "__gameOver",
+                "data": {"winners": data, "tableNumber": tableNumber}
+            }
+            that.admin.send(JSON.stringify(message), errorCb);
+        });
 
-    that.table.eventEmitter.on("__newRound", function (data) {
-        var message = {
-            "eventName": "__newRound",
-            "data": data
-        }
-        that.admin.send(JSON.stringify(message), errorCb);
-    });
+        that.table[i].eventEmitter.on("__newRound", function (data, tableNumber) {
+            var message = {
+                "eventName": "__newRound",
+                "data": {"roundCount": data, "tableNumber": tableNumber}
+            }
+            that.admin.send(JSON.stringify(message), errorCb);
+        });
+    }
 }
 
 SkyRTC.prototype.getPlayerAction = function (message) {
     var player = message.data.player.playerName;
     var that = this;
-    console.log("服务端轮询动作："+JSON.stringify(message));
+    console.log("服务端轮询动作：" + JSON.stringify(message));
     if (player)
-        that.round[player].send(JSON.stringify(message), errorCb);
+        that.players[player].send(JSON.stringify(message), errorCb);
     /*that.timeout = setTimeout(function () {
      console.log("用户" + that.table.players[that.table.currentPlayer].playerName + "超时，自动放弃");
      that.table.players[that.table.currentPlayer].Fold();
@@ -197,12 +220,12 @@ SkyRTC.prototype.getPlayerAction = function (message) {
 SkyRTC.prototype.removeSocket = function (socket) {
     var id = socket.id;
     var that = this;
-    delete that.round[id];
+    delete that.players[id];
 };
 
 SkyRTC.prototype.broadcastInPlayers = function (data) {
-    for (var player in this.round) {
-        this.round[player].send(JSON.stringify(data), errorCb);
+    for (var player in this.players) {
+        this.players[player].send(JSON.stringify(data), errorCb);
     }
 };
 

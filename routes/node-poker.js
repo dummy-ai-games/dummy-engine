@@ -74,7 +74,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             that.game = new Game(that.smallBlind, that.bigBlind);
             that.NewRound();
             that.roundCount++;
-            that.eventEmitter.emit("__newRound", that.roundCount);
+            that.eventEmitter.emit("__newRound", that.roundCount, that.tableNumber);
         }
         else {
             console.log("gameOver, 胜者如下：");
@@ -104,7 +104,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 var player = that.gameWinners[i];
                 console.log(player);
             }
-            that.eventEmitter.emit("__gameOver", that.gameWinners);
+            that.eventEmitter.emit("__gameOver", that.gameWinners, that.tableNumber);
         }
     });
 }
@@ -136,6 +136,7 @@ function takeAction(table, action) {
     player['allIn'] = currentPlayer['allIn'];
     player['cards'] = currentPlayer['cards'];
     var data = {
+        "tableNumber": table.tableNumber,
         "player": player,
         "game": {
             "roundBets": table.game.roundBets,
