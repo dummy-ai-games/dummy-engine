@@ -20,7 +20,6 @@ function SkyRTC() {
     this.table = [];
     this.admin = null;
     this.players = {};
-    this.timeout = null;
     this.tablePlayerNumber = 3;
     this.playerNumber = 0;
     this.on('__join', function (data, socket) {
@@ -46,52 +45,54 @@ function SkyRTC() {
     this.on('_action', function (data) {
         console.log("用户" + data.playerName + "采取动作" + data.action);
         var that = this;
-        //clearTimeout(that.timeout);
         var action = data.action;
         var playerName = data.playerName;
         var tableNum = that.players[playerName].tableNumber;
-        var playerIndex = parseInt(getPlayerIndex(playerName, that.table[tableNum].players));
-        if (playerIndex != that.table[tableNum].currentPlayer)
-            that.table[tableNum].players[playerIndex].Fold();
-        else if (playerIndex != -1 && that.table[tableNum].checkPlayer(playerIndex)) {
+        var currentTable = that.table[tableNum];
+        if (currentTable.timeout)
+            clearTimeout(currentTable.timeout);
+        var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
+        if (playerIndex != currentTable.currentPlayer)
+            currentTable.players[playerIndex].Fold();
+        else if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
             switch (action) {
                 case "Bet":
-                    if (that.table[tableNum].isBet) {
+                    if (currentTable.isBet) {
                         try {
                             var amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
-                            that.table[tableNum].players[playerIndex].Bet(amount);
+                            currentTable.players[playerIndex].Bet(amount);
                         } catch (e) {
                             console.log(e.message);
-                            that.table[tableNum].players[playerIndex].Fold();
+                            currentTable.players[playerIndex].Fold();
                         }
                     } else
-                        that.table[tableNum].players[playerIndex].Call();
+                        currentTable.players[playerIndex].Call();
                     break;
                 case "Call":
-                    if (that.table[tableNum].isBet)
-                        that.table[tableNum].players[playerIndex].Bet(that.table[tableNum].smallBlind);
+                    if (currentTable.isBet)
+                        currentTable.players[playerIndex].Bet(currentTable.smallBlind);
                     else
-                        that.table[tableNum].players[playerIndex].Call();
+                        currentTable.players[playerIndex].Call();
                     break;
                 case "Check":
-                    that.table[tableNum].players[playerIndex].Check();
+                    currentTable.players[playerIndex].Check();
                     break;
                 case "Raise":
-                    if (that.table[tableNum].isBet)
-                        that.table[tableNum].players[playerIndex].Bet(that.table[tableNum].smallBlind);
+                    if (currentTable.isBet)
+                        currentTable.players[playerIndex].Bet(currentTable.smallBlind);
                     else
-                        that.table[tableNum].players[playerIndex].Raise();
+                        currentTable.players[playerIndex].Raise();
                     break;
                 case "All-in":
-                    if (that.table[tableNum].isBet)
-                        that.table[tableNum].isBet = false;
-                    that.table[tableNum].players[playerIndex].AllIn();
+                    if (currentTable.isBet)
+                        currentTable.isBet = false;
+                    currentTable.players[playerIndex].AllIn();
                     break;
                 case "Fold":
-                    that.table[tableNum].players[playerIndex].Fold();
+                    currentTable.players[playerIndex].Fold();
                     break;
                 default:
-                    that.table[tableNum].players[playerIndex].Fold();
+                    currentTable.players[playerIndex].Fold();
                     break;
             }
 
@@ -206,15 +207,18 @@ SkyRTC.prototype.initTable = function () {
 }
 
 SkyRTC.prototype.getPlayerAction = function (message) {
-    var player = message.data.player.playerName;
     var that = this;
+    var player = message.data.player.playerName;
+    var tableNumber = that.players[player].tableNumber;
+    var currentTable = that.table[tableNumber];
     console.log("服务端轮询动作：" + JSON.stringify(message));
-    if (player)
+    if (player) {
         that.players[player].send(JSON.stringify(message), errorCb);
-    /*that.timeout = setTimeout(function () {
-     console.log("用户" + that.table.players[that.table.currentPlayer].playerName + "超时，自动放弃");
-     that.table.players[that.table.currentPlayer].Fold();
-     }, 5000);*/
+       /* currentTable.timeout = setTimeout(function () {
+            console.log("用户" + currentTable.players[currentTable.currentPlayer].playerName + "超时，自动放弃");
+            currentTable.players[currentTable.currentPlayer].Fold();
+        }, 5000);*/
+    }
 };
 
 SkyRTC.prototype.removeSocket = function (socket) {

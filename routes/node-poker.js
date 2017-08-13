@@ -7,6 +7,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.minPlayers = minPlayers;
     this.maxPlayers = maxPlayers;
     this.players = [];
+    this.timeout = null;
     this.dealer = 0; //Track the dealer position between games
     this.minBuyIn = minBuyIn;
     this.maxBuyIn = maxBuyIn;
