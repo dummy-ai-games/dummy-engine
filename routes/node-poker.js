@@ -143,7 +143,8 @@ function takeAction(table, action) {
             "roundBets": table.game.roundBets,
             "bets": table.game.bets,
             "board": table.game.board,
-            "minBet": table.smallBlind
+            "minBet": table.smallBlind,
+            "roundName":table.game.roundName
         }
     };
     table.eventEmitter.emit(action, data);
