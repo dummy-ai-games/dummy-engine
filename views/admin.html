@@ -75,6 +75,16 @@
         $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 第" + roundCount + "轮开始");
         $("#msg").show();
     });
+    rtc.on('__showAction', function (data) {
+        var tableNumber = data.tableNumber;
+        var roundAction = data.data;
+        if (roundAction.action == "check" || roundAction.action == "fold" || roundAction.action == "raise" || roundAction.action == "call")
+            $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);
+        else
+            $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action + ",押注金额：" + roundAction.amount);
+
+        $("#msg").show();
+    });
     function startGame() {
         rtc.startGame();
     }

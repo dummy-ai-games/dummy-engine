@@ -144,7 +144,7 @@ function takeAction(table, action) {
             "bets": table.game.bets,
             "board": table.game.board,
             "minBet": table.smallBlind,
-            "roundName":table.game.roundName
+            "roundName": table.game.roundName
         }
     };
     table.eventEmitter.emit(action, data);
@@ -1838,6 +1838,7 @@ Player.prototype.Check = function () {
         }
         //Attemp to progress the game
         this.turnBet = {action: "check", playerName: this.playerName}
+        this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
         progress(this.table);
     } else {
         console.log("Check not allowed, replay please");
@@ -1856,7 +1857,8 @@ Player.prototype.Fold = function () {
     }
     //Mark the player as folded
     this.folded = true;
-    this.turnBet = {action: "fold", playerName: this.playerName}
+    this.turnBet = {action: "fold", playerName: this.playerName};
+    this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
 
     //Attemp to progress the game
     progress(this.table);
@@ -1880,6 +1882,7 @@ Player.prototype.Raise = function () {
                     this.chips = this.chips + mybet - bet;
                     this.table.game.bets[i] = bet;
                     this.turnBet = {action: "raise", playerName: this.playerName, amount: bet};
+                    this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
                     this.table.raiseCount++;
                     for (i = 0; i < this.table.players.length; i += 1) {
                         if (!this.table.players[i].allIn && !this.table.players[i].folded)
@@ -1912,6 +1915,7 @@ Player.prototype.Bet = function (bet) {
         }
         //Attemp to progress the game
         this.turnBet = {action: "bet", playerName: this.playerName, amount: bet}
+        this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
         progress(this.table);
     } else {
         console.log('You don\'t have enought chips --> ALL IN !!!');
@@ -1935,6 +1939,7 @@ Player.prototype.Call = function () {
                 this.table.game.bets[i] = maxBet;
                 this.talked = true;
                 this.turnBet = {action: "call", playerName: this.playerName, amount: maxBet}
+                this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
                 progress(this.table);
             } else {
                 console.log('You don\'t have enought chips --> ALL IN !!!');
@@ -1962,6 +1967,7 @@ Player.prototype.AllIn = function () {
 
     //Attemp to progress the game
     this.turnBet = {action: "allin", playerName: this.playerName, amount: allInValue}
+    this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
     progress(this.table);
 };
 

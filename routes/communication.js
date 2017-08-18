@@ -203,6 +203,15 @@ SkyRTC.prototype.initTable = function () {
             }
             that.admin.send(JSON.stringify(message), errorCb);
         });
+
+        that.table[i].eventEmitter.on("_showAction", function (data, tableNumber) {
+            var message = {
+                "eventName": "__showAction",
+                "data": {"data": data, "tableNumber": tableNumber}
+            }
+            that.admin.send(JSON.stringify(message), errorCb);
+            that.broadcastInPlayers(message);
+        });
     }
 }
 
@@ -214,10 +223,10 @@ SkyRTC.prototype.getPlayerAction = function (message) {
     console.log("服务端轮询动作：" + JSON.stringify(message));
     if (player) {
         that.players[player].send(JSON.stringify(message), errorCb);
-       /* currentTable.timeout = setTimeout(function () {
-            console.log("用户" + currentTable.players[currentTable.currentPlayer].playerName + "超时，自动放弃");
-            currentTable.players[currentTable.currentPlayer].Fold();
-        }, 5000);*/
+        /* currentTable.timeout = setTimeout(function () {
+         console.log("用户" + currentTable.players[currentTable.currentPlayer].playerName + "超时，自动放弃");
+         currentTable.players[currentTable.currentPlayer].Fold();
+         }, 5000);*/
     }
 };
 
