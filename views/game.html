@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="edge">
+    <title>TrendMicro Engineering Camp 2017 TexasHold'em Competition</title>
+    <link rel="stylesheet" href="style/bootstrap.min.css">
+    <link rel="stylesheet" href="style/bootstrap-theme.min.css">
+
+</head>
+<body>
+<div class="container" style="display: none;">
+    <form action="/startGame" method="post">
+        <div class="form-group" id="content">
+
+        </div>
+        <input type="button" class="btn btn-primary" onclick="startGame()" value="startGame">
+        <div class="alert alert-warning" id="msg" style="display: none" align="center"></div>
+    </form>
+</div>
+<!-- cocos2d game container -->
+<div id="gameContainer">
+</div>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/SkyRTC-client.js"></script>
+<script src="./js/cocos2d-js-v3.1-lite.js"></script>
+<script src="./js/src/resource.js"></script>
+<script src="./js/src/game-layer.js"></script>
+<script src="./js/game.js"></script>
+</body>
+</html>
