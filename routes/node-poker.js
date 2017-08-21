@@ -1890,7 +1890,6 @@ Player.prototype.Raise = function () {
                         if (!this.table.players[i].allIn && !this.table.players[i].folded)
                             this.table.players[i].talked = false;
                     }
-                    this.talked = true;
                     progress(this.table);
                 } else {
                     console.log('You don\'t have enough chips --> ALL IN !!!');
