@@ -21,6 +21,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.raiseCount = 0;
     this.isBet = false;
     this.roundCount = 1;
+    this.surviveCount = 0;
 
     //Validate acceptable value ranges.
     var err;
@@ -43,16 +44,16 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
 
     this.eventEmitter.on("deal", function () {
         var end = true;
-        var surviveCount = 0;
         for (var i in that.players) {
             if (!that.players[i].folded && !that.players[i].allIn) {
                 end = false;
-                surviveCount++;
             }
         }
-        if (end || surviveCount < 2)
+        if (end || that.surviveCount == 1) {
+            for (var j = 0; j < that.players.length; j++)
+                that.players[j].talked = true;
             progress(that);
-        else {
+        } else {
             that.currentPlayer = that.dealer;
             that.isBet = true;
             getNextPlayer(that);
@@ -70,6 +71,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         }
         if (that.roundCount < 2 && that.players.length > 2) {
             console.log("上轮结束，下一轮开始");
+            that.surviveCount  = that.players.length;
             for (var j = 0; j < that.players.length; j++)
                 that.players[j] = new Player(that.players[j].playerName, that.players[j].chips, that);
             that.game = new Game(that.smallBlind, that.bigBlind);
@@ -248,7 +250,6 @@ function getMaxBet(bets) {
 function checkForEndOfRound(table) {
     var maxBet, i, endOfRound;
     endOfRound = true;
-    var surviveCount = 0;
     maxBet = getMaxBet(table.game.bets);
     //For each player, check
     for (i = 0; i < table.players.length; i += 1) {
@@ -259,12 +260,7 @@ function checkForEndOfRound(table) {
                 }
             }
         }
-        if(!table.players[i].folded && !table.players[i].allIn){
-            surviveCount++;
-        }
     }
-    if (surviveCount < 2 )
-        endOfRound = true;
     return endOfRound;
 }
 
@@ -1614,7 +1610,9 @@ function progress(table) {
             }
         } else {
             getNextPlayer(table);
-            if (table.isBet)
+            if (table.surviveCount == 1)
+                table.players[table.currentPlayer].Call();
+            else if (table.isBet)
                 takeAction(table, "__bet");
             else
                 takeAction(table, "__turn");
@@ -1755,6 +1753,7 @@ Table.prototype.AddPlayer = function (playerName) {
     if (chips >= this.minBuyIn && chips <= this.maxBuyIn) {
         var player = new Player(playerName, chips, this);
         this.playersToAdd.push(player);
+        this.surviveCount++;
     }
     /*if (this.players.length === 0 && this.playersToAdd.length >= this.minPlayers) {
      this.StartGame();
@@ -1861,7 +1860,7 @@ Player.prototype.Fold = function () {
     this.folded = true;
     this.turnBet = {action: "fold", playerName: this.playerName};
     this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
-
+    this.table.surviveCount--;
     //Attemp to progress the game
     progress(this.table);
 };
