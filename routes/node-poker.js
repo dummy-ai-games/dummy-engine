@@ -256,12 +256,14 @@ function checkForEndOfRound(table) {
             if (table.players[i].talked === false || table.game.bets[i] !== maxBet) {
                 if (table.players[i].allIn === false) {
                     endOfRound = false;
-                    surviveCount++;
                 }
             }
         }
+        if(!table.players[i].folded && !table.players[i].allIn){
+            surviveCount++;
+        }
     }
-    if (surviveCount < 2)
+    if (surviveCount < 2 )
         endOfRound = true;
     return endOfRound;
 }
