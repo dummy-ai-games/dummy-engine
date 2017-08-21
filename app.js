@@ -16,6 +16,7 @@ var app = express();
 
 var port = normalizePort(process.env.PORT || '3000' || '443');
 app.set('port', port);
+
 /*var options = {
  key: fs.readFileSync('./cer/privatekey.pem'),
  cert: fs.readFileSync('./cer/certificate.pem')
@@ -29,7 +30,6 @@ var httpPort = normalizePort(process.env.PORT || '3000');
 httpServer.listen(httpPort);
 
 var SkyRTC = require('./routes/communication').listen(httpServer);
-
 
 function normalizePort(val) {
     var port = parseInt(val, 10);
@@ -45,18 +45,10 @@ function normalizePort(val) {
 }
 
 
-db.open(function (err, db) {//初始化db认证
+db.open(function (err, db) {
     db.authenticate("admin", "123456", function () {
     });
 });
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));//设置页面模板所在路径,调用模板不能加后缀
-
-
-//app.set('view engine', 'ejs');
-app.engine('html', require('ejs').renderFile);
-app.set('view engine', 'html')
-//app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -76,9 +68,8 @@ app.use(session({
         url: Settings.URL,
         db: db
     })
-}))
+}));
 
-//下面是登录错误输出的信息
 app.use(function (req, res, next) {
     if (req.session.user)
         res.locals.user = req.session.user;
@@ -89,52 +80,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));//设置静态路径，调用时要加后缀
-
-
-
-
-app.get('/user', function (req, res) {
-    res.render("user");
-});
-
-app.get('/admin', function (req, res) {
-    res.render("admin");
-});
-
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function (err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function (err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
-
+app.use("/", express.static(__dirname + '/views/'));
 
 SkyRTC.rtc.on('new_connect', function (socket) {
     console.log('创建新连接');

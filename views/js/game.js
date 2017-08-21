@@ -1,35 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="format-detection" content="telephone=no">
-    <meta http-equiv="X-UA-Compatible" content="edge">
-    <title>Title</title>
-    <link rel="stylesheet" href="stylesheets/bootstrap.min.css">
-    <link rel="stylesheet" href="stylesheets/bootstrap-theme.min.css">
+/**
+ * Created by Strawmanbobi
+ * 2017-08-21
+ */
 
-</head>
-<body>
-<div style="position: relative;width:100%;top:50px;;">
+(function () {
+    initWebsock();
+    initGame();
+})();
 
-    <form action="/startGame" method="post">
-
-        <div class="form-group" id="content">
-
-        </div>
-        <input type="button" class="btn btn-primary" onclick="startGame()" value="startGame">
-
-        <div class="alert alert-warning" id="msg" style="display: none" align="center"></div>
-    </form>
-
-</div>
-<script src="javascripts/jquery.min.js"></script>
-<script src="javascripts/SkyRTC-client.js"></script>
-<script type="text/javascript">
+function initWebsock() {
+// initialize web communication
     var rtc = SkyRTC();
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], 'admin');
     rtc.on("_new_peer", function (data) {
@@ -85,9 +65,52 @@
 
         $("#msg").show();
     });
-    function startGame() {
-        rtc.startGame();
+}
+
+function initGame() {
+    var d = document;
+    var container = document.getElementById('gameContainer');
+    var winWidth, winHeight;
+    winWidth = document.documentElement.clientWidth;
+    winHeight = document.documentElement.clientHeight;
+    container.innerHTML = '<canvas id="gameCanvas" width="' + winWidth + '" height="' + winHeight + '"></canvas>';
+    if (!d.createElement('canvas').getContext) {
+        var s = d.createElement('div');
+        s.innerHTML = '<h2>您的浏览器不支持HTML5 !</h2>' +
+            '<p>Google Chrome is a browser that combines a minimal design with sophisticated technology to make the web faster, safer, and easier.Click the logo to download.</p>' +
+            '<a href="http://www.google.com/chrome" target="_blank">' +
+            '<img src="http://www.google.com/intl/zh-CN/chrome/assets/common/images/chrome_logo_2x.png" border="0"/></a>';
+        var p = d.getElementById(c.tag).parentNode;
+        p.style.background = 'none';
+        p.style.border = 'none';
+        p.insertBefore(s);
+
+        d.body.style.background = '#ffffff';
+        return;
     }
-</script>
-</body>
-</html>
+    window.addEventListener('DOMContentLoaded', function () {
+        ccLoad();
+    });
+}
+
+function ccLoad() {
+    cc.game.onStart = function() {
+        //load resources
+        cc.LoaderScene.preload(g_resources, function () {
+            var LSScene = cc.Scene.extend({
+                onEnter: function () {
+                    this._super();
+                    var layer = new GameLayer();
+                    layer.init();
+                    this.addChild(layer);
+                }
+            });
+            cc.director.runScene(new LSScene());
+        }, this);
+    };
+    cc.game.run("gameCanvas");
+}
+
+function startGame() {
+    rtc.startGame();
+}
