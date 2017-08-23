@@ -4,6 +4,7 @@
  */
 
 var ccTheGame;
+var rtc = SkyRTC();
 
 (function () {
     initGame();
@@ -12,14 +13,10 @@ var ccTheGame;
 // game communication with back-end
 function initWebsock() {
 // initialize web communication
-    var rtc = SkyRTC();
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], 'admin');
     rtc.on("_new_peer", function (data) {
-        console.log("new player join : " + JSON.stringify(data));
         var parent = $("#content");
         parent.empty();
-
-        currentPlayers = 0;
 
         for (var i = 0; i < data.length; i++) {
             var playerName = data[i];
@@ -27,14 +24,19 @@ function initWebsock() {
                 class: "form-group"
             }).prependTo(parent);
             $("<span/>").text("用户:" + playerName + "加入").appendTo(div);
-
-            // update in game engine
-            players[currentPlayers] =
-                new Player(currentPlayers,
-                    playerNames[currentPlayers], 3000);
-            currentPlayers++;
         }
 
+        console.log("player_join : " + JSON.stringify(data));
+        currentPlayers = data.length;
+        for (i = 0; i < data.length; i++) {
+            if (null == players[i]) {
+                players[i] =
+                    new Player(data[i], playerNames[i], 3000);
+            } else {
+                players.id = data[i];
+                players[i].name = playerNames[i];
+            }
+        }
     });
     rtc.on("_gameOver", function (data) {
         var tableNumber = data.tableNumber;
@@ -48,6 +50,7 @@ function initWebsock() {
         $("#msg").show();
 
         // update in game engine
+        console.log("finish_game : " + JSON.stringify(data));
         gameStatus = STATUS_GAME_FINISHED;
     });
     rtc.on('startGame', function (data) {
@@ -55,6 +58,7 @@ function initWebsock() {
         $("#msg").show();
 
         // update in game engine
+        console.log("start_game : " + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
     });
 
@@ -70,21 +74,49 @@ function initWebsock() {
         $("#msg").show();
 
         // update in game engine
-
+        console.log("deal : " + JSON.stringify(data));
+        for (var i = 0; i < data.length; i++) {
+            publicCards[i] = data[i];
+        }
     });
     rtc.on('__newRound', function (data) {
         var roundCount = data.roundCount;
         var tableNumber = data.tableNumber;
         $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 第" + roundCount + "轮开始");
         $("#msg").show();
+
+        // update in game engine
+        console.log("new_round : " + JSON.stringify(data));
     });
     rtc.on('__showAction', function (data) {
+        console.log("action : " + JSON.stringify(data));
+
         var tableNumber = data.tableNumber;
         var roundAction = data.data;
-        if (roundAction.action == "check" || roundAction.action == "fold" || roundAction.action == "raise" || roundAction.action == "call")
+
+        var playerIndex = findPlayerIndexById(roundAction.playerName);
+
+        if (roundAction.action == "check" || roundAction.action == "fold" || roundAction.action == "raise" || roundAction.action == "call") {
             $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);
-        else
-            $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action + ",押注金额：" + roundAction.amount);
+            // update in game engine
+            if (playerIndex != -1) {
+                players[playerIndex].setAction(roundAction.action);
+            }
+        } else {
+            $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action + ", 押注金额：" + roundAction.amount);
+            // update in game engine
+            if (playerIndex != -1) {
+                players[playerIndex].setAction(roundAction.action);
+            }
+        }
+        // set in turn
+        for (var i = 0; i < currentPlayers; i++) {
+            if (playerIndex == i) {
+                players[i].setInTurn();
+            } else {
+                players[i].clearInTurn();
+            }
+        }
 
         $("#msg").show();
     });
@@ -135,6 +167,16 @@ function ccLoad() {
     cc.game.run("gameCanvas");
 }
 
+// utilities
 function startGame() {
     rtc.startGame();
+}
+
+function findPlayerIndexById(id) {
+    for (var i = 0; i < players.length; i++) {
+        if (players[i].id == id) {
+            return i;
+        }
+    }
+    return -1;
 }

@@ -13,6 +13,8 @@ var players = [];
 var currentPlayers = 0;
 var playerNames = ["Tom", "Mary", "Jerry", "Alex"];
 
+var publicCards = [];
+
 // visualization related
 
 var GameLayer = cc.Layer.extend({
@@ -34,7 +36,6 @@ var GameLayer = cc.Layer.extend({
     moneyInitiates: [],
     betInitiates: [],
     actionInitiates: [],
-    publicCards: [],
 
     // canvas scale
     bgScale: 1.0,
@@ -211,7 +212,7 @@ var GameLayer = cc.Layer.extend({
 
         // kick start the game
         // test public card change display frame
-        this.publicCards = new Array();
+        publicCards = new Array();
         this.reset();
         this.scheduleUpdate();
     },
@@ -283,6 +284,13 @@ var GameLayer = cc.Layer.extend({
 
             this.moneyTexts[i].setString(players[i].gold);
             this.betTexts[i].setString(players[i].bet);
+            this.actionTexts[i].setString(players[i].action);
+
+            if (players[i].inTurn == 1) {
+                this.actionTexts[i].setColor(cc.color(255, 0, 0, 255));
+            } else {
+                this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
+            }
 
             // draw cards
         }
@@ -291,8 +299,8 @@ var GameLayer = cc.Layer.extend({
     updatePublicCards: function() {
         var i = 0;
         for (i = 0; i < this.publicCardMax; i++) {
-            if (this.publicCards[i] != null) {
-                var frameName = pokerMap.get(this.publicCards[i]);
+            if (publicCards[i] != null) {
+                var frameName = pokerMap.get(publicCards[i]);
 
                 var frame = cc.SpriteFrame.create(frameName, cc.rect(0, 0,
                         this.publicCardSprites[i].width, this.publicCardSprites[i].height));

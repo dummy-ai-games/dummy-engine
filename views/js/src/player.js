@@ -13,15 +13,28 @@ var Player = function(_id, _name, _gold) {
     this.gold = _gold;
     this.bet = 0;
     this.privateCards = [];
-    // member allCards might not be needed
-    this.allCards = [];
+    this.action = "";
+    this.inTurn = 0;
 };
 
 // UX flow control on player
-Player.prototype.bet = function (bet) {
+Player.prototype.bet = function (_bet) {
+    this.bet = _bet;
     this.gold -= bet;
 };
 
 Player.prototype.die = function () {
     this.status = playerStatusDead;
+};
+
+Player.prototype.setAction = function(_action) {
+    this.action = _action;
+};
+
+Player.prototype.setInTurn = function() {
+    this.inTurn = 1;
+};
+
+Player.prototype.clearInTurn = function() {
+    this.inTurn = 0;
 };
