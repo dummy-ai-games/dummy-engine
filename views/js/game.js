@@ -14,6 +14,10 @@ var rtc = SkyRTC();
 function initWebsock() {
 // initialize web communication
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], 'admin');
+    rtc.on("_join", function (data) {
+        console.log("init data : " + JSON.stringify(data));
+    });
+
     rtc.on("_new_peer", function (data) {
         var parent = $("#content");
         parent.empty();
@@ -39,7 +43,7 @@ function initWebsock() {
         }
     });
     rtc.on("_gameOver", function (data) {
-        var tableNumber = data.tableNumber;
+        var tableNumber = data.table.tableNumber;
         var result = "table " + tableNumber + " 游戏结束，胜者如下：";
         var winners = data.winners;
         for (var i in winners) {
@@ -63,12 +67,11 @@ function initWebsock() {
     });
 
     rtc.on('__deal', function (data) {
-        console.log("deal : " + JSON.stringify(data));
-        var tableNumber = data.tableNumber;
-        var data = data.data;
+        var tableNumber = data.table.tableNumber;
+        var board_card = data.table.board;
         var board = "";
-        for (var index in data) {
-            board += data[index] + ",";
+        for (var index in board_card) {
+            board += board_card[index] + ",";
         }
         $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 当前公共牌：" + board);
         $("#msg").show();
@@ -80,8 +83,8 @@ function initWebsock() {
         }
     });
     rtc.on('__newRound', function (data) {
-        var roundCount = data.roundCount;
-        var tableNumber = data.tableNumber;
+        var roundCount = data.table.roundCount;
+        var tableNumber = data.table.tableNumber;
         $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 第" + roundCount + "轮开始");
         $("#msg").show();
 
@@ -89,12 +92,12 @@ function initWebsock() {
         console.log("new_round : " + JSON.stringify(data));
     });
     rtc.on('__showAction', function (data) {
-        console.log("action : " + JSON.stringify(data));
+        console.log("action : " + JSON.stringify(data.action));
 
-        var tableNumber = data.tableNumber;
-        var roundAction = data.data;
+        var tableNumber = data.table.tableNumber;
+        var roundAction = data.action;
 
-        var playerIndex = findPlayerIndexById(roundAction.playerName);
+        var playerIndex = findPlayerIndexById(data.playerName);
 
         if (roundAction.action == "check" || roundAction.action == "fold" || roundAction.action == "raise" || roundAction.action == "call") {
             $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);

@@ -42,6 +42,12 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         takeAction(that, "__turn");
     });
 
+    this.eventEmitter.on("_showAction", function (data) {
+        var myData = getBasicData(that);
+        myData.action = data;
+        that.eventEmitter.emit("__showAction", myData);
+    });
+
     this.eventEmitter.on("deal", function () {
         var end = true;
         for (var i in that.players) {
@@ -71,13 +77,14 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         }
         if (that.roundCount < 2 && that.players.length > 2) {
             console.log("上轮结束，下一轮开始");
-            that.surviveCount  = that.players.length;
+            that.surviveCount = that.players.length;
             for (var j = 0; j < that.players.length; j++)
                 that.players[j] = new Player(that.players[j].playerName, that.players[j].chips, that);
             that.game = new Game(that.smallBlind, that.bigBlind);
             that.NewRound();
             that.roundCount++;
-            that.eventEmitter.emit("__newRound", that.roundCount, that.tableNumber);
+            var data = getBasicData(that);
+            that.eventEmitter.emit("__newRound", data);
         }
         else {
             console.log("gameOver, 胜者如下：");
@@ -103,13 +110,33 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 }
             }
 
-            for (var i in that.gameWinners) {
-                var player = that.gameWinners[i];
-                console.log(player);
-            }
-            that.eventEmitter.emit("__gameOver", that.gameWinners, that.tableNumber);
+            var data = getBasicData(that);
+            data.winners = that.gameWinners;
+            that.eventEmitter.emit("__gameOver", data);
         }
     });
+}
+
+function getBasicData(table) {
+    var players = [];
+    var mytable = {};
+    var data = {};
+    for (var i = 0; i < table.players.length; i++) {
+        var player = {};
+        player['playerName'] = table.players[i]['playerName'];
+        player['chips'] = table.players[i]['chips'];
+        player['folded'] = table.players[i]['folded'];
+        player['allIn'] = table.players[i]['allIn'];
+        player['cards'] = table.players[i]['cards'];
+        players.push(player);
+    }
+    mytable["tableNumber"] = table.tableNumber;
+    mytable["roundName"] = table.roundName;
+    mytable["board"] = table.game.board;
+    mytable["roundCount"] = table.roundCount;
+    data.players = players;
+    data.table = mytable;
+    return data;
 }
 function getNextPlayer(table) {
     var maxBet = getMaxBet(table.game.bets);
@@ -1839,7 +1866,7 @@ Player.prototype.Check = function () {
         }
         //Attemp to progress the game
         this.turnBet = {action: "check", playerName: this.playerName}
-        this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
+        this.table.eventEmitter.emit("_showAction", this.turnBet);
         progress(this.table);
     } else {
         console.log("Check not allowed, replay please");
@@ -1859,7 +1886,7 @@ Player.prototype.Fold = function () {
     //Mark the player as folded
     this.folded = true;
     this.turnBet = {action: "fold", playerName: this.playerName};
-    this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
+    this.table.eventEmitter.emit("_showAction", this.turnBet);
     this.table.surviveCount--;
     //Attemp to progress the game
     progress(this.table);
@@ -1883,7 +1910,7 @@ Player.prototype.Raise = function () {
                     this.chips = this.chips + mybet - bet;
                     this.table.game.bets[i] = bet;
                     this.turnBet = {action: "raise", playerName: this.playerName, amount: bet};
-                    this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
+                    this.table.eventEmitter.emit("_showAction", this.turnBet);
                     this.table.raiseCount++;
                     for (i = 0; i < this.table.players.length; i += 1) {
                         if (!this.table.players[i].allIn && !this.table.players[i].folded)
@@ -1915,7 +1942,7 @@ Player.prototype.Bet = function (bet) {
         }
         //Attemp to progress the game
         this.turnBet = {action: "bet", playerName: this.playerName, amount: bet}
-        this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
+        this.table.eventEmitter.emit("_showAction", this.turnBet);
         progress(this.table);
     } else {
         console.log('You don\'t have enought chips --> ALL IN !!!');
@@ -1939,7 +1966,7 @@ Player.prototype.Call = function () {
                 this.table.game.bets[i] = maxBet;
                 this.talked = true;
                 this.turnBet = {action: "call", playerName: this.playerName, amount: maxBet}
-                this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
+                this.table.eventEmitter.emit("_showAction", this.turnBet);
                 progress(this.table);
             } else {
                 console.log('You don\'t have enought chips --> ALL IN !!!');
@@ -1967,7 +1994,7 @@ Player.prototype.AllIn = function () {
 
     //Attemp to progress the game
     this.turnBet = {action: "allin", playerName: this.playerName, amount: allInValue}
-    this.table.eventEmitter.emit("_showAction", this.turnBet, this.table.tableNumber);
+    this.table.eventEmitter.emit("_showAction", this.turnBet);
     progress(this.table);
 };
 

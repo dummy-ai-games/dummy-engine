@@ -25,17 +25,22 @@ function SkyRTC() {
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
+        var table = data.tableNumber || 0;
         if (playerName)
             socket.id = playerName;
 
-        if (playerName == 'admin')
+        if (playerName == 'admin') {
             that.admin = socket;
+            that.admin.tableNumber = table;
+            that.initAdminData();
+        }
         else {
             that.playerNumber++;
             that.players[socket.id] = socket;
+            this.emit('new_peer', socket.id);
+            that.notificationAdmin();
         }
-        this.emit('new_peer', socket.id);
-        that.notificationAdmin();
+
     });
 
     this.on('_startGame', function () {
@@ -112,7 +117,36 @@ function getPlayerIndex(playerName, players) {
     }
     return -1;
 }
-
+SkyRTC.prototype.initAdminData = function () {
+    var that = this;
+    if (that.admin) {
+        var players = [];
+        var table = {};
+        var data = {};
+        var desTable = that.table[that.admin.tableNumber];
+        if (desTable) {
+            for (var i = 0; i < desTable.players.length; i++) {
+                var player = {};
+                player['playerName'] = desTable.players[i]['playerName'];
+                player['chips'] = desTable.players[i]['chips'];
+                player['folded'] = desTable.players[i]['folded'];
+                player['allIn'] = desTable.players[i]['allIn'];
+                player['cards'] = desTable.players[i]['cards'];
+                players.push(player);
+            }
+            table["tableNumber"] = desTable.tableNumber;
+            table["roundName"] = desTable.roundName;
+            table["board"] = desTable.game.board;
+            data.players = players;
+            data.table = table;
+        }
+        var message = {
+            "eventName": "_join",
+            "data": data
+        }
+        that.admin.send(JSON.stringify(message), errorCb);
+    }
+}
 SkyRTC.prototype.notificationAdmin = function () {
     var that = this;
     if (that.admin) {
@@ -182,33 +216,56 @@ SkyRTC.prototype.initTable = function () {
                 "data": data
             }
             that.getPlayerAction(message);
-            var message2 = {
-                "eventName": "__deal",
-                "data": {"data": data.game.board, "tableNumber": data.tableNumber}
+            if (that.admin) {
+                var players = [];
+                var table = {};
+                var data = {};
+                var desTable = that.table[that.admin.tableNumber];
+                if (desTable) {
+                    for (var i = 0; i < desTable.players.length; i++) {
+                        var player = {};
+                        player['playerName'] = desTable.players[i]['playerName'];
+                        player['chips'] = desTable.players[i]['chips'];
+                        player['folded'] = desTable.players[i]['folded'];
+                        player['allIn'] = desTable.players[i]['allIn'];
+                        player['cards'] = desTable.players[i]['cards'];
+                        players.push(player);
+                    }
+                    table["tableNumber"] = desTable.tableNumber;
+                    table["roundName"] = desTable.roundName;
+                    table["board"] = desTable.game.board;
+                    data.players = players;
+                    data.table = table;
+                }
+
+                var message2 = {
+                    "eventName": "__deal",
+                    "data": data
+                }
+                that.admin.send(JSON.stringify(message2), errorCb);
             }
-            that.admin.send(JSON.stringify(message2), errorCb);
         });
 
-        that.table[i].eventEmitter.on("__gameOver", function (data, tableNumber) {
+        that.table[i].eventEmitter.on("__gameOver", function (data) {
             var message = {
                 "eventName": "__gameOver",
-                "data": {"winners": data, "tableNumber": tableNumber}
+                "data": data
             }
             that.admin.send(JSON.stringify(message), errorCb);
         });
 
-        that.table[i].eventEmitter.on("__newRound", function (data, tableNumber) {
+        that.table[i].eventEmitter.on("__newRound", function (data) {
             var message = {
                 "eventName": "__newRound",
-                "data": {"roundCount": data, "tableNumber": tableNumber}
+                "data": data
             }
             that.admin.send(JSON.stringify(message), errorCb);
         });
 
-        that.table[i].eventEmitter.on("_showAction", function (data, tableNumber) {
+        that.table[i].eventEmitter.on("__showAction", function (data) {
             var message = {
                 "eventName": "__showAction",
-                "data": {"data": data, "tableNumber": tableNumber}
+                "data": data
             }
             that.admin.send(JSON.stringify(message), errorCb);
             that.broadcastInPlayers(message);
