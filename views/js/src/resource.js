@@ -3,6 +3,8 @@
  * 2017-08-21
  */
 
+var bg = "./res/images/game_bg.png";
+
 var s_p_2C = "./res/images/poker/2C.png";
 var s_p_2D = "./res/images/poker/2D.png";
 var s_p_2H = "./res/images/poker/2H.png";
@@ -119,6 +121,7 @@ pokerMap.set("AS", s_p_AS);
 
 
 var resources = [
+    bg,
     s_p_2C,
     s_p_2D,
     s_p_2H,

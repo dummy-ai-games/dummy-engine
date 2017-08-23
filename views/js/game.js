@@ -15,21 +15,26 @@ function initWebsock() {
     var rtc = SkyRTC();
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], 'admin');
     rtc.on("_new_peer", function (data) {
+        console.log("new player join : " + JSON.stringify(data));
         var parent = $("#content");
         parent.empty();
-        for (var i in data) {
+
+        currentPlayers = 0;
+
+        for (var i = 0; i < data.length; i++) {
             var playerName = data[i];
             var div = $("<div/>", {
                 class: "form-group"
             }).prependTo(parent);
             $("<span/>").text("用户:" + playerName + "加入").appendTo(div);
+
+            // update in game engine
+            players[currentPlayers] =
+                new Player(currentPlayers,
+                    playerNames[currentPlayers], 3000);
+            currentPlayers++;
         }
 
-        // update in game canvas
-        players[currentPlayers] =
-            new Player(currentPlayers,
-                        playerNames[currentPlayers], 3000);
-        currentPlayers++;
     });
     rtc.on("_gameOver", function (data) {
         var tableNumber = data.tableNumber;
@@ -41,13 +46,20 @@ function initWebsock() {
         }
         $("#msg").html($("#msg").html() + "<br/>" + result);
         $("#msg").show();
+
+        // update in game engine
+        gameStatus = STATUS_GAME_FINISHED;
     });
     rtc.on('startGame', function (data) {
         $("#msg").html($("#msg").html() + "<br/>" + data.msg);
         $("#msg").show();
+
+        // update in game engine
+        gameStatus = STATUS_GAME_RUNNING;
     });
 
     rtc.on('__deal', function (data) {
+        console.log("deal : " + JSON.stringify(data));
         var tableNumber = data.tableNumber;
         var data = data.data;
         var board = "";
@@ -56,6 +68,9 @@ function initWebsock() {
         }
         $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 当前公共牌：" + board);
         $("#msg").show();
+
+        // update in game engine
+
     });
     rtc.on('__newRound', function (data) {
         var roundCount = data.roundCount;
@@ -111,7 +126,6 @@ function ccLoad() {
                     ccTheGame = new GameLayer();
                     ccTheGame.init();
                     this.addChild(ccTheGame);
-                    // lazy init web socket
                     initWebsock();
                 }
             });

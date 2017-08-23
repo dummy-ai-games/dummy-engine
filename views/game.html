@@ -14,17 +14,19 @@
 
 </head>
 <body>
-<div class="container" style="display: none;">
+
+<!-- cocos2d game container -->
+<div id="gameContainer">
+</div>
+
+<div class="container">
     <form action="/startGame" method="post">
         <div class="form-group" id="content">
 
         </div>
         <input type="button" class="btn btn-primary" onclick="startGame()" value="startGame">
-        <div class="alert alert-warning" id="msg" style="display: none" align="center"></div>
+        <div class="alert alert-warning" id="msg" align="center"></div>
     </form>
-</div>
-<!-- cocos2d game container -->
-<div id="gameContainer">
 </div>
 
 <script src="./js/jquery.min.js"></script>

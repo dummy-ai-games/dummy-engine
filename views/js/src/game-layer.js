@@ -8,6 +8,7 @@ var STATUS_WAITING_FOR_PLAYERS = 0;
 var STATUS_GAME_RUNNING = 1;
 var STATUS_GAME_FINISHED = 2;
 
+var gameStatus = STATUS_WAITING_FOR_PLAYERS;
 var players = [];
 var currentPlayers = 0;
 var playerNames = ["Tom", "Mary", "Jerry", "Alex"];
@@ -21,7 +22,6 @@ var GameLayer = cc.Layer.extend({
     size: null,
     validWidth: 0,
     validHeight: 0,
-    gameStatus: STATUS_WAITING_FOR_PLAYERS,
 
     defaultMoneyInit: 3000,
     defaultBetInit: 0,
@@ -34,12 +34,13 @@ var GameLayer = cc.Layer.extend({
     moneyInitiates: [],
     betInitiates: [],
     actionInitiates: [],
-    publicCardsInitiates: [],
-    privateCardsInitiates: [], // 2-dimension int array
+    publicCards: [],
 
     // canvas scale
     bgScale: 1.0,
     cardScale: 1.0,
+    cardWidth: 0.0,
+    cardHeight: 0.0,
 
     // sprites
     bgSprite: null,
@@ -81,6 +82,12 @@ var GameLayer = cc.Layer.extend({
         this.validWidth = document.documentElement.clientWidth;
         this.validHeight = document.documentElement.clientHeight;
         this.size = cc.size(this.validWidth, this.validHeight);
+
+        //  initiate background
+        this.bgSprite = new cc.Sprite.create(bg, cc.rect(0, 0,
+            this.validWidth, this.validHeight));
+        this.bgSprite.setAnchorPoint(0, 0);
+        this.addChild(this.bgSprite);
 
         // show round N text at the center | top
         this.roundText = new cc.LabelTTF("Round " + this.theRound, this.defaultFont, 32,
@@ -176,11 +183,11 @@ var GameLayer = cc.Layer.extend({
         this.publicCardSprites[3] = cc.Sprite.create(s_p_empty);
         this.publicCardSprites[4] = cc.Sprite.create(s_p_empty);
 
-        this.publicCardSprites[0].setAnchorPoint(0, 0);
-        this.publicCardSprites[1].setAnchorPoint(0, 0);
-        this.publicCardSprites[2].setAnchorPoint(0, 0);
-        this.publicCardSprites[3].setAnchorPoint(0, 0);
-        this.publicCardSprites[4].setAnchorPoint(0, 0);
+        this.publicCardSprites[0].setAnchorPoint(0, -0.5);
+        this.publicCardSprites[1].setAnchorPoint(0, -0.5);
+        this.publicCardSprites[2].setAnchorPoint(0, -0.5);
+        this.publicCardSprites[3].setAnchorPoint(0, -0.5);
+        this.publicCardSprites[4].setAnchorPoint(0, -0.5);
 
         this.publicCardSprites[0].setPosition(cc.p(this.validWidth / 8 * 2, this.validHeight - this.roundText.height));
         this.publicCardSprites[1].setPosition(cc.p(this.validWidth / 8 * 3, this.validHeight - this.roundText.height));
@@ -203,6 +210,8 @@ var GameLayer = cc.Layer.extend({
         this.addChild(this.publicCardSprites[4], 6);
 
         // kick start the game
+        // test public card change display frame
+        this.publicCards = new Array();
         this.reset();
         this.scheduleUpdate();
     },
@@ -217,7 +226,7 @@ var GameLayer = cc.Layer.extend({
         // initiate players
         players = new Array();
         currentPlayers = 0;
-        this.gameStatus = STATUS_WAITING_FOR_PLAYERS;
+        gameStatus = STATUS_WAITING_FOR_PLAYERS;
     },
 
     removeAll: function() {
@@ -239,16 +248,18 @@ var GameLayer = cc.Layer.extend({
     },
 
     doUpdate: function() {
-        switch(this.gameStatus) {
+        switch(gameStatus) {
             case STATUS_WAITING_FOR_PLAYERS:
             {
                 this.updatePlayers();
+                this.updatePublicCards();
                 break;
             }
 
             case STATUS_GAME_RUNNING:
             {
                 this.updatePlayers();
+                this.updatePublicCards();
                 break;
             }
 
@@ -272,6 +283,21 @@ var GameLayer = cc.Layer.extend({
 
             this.moneyTexts[i].setString(players[i].gold);
             this.betTexts[i].setString(players[i].bet);
+
+            // draw cards
+        }
+    },
+
+    updatePublicCards: function() {
+        var i = 0;
+        for (i = 0; i < this.publicCardMax; i++) {
+            if (this.publicCards[i] != null) {
+                var frameName = pokerMap.get(this.publicCards[i]);
+
+                var frame = cc.SpriteFrame.create(frameName, cc.rect(0, 0,
+                        this.publicCardSprites[i].width, this.publicCardSprites[i].height));
+                this.publicCardSprites[i].setSpriteFrame(frame);
+            }
         }
     },
 
