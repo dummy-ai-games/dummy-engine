@@ -3,11 +3,13 @@
  * 2017-08-21
  */
 
+var ccTheGame;
+
 (function () {
-    initWebsock();
     initGame();
 })();
 
+// game communication with back-end
 function initWebsock() {
 // initialize web communication
     var rtc = SkyRTC();
@@ -22,6 +24,12 @@ function initWebsock() {
             }).prependTo(parent);
             $("<span/>").text("用户:" + playerName + "加入").appendTo(div);
         }
+
+        // update in game canvas
+        players[currentPlayers] =
+            new Player(currentPlayers,
+                        playerNames[currentPlayers], 3000);
+        currentPlayers++;
     });
     rtc.on("_gameOver", function (data) {
         var tableNumber = data.tableNumber;
@@ -96,13 +104,15 @@ function initGame() {
 function ccLoad() {
     cc.game.onStart = function() {
         //load resources
-        cc.LoaderScene.preload(g_resources, function () {
+        cc.LoaderScene.preload(resources, function () {
             var LSScene = cc.Scene.extend({
                 onEnter: function () {
                     this._super();
-                    var layer = new GameLayer();
-                    layer.init();
-                    this.addChild(layer);
+                    ccTheGame = new GameLayer();
+                    ccTheGame.init();
+                    this.addChild(ccTheGame);
+                    // lazy init web socket
+                    initWebsock();
                 }
             });
             cc.director.runScene(new LSScene());
