@@ -20,7 +20,7 @@ function SkyRTC() {
     this.table = [];
     this.admin = null;
     this.players = {};
-    this.tablePlayerNumber = 3;
+    this.tablePlayerNumber = 10;
     this.playerNumber = 0;
     this.on('__join', function (data, socket) {
         var that = this;
@@ -298,6 +298,9 @@ SkyRTC.prototype.removeSocket = function (socket) {
 };
 
 SkyRTC.prototype.broadcastInPlayers = function (data) {
+    for (var i = 0; i < data.table.players.length; i++) {
+        delete data.table.players[i].cards;
+    }
     for (var player in this.players) {
         this.players[player].send(JSON.stringify(data), errorCb);
     }

@@ -124,6 +124,9 @@
         $("#msg").show();
         $("#action").hide();
     });
+    rtc.on('__showAction', function (data) {
+        console.log("action : " + JSON.stringify(data.action));
+    });
 </script>
 </body>
 </html>

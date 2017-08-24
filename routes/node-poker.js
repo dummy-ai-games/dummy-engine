@@ -75,7 +75,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 i--;
             }
         }
-        if (that.roundCount < 2 && that.players.length > 2) {
+        if (that.players.length > 3) {
             console.log("上轮结束，下一轮开始");
             that.surviveCount = that.players.length;
             for (var j = 0; j < that.players.length; j++)
@@ -97,18 +97,18 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 });
             }
             sort(that.gameWinners);
-            if (that.players.length > 3) {
-                for (var i = 3; i < that.players.length; i++) {
-                    if (that.players[i].chips >= that.gameWinners[2].chips) {
-                        that.gameWinners[2] = {
-                            playerName: that.players[i].playerName,
-                            hand: that.players[i].hand,
-                            chips: that.players[i].chips
-                        };
-                        sort(that.gameWinners);
-                    }
-                }
-            }
+            /*if (that.players.length > 3) {
+             for (var i = 3; i < that.players.length; i++) {
+             if (that.players[i].chips >= that.gameWinners[2].chips) {
+             that.gameWinners[2] = {
+             playerName: that.players[i].playerName,
+             hand: that.players[i].hand,
+             chips: that.players[i].chips
+             };
+             sort(that.gameWinners);
+             }
+             }
+             }*/
 
             var data = getBasicData(that);
             data.winners = that.gameWinners;
