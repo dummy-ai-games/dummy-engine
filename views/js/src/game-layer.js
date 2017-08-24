@@ -9,6 +9,8 @@ var STATUS_GAME_RUNNING = 1;
 var STATUS_GAME_FINISHED = 2;
 
 var gameStatus = STATUS_WAITING_FOR_PLAYERS;
+
+var currentRound = 1;
 var players = [];
 var currentPlayers = 0;
 var playerNames = ["Tom", "Mary", "Jerry", "Alex"];
@@ -27,12 +29,11 @@ var GameLayer = cc.Layer.extend({
 
     defaultMoneyInit: 3000,
     defaultBetInit: 0,
-    playerMax: 4,
+    playerMax: 3,
     publicCardMax: 5,
     privateCardMax: 2,
     currentPublicCard: 0,
     currentPrivateCard: 0,
-    theRound: 1,
     moneyInitiates: [],
     betInitiates: [],
     actionInitiates: [],
@@ -53,7 +54,7 @@ var GameLayer = cc.Layer.extend({
     // buttons
 
     // texts
-    roundText: this.theRound + "",
+    roundText: null,
     nameTexts: [],
     moneyTexts: [],
     actionTexts: [],
@@ -91,7 +92,7 @@ var GameLayer = cc.Layer.extend({
         this.addChild(this.bgSprite);
 
         // show round N text at the center | top
-        this.roundText = new cc.LabelTTF("Round " + this.theRound, this.defaultFont, 32,
+        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 32,
             cc.size(this.validWidth / 8 * this.scale, this.validHeight / 4 * this.scale));
         this.roundText.setColor(cc.color(255, 255, 255, 255));
 
@@ -252,6 +253,7 @@ var GameLayer = cc.Layer.extend({
         switch(gameStatus) {
             case STATUS_WAITING_FOR_PLAYERS:
             {
+                this.updateRound();
                 this.updatePlayers();
                 this.updatePublicCards();
                 break;
@@ -259,6 +261,15 @@ var GameLayer = cc.Layer.extend({
 
             case STATUS_GAME_RUNNING:
             {
+                this.updateRound();
+                this.updatePlayers();
+                this.updatePublicCards();
+                break;
+            }
+
+            case STATUS_GAME_FINISHED:
+            {
+                this.updateRound();
                 this.updatePlayers();
                 this.updatePublicCards();
                 break;
@@ -269,6 +280,10 @@ var GameLayer = cc.Layer.extend({
                 break;
             }
         }
+    },
+
+    updateRound: function() {
+        this.roundText.setString("Round " + currentRound);
     },
 
     updatePlayers: function() {
@@ -292,17 +307,38 @@ var GameLayer = cc.Layer.extend({
                 this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
             }
 
-            // draw cards
+            // draw private cards
+            var privateCard0 = players[i].privateCards[0];
+            if (privateCard0) {
+                var cardName1 = pokerMap.get(privateCard0);
+                var frame1 = cc.SpriteFrame.create(cardName1, cc.rect(0, 0,
+                    this.privateCardSprites[i][0].width, this.privateCardSprites[i][0].height));
+                this.privateCardSprites[i][0].setSpriteFrame(frame1);
+            }
+            var privateCard1 = players[i].privateCards[1];
+            if (privateCard1) {
+                var cardName2 = pokerMap.get(privateCard1);
+                var frame2 = cc.SpriteFrame.create(cardName2, cc.rect(0, 0,
+                    this.privateCardSprites[i][1].width, this.privateCardSprites[i][1].height));
+                this.privateCardSprites[i][1].setSpriteFrame(frame2);
+            }
         }
     },
 
     updatePublicCards: function() {
         var i = 0;
+
+        // clear public cards
+        for (i = 0; i < this.publicCardMax; i++) {
+            var frame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
+                this.publicCardSprites[i].width, this.publicCardSprites[i].height));
+            this.publicCardSprites[i].setSpriteFrame(frame);
+        }
+
         for (i = 0; i < this.publicCardMax; i++) {
             if (publicCards[i] != null) {
-                var frameName = pokerMap.get(publicCards[i]);
-
-                var frame = cc.SpriteFrame.create(frameName, cc.rect(0, 0,
+                var cardName = pokerMap.get(publicCards[i]);
+                var frame = cc.SpriteFrame.create(cardName, cc.rect(0, 0,
                         this.publicCardSprites[i].width, this.publicCardSprites[i].height));
                 this.publicCardSprites[i].setSpriteFrame(frame);
             }

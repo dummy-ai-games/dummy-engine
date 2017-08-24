@@ -35,7 +35,7 @@ function initWebsock() {
         for (i = 0; i < data.length; i++) {
             if (null == players[i]) {
                 players[i] =
-                    new Player(data[i], playerNames[i], 3000);
+                    new Player(data[i], playerNames[i], 900);
             } else {
                 players.id = data[i];
                 players[i].name = playerNames[i];
@@ -55,6 +55,7 @@ function initWebsock() {
 
         // update in game engine
         console.log("finish_game : " + JSON.stringify(data));
+        updateTable(data);
         gameStatus = STATUS_GAME_FINISHED;
     });
     rtc.on('startGame', function (data) {
@@ -78,9 +79,7 @@ function initWebsock() {
 
         // update in game engine
         console.log("deal : " + JSON.stringify(data));
-        for (var i = 0; i < data.length; i++) {
-            publicCards[i] = data[i];
-        }
+        updateTable(data);
     });
     rtc.on('__newRound', function (data) {
         var roundCount = data.table.roundCount;
@@ -90,26 +89,33 @@ function initWebsock() {
 
         // update in game engine
         console.log("new_round : " + JSON.stringify(data));
+        updateTable(data);
     });
     rtc.on('__showAction', function (data) {
-        console.log("action : " + JSON.stringify(data.action));
+        console.log("action : " + JSON.stringify(data));
 
         var tableNumber = data.table.tableNumber;
         var roundAction = data.action;
 
-        var playerIndex = findPlayerIndexById(data.playerName);
+        var playerIndex = findPlayerIndexById(data.action.playerName);
 
         if (roundAction.action == "check" || roundAction.action == "fold" || roundAction.action == "raise" || roundAction.action == "call") {
             $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);
             // update in game engine
             if (playerIndex != -1) {
                 players[playerIndex].setAction(roundAction.action);
+                if (data.action.amount) {
+                    players[playerIndex].setBet(data.action.amount);
+                }
             }
         } else {
             $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action + ", 押注金额：" + roundAction.amount);
             // update in game engine
             if (playerIndex != -1) {
                 players[playerIndex].setAction(roundAction.action);
+                if (data.action.amount) {
+                    players[playerIndex].setBet(data.action.amount);
+                }
             }
         }
         // set in turn
@@ -120,6 +126,8 @@ function initWebsock() {
                 players[i].clearInTurn();
             }
         }
+
+        updateTable(data);
 
         $("#msg").show();
     });
@@ -173,6 +181,27 @@ function ccLoad() {
 // utilities
 function startGame() {
     rtc.startGame();
+}
+
+function updateTable(data) {
+    var i;
+    if (data.table && data.table.roundCount) {
+        currentRound = data.table.roundCount;
+    }
+    if (data.players) {
+        for (i = 0; i < data.players.length; i++) {
+            players[i].id = data.players[i].playerName;
+            players[i].privateCards[0] = data.players[i].cards[0];
+            players[i].privateCards[1] = data.players[i].cards[1];
+            players[i].gold = data.players[i].chips;
+        }
+    }
+    if (data.table) {
+        publicCards = new Array();
+        for (i = 0; i < data.table.board.length; i++) {
+            publicCards[i] = data.table.board[i];
+        }
+    }
 }
 
 function findPlayerIndexById(id) {

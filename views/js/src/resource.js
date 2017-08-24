@@ -3,7 +3,7 @@
  * 2017-08-21
  */
 
-var bg = "./res/images/game_bg.png";
+var bg = "./res/images/game_bg.jpg";
 
 var s_p_2C = "./res/images/poker/2C.png";
 var s_p_2D = "./res/images/poker/2D.png";

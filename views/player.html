@@ -52,6 +52,8 @@
     var rtc = SkyRTC();
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], '');
     rtc.on("_action", function (data) {
+        console.log(data);
+
         $("#userName").text("用户名:"+data.player.playerName);
         $("#bet").prop("disabled",true);
         $("#msg").text("该回合轮到你了");
@@ -70,6 +72,8 @@
 
     });
     rtc.on("_bet", function (data) {
+        console.log(data);
+
         $("#msg").text("该回合轮到你首先押注,注意最小押注额");
         $("#bet").prop("disabled",false);
         $("#msg").show();
