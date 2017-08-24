@@ -1622,11 +1622,11 @@ function progress(table) {
             } else if (table.game.roundName === 'Deal') {
                 console.log('effective deal');
                 table.game.roundName = 'Flop';
-                table.game.deck.pop(); //Burn a card
-                for (i = 0; i < 3; i += 1) { //Turn three cards
+                table.game.deck.pop(); // Burn a card
+                for (i = 0; i < 3; i += 1) { // Turn three cards
                     table.game.board.push(table.game.deck.pop());
                 }
-                //table.game.bets.splice(0,table.game.bets.length-1);
+                // table.game.bets.splice(0,table.game.bets.length-1);
                 for (i = 0; i < table.game.bets.length; i += 1) {
                     table.game.bets[i] = 0;
                 }

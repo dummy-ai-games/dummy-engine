@@ -13,7 +13,7 @@ var Player = function(_id, _name, _gold) {
     this.gold = _gold;
     this.bet = 0;
     this.privateCards = [];
-    this.action = "";
+    this.action = "No Action";
     this.inTurn = 0;
 };
 

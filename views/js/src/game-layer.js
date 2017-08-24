@@ -264,6 +264,13 @@ var GameLayer = cc.Layer.extend({
                 break;
             }
 
+            case STATUS_GAME_FINISHED:
+            {
+                this.updatePlayers();
+                this.updatePublicCards();
+                break;
+            }
+
             default:
             {
                 break;
@@ -292,7 +299,21 @@ var GameLayer = cc.Layer.extend({
                 this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
             }
 
-            // draw cards
+            // draw private cards
+            var privateCard0 = players[i].privateCards[0];
+            if (privateCard0) {
+                var cardName1 = pokerMap.get(privateCard0);
+                var frame1 = cc.SpriteFrame.create(cardName1, cc.rect(0, 0,
+                    this.privateCardSprites[i][0].width, this.privateCardSprites[i][0].height));
+                this.privateCardSprites[i][0].setSpriteFrame(frame1);
+            }
+            var privateCard1 = players[i].privateCards[1];
+            if (privateCard1) {
+                var cardName2 = pokerMap.get(privateCard1);
+                var frame2 = cc.SpriteFrame.create(cardName2, cc.rect(0, 0,
+                    this.privateCardSprites[i][1].width, this.privateCardSprites[i][1].height));
+                this.privateCardSprites[i][1].setSpriteFrame(frame2);
+            }
         }
     },
 
@@ -300,9 +321,8 @@ var GameLayer = cc.Layer.extend({
         var i = 0;
         for (i = 0; i < this.publicCardMax; i++) {
             if (publicCards[i] != null) {
-                var frameName = pokerMap.get(publicCards[i]);
-
-                var frame = cc.SpriteFrame.create(frameName, cc.rect(0, 0,
+                var cardName = pokerMap.get(publicCards[i]);
+                var frame = cc.SpriteFrame.create(cardName, cc.rect(0, 0,
                         this.publicCardSprites[i].width, this.publicCardSprites[i].height));
                 this.publicCardSprites[i].setSpriteFrame(frame);
             }
