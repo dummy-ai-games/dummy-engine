@@ -183,6 +183,9 @@ function startGame() {
 
 function updateTable(data) {
     var i;
+    if (data.table && data.table.roundCount) {
+        currentRound = data.table.roundCount;
+    }
     if (data.players) {
         for (i = 0; i < data.players.length; i++) {
             players[i].id = data.players[i].name;
