@@ -302,7 +302,7 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
         delete message.data.table.players[i].cards;
     }
     for (var player in this.players) {
-        this.players[player].send(JSON.stringify(data), errorCb);
+        this.players[player].send(JSON.stringify(message), errorCb);
     }
 };
 
