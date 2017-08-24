@@ -97,6 +97,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 });
             }
             sort(that.gameWinners);
+            console.log(JSON.stringify(that.gameWinners));
             /*if (that.players.length > 3) {
              for (var i = 3; i < that.players.length; i++) {
              if (that.players[i].chips >= that.gameWinners[2].chips) {

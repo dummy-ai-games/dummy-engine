@@ -298,8 +298,8 @@ SkyRTC.prototype.removeSocket = function (socket) {
 };
 
 SkyRTC.prototype.broadcastInPlayers = function (message) {
-    for (var i = 0; i < message.data.table.players.length; i++) {
-        delete message.data.table.players[i].cards;
+    for (var i = 0; i < message.data.players.length; i++) {
+        delete message.data.players[i].cards;
     }
     for (var player in this.players) {
         this.players[player].send(JSON.stringify(message), errorCb);
