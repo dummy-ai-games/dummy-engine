@@ -29,7 +29,7 @@ var GameLayer = cc.Layer.extend({
 
     defaultMoneyInit: 3000,
     defaultBetInit: 0,
-    playerMax: 4,
+    playerMax: 3,
     publicCardMax: 5,
     privateCardMax: 2,
     currentPublicCard: 0,

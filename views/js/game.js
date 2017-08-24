@@ -92,20 +92,20 @@ function initWebsock() {
         updateTable(data);
     });
     rtc.on('__showAction', function (data) {
-        console.log("action : " + JSON.stringify(data.action));
+        console.log("action : " + JSON.stringify(data));
 
         var tableNumber = data.table.tableNumber;
         var roundAction = data.action;
 
-        var playerIndex = findPlayerIndexById(data.playerName);
+        var playerIndex = findPlayerIndexById(data.action.playerName);
 
         if (roundAction.action == "check" || roundAction.action == "fold" || roundAction.action == "raise" || roundAction.action == "call") {
             $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);
             // update in game engine
             if (playerIndex != -1) {
                 players[playerIndex].setAction(roundAction.action);
-                if (data.amount) {
-                    players[playerIndex].bet(data.amount);
+                if (data.action.amount) {
+                    players[playerIndex].setBet(data.action.amount);
                 }
             }
         } else {
@@ -113,8 +113,8 @@ function initWebsock() {
             // update in game engine
             if (playerIndex != -1) {
                 players[playerIndex].setAction(roundAction.action);
-                if (data.amount) {
-                    players[playerIndex].bet(data.amount);
+                if (data.action.amount) {
+                    players[playerIndex].setBet(data.action.amount);
                 }
             }
         }
@@ -126,6 +126,8 @@ function initWebsock() {
                 players[i].clearInTurn();
             }
         }
+
+        updateTable(data);
 
         $("#msg").show();
     });
@@ -188,7 +190,7 @@ function updateTable(data) {
     }
     if (data.players) {
         for (i = 0; i < data.players.length; i++) {
-            players[i].id = data.players[i].name;
+            players[i].id = data.players[i].playerName;
             players[i].privateCards[0] = data.players[i].cards[0];
             players[i].privateCards[1] = data.players[i].cards[1];
             players[i].gold = data.players[i].chips;

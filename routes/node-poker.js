@@ -138,6 +138,7 @@ function getBasicData(table) {
     data.table = mytable;
     return data;
 }
+
 function getNextPlayer(table) {
     var maxBet = getMaxBet(table.game.bets);
     do {
@@ -1993,7 +1994,7 @@ Player.prototype.AllIn = function () {
     }
 
     //Attemp to progress the game
-    this.turnBet = {action: "allin", playerName: this.playerName, amount: allInValue}
+    this.turnBet = {action: "allin", playerName: this.playerName, amount: allInValue};
     this.table.eventEmitter.emit("_showAction", this.turnBet);
     progress(this.table);
 };

@@ -18,9 +18,9 @@ var Player = function(_id, _name, _gold) {
 };
 
 // UX flow control on player
-Player.prototype.bet = function (_bet) {
+Player.prototype.setBet = function (_bet) {
     this.bet = _bet;
-    this.gold -= bet;
+    this.gold -= _bet;
 };
 
 Player.prototype.die = function () {
