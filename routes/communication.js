@@ -64,13 +64,14 @@ function SkyRTC() {
                 switch (action) {
                     case "Bet":
                         if (currentTable.isBet) {
+                            var amount;
                             try {
-                                var amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
-                                currentTable.players[playerIndex].Bet(amount);
+                                amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
                             } catch (e) {
                                 console.log(e.message);
-                                currentTable.players[playerIndex].Fold();
+                                amount = currentTable.smallBlind;
                             }
+                            currentTable.players[playerIndex].Bet(amount);
                         } else
                             currentTable.players[playerIndex].Call();
                         break;
