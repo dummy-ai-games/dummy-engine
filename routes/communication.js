@@ -301,9 +301,10 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
     for (var i = 0; i < message.data.players.length; i++) {
         delete message.data.players[i].cards;
     }
+    var tableNumber = message.data.table.tableNumber;
     for (var player in this.players) {
         var currentPlayer = message.data.action.playerName;
-        if (player != currentPlayer)
+        if (player != currentPlayer && this.players[player].tableNumber == tableNumber)
             this.players[player].send(JSON.stringify(message), errorCb);
     }
 };

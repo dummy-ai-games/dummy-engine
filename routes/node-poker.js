@@ -75,7 +75,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 i--;
             }
         }
-        if (that.players.length > 3) {
+        if (that.roundCount < 2 && that.players.length > 2) {
             console.log("上轮结束，下一轮开始");
             that.surviveCount = that.players.length;
             for (var j = 0; j < that.players.length; j++)
@@ -88,8 +88,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         }
         else {
             console.log("gameOver, 胜者如下：");
-            var len = that.players.length >= 3 ? 3 : that.players.length;
-            for (var i = 0; i < len; i++) {
+            for (var i = 0; i < that.players.length; i++) {
                 that.gameWinners.push({
                     playerName: that.players[i].playerName,
                     hand: that.players[i].hand,
@@ -97,19 +96,17 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 });
             }
             sort(that.gameWinners);
+            if (that.gameWinners.length > 3) {
+                for (var i = 3; i < that.gameWinners.length; i++) {
+                    if (that.gameWinners[i].chips == that.gameWinners[2].chips && that.gameWinners[i].hand.rank == that.gameWinners[2].hand.rank) {
+                        continue;
+                    } else {
+                        delete that.gameWinners[i];
+                        i--;
+                    }
+                }
+            }
             console.log(JSON.stringify(that.gameWinners));
-            /*if (that.players.length > 3) {
-             for (var i = 3; i < that.players.length; i++) {
-             if (that.players[i].chips >= that.gameWinners[2].chips) {
-             that.gameWinners[2] = {
-             playerName: that.players[i].playerName,
-             hand: that.players[i].hand,
-             chips: that.players[i].chips
-             };
-             sort(that.gameWinners);
-             }
-             }
-             }*/
 
             var data = getBasicData(that);
             data.winners = that.gameWinners;
@@ -150,7 +147,7 @@ function getNextPlayer(table) {
 function sort(data) {
     for (var k = 0; k < data.length; k++) {
         for (var p = k + 1; p < data.length; p++) {
-            if (data[p].chips > data[k].chips) {
+            if (data[p].chips > data[k].chips || (data[p].chips == data[k].chips && data[p].hand.rank > data[k].hand.rank)) {
                 var temp = data[k];
                 data[k] = data[p];
                 data[p] = temp;
