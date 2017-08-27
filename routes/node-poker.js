@@ -1,5 +1,6 @@
 var events = require('events');
 var util = require('util');
+var playerDao = require("./playerDao");
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn) {
     this.smallBlind = smallBlind;
@@ -111,6 +112,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             var data = getBasicData(that);
             data.winners = that.gameWinners;
             that.eventEmitter.emit("__gameOver", data);
+            for (var i in that.gameWinners)
+                playerDao.addOrUpdatePlayer(that.gameWinners[i]);
         }
     });
 }
@@ -1864,7 +1867,7 @@ Player.prototype.Check = function () {
             }
         }
         //Attemp to progress the game
-        this.turnBet = {action: "check", playerName: this.playerName}
+        this.turnBet = {action: "check", playerName: this.playerName, chips: this.chips}
         this.table.eventEmitter.emit("_showAction", this.turnBet);
         progress(this.table);
     } else {
@@ -1884,7 +1887,7 @@ Player.prototype.Fold = function () {
     }
     //Mark the player as folded
     this.folded = true;
-    this.turnBet = {action: "fold", playerName: this.playerName};
+    this.turnBet = {action: "fold", playerName: this.playerName, chips: this.chips};
     this.table.eventEmitter.emit("_showAction", this.turnBet);
     this.table.surviveCount--;
     //Attemp to progress the game
@@ -1908,7 +1911,7 @@ Player.prototype.Raise = function () {
                 if (this.chips + mybet >= bet) {
                     this.chips = this.chips + mybet - bet;
                     this.table.game.bets[i] = bet;
-                    this.turnBet = {action: "raise", playerName: this.playerName, amount: bet};
+                    this.turnBet = {action: "raise", playerName: this.playerName, amount: bet, chips: this.chips};
                     this.table.eventEmitter.emit("_showAction", this.turnBet);
                     this.table.raiseCount++;
                     for (i = 0; i < this.table.players.length; i += 1) {
@@ -1940,7 +1943,7 @@ Player.prototype.Bet = function (bet) {
             }
         }
         //Attemp to progress the game
-        this.turnBet = {action: "bet", playerName: this.playerName, amount: bet}
+        this.turnBet = {action: "bet", playerName: this.playerName, amount: bet, chips: this.chips}
         this.table.eventEmitter.emit("_showAction", this.turnBet);
         progress(this.table);
     } else {
@@ -1964,7 +1967,7 @@ Player.prototype.Call = function () {
                 this.chips = this.chips + mybet - maxBet;
                 this.table.game.bets[i] = maxBet;
                 this.talked = true;
-                this.turnBet = {action: "call", playerName: this.playerName, amount: maxBet}
+                this.turnBet = {action: "call", playerName: this.playerName, amount: maxBet, chips: this.chips}
                 this.table.eventEmitter.emit("_showAction", this.turnBet);
                 progress(this.table);
             } else {
@@ -1992,7 +1995,7 @@ Player.prototype.AllIn = function () {
     }
 
     //Attemp to progress the game
-    this.turnBet = {action: "allin", playerName: this.playerName, amount: allInValue};
+    this.turnBet = {action: "allin", playerName: this.playerName, amount: allInValue, chips: this.chips};
     this.table.eventEmitter.emit("_showAction", this.turnBet);
     progress(this.table);
 };
