@@ -55,6 +55,14 @@
             }).text(player.chips).appendTo(div);
         }
     });
+
+    rtc.on('_playerExit', function (player) {
+        var kanban = $("#kanban");
+        var temp = kanban.find("#" + player.id);
+        if (temp.length > 0) {
+            temp.text("offline");
+        }
+    });
 </script>
 </body>
 </html>
