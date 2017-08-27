@@ -176,6 +176,7 @@ SkyRTC.prototype.updateKanban = function (playerName, tableNumber, chips) {
 }
 
 SkyRTC.prototype.notifyKanban = function (playerName, index) {
+    var that = this;
     if (that.kanban) {
         var message = {
             "eventName": "_playerExit",
