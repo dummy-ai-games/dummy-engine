@@ -1,5 +1,5 @@
 /**
- * Created by Strawmanbobi
+ * Created by the-engine-team
  * 2017-08-22
  */
 

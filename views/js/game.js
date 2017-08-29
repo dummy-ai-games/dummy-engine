@@ -1,5 +1,5 @@
 /**
- * Created by Strawmanbobi
+ * Created by the-engine-team
  * 2017-08-21
  */
 
@@ -145,7 +145,7 @@ function initGame() {
         s.innerHTML = '<h2>您的浏览器不支持HTML5 !</h2>' +
             '<p>Google Chrome is a browser that combines a minimal design with sophisticated technology to make the web faster, safer, and easier.Click the logo to download.</p>' +
             '<a href="http://www.google.com/chrome" target="_blank">' +
-            '<img src="http://www.google.com/intl/zh-CN/chrome/assets/common/images/chrome_logo_2x.png" border="0"/></a>';
+            '<img game-src="http://www.google.com/intl/zh-CN/chrome/assets/common/images/chrome_logo_2x.png" border="0"/></a>';
         var p = d.getElementById(c.tag).parentNode;
         p.style.background = 'none';
         p.style.border = 'none';

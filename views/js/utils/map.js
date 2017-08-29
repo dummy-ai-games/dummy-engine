@@ -1,6 +1,6 @@
 /**
- * Created by Strawmanbobi
- * 2014-08-30
+ * Created by strawmanbobi
+ * 2015-06-26
  */
 
 function Map() {

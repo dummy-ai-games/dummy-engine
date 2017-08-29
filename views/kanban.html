@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="edge">
+    <title>THE KanBan</title>
+    <link rel="stylesheet" href="style/bootstrap.min.css">
+    <link rel="stylesheet" href="style/bootstrap-theme.min.css">
 </head>
 <body>
 <h1 style="text-align: center">欢迎来到看版</h1>
@@ -10,59 +18,8 @@
 <div id="kanban">
 
 </div>
-<script src="./js/jquery.min.js"></script>
-<script src="./js/SkyRTC-client.js"></script>
-<script type="text/javascript">
-    var rtc = SkyRTC();
-    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], 'kanban');
-    rtc.on("_join", function (data) {
-        console.log("init data : " + JSON.stringify(data));
-        var kanban = $("#kanban");
-        for (var index in data) {
-            var player = data[index];
-            var temp = kanban.find("#" + player.id);
-            if (temp.length > 0) {
-                temp.text(player.chips);
-            } else {
-                var div = $("<div/>", {
-                    class: "form-group"
-                }).prependTo(kanban);
-                $("<span/>", {
-                    style: "color:red"
-                }).text(player.playerName + ":").appendTo(div);
-                $("<span/>", {
-                    id: player.id
-                }).text(player.chips).appendTo(div);
-            }
-        }
-    });
-
-    rtc.on('_showAction', function (player) {
-        console.log("action update data : " + JSON.stringify(player));
-        var kanban = $("#kanban");
-        var temp = kanban.find("#" + player.id);
-        if (temp.length > 0) {
-            temp.text(player.chips);
-        } else {
-            var div = $("<div/>", {
-                class: "form-group"
-            }).prependTo(kanban);
-            $("<span/>", {
-                style: "color:red"
-            }).text(player.playerName + ":").appendTo(div);
-            $("<span/>", {
-                id: player.id
-            }).text(player.chips).appendTo(div);
-        }
-    });
-
-    rtc.on('_playerExit', function (player) {
-        var kanban = $("#kanban");
-        var temp = kanban.find("#" + player.id);
-        if (temp.length > 0) {
-            temp.text("offline");
-        }
-    });
-</script>
+<script src="js/public/jquery.min.js"></script>
+<script src="js/public/SkyRTC-client.js"></script>
+<script src="js/kanban.js"></script>
 </body>
 </html>
