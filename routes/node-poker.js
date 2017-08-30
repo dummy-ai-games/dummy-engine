@@ -1778,7 +1778,7 @@ Table.prototype.StartGame = function () {
 };
 
 Table.prototype.AddPlayer = function (playerName) {
-    var chips = 1000;
+    var chips = 900;
     if (chips >= this.minBuyIn && chips <= this.maxBuyIn) {
         var player = new Player(playerName, chips, this);
         this.playersToAdd.push(player);
