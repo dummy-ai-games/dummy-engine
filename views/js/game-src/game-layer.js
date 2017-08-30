@@ -13,7 +13,8 @@ var gameStatus = STATUS_WAITING_FOR_PLAYERS;
 var currentRound = 1;
 var players = [];
 var currentPlayers = 0;
-var playerNames = ["Tom", "Mary", "Jerry", "Alex"];
+var playerNames = ["AlphaGo", "BetaCat", "Cinderella", "DonaldDuck", "Eva",
+     "Floyd", "Gadget", "HelloWorld", "II", "JonSnow"];
 
 var publicCards = [];
 
@@ -27,9 +28,9 @@ var GameLayer = cc.Layer.extend({
     validWidth: 0,
     validHeight: 0,
 
-    defaultMoneyInit: 3000,
+    defaultMoneyInit: 900,
     defaultBetInit: 0,
-    playerMax: 3,
+    playerMax: 10,
     publicCardMax: 5,
     privateCardMax: 2,
     currentPublicCard: 0,
@@ -39,19 +40,28 @@ var GameLayer = cc.Layer.extend({
     actionInitiates: [],
 
     // canvas scale
-    bgScale: 1.0,
-    cardScale: 1.0,
+    scale: 1.0,
+    playerScale: 0.8,
+    bgScale: 1.2,
+    privateCardScale: 1.0,
+    publicCardScale: 1.0,
+    avatarScale: 1.0,
+    controlMenuScale: 1.0,
     cardWidth: 0.0,
     cardHeight: 0.0,
 
     // sprites
     bgSprite: null,
-    playerLayer: [],
     avatarSprites: [],
     privateCardSprites: [],
     publicCardSprites: [],
 
     // buttons
+    startButton: null,
+
+
+    // menus
+    controlMenu: null,
 
     // texts
     roundText: null,
@@ -89,33 +99,38 @@ var GameLayer = cc.Layer.extend({
         this.bgSprite = new cc.Sprite.create(bg, cc.rect(0, 0,
             this.validWidth, this.validHeight));
         this.bgSprite.setAnchorPoint(0, 0);
+        this.bgSprite.setScale(this.bgScale);
+        this.bgSprite.setPosition(0, 0);
         this.addChild(this.bgSprite);
 
         // show round N text at the center | top
         this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 32,
-            cc.size(this.validWidth / 8 * this.scale, this.validHeight / 4 * this.scale));
+            cc.size(this.validWidth / 8 * this.playerScale, this.validHeight / 4 * this.playerScale));
         this.roundText.setColor(cc.color(255, 255, 255, 255));
 
         this.roundText.setAnchorPoint(0, 0);
         this.roundText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT);
         this.roundText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-        this.roundText.boundingWidth = this.validWidth / 8 * this.scale;
-        this.roundText.setPosition(this.validWidth / 8  * this.scale, this.validHeight - this.roundText.height);
+        this.roundText.boundingWidth = this.validWidth / 12 * this.playerScale;
+        this.roundText.setPosition(this.validWidth / 16  * this.playerScale, this.validHeight - this.roundText.height);
         this.addChild(this.roundText, 6);
 
         // initialize N empty players
         for (i = 0; i < this.playerMax; i++) {
+
             this.nameTexts[i] = new cc.LabelTTF("Wait...", this.defaultFont, 24,
-                cc.size(this.validWidth / 8 * this.scale, this.validHeight / 6 * this.scale));
+                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
+
+            this.avatarSprites[i] = new cc.Sprite.create(s_a_avatar_none);
 
             this.moneyTexts[i] = new cc.LabelTTF("0", this.defaultFont, 24,
-                cc.size(this.validWidth / 8 * this.scale, this.validHeight / 6 * this.scale));
+                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.actionTexts[i] = new cc.LabelTTF("No Action", this.defaultFont, 24,
-                cc.size(this.validWidth / 8 * this.scale, this.validHeight / 6 * this.scale));
+                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.betTexts[i] = new cc.LabelTTF("0", this.defaultFont, 24,
-                cc.size(this.validWidth / 8 * this.scale, this.validHeight / 6 * this.scale));
+                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.nameTexts[i].setColor(cc.color(255, 255, 255, 255));
             this.moneyTexts[i].setColor(cc.color(255, 0, 0, 255));
@@ -124,6 +139,7 @@ var GameLayer = cc.Layer.extend({
 
             this.nameTexts[i].setAnchorPoint(0, 0);
             this.moneyTexts[i].setAnchorPoint(0, 0);
+            this.avatarSprites[i].setAnchorPoint(0, 0);
             this.actionTexts[i].setAnchorPoint(0, 0);
             this.betTexts[i].setAnchorPoint(0, 0);
 
@@ -137,20 +153,43 @@ var GameLayer = cc.Layer.extend({
             this.actionTexts[i].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.betTexts[i].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
 
-            this.nameTexts[i].boundingWidth = this.validWidth / 8 * this.scale;
-            this.moneyTexts[i].boundingWidth = this.validWidth / 8 * this.scale;
-            this.actionTexts[i].boundingWidth = this.validWidth / 8 * this.scale;
-            this.betTexts[i].boundingWidth = this.validWidth / 8 * this.scale;
+            this.nameTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
+            this.moneyTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
+            this.actionTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
+            this.betTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
 
-            this.nameTexts[i].setPosition(0,
-                this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-            this.moneyTexts[i].setPosition(this.validWidth / 8,
-                this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-            this.actionTexts[i].setPosition(this.validWidth / 8 * 2,
-                this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-            this.betTexts[i].setPosition(this.validWidth / 8 * 3,
-                this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
+            this.avatarScale = this.validHeight / 12 / this.avatarSprites[i].height;
+            this.avatarSprites[i].setScale(this.avatarScale);
+            this.avatarSprites[i].setAnchorPoint(-0.5, -0.5);
 
+            if (i < 5) {
+                // put them in the left side
+                this.avatarSprites[i].setPosition(this.validWidth / 16 * 0 + 20,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
+                this.nameTexts[i].setPosition(this.validWidth / 16 * 1,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
+                this.moneyTexts[i].setPosition(this.validWidth / 16 * 2,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
+                this.actionTexts[i].setPosition(this.validWidth / 16 * 3,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
+                this.betTexts[i].setPosition(this.validWidth / 16 * 4,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
+            } else {
+                // put them in the right side
+                this.avatarSprites[i].setPosition(this.validWidth / 16 * 8 + 20,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
+                this.nameTexts[i].setPosition(this.validWidth / 16 * 9,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
+                this.moneyTexts[i].setPosition(this.validWidth / 16 * 10,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
+                this.actionTexts[i].setPosition(this.validWidth / 16 * 11,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
+                this.betTexts[i].setPosition(this.validWidth / 16 * 12,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
+            }
+
+
+            this.addChild(this.avatarSprites[i], 6);
             this.addChild(this.nameTexts[i], 6);
             this.addChild(this.moneyTexts[i], 6);
             this.addChild(this.actionTexts[i], 6);
@@ -158,24 +197,31 @@ var GameLayer = cc.Layer.extend({
 
             // create private card sprite
             this.privateCardSprites[i] = new Array();
-            this.privateCardSprites[i][0] = cc.Sprite.create(s_p_empty);
-            this.privateCardSprites[i][1] = cc.Sprite.create(s_p_empty);
+            this.privateCardSprites[i][0] = cc.Sprite.create(s_p_back);
+            this.privateCardSprites[i][1] = cc.Sprite.create(s_p_back);
 
-            this.privateCardSprites[i][0].setAnchorPoint(0, 0);
-            this.privateCardSprites[i][1].setAnchorPoint(0, 0);
+            this.privateCardSprites[i][0].setAnchorPoint(0, -0.45);
+            this.privateCardSprites[i][1].setAnchorPoint(0, -0.45);
 
-            this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 8 * 4,
-                this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
-            this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 8 * 5,
-                this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
+            if (i < 5) {
+                this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 16 * 6,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
+                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 6 + 20,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
+            } else {
+                this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 16 * 14,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height));
+                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 14 + 20,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height));
+            }
 
             // calculate card sprite scale for the screen
-            this.cardScale = this.validHeight / 8 / this.privateCardSprites[i][0].height;
-            this.privateCardSprites[i][0].setScale(this.cardScale);
-            this.privateCardSprites[i][1].setScale(this.cardScale);
+            this.privateCardScale = this.validHeight / 12 / this.privateCardSprites[i][0].height;
+            this.privateCardSprites[i][0].setScale(this.privateCardScale);
+            this.privateCardSprites[i][1].setScale(this.privateCardScale);
 
             this.addChild(this.privateCardSprites[i][0], 6);
-            this.addChild(this.privateCardSprites[i][1], 6);
+            this.addChild(this.privateCardSprites[i][1], 7);
         }
 
         this.publicCardSprites = new Array();
@@ -191,14 +237,14 @@ var GameLayer = cc.Layer.extend({
         this.publicCardSprites[3].setAnchorPoint(0, -0.5);
         this.publicCardSprites[4].setAnchorPoint(0, -0.5);
 
-        this.publicCardSprites[0].setPosition(cc.p(this.validWidth / 8 * 2, this.validHeight - this.roundText.height));
-        this.publicCardSprites[1].setPosition(cc.p(this.validWidth / 8 * 3, this.validHeight - this.roundText.height));
-        this.publicCardSprites[2].setPosition(cc.p(this.validWidth / 8 * 4, this.validHeight - this.roundText.height));
-        this.publicCardSprites[3].setPosition(cc.p(this.validWidth / 8 * 5, this.validHeight - this.roundText.height));
-        this.publicCardSprites[4].setPosition(cc.p(this.validWidth / 8 * 6, this.validHeight - this.roundText.height));
+        this.publicCardSprites[0].setPosition(cc.p(this.validWidth / 16 * 5, this.validHeight - this.roundText.height));
+        this.publicCardSprites[1].setPosition(cc.p(this.validWidth / 16 * 6, this.validHeight - this.roundText.height));
+        this.publicCardSprites[2].setPosition(cc.p(this.validWidth / 16 * 7, this.validHeight - this.roundText.height));
+        this.publicCardSprites[3].setPosition(cc.p(this.validWidth / 16 * 8, this.validHeight - this.roundText.height));
+        this.publicCardSprites[4].setPosition(cc.p(this.validWidth / 16 * 9, this.validHeight - this.roundText.height));
 
         // calculate card sprite scale for the screen
-        this.cardScale = this.validHeight / 8 / this.publicCardSprites[0].height;
+        this.cardScale = this.validHeight / 10 / this.publicCardSprites[0].height;
         this.publicCardSprites[0].setScale(this.cardScale);
         this.publicCardSprites[1].setScale(this.cardScale);
         this.publicCardSprites[2].setScale(this.cardScale);
@@ -210,6 +256,21 @@ var GameLayer = cc.Layer.extend({
         this.addChild(this.publicCardSprites[2], 6);
         this.addChild(this.publicCardSprites[3], 6);
         this.addChild(this.publicCardSprites[4], 6);
+
+        // add game start button
+        this.startButton = cc.MenuItemImage.create(
+            btn_start,
+            btn_start_clicked,
+            function () {
+                console.log("game start");
+                startGame();
+            },this);
+        this.controlMenuScale = this.validHeight / 10 / this.startButton.height;
+        this.startButton.setScale(this.controlMenuScale);
+        this.startButton.setAnchorPoint(0, -0.5);
+        this.controlMenu = cc.Menu.create(this.startButton);
+        this.controlMenu.setPosition(cc.p(this.validWidth / 16 * 2, this.validHeight - this.roundText.height));
+        this.addChild(this.controlMenu);
 
         // kick start the game
         // test public card change display frame
@@ -290,6 +351,12 @@ var GameLayer = cc.Layer.extend({
         var i;
         for (i = 0; i < currentPlayers; i++) {
             this.nameTexts[i].setString(players[i].name);
+
+            // update avatar
+            var avatar = avartarSamples[i];
+            var avatarFrame = cc.SpriteFrame.create(avatar, cc.rect(0, 0,
+                this.avatarSprites[i].width, this.avatarSprites[i].height));
+            this.avatarSprites[i].setSpriteFrame(avatarFrame);
 
             if (players[i].status == playerStatusAlive) {
                 this.nameTexts[i].setColor(cc.color(0, 255, 255, 255));

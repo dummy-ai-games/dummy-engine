@@ -137,8 +137,10 @@ function initGame() {
     var d = document;
     var container = document.getElementById('gameContainer');
     var winWidth, winHeight;
-    winWidth = document.documentElement.clientWidth;
-    winHeight = document.documentElement.clientHeight;
+    var marginLeft = 20;
+    var marginTop = 20;
+    winWidth = document.documentElement.clientWidth - marginLeft;
+    winHeight = document.documentElement.clientHeight - marginTop;
     container.innerHTML = '<canvas id="gameCanvas" width="' + winWidth + '" height="' + winHeight + '"></canvas>';
     if (!d.createElement('canvas').getContext) {
         var s = d.createElement('div');
@@ -151,7 +153,7 @@ function initGame() {
         p.style.border = 'none';
         p.insertBefore(s);
 
-        d.body.style.background = '#ffffff';
+        d.body.style.background = '#000000';
         return;
     }
     window.addEventListener('DOMContentLoaded', function () {
