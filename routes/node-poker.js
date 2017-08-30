@@ -1687,47 +1687,10 @@ Table.prototype.getPreviousPlayerAction = function () {
     return this.turnBet;
 };
 // Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
-Table.prototype.check = function (playerName) {
-    var currentPlayer = this.currentPlayer;
-    if (playerName === this.players[currentPlayer].playerName) {
-        this.players[currentPlayer].Check();
-        return true;
-    } else {
-        // todo: check if something went wrong ( not enough money or things )
-        console.log("wrong user has made a move");
-        return false;
-    }
-};
-Table.prototype.fold = function (playerName) {
-    var currentPlayer = this.currentPlayer;
-    if (playerName === this.players[currentPlayer].playerName) {
-        this.players[currentPlayer].Fold();
-        return true;
-    } else {
-        console.log("wrong user has made a move");
-        return false;
-    }
-};
-Table.prototype.call = function (playerName) {
-    var currentPlayer = this.currentPlayer;
-    if (playerName === this.players[currentPlayer].playerName) {
-        this.players[currentPlayer].Call();
-        return true;
-    } else {
-        console.log("wrong user has made a move");
-        return false;
-    }
-};
-Table.prototype.bet = function (playerName, amt) {
-    var currentPlayer = this.currentPlayer;
-    if (playerName === this.players[currentPlayer].playerName) {
-        this.players[currentPlayer].Bet(amt);
-        return true;
-    } else {
-        console.log("wrong user has made a move");
-        return false;
-    }
-};
+
+
+
+
 Table.prototype.getWinners = function () {
     return this.gameWinners;
 };
@@ -1908,7 +1871,7 @@ Player.prototype.Raise = function () {
                     mybet = this.table.game.bets[i];
                 }
                 bet = 2 * maxBet;
-                if (this.chips + mybet >= bet) {
+                if (this.chips + mybet > bet) {
                     this.chips = this.chips + mybet - bet;
                     this.table.game.bets[i] = bet;
                     this.turnBet = {action: "raise", playerName: this.playerName, amount: bet, chips: this.chips};
@@ -1983,7 +1946,7 @@ Player.prototype.AllIn = function () {
     var i, allInValue = 0;
     for (i = 0; i < this.table.players.length; i += 1) {
         if (this === this.table.players[i]) {
-            if (this.table.players[i].chips !== 0) {
+            if (this.table.players[i].chips != 0) {
                 allInValue = this.table.players[i].chips;
                 this.table.game.bets[i] += this.table.players[i].chips;
                 this.table.players[i].chips = 0;
