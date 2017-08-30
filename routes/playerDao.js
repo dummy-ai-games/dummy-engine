@@ -2,27 +2,26 @@
  * Created by jieping on 2017/8/27.
  */
 var db = require('../database/msession');
-exports.addOrUpdatePlayer = function (player) {
-    db.collection("players", function (err, collection) {
-        collection.find({playerName: player.playerName}).toArray(function (err, results) {
+exports.addOrUpdateWinner = function (data) {
+    db.collection("tables", function (err, collection) {
+        collection.find({tableNumber: data.tableNumber}).toArray(function (err, results) {
             if (results && results.length > 0) {
-                collection.update({playerName: player.playerName}, {
+                collection.update({tableNumber: data.tableNumber}, {
                     $set: {
-                        chips: player.chips,
-                        hand: player.hand
+                        winners: data.winners
                     }
                 }, function (err, result) {
                     if (result)
-                        console.log("update player:" + player.playerName + " success");
+                        console.log("update table "+ data.tableNumber + " winner success");
                     else
-                        console.log("update player:" + player.playerName + " fail");
+                        console.log("update table "+ data.tableNumber + " winner fail");
                 });
             } else {
-                collection.insert(player, function (err, docs) {
+                collection.insert(data, function (err, docs) {
                     if (!err)
-                        console.log("insert player:" + player.playerName + " success");
+                        console.log("insert table "+ data.tableNumber + " winner success");
                     else
-                        console.log("insert player:" + player.playerName + " fail" + err);
+                        console.log("insert table "+ data.tableNumber + " winner fail" + err);
                 });
             }
         });
@@ -31,7 +30,7 @@ exports.addOrUpdatePlayer = function (player) {
 };
 
 exports.clearTable = function () {
-    db.collection("players", function (err, collection) {
+    db.collection("tables", function (err, collection) {
         collection.remove({}, function (err, docs) {
             if (!err)
                 console.log("remove all data success");

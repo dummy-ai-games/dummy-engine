@@ -114,8 +114,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             var data = getBasicData(that);
             data.winners = that.gameWinners;
             that.eventEmitter.emit("__gameOver", data);
-            for (var i in that.gameWinners)
-                playerDao.addOrUpdatePlayer(that.gameWinners[i]);
+            playerDao.addOrUpdateWinner({tableNumber: that.tableNumber, winners: that.gameWinners});
         }
     });
 }
@@ -146,7 +145,7 @@ function getNextPlayer(table) {
     var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ? (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
-    } while (table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] == maxBet) || table.players[table.currentPlayer].chips <= 0);
+    } while (table.players[table.currentPlayer].chips <= 0 || table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] == maxBet));
 }
 
 function sort(data) {
