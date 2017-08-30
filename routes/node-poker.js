@@ -40,6 +40,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
 
     this.eventEmitter.on("newRound", function () {
         console.log("newRound");
+        getNextPlayer(that);
         takeAction(that, "__turn");
     });
 
@@ -50,13 +51,13 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     });
 
     this.eventEmitter.on("deal", function () {
-        var end = true;
+        var playerCount = 0;
         for (var i in that.players) {
-            if (!that.players[i].folded && !that.players[i].allIn) {
-                end = false;
+            if (!that.players[i].folded && !that.players[i].allIn && that.players[i].chips > 0) {
+                playerCount++;
             }
         }
-        if (end || that.surviveCount == 1) {
+        if (playerCount <= 1 || that.surviveCount == 1) {
             for (var j = 0; j < that.players.length; j++)
                 that.players[j].talked = true;
             progress(that);
@@ -70,15 +71,15 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     });
 
     this.eventEmitter.on("gameOver", function () {
+        var count = 0;
         for (var i = 0; i < that.players.length; i++) {
-            if (that.players[i].chips == 0) {
-                that.players.splice(i, 1);
-                i--;
+            if (that.players[i].chips != 0) {
+                count++;
             }
         }
-        if (that.roundCount < 2 && that.players.length > 2) {
+        if (that.roundCount < 2 && count > 3) {
             console.log("上轮结束，下一轮开始");
-            that.surviveCount = that.players.length;
+            that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++)
                 that.players[j] = new Player(that.players[j].playerName, that.players[j].chips, that);
             that.game = new Game(that.smallBlind, that.bigBlind);
@@ -90,11 +91,12 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         else {
             console.log("gameOver, 胜者如下：");
             for (var i = 0; i < that.players.length; i++) {
-                that.gameWinners.push({
-                    playerName: that.players[i].playerName,
-                    hand: that.players[i].hand,
-                    chips: that.players[i].chips
-                });
+                if (that.players[i].chips > 0)
+                    that.gameWinners.push({
+                        playerName: that.players[i].playerName,
+                        hand: that.players[i].hand,
+                        chips: that.players[i].chips
+                    });
             }
             sort(that.gameWinners);
             if (that.gameWinners.length > 3) {
@@ -144,7 +146,7 @@ function getNextPlayer(table) {
     var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ? (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
-    } while (table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.currentPlayer.talked === true && table.game.bets[table.currentPlayer] == maxBet));
+    } while (table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] == maxBet) || table.players[table.currentPlayer].chips <= 0);
 }
 
 function sort(data) {
@@ -282,7 +284,7 @@ function checkForEndOfRound(table) {
     maxBet = getMaxBet(table.game.bets);
     //For each player, check
     for (i = 0; i < table.players.length; i += 1) {
-        if (table.players[i].folded === false) {
+        if (table.players[i].chips > 0 && table.players[i].folded === false) {
             if (table.players[i].talked === false || table.game.bets[i] !== maxBet) {
                 if (table.players[i].allIn === false) {
                     endOfRound = false;
@@ -1689,8 +1691,6 @@ Table.prototype.getPreviousPlayerAction = function () {
 // Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
 
 
-
-
 Table.prototype.getWinners = function () {
     return this.gameWinners;
 };
@@ -1735,6 +1735,7 @@ Table.prototype.initNewRound = function () {
 Table.prototype.StartGame = function () {
     //If there is no current game and we have enough players, start a new game.
     if (!this.game) {
+        this.playersToRemove = [];
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
     }
@@ -1772,7 +1773,6 @@ Table.prototype.NewRound = function () {
         var temp = i;
         this.players.push(this.playersToAdd[i]);
     }
-    this.playersToRemove = [];
     this.playersToAdd = [];
     this.gameWinners = [];
     this.gameLosers = [];
@@ -1791,10 +1791,15 @@ Table.prototype.NewRound = function () {
     if (smallBlind >= this.players.length) {
         smallBlind = 0;
     }
-    bigBlind = this.dealer + 2;
+    while (this.players[smallBlind].chips <= 0)
+        smallBlind++;
+
+    bigBlind = smallBlind + 1;
     if (bigBlind >= this.players.length) {
         bigBlind -= this.players.length;
     }
+    while (this.players[bigBlind].chips <= 0)
+        bigBlind++;
     //Force Blind Bets
     this.players[smallBlind].chips -= this.smallBlind;
     this.players[bigBlind].chips -= this.bigBlind;
@@ -1802,10 +1807,7 @@ Table.prototype.NewRound = function () {
     this.game.bets[bigBlind] = this.bigBlind;
 
     // get currentPlayer
-    this.currentPlayer = this.dealer + 3;
-    if (this.currentPlayer >= this.players.length) {
-        this.currentPlayer -= this.players.length;
-    }
+    this.currentPlayer = bigBlind;
     this.eventEmitter.emit("newRound");
 };
 
@@ -1950,7 +1952,6 @@ Player.prototype.AllIn = function () {
                 allInValue = this.table.players[i].chips;
                 this.table.game.bets[i] += this.table.players[i].chips;
                 this.table.players[i].chips = 0;
-
                 this.allIn = true;
                 this.talked = true;
             }
