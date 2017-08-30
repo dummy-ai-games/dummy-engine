@@ -200,8 +200,8 @@ var GameLayer = cc.Layer.extend({
             this.privateCardSprites[i][0] = cc.Sprite.create(s_p_back);
             this.privateCardSprites[i][1] = cc.Sprite.create(s_p_back);
 
-            this.privateCardSprites[i][0].setAnchorPoint(0, -0.45);
-            this.privateCardSprites[i][1].setAnchorPoint(0, -0.45);
+            this.privateCardSprites[i][0].setAnchorPoint(0, -0.25);
+            this.privateCardSprites[i][1].setAnchorPoint(0, -0.25);
 
             if (i < 5) {
                 this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 16 * 6,
@@ -216,7 +216,7 @@ var GameLayer = cc.Layer.extend({
             }
 
             // calculate card sprite scale for the screen
-            this.privateCardScale = this.validHeight / 12 / this.privateCardSprites[i][0].height;
+            this.privateCardScale = this.validHeight / 10 / this.privateCardSprites[i][0].height;
             this.privateCardSprites[i][0].setScale(this.privateCardScale);
             this.privateCardSprites[i][1].setScale(this.privateCardScale);
 
@@ -244,12 +244,12 @@ var GameLayer = cc.Layer.extend({
         this.publicCardSprites[4].setPosition(cc.p(this.validWidth / 16 * 9, this.validHeight - this.roundText.height));
 
         // calculate card sprite scale for the screen
-        this.cardScale = this.validHeight / 10 / this.publicCardSprites[0].height;
-        this.publicCardSprites[0].setScale(this.cardScale);
-        this.publicCardSprites[1].setScale(this.cardScale);
-        this.publicCardSprites[2].setScale(this.cardScale);
-        this.publicCardSprites[3].setScale(this.cardScale);
-        this.publicCardSprites[4].setScale(this.cardScale);
+        this.publicCardScale = this.validHeight / 10 / this.publicCardSprites[0].height;
+        this.publicCardSprites[0].setScale(this.publicCardScale);
+        this.publicCardSprites[1].setScale(this.publicCardScale);
+        this.publicCardSprites[2].setScale(this.publicCardScale);
+        this.publicCardSprites[3].setScale(this.publicCardScale);
+        this.publicCardSprites[4].setScale(this.publicCardScale);
 
         this.addChild(this.publicCardSprites[0], 6);
         this.addChild(this.publicCardSprites[1], 6);
