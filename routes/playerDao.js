@@ -16,6 +16,19 @@ exports.getPlayers = function (req, res) {
     });
 };
 
+exports.getAllPlayer = function (data) {
+    db.collection("players", function (err, collection) {
+        collection.find({}).toArray(function (err, results) {
+            if (!err) {
+                for (var i = 0; i < results.length; i++) {
+                    var player = results[i];
+                    data[player.playerName] = player.tableNumber;
+                }
+            }
+        });
+    });
+};
+
 exports.savePlayers = function (req, res) {
     var players = JSON.parse(req.body.players);
     db.collection("players", function (err, collection) {

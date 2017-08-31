@@ -6,8 +6,8 @@ var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
 var poker = require('./node-poker');
-var playerDao = require("./winnerDao");
-
+var winnerDao = require("./winnerDao");
+var playerDao = require("./playerDao");
 
 var errorCb = function (rtc) {
     return function (error) {
@@ -25,6 +25,7 @@ function SkyRTC() {
     this.exitPlayers = {};
     this.tablePlayerNumber = 10;
     this.playerNumber = 0;
+    this.playerAndTable = {};
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
@@ -47,6 +48,8 @@ function SkyRTC() {
                 socket.tableNumber = exitPlayer.tableNumber;
                 socket.index = exitPlayer.index;
                 delete that.exitPlayers[socket.id];
+            } else {
+                socket.tableNumber = that.playerAndTable[socket.id];
             }
             that.players[socket.id] = socket;
             this.emit('new_peer', socket.id);
@@ -56,7 +59,7 @@ function SkyRTC() {
     });
 
     this.on('_startGame', function () {
-        playerDao.clearTable();
+        winnerDao.clearTable();
         this.startGame();
     });
 
@@ -197,7 +200,7 @@ SkyRTC.prototype.initAdminData = function () {
         that.admin.send(JSON.stringify(message), errorCb);
     }
 }
-SkyRTC.prototype.getBasicData = function(){
+SkyRTC.prototype.getBasicData = function () {
     var that = this;
     var players = [];
     var table = {};
@@ -248,9 +251,12 @@ SkyRTC.prototype.startGame = function () {
     that.initTable();
     var index = 0;
     for (var player in this.players) {
-        var belongTable = parseInt(index / tablePlayerNum);
+        var belongTable = that.players[player].tableNumber;
+        if (!belongTable) {
+            belongTable = parseInt(index / tablePlayerNum);
+            that.players[player].tableNumber = belongTable;
+        }
         that.table[belongTable].AddPlayer(player);
-        that.players[player].tableNumber = belongTable;
         that.players[player].index = index;
         index++;
     }
@@ -402,6 +408,8 @@ SkyRTC.prototype.init = function (socket) {
         that.removeSocket(socket);
 
     });
+
+    playerDao.getAllPlayer(that.playerAndTable);
     that.emit('new_connect', socket);
 };
 
