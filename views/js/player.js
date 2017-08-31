@@ -28,9 +28,9 @@ rtc.on("_action", function (data) {
     board = data.game.board;
     minBet = data.game.minBet;
     raiseCount = data.game.raiseCount;
-    /* setTimeout(function(){
-         $("#call").click();
-     },2000);*/
+     setTimeout(function(){
+         $("#raise").click();
+     },2000);
 
 });
 
@@ -48,10 +48,10 @@ rtc.on("_bet", function (data) {
     board = data.game.board;
     minBet = data.game.minBet;
     raiseCount = data.game.raiseCount;
-    /* setTimeout(function(){
+     setTimeout(function(){
          $("#amount").val("20");
          $("#bet").click();
-     },2000);*/
+     },2000);
 });
 
 $("#bet").click(function () {

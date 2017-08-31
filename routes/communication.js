@@ -6,7 +6,7 @@ var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
 var poker = require('./node-poker');
-var playerDao = require("./playerDao");
+var playerDao = require("./winnerDao");
 
 
 var errorCb = function (rtc) {

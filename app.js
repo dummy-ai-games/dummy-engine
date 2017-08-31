@@ -13,6 +13,7 @@ var routes = require('./routes/index');
 var flash = require('connect-flash');
 var fs = require("fs");
 var app = express();
+var playerDao = require('./routes/playerDao');
 
 var port = normalizePort(process.env.PORT || '3000' || '443');
 app.set('port', port);
@@ -81,6 +82,12 @@ app.use(function (req, res, next) {
 });
 
 app.use("/", express.static(__dirname + '/views/'));
+app.post("/getPlayers", function (req, res) {
+    playerDao.getPlayers(req, res);
+});
+app.post("/savePlayers", function (req, res) {
+    playerDao.savePlayers(req, res);
+});
 
 SkyRTC.rtc.on('new_connect', function (socket) {
     console.log('创建新连接');

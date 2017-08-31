@@ -1,39 +1,44 @@
 /**
- * Created by jieping on 2017/8/27.
+ * Created by jieping on 2017/8/31.
  */
 var db = require('../database/msession');
-exports.addOrUpdateWinner = function (data) {
-    db.collection("tables", function (err, collection) {
-        collection.find({tableNumber: data.tableNumber}).toArray(function (err, results) {
-            if (results && results.length > 0) {
-                collection.update({tableNumber: data.tableNumber}, {
-                    $set: {
-                        winners: data.winners
-                    }
-                }, function (err, result) {
-                    if (result)
-                        console.log("update table "+ data.tableNumber + " winner success");
-                    else
-                        console.log("update table "+ data.tableNumber + " winner fail");
-                });
+exports.getPlayers = function (req, res) {
+    db.collection("players", function (err, collection) {
+        collection.find({}).toArray(function (err, results) {
+            if (!err) {
+                res.send({error_code: 0, players: results});
             } else {
-                collection.insert(data, function (err, docs) {
-                    if (!err)
-                        console.log("insert table "+ data.tableNumber + " winner success");
-                    else
-                        console.log("insert table "+ data.tableNumber + " winner fail" + err);
-                });
+                res.send({error_code: 1, players: {}})
             }
+            res.end();
         });
 
     });
 };
 
-exports.clearTable = function () {
-    db.collection("tables", function (err, collection) {
+exports.savePlayers = function (req, res) {
+    var players = JSON.parse(req.body.players);
+    db.collection("players", function (err, collection) {
         collection.remove({}, function (err, docs) {
             if (!err)
                 console.log("remove all data success");
+            if (players) {
+                for (var i = 0; i < players.length; i++)
+                    addPlayer(collection, players[i]);
+            }
+            res.send({error_code: 0});
+            res.end();
+
         });
     });
+};
+
+function addPlayer(collection, player) {
+    collection.insert(player, function (err, docs) {
+        if (!err)
+            console.log("insert player " + player.playerName + " success");
+        else
+            console.log("insert player " + player.playerName + " fail" + err);
+    });
+
 }

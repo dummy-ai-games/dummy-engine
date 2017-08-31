@@ -1,6 +1,6 @@
 var events = require('events');
 var util = require('util');
-var playerDao = require("./playerDao");
+var winnerDao = require("./winnerDao");
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn) {
     this.smallBlind = smallBlind;
@@ -77,7 +77,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 count++;
             }
         }
-        if (that.roundCount < 2 && count > 3) {
+        if (count > 3) {
             console.log("上轮结束，下一轮开始");
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++)
@@ -114,7 +114,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             var data = getBasicData(that);
             data.winners = that.gameWinners;
             that.eventEmitter.emit("__gameOver", data);
-            playerDao.addOrUpdateWinner({tableNumber: that.tableNumber, winners: that.gameWinners});
+            winnerDao.addOrUpdateWinner({tableNumber: that.tableNumber, winners: that.gameWinners});
         }
     });
 }
