@@ -71,7 +71,7 @@
                     value: "delete"
                 }).click(function () {
                     $(this).parent().remove();
-                    delete players[$(this).val()];
+                    delete players[$(this).next().val()];
                 }).appendTo(recordData);
                 $("<input/>", {
                     type: "text",
@@ -121,7 +121,7 @@
             value: "delete"
         }).click(function () {
             $(this).parent().remove();
-            delete players[$(this).val()];
+            delete players[$(this).next().val()];
         }).appendTo(recordData);
         $("<input/>", {
             type: "text",
