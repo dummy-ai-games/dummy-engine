@@ -1,6 +1,8 @@
 /**
- * Created by jieping on 2017/8/27.
+ * Created by the-engine-team
+ * 2017-08-27
  */
+
 var db = require('../database/msession');
 exports.addOrUpdateWinner = function (data) {
     db.collection("tables", function (err, collection) {

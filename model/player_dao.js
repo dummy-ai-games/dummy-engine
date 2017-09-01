@@ -1,6 +1,8 @@
 /**
- * Created by jieping on 2017/8/31.
+ * Created by the-engine-team
+ * 2017-08-31
  */
+
 var db = require('../database/msession');
 
 exports.getPlayers = function (req, res) {
@@ -54,5 +56,4 @@ function addPlayer(collection, player) {
         else
             console.log("insert player " + player.playerName + " fail" + err);
     });
-
 }

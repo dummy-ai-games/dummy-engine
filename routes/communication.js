@@ -398,6 +398,7 @@ SkyRTC.prototype.init = function (socket) {
             that.emit("socket_message", socket, data);
         }
     });
+
     //连接关闭后从SkyRTC实例中移除连接，并通知其他连接
     socket.on('close', function () {
         that.emit('remove_peer', socket.id);
@@ -406,7 +407,6 @@ SkyRTC.prototype.init = function (socket) {
             that.notifyKanban(socket.id, socket.index);
         }
         that.removeSocket(socket);
-
     });
 
     playerDao.getAllPlayer(that.playerAndTable);
