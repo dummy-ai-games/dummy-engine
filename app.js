@@ -1,6 +1,4 @@
 var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -9,22 +7,13 @@ var session = require('express-session');
 var Settings = require('./database/settings');
 var MongoStore = require('connect-mongodb');
 var db = require('./database/msession');
-var routes = require('./routes/index');
 var flash = require('connect-flash');
-var fs = require("fs");
 var app = express();
-var playerDao = require('./routes/playerDao');
+var playerDao = require('./model/player_dao');
 
 var port = normalizePort(process.env.PORT || '3000' || '443');
 app.set('port', port);
 
-/*var options = {
- key: fs.readFileSync('./cer/privatekey.pem'),
- cert: fs.readFileSync('./cer/certificate.pem')
- };
- var httpsServer = require('https').createServer(options,app);
- var httpsPort = normalizePort('443');
- httpsServer.listen(httpsPort);*/
 
 var httpServer = require('http').createServer(app);
 var httpPort = normalizePort(process.env.PORT || '3000');

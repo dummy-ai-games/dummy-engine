@@ -19,15 +19,9 @@ function initWebsock() {
     });
 
     rtc.on("_new_peer", function (data) {
-        var parent = $("#content");
-        parent.empty();
-
         for (var i = 0; i < data.length; i++) {
             var playerName = data[i];
-            var div = $("<div/>", {
-                class: "form-group"
-            }).prependTo(parent);
-            $("<span/>").text("用户:" + playerName + "加入").appendTo(div);
+            console.log("用户:" + playerName + "加入");
         }
 
         console.log("player_join : " + JSON.stringify(data));
@@ -50,8 +44,7 @@ function initWebsock() {
             var player = winners[i];
             result += "用户:" + player.playerName + ",最终金额:" + player.chips + "\n";
         }
-        $("#msg").html($("#msg").html() + "<br/>" + result);
-        $("#msg").show();
+        console.log(result);
 
         // update in game engine
         console.log("finish_game : " + JSON.stringify(data));
@@ -59,9 +52,6 @@ function initWebsock() {
         gameStatus = STATUS_GAME_FINISHED;
     });
     rtc.on('startGame', function (data) {
-        $("#msg").html($("#msg").html() + "<br/>" + data.msg);
-        $("#msg").show();
-
         // update in game engine
         console.log("start_game : " + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
@@ -74,8 +64,7 @@ function initWebsock() {
         for (var index in board_card) {
             board += board_card[index] + ",";
         }
-        $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 当前公共牌：" + board);
-        $("#msg").show();
+        console.log("table " + tableNumber + " 当前公共牌：" + board);
 
         // update in game engine
         console.log("deal : " + JSON.stringify(data));
@@ -84,8 +73,7 @@ function initWebsock() {
     rtc.on('__newRound', function (data) {
         var roundCount = data.table.roundCount;
         var tableNumber = data.table.tableNumber;
-        $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 第" + roundCount + "轮开始");
-        $("#msg").show();
+        console.log("table " + tableNumber + " 第" + roundCount + "轮开始");
 
         // update in game engine
         console.log("new_round : " + JSON.stringify(data));
@@ -99,8 +87,11 @@ function initWebsock() {
 
         var playerIndex = findPlayerIndexById(data.action.playerName);
 
-        if (roundAction.action == "check" || roundAction.action == "fold" || roundAction.action == "raise" || roundAction.action == "call") {
-            $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);
+        if (roundAction.action == "check" ||
+            roundAction.action == "fold" ||
+            roundAction.action == "raise" ||
+            roundAction.action == "call") {
+            console.log("table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);
             // update in game engine
             if (playerIndex != -1) {
                 players[playerIndex].setAction(roundAction.action);
@@ -109,7 +100,7 @@ function initWebsock() {
                 }
             }
         } else {
-            $("#msg").html($("#msg").html() + "<br/>" + "table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action + ", 押注金额：" + roundAction.amount);
+            console.log("table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action + ", 押注金额：" + roundAction.amount);
             // update in game engine
             if (playerIndex != -1) {
                 players[playerIndex].setAction(roundAction.action);
@@ -144,7 +135,7 @@ function initGame() {
     container.innerHTML = '<canvas id="gameCanvas" width="' + winWidth + '" height="' + winHeight + '"></canvas>';
     if (!d.createElement('canvas').getContext) {
         var s = d.createElement('div');
-        s.innerHTML = '<h2>您的浏览器不支持HTML5 !</h2>' +
+        s.innerHTML = '<h2>Your browser does not support HTML5 !</h2>' +
             '<p>Google Chrome is a browser that combines a minimal design with sophisticated technology to make the web faster, safer, and easier.Click the logo to download.</p>' +
             '<a href="http://www.google.com/chrome" target="_blank">' +
             '<img game-src="http://www.google.com/intl/zh-CN/chrome/assets/common/images/chrome_logo_2x.png" border="0"/></a>';
@@ -162,7 +153,7 @@ function initGame() {
 }
 
 function ccLoad() {
-    cc.game.onStart = function() {
+    cc.game.onStart = function () {
         //load resources
         cc.LoaderScene.preload(resources, function () {
             var LSScene = cc.Scene.extend({

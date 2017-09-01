@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="X-UA-Compatible" content="edge">
+    <title>THE Register</title>
+    <link rel="stylesheet" href="style/bootstrap.min.css">
+    <link rel="stylesheet" href="style/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="style/register.css">
+
+</head>
+<body>
+
+<div class="container">
+    <div class="jumbotron" style="margin-top: 50px;">
+        <h1 style="text-align: center;">玩家报名</h1>
+        <p style="text-align: center;">CDC Engineering Camp 2017</p>
+    </div>
+
+    <hr>
+    <div class="form-signin">
+        <label for="user_name" class="sr-only">队伍名称</label>
+        <input type="email" id="user_name" class="form-control" placeholder="队伍名称" value="" required autofocus>
+        <label for="password" class="sr-only">密码</label>
+        <input type="password" id="password" class="form-control" value="" placeholder="密码" required>
+        <button class="btn btn-normal btn-success" onclick="register();">注册</button>
+        <button class="btn btn-normal btn-default" onclick="update();">修改信息</button>
+    </div>
+</div>
+
+<script src="js/public/jquery.min.js"></script>
+<script src="js/utils/url-parser.js"></script>
+<script src="js/register.js"></script>
+</body>
+</html>

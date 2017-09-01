@@ -1,7 +1,8 @@
 var events = require('events');
 var util = require('util');
-var winnerDao = require("./winnerDao");
-var playerDao = require("./playerDao");
+var playerDao = require("../model/player_dao");
+var winnerDao = require("../model/winner_dao");
+
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn) {
     this.smallBlind = smallBlind;
