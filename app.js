@@ -88,6 +88,9 @@ app.post("/getPlayers", function (req, res) {
 app.post("/savePlayers", function (req, res) {
     playerDao.savePlayers(req, res);
 });
+app.post("/getTables", function (req, res) {
+    playerDao.getAllTable(req, res);
+});
 
 SkyRTC.rtc.on('new_connect', function (socket) {
     console.log('创建新连接');

@@ -27,6 +27,7 @@ rtc.on("_join", function (data) {
             }).text(player.chips).appendTo(div);
         }
     }
+
 });
 
 rtc.on('_showAction', function (player) {

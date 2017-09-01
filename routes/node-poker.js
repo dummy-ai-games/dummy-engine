@@ -1,6 +1,7 @@
 var events = require('events');
 var util = require('util');
 var winnerDao = require("./winnerDao");
+var playerDao = require("./playerDao");
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn) {
     this.smallBlind = smallBlind;
@@ -42,6 +43,11 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         console.log("newRound");
         getNextPlayer(that);
         takeAction(that, "__turn");
+        var tempData = [];
+        for (var i = 0; i < that.players.length; i++) {
+            tempData.push({playerName: that.players[i].playerName, chips: that.players[i].chips});
+        }
+        playerDao.updatePlayerChips(tempData);
     });
 
     this.eventEmitter.on("_showAction", function (data) {
