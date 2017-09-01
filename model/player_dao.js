@@ -2,6 +2,7 @@
  * Created by jieping on 2017/8/31.
  */
 var db = require('../database/msession');
+
 exports.getPlayers = function (req, res) {
     db.collection("players", function (err, collection) {
         collection.find({}).toArray(function (err, results) {

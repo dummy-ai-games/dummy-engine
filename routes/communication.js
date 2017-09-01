@@ -5,9 +5,9 @@ var WebSocketServer = require('ws').Server;
 var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
-var poker = require('./node-poker');
-var winnerDao = require("./winnerDao");
-var playerDao = require("./playerDao");
+var poker = require('./node_poker');
+var winnerDao = require("../model/winner_dao");
+var playerDao = require("../model/player_dao");
 
 var errorCb = function (rtc) {
     return function (error) {
