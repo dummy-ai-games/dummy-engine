@@ -168,22 +168,30 @@ function sort(data) {
 }
 
 function takeAction(table, action) {
-    var player = {};
-    var currentPlayer = table.players[table.currentPlayer];
-    player['playerName'] = currentPlayer['playerName'];
-    player['chips'] = currentPlayer['chips'];
-    player['folded'] = currentPlayer['folded'];
-    player['allIn'] = currentPlayer['allIn'];
-    player['cards'] = currentPlayer['cards'];
+    var players = [];
+    var destPlayer = {};
+    for (var i = 0; i < table.players.length; i++) {
+        var player = {};
+        player['playerName'] = table.players[i]['playerName'];
+        player['chips'] = table.players[i]['chips'];
+        player['folded'] = table.players[i]['folded'];
+        player['allIn'] = table.players[i]['allIn'];
+        if (i == table.currentPlayer) {
+            player['cards'] = table.players[i]['cards'];
+            destPlayer = player;
+        } else
+            players.push(player);
+    }
     var data = {
         "tableNumber": table.tableNumber,
-        "player": player,
+        "self": destPlayer,
         "game": {
             "roundBets": table.game.roundBets,
             "bets": table.game.bets,
             "board": table.game.board,
             "minBet": table.smallBlind,
-            "roundName": table.game.roundName
+            "roundName": table.game.roundName,
+            "otherPlayers": players
         }
     };
     table.eventEmitter.emit(action, data);
@@ -467,7 +475,7 @@ function rankHandInt(hand) {
 
     for (i = 0; i < hand.cards.length; i += 1) {
         handRanks[i] = hand.cards[i].substr(0, 1);
-        handSuits[i] = hand.cards[i].substr(1, 1);
+        handSuits[i] = hand.cards[i].substr(1, 2);
     }
 
     ranks = handRanks.sort().toString().replace(/\W/g, "");

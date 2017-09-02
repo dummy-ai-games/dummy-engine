@@ -340,7 +340,7 @@ SkyRTC.prototype.initTable = function () {
 
 SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var that = this;
-    var player = message.data.player.playerName;
+    var player = message.data.self.playerName;
     if (that.players[player]) {
         var tableNumber = that.players[player].tableNumber;
         var currentTable = that.table[tableNumber];
