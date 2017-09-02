@@ -67,6 +67,7 @@ function takeAction(selfCard, cards, players) {
     var isSitiao = false;
     var isSantiao = false;
     var pairNumber = 0;
+    var pairValue = '0';
 
 
     var temp = 1;
@@ -97,8 +98,13 @@ function takeAction(selfCard, cards, players) {
                 isSitiao = true;
             else if (temp == 3)
                 isSantiao = true;
-            else if (temp == 2)
+            else if (temp == 2) {
                 pairNumber++;
+                if (handRanks[i] == 'A')
+                    pairValue = 1;
+                else if (handRanks[i] > pairValue)
+                    pairValue = handRanks[i];
+            }
         } else {
             temp = 1;
         }
@@ -147,7 +153,7 @@ function takeAction(selfCard, cards, players) {
         return;
     }
 
-    if (pairNumber > 0 && selfCard[0] != selfCard[1]) {
+    if (pairNumber > 0 && selfCard.toString().indexOf(pairValue) > -1) {
         setTimeout(function () {
             $("#call").click();
         }, 2000);
