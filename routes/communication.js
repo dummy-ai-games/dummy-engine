@@ -20,7 +20,6 @@ var errorCb = function (rtc) {
 function SkyRTC() {
     this.table = [];
     this.admin = null;
-    this.kanban = null;
     this.players = {};
     this.exitPlayers = {};
     this.tablePlayerNumber = 10;
@@ -37,16 +36,11 @@ function SkyRTC() {
             that.admin = socket;
             that.admin.tableNumber = table;
             that.initAdminData();
-        } else if (playerName == "kanban") {
-            that.kanban = socket;
-            if (that.isStart)
-                that.initKanbanData();
         } else {
             that.playerNumber++;
             var exitPlayer = that.exitPlayers[socket.id];
             if (exitPlayer) {
                 socket.tableNumber = exitPlayer.tableNumber;
-                socket.index = exitPlayer.index;
                 delete that.exitPlayers[socket.id];
             } else {
                 socket.tableNumber = that.playerAndTable[socket.id];
@@ -78,7 +72,7 @@ function SkyRTC() {
                 currentTable.players[playerIndex].Fold();
             else if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
                 switch (action) {
-                    case "Bet":
+                    case "bet":
                         if (currentTable.isBet) {
                             var amount;
                             try {
@@ -91,27 +85,27 @@ function SkyRTC() {
                         } else
                             currentTable.players[playerIndex].Call();
                         break;
-                    case "Call":
+                    case "call":
                         if (currentTable.isBet)
                             currentTable.players[playerIndex].Bet(currentTable.smallBlind);
                         else
                             currentTable.players[playerIndex].Call();
                         break;
-                    case "Check":
+                    case "check":
                         currentTable.players[playerIndex].Check();
                         break;
-                    case "Raise":
+                    case "raise":
                         if (currentTable.isBet)
                             currentTable.players[playerIndex].Bet(currentTable.smallBlind);
                         else
                             currentTable.players[playerIndex].Raise();
                         break;
-                    case "All-in":
+                    case "allin":
                         if (currentTable.isBet)
                             currentTable.isBet = false;
                         currentTable.players[playerIndex].AllIn();
                         break;
-                    case "Fold":
+                    case "fold":
                         currentTable.players[playerIndex].Fold();
                         break;
                     default:
@@ -133,60 +127,6 @@ function getPlayerIndex(playerName, players) {
             return i;
     }
     return -1;
-}
-
-SkyRTC.prototype.initKanbanData = function () {
-    var result = [];
-    var chips = {};
-    var that = this;
-    if (that.kanban) {
-        for (var i = 0; i < that.table.length; i++) {
-            for (var j in that.table[i].players) {
-                var player = that.table[i].players[j];
-                chips[player.playerName] = player.chips;
-            }
-        }
-        for (var player in that.players) {
-            var data = {playerName: player};
-            var id = that.players[player].index;
-            var chip = 0;
-            chip = chips[player] || 0;
-            data["chips"] = chip;
-            data["id"] = id;
-            result.push(data);
-        }
-        var message = {
-            "eventName": "_join",
-            "data": result
-        }
-        that.kanban.send(JSON.stringify(message), errorCb);
-    }
-}
-
-SkyRTC.prototype.updateKanban = function (playerName, tableNumber, chips) {
-    var that = this;
-    if (that.kanban && that.players[playerName]) {
-        var data = {};
-        data["playerName"] = playerName;
-        data["chips"] = chips;
-        data["id"] = that.players[playerName].index;
-        var message = {
-            "eventName": "_showAction",
-            "data": data
-        }
-        that.kanban.send(JSON.stringify(message), errorCb);
-    }
-}
-
-SkyRTC.prototype.notifyKanban = function (playerName, index) {
-    var that = this;
-    if (that.kanban) {
-        var message = {
-            "eventName": "_playerExit",
-            "data": {playerName: playerName, id: index}
-        }
-        that.kanban.send(JSON.stringify(message), errorCb);
-    }
 }
 
 SkyRTC.prototype.initAdminData = function () {
@@ -245,10 +185,10 @@ SkyRTC.prototype.startGame = function () {
     var tablePlayerNum = parseInt(that.tablePlayerNumber);
     var tableNum = playerNum % tablePlayerNum == 0 ? parseInt(playerNum / tablePlayerNum) : parseInt(playerNum / tablePlayerNum) + 1;
     that.table.splice(0, that.table.length);
-    that.isStart = true;
     for (var i = 0; i < tableNum; i++)
         that.table.push(new poker.Table(50, 100, 3, 10, 100, 1000));
     that.initTable();
+
     var index = 0;
     for (var player in this.players) {
         var belongTable = that.players[player].tableNumber;
@@ -257,7 +197,6 @@ SkyRTC.prototype.startGame = function () {
             that.players[player].tableNumber = belongTable;
         }
         that.table[belongTable].AddPlayer(player);
-        that.players[player].index = index;
         index++;
     }
     for (var i = 0; i < that.table.length; i++) {
@@ -314,8 +253,6 @@ SkyRTC.prototype.initTable = function () {
                 "data": data
             }
             that.admin.send(JSON.stringify(message), errorCb);
-            that.initKanbanData();
-            that.isStart = false;
         });
 
         that.table[i].eventEmitter.on("__newRound", function (data) {
@@ -332,7 +269,6 @@ SkyRTC.prototype.initTable = function () {
                 "data": data
             }
             that.admin.send(JSON.stringify(message), errorCb);
-            that.updateKanban(data.action.playerName, data.table.tableNumber, data.action.chips);
             that.broadcastInPlayers(message);
         });
     }
@@ -375,6 +311,11 @@ SkyRTC.prototype.removeSocket = function (socket) {
 SkyRTC.prototype.broadcastInPlayers = function (message) {
     for (var i = 0; i < message.data.players.length; i++) {
         delete message.data.players[i].cards;
+        if (!message.data.players[i].isSurvive) {
+            delete  message.data.players[i];
+            i--;
+        }
+        delete message.data.players[i].isSurvive;
     }
     var tableNumber = message.data.table.tableNumber;
     for (var player in this.players) {
@@ -402,9 +343,8 @@ SkyRTC.prototype.init = function (socket) {
     //连接关闭后从SkyRTC实例中移除连接，并通知其他连接
     socket.on('close', function () {
         that.emit('remove_peer', socket.id);
-        if (socket.id != "admin" && socket.id != "kanban" && that.players[socket.id].tableNumber != undefined) {
+        if (socket.id != "admin" && that.players[socket.id].tableNumber != undefined) {
             that.exitPlayers[socket.id] = socket;
-            that.notifyKanban(socket.id, socket.index);
         }
         that.removeSocket(socket);
     });

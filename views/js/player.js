@@ -10,6 +10,10 @@ var board;
 var minBet;
 var raiseCount;
 var otherPlayers;
+var playerActions = {};
+var gameStatus = 0;
+var risk = 1;
+var danager = 2;
 var rtc = SkyRTC();
 
 rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], '');
@@ -53,6 +57,24 @@ rtc.on("_bet", function (data) {
     }, 2000);
 });
 
+rtc.on('__showAction', function (data) {
+    console.log("action : " + JSON.stringify(data.action));
+    var playerAction = data.action;
+
+    if (!playerActions[playerAction.playerName]) {
+        playerActions[playerAction.playerName] = [];
+    }
+    var currentPlayer = playerActions[playerAction.playerName];
+    currentPlayer.push(playerAction.action);
+    if (data.table.roundName == 'Flop' && (playerAction.action == 'raise' || playerAction.action == 'allin') && currentPlayer.toString().indexOf('raise') == -1) {
+        gameStatus = risk;
+    }
+    if (data.table.roundName == 'Turn' && (playerAction.action == 'raise' || playerAction.action == 'allin') && currentPlayer.toString().indexOf('raise') == -1) {
+        gameStatus = danager;
+    }
+
+});
+
 function takeAction(selfCard, cards, players) {
     if (cards.length == 2) {
         setTimeout(function () {
@@ -67,7 +89,8 @@ function takeAction(selfCard, cards, players) {
     var isSitiao = false;
     var isSantiao = false;
     var pairNumber = 0;
-    var pairValue = '0';
+    var pairValue = '';
+    var maxPairValue = '0';
 
 
     var temp = 1;
@@ -100,10 +123,11 @@ function takeAction(selfCard, cards, players) {
                 isSantiao = true;
             else if (temp == 2) {
                 pairNumber++;
-                if (handRanks[i] == 'A')
-                    pairValue = 1;
-                else if (handRanks[i] > pairValue)
-                    pairValue = handRanks[i];
+                pairValue += handRanks[i];
+                if (handRanks[i] == 'A' && maxPairValue == '0')
+                    maxPairValue = '1';
+                else if (handRanks[i] > maxPairValue)
+                    maxPairValue = handRanks[i];
             }
         } else {
             temp = 1;
@@ -122,27 +146,16 @@ function takeAction(selfCard, cards, players) {
             temp = 1;
     }
 
-    if (isTonghua && isShunzi) {
+    if (isTonghua || isShunzi) {
         if (handRanks.indexOf("T") > -1 && handRanks.indexOf("J") > -1 && handRanks.indexOf("Q") > -1 && handRanks.indexOf("K") > -1 && handRanks.indexOf("A") > -1)
             setTimeout(function () {
                 $("#allin").click();
             }, 2000);
-        else
+        else if (isTonghua && isShunzi)
             setTimeout(function () {
                 $("#raise").click();
             }, 2000);
-        return;
-    }
-
-    if (isSitiao) {
-        setTimeout(function () {
-            $("#raise").click();
-        }, 2000);
-        return;
-    }
-
-    if (isSantiao || pairNumber > 1) {
-        if (pairNumber > 0)
+        else if (gameStatus == 0)
             setTimeout(function () {
                 $("#raise").click();
             }, 2000);
@@ -153,16 +166,55 @@ function takeAction(selfCard, cards, players) {
         return;
     }
 
-    if (pairNumber > 0 && selfCard.toString().indexOf(pairValue) > -1) {
-        setTimeout(function () {
-            $("#call").click();
-        }, 2000);
+    if (isSitiao) {
+        if (gameStatus != danager)
+            setTimeout(function () {
+                $("#raise").click();
+            }, 2000);
+        else
+            setTimeout(function () {
+                $("#call").click();
+            }, 2000);
         return;
     }
 
-    setTimeout(function () {
-        $("#fold").click();
-    }, 2000);
+    if (isSantiao || pairNumber > 1) {
+        if (isSantiao && (pairNumber > 1 || maxPairValue > '9') && gameStatus != danager)
+            setTimeout(function () {
+                $("#raise").click();
+            }, 2000);
+        else if (gameStatus == danager && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] != selfCard[1]))
+            setTimeout(function () {
+                $("#fold").click();
+            }, 2000);
+        else
+            setTimeout(function () {
+                $("#call").click();
+            }, 2000);
+        return;
+    }
+
+    if (pairNumber > 0 && selfCard.toString().indexOf(pairValue) > -1) {
+        if (gameStatus > 0 && maxPairValue < '6')
+            setTimeout(function () {
+                $("#fold").click();
+            }, 2000);
+        else
+            setTimeout(function () {
+                $("#call").click();
+            }, 2000);
+        return;
+    }
+
+    if (cards.length > 5)
+        setTimeout(function () {
+            $("#fold").click();
+        }, 2000);
+    else
+        setTimeout(function () {
+            $("#call").click();
+        }, 2000);
+
 }
 
 
@@ -209,6 +261,3 @@ $("#fold").click(function () {
     $("#action").hide();
 });
 
-rtc.on('__showAction', function (data) {
-    console.log("action : " + JSON.stringify(data.action));
-});

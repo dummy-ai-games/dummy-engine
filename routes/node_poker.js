@@ -54,6 +54,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.eventEmitter.on("_showAction", function (data) {
         var myData = getBasicData(that);
         myData.action = data;
+        console.log(JSON.stringify(myData));
         that.eventEmitter.emit("__showAction", myData);
     });
 
@@ -84,11 +85,15 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 count++;
             }
         }
-        if (count > 3) {
+        if (count > 3 && that.roundCount < 5) {
             console.log("上轮结束，下一轮开始");
             that.surviveCount = count;
-            for (var j = 0; j < that.players.length; j++)
-                that.players[j] = new Player(that.players[j].playerName, that.players[j].chips, that);
+            for (var j = 0; j < that.players.length; j++) {
+                var isSurvive = true;
+                if (that.players[j].chips == 0)
+                    isSurvive = false;
+                that.players[j] = new Player(that.players[j].playerName, that.players[j].chips, that, isSurvive);
+            }
             that.game = new Game(that.smallBlind, that.bigBlind);
             that.NewRound();
             that.roundCount++;
@@ -137,6 +142,7 @@ function getBasicData(table) {
         player['folded'] = table.players[i]['folded'];
         player['allIn'] = table.players[i]['allIn'];
         player['cards'] = table.players[i]['cards'];
+        player['isSurvive'] = table.players[i]['isSurvive'];
         players.push(player);
     }
     mytable["tableNumber"] = table.tableNumber;
@@ -152,7 +158,7 @@ function getNextPlayer(table) {
     var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ? (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
-    } while (table.players[table.currentPlayer].chips <= 0 || table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] == maxBet));
+    } while (!table.players[table.currentPlayer].isSurvive || table.players[table.currentPlayer].folded || table.players[table.currentPlayer].allIn || (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] == maxBet));
 }
 
 function sort(data) {
@@ -206,7 +212,7 @@ Table.prototype.checkPlayer = function (player) {
     return true;
 }
 
-function Player(playerName, chips, table) {
+function Player(playerName, chips, table, isSurvive) {
     this.playerName = playerName;
     this.chips = chips;
     this.folded = false;
@@ -214,6 +220,7 @@ function Player(playerName, chips, table) {
     this.talked = false;
     this.table = table; //Circular reference to allow reference back to parent object.
     this.cards = [];
+    this.isSurvive = isSurvive;
 }
 
 function fillDeck(deck) {
@@ -298,7 +305,7 @@ function checkForEndOfRound(table) {
     maxBet = getMaxBet(table.game.bets);
     //For each player, check
     for (i = 0; i < table.players.length; i += 1) {
-        if (table.players[i].chips > 0 && table.players[i].folded === false) {
+        if (table.players[i].isSurvive && table.players[i].folded === false) {
             if (table.players[i].talked === false || table.game.bets[i] !== maxBet) {
                 if (table.players[i].allIn === false) {
                     endOfRound = false;
@@ -1750,6 +1757,7 @@ Table.prototype.StartGame = function () {
     //If there is no current game and we have enough players, start a new game.
     if (!this.game) {
         this.playersToRemove = [];
+        this.dealer = Math.round(Math.random() * (this.surviveCount - 1));
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
     }
@@ -1758,7 +1766,7 @@ Table.prototype.StartGame = function () {
 Table.prototype.AddPlayer = function (playerName) {
     var chips = 900;
     if (chips >= this.minBuyIn && chips <= this.maxBuyIn) {
-        var player = new Player(playerName, chips, this);
+        var player = new Player(playerName, chips, this, true);
         this.playersToAdd.push(player);
         this.surviveCount++;
     }
@@ -1795,10 +1803,12 @@ Table.prototype.NewRound = function () {
     var i, smallBlind, bigBlind;
     //Deal 2 cards to each player
     for (i = 0; i < this.players.length; i += 1) {
-        this.players[i].cards.push(this.game.deck.pop());
-        this.players[i].cards.push(this.game.deck.pop());
-        this.game.bets[i] = 0;
-        this.game.roundBets[i] = 0;
+        if (this.players[i].isSurvive) {
+            this.players[i].cards.push(this.game.deck.pop());
+            this.players[i].cards.push(this.game.deck.pop());
+            this.game.bets[i] = 0;
+            this.game.roundBets[i] = 0;
+        }
     }
     //Identify Small and Big Blind player indexes
     smallBlind = this.dealer + 1;
