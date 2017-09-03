@@ -116,7 +116,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                     if (that.gameWinners[i].chips == that.gameWinners[2].chips && that.gameWinners[i].hand.rank == that.gameWinners[2].hand.rank) {
                         continue;
                     } else {
-                        delete that.gameWinners[i];
+                        that.gameWinners.splice(i, 1);
                         i--;
                     }
                 }
@@ -1815,14 +1815,14 @@ Table.prototype.NewRound = function () {
     if (smallBlind >= this.players.length) {
         smallBlind = 0;
     }
-    while (this.players[smallBlind].chips <= 0)
+    while (!this.players[smallBlind].isSurvive)
         smallBlind++;
 
     bigBlind = smallBlind + 1;
     if (bigBlind >= this.players.length) {
         bigBlind -= this.players.length;
     }
-    while (this.players[bigBlind].chips <= 0)
+    while (!this.players[bigBlind].isSurvive)
         bigBlind++;
     //Force Blind Bets
     this.players[smallBlind].chips -= this.smallBlind;

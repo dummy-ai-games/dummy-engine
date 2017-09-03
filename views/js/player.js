@@ -51,15 +51,18 @@ rtc.on("_bet", function (data) {
     board = data.game.board;
     minBet = data.game.minBet;
     raiseCount = data.game.raiseCount;
-    setTimeout(function () {
-        $("#amount").val("20");
-        $("#bet").click();
-    }, 2000);
+    otherPlayers = data.game.otherPlayers;
+    takeAction(self.cards, self.cards.concat(board), otherPlayers);
 });
 
+rtc.on('__newRound', function (data) {
+    playerActions = {};
+    gameStatus = 0;
+});
 rtc.on('__showAction', function (data) {
     console.log("action : " + JSON.stringify(data.action));
     var playerAction = data.action;
+
 
     if (!playerActions[playerAction.playerName]) {
         playerActions[playerAction.playerName] = [];
@@ -99,6 +102,8 @@ function takeAction(selfCard, cards, players) {
         handRanks[i] = cards[i].substr(0, 1);
         handSuits[i] = cards[i].substr(1, 2);
     }
+    for (var i = 0; i < selfCard.length; i++)
+        selfCard[i] = selfCard[i].substr(0, 1);
     handRanks = handRanks.sort().toString().replace(/\W/g, "");
     handSuits = handSuits.sort().toString().replace(/\W/g, "");
 
@@ -126,6 +131,8 @@ function takeAction(selfCard, cards, players) {
                 pairValue += handRanks[i];
                 if (handRanks[i] == 'A' && maxPairValue == '0')
                     maxPairValue = '1';
+                else if (handRanks[i] == 'T' && maxPairValue < 'I')
+                    maxPairValue = 'I';
                 else if (handRanks[i] > maxPairValue)
                     maxPairValue = handRanks[i];
             }
@@ -183,7 +190,7 @@ function takeAction(selfCard, cards, players) {
             setTimeout(function () {
                 $("#raise").click();
             }, 2000);
-        else if (gameStatus == danager && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] != selfCard[1]))
+        else if (gameStatus == danager && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] != selfCard[1]))
             setTimeout(function () {
                 $("#fold").click();
             }, 2000);
@@ -194,8 +201,8 @@ function takeAction(selfCard, cards, players) {
         return;
     }
 
-    if (pairNumber > 0 && selfCard.toString().indexOf(pairValue) > -1) {
-        if (gameStatus > 0 && maxPairValue < '6')
+    if (pairNumber > 0 && (pairValue.toString().indexOf(selfCard[0]) > -1 || pairValue.toString().indexOf(selfCard[1]) > -1)) {
+        if ((gameStatus == risk && maxPairValue < '6') || (gameStatus == danager && maxPairValue < 'I'))
             setTimeout(function () {
                 $("#fold").click();
             }, 2000);

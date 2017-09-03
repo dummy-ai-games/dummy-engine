@@ -261,6 +261,7 @@ SkyRTC.prototype.initTable = function () {
                 "data": data
             }
             that.admin.send(JSON.stringify(message), errorCb);
+            that.broadcastInPlayers(message);
         });
 
         that.table[i].eventEmitter.on("__showAction", function (data) {
@@ -312,16 +313,21 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
     for (var i = 0; i < message.data.players.length; i++) {
         delete message.data.players[i].cards;
         if (!message.data.players[i].isSurvive) {
-            delete  message.data.players[i];
+            message.data.players.splice(i, 1);
             i--;
+            continue;
         }
         delete message.data.players[i].isSurvive;
     }
     var tableNumber = message.data.table.tableNumber;
     for (var player in this.players) {
-        var currentPlayer = message.data.action.playerName;
-        if (player != currentPlayer && this.players[player].tableNumber == tableNumber)
+        if (message.eventName == '__newRound')
             this.players[player].send(JSON.stringify(message), errorCb);
+        else {
+            var currentPlayer = message.data.action.playerName;
+            if (player != currentPlayer && this.players[player].tableNumber == tableNumber)
+                this.players[player].send(JSON.stringify(message), errorCb);
+        }
     }
 };
 
