@@ -284,7 +284,8 @@ SkyRTC.prototype.initTable = function () {
                 "eventName": "__gameOver",
                 "data": data
             }
-            that.admin.send(JSON.stringify(message), errorCb);
+            if (that.admin)
+                that.admin.send(JSON.stringify(message), errorCb);
             that.broadcastInGuests(message);
         });
 
@@ -293,7 +294,8 @@ SkyRTC.prototype.initTable = function () {
                 "eventName": "__newRound",
                 "data": data
             }
-            that.admin.send(JSON.stringify(message), errorCb);
+            if (that.admin)
+                that.admin.send(JSON.stringify(message), errorCb);
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
         });
@@ -303,7 +305,8 @@ SkyRTC.prototype.initTable = function () {
                 "eventName": "__showAction",
                 "data": data
             }
-            that.admin.send(JSON.stringify(message), errorCb);
+            if (that.admin)
+                that.admin.send(JSON.stringify(message), errorCb);
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
         });
