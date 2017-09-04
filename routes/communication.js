@@ -44,7 +44,8 @@ function SkyRTC() {
             }
             that.players[socket.id] = socket;
             this.emit('new_peer', socket.id);
-            that.notificationGuest();
+            that.notificationGuestAndPlayer();
+            that.initPlayerData(socket.id);
         } else {
             that.guests[socket.id] = socket;
             that.initGuestData(socket.id);
@@ -155,6 +156,20 @@ SkyRTC.prototype.initGuestData = function (guest) {
     that.guests[guest].send(JSON.stringify(message), errorCb);
 
 }
+SkyRTC.prototype.initPlayerData = function (player) {
+    var that = this;
+    var data = that.getBasicData(that.players[player].tableNumber);
+    for (var i in data.players) {
+        if (data.players[i].playerName != that.players[player].id)
+            delete data.players[i].cards;
+    }
+    var message = {
+        "eventName": "_join",
+        "data": data
+    };
+    that.players[player].send(JSON.stringify(message), errorCb);
+
+}
 SkyRTC.prototype.getBasicData = function (tableNumber) {
     var that = this;
     var players = [];
@@ -194,7 +209,7 @@ SkyRTC.prototype.notificationAdmin = function () {
     }
 }
 
-SkyRTC.prototype.notificationGuest = function () {
+SkyRTC.prototype.notificationGuestAndPlayer = function () {
     var that = this;
     var tableAndPlayer = {};
     for (var playerName in that.players) {
@@ -210,7 +225,15 @@ SkyRTC.prototype.notificationGuest = function () {
         }
         that.guests[guest].send(JSON.stringify(message), errorCb);
     }
+    for (var player in that.players) {
+        var message = {
+            "eventName": "_new_peer",
+            "data": tableAndPlayer[that.players[player].tableNumber]
+        }
+        that.players[player].send(JSON.stringify(message), errorCb);
+    }
 }
+
 
 SkyRTC.prototype.startGame = function () {
     var that = this;
@@ -272,6 +295,7 @@ SkyRTC.prototype.initTable = function () {
                 "data": data
             }
             that.broadcastInGuests(message2);
+            that.broadcastInPlayers(message2);
         });
 
         that.table[i].eventEmitter.on("__gameOver", function (data) {
@@ -280,6 +304,7 @@ SkyRTC.prototype.initTable = function () {
                 "data": data
             }
             that.broadcastInGuests(message);
+            that.broadcastInPlayers(message);
         });
 
         that.table[i].eventEmitter.on("__newRound", function (data) {
@@ -347,7 +372,11 @@ SkyRTC.prototype.broadcastInGuests = function (message) {
     }
 }
 SkyRTC.prototype.broadcastInPlayers = function (message) {
+    var cards = {};
+    var players = {};
     for (var i = 0; i < message.data.players.length; i++) {
+        cards[message.data.players[i].playerName] = message.data.players[i].cards;
+        players[message.data.players[i].playerName] = message.data.players[i];
         delete message.data.players[i].cards;
         if (!message.data.players[i].isSurvive) {
             message.data.players.splice(i, 1);
@@ -358,12 +387,10 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
     }
     var tableNumber = message.data.table.tableNumber;
     for (var player in this.players) {
-        if (message.eventName == '__newRound')
+        if (this.players[player].tableNumber == tableNumber) {
+            players[player].cards = cards[player];
             this.players[player].send(JSON.stringify(message), errorCb);
-        else {
-            var currentPlayer = message.data.action.playerName;
-            if (player != currentPlayer && this.players[player].tableNumber == tableNumber)
-                this.players[player].send(JSON.stringify(message), errorCb);
+            players[player].cards = [];
         }
     }
 };

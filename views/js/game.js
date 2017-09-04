@@ -130,6 +130,48 @@ function initWebsock() {
 
         $("#msg").show();
     });
+
+    rtc.on("_action", function (data) {
+        console.log(data);
+
+        $("#userName").text("用户名:" + data.self.playerName);
+        $("#bet").prop("disabled", true);
+        $("#msg").text("该回合轮到你了");
+        $("#msg").show();
+        $("#amount").val("");
+        $("#action").show();
+        self = data.self;
+        roundBets = data.game.roundBets;
+        bets = data.game.bets;
+        board = data.game.board;
+        minBet = data.game.minBet;
+        raiseCount = data.game.raiseCount;
+        otherPlayers = data.game.otherPlayers;
+        setTimeout(function () {
+            rtc.Call(self.playerName);
+        }, 2000);
+
+    });
+
+    rtc.on("_bet", function (data) {
+        console.log(data);
+
+        $("#msg").text("该回合轮到你首先押注,注意最小押注额");
+        $("#bet").prop("disabled", false);
+        $("#msg").show();
+        $("#amount").val("");
+        $("#action").show();
+        self = data.self;
+        roundBets = data.game.roundBets;
+        bets = data.game.bets;
+        board = data.game.board;
+        minBet = data.game.minBet;
+        raiseCount = data.game.raiseCount;
+        otherPlayers = data.game.otherPlayers;
+        setTimeout(function () {
+            rtc.Call(self.playerName);
+        }, 2000);
+    });
 }
 
 function initGame() {
