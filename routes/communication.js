@@ -378,12 +378,6 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
         cards[message.data.players[i].playerName] = message.data.players[i].cards;
         players[message.data.players[i].playerName] = message.data.players[i];
         delete message.data.players[i].cards;
-        if (!message.data.players[i].isSurvive) {
-            message.data.players.splice(i, 1);
-            i--;
-            continue;
-        }
-        delete message.data.players[i].isSurvive;
     }
     var tableNumber = message.data.table.tableNumber;
     for (var player in this.players) {
