@@ -33,7 +33,7 @@ function SkyRTC() {
         else
             socket.tableNumber = param;
 
-       if (that.playerAndTable[socket.id]) {
+        if (that.playerAndTable[socket.id]) {
             that.playerNumber++;
             var exitPlayer = that.exitPlayers[socket.id];
             if (exitPlayer) {
@@ -71,46 +71,51 @@ function SkyRTC() {
             if (playerIndex != currentTable.currentPlayer)
                 currentTable.players[playerIndex].Fold();
             else if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
-                switch (action) {
-                    case "bet":
-                        if (currentTable.isBet) {
-                            var amount;
-                            try {
-                                amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
-                            } catch (e) {
-                                console.log(e.message);
-                                amount = currentTable.smallBlind;
-                            }
-                            currentTable.players[playerIndex].Bet(amount);
-                        } else
-                            currentTable.players[playerIndex].Call();
-                        break;
-                    case "call":
-                        if (currentTable.isBet)
-                            currentTable.players[playerIndex].Bet(currentTable.smallBlind);
-                        else
-                            currentTable.players[playerIndex].Call();
-                        break;
-                    case "check":
-                        currentTable.players[playerIndex].Check();
-                        break;
-                    case "raise":
-                        if (currentTable.isBet)
-                            currentTable.players[playerIndex].Bet(currentTable.smallBlind);
-                        else
-                            currentTable.players[playerIndex].Raise();
-                        break;
-                    case "allin":
-                        if (currentTable.isBet)
-                            currentTable.isBet = false;
-                        currentTable.players[playerIndex].AllIn();
-                        break;
-                    case "fold":
-                        currentTable.players[playerIndex].Fold();
-                        break;
-                    default:
-                        currentTable.players[playerIndex].Fold();
-                        break;
+                try {
+                    switch (action) {
+                        case "bet":
+                            if (currentTable.isBet) {
+                                var amount;
+                                try {
+                                    amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
+                                } catch (e) {
+                                    console.log(e.message);
+                                    amount = currentTable.smallBlind;
+                                }
+                                currentTable.players[playerIndex].Bet(amount);
+                            } else
+                                currentTable.players[playerIndex].Call();
+                            break;
+                        case "call":
+                            if (currentTable.isBet)
+                                currentTable.players[playerIndex].Bet(currentTable.smallBlind);
+                            else
+                                currentTable.players[playerIndex].Call();
+                            break;
+                        case "check":
+                            currentTable.players[playerIndex].Check();
+                            break;
+                        case "raise":
+                            if (currentTable.isBet)
+                                currentTable.players[playerIndex].Bet(currentTable.smallBlind);
+                            else
+                                currentTable.players[playerIndex].Raise();
+                            break;
+                        case "allin":
+                            if (currentTable.isBet)
+                                currentTable.isBet = false;
+                            currentTable.players[playerIndex].AllIn();
+                            break;
+                        case "fold":
+                            currentTable.players[playerIndex].Fold();
+                            break;
+                        default:
+                            currentTable.players[playerIndex].Fold();
+                            break;
+                    }
+                } catch (e) {
+                    console.log(e.message);
+                    currentTable.players[playerIndex].Fold();
                 }
 
             }
