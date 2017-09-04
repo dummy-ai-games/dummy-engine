@@ -50,7 +50,7 @@ var SkyRTC = function () {
 
 
         //本地连接信道，信道为websocket，创建socket连接
-    skyrtc.prototype.connect = function (server, player,tableNumber) {
+    skyrtc.prototype.connect = function (server, param) {
         var socket,
             that = this;
 
@@ -59,8 +59,7 @@ var SkyRTC = function () {
             socket.send(JSON.stringify({
                 "eventName": "__join",
                 "data": {
-                    "playerName": player,
-                    "tableNumber":tableNumber
+                    "param": param
                 }
             }));
             that.emit("socket_opened", socket);

@@ -27,18 +27,13 @@ function SkyRTC() {
     this.playerAndTable = {};
     this.on('__join', function (data, socket) {
         var that = this;
-        var playerName = data.playerName;
-        var tableNumber = data.tableNumber || 0;
-        if (playerName)
-            socket.id = playerName;
-        if (tableNumber)
-            socket.tableNumber = tableNumber;
+        var param = data.param;
+        if (that.playerAndTable[param])
+            socket.id = param;
+        else
+            socket.tableNumber = param;
 
-        if (playerName == 'admin') {
-            that.admin = socket;
-            that.admin.tableNumber = tableNumber;
-            that.initAdminData();
-        } else if (that.playerAndTable[socket.id]) {
+       if (that.playerAndTable[socket.id]) {
             that.playerNumber++;
             var exitPlayer = that.exitPlayers[socket.id];
             if (exitPlayer) {
@@ -49,7 +44,6 @@ function SkyRTC() {
             }
             that.players[socket.id] = socket;
             this.emit('new_peer', socket.id);
-            that.notificationAdmin();
             that.notificationGuest();
         } else {
             that.guests[socket.id] = socket;
@@ -244,8 +238,7 @@ SkyRTC.prototype.startGame = function () {
                 "data": {"msg": "table " + i + " start successfully", "tableNumber": i}
             }
         }
-        if (that.admin)
-            that.admin.send(JSON.stringify(message), errorCb);
+
         that.broadcastInGuests(message);
     }
 
@@ -269,12 +262,9 @@ SkyRTC.prototype.initTable = function () {
             }
             that.getPlayerAction(message);
             var data = that.getBasicData(data.tableNumber);
-            var message2= {
+            var message2 = {
                 "eventName": "__deal",
                 "data": data
-            }
-            if (that.admin) {
-                that.admin.send(JSON.stringify(message2), errorCb);
             }
             that.broadcastInGuests(message2);
         });
@@ -284,8 +274,6 @@ SkyRTC.prototype.initTable = function () {
                 "eventName": "__gameOver",
                 "data": data
             }
-            if (that.admin)
-                that.admin.send(JSON.stringify(message), errorCb);
             that.broadcastInGuests(message);
         });
 
@@ -294,8 +282,6 @@ SkyRTC.prototype.initTable = function () {
                 "eventName": "__newRound",
                 "data": data
             }
-            if (that.admin)
-                that.admin.send(JSON.stringify(message), errorCb);
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
         });
@@ -305,8 +291,7 @@ SkyRTC.prototype.initTable = function () {
                 "eventName": "__showAction",
                 "data": data
             }
-            if (that.admin)
-                that.admin.send(JSON.stringify(message), errorCb);
+
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
         });
