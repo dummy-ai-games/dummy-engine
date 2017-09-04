@@ -268,15 +268,15 @@ SkyRTC.prototype.initTable = function () {
                 "data": data
             }
             that.getPlayerAction(message);
-            if (that.admin) {
-                var data = that.getBasicData(data.tableNumber);
-                var message2 = {
-                    "eventName": "__deal",
-                    "data": data
-                }
-                that.admin.send(JSON.stringify(message2), errorCb);
-                that.broadcastInGuests(message2);
+            var data = that.getBasicData(data.tableNumber);
+            var message2= {
+                "eventName": "__deal",
+                "data": data
             }
+            if (that.admin) {
+                that.admin.send(JSON.stringify(message2), errorCb);
+            }
+            that.broadcastInGuests(message2);
         });
 
         that.table[i].eventEmitter.on("__gameOver", function (data) {
