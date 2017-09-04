@@ -15,8 +15,14 @@ var gameStatus = 0;
 var risk = 1;
 var danager = 2;
 var rtc = SkyRTC();
-
-rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], '');
+var playerName;
+var url = location.href.split("?");
+if (url.length > 1) {
+    var params = url[1].split("&");
+    if (params.length > 0)
+        playerName = params[0].split("=")[1];
+}
+rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName);
 
 rtc.on("_action", function (data) {
     console.log(data);

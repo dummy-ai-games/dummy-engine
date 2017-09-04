@@ -5,6 +5,13 @@
 
 var ccTheGame;
 var rtc = SkyRTC();
+var playerName;
+var url = location.href.split("?");
+if (url.length > 1) {
+    var params = url[1].split("&");
+    if (params.length > 0)
+        playerName = params[0].split("=")[1];
+}
 
 (function () {
     initGame();
@@ -13,7 +20,7 @@ var rtc = SkyRTC();
 // game communication with back-end
 function initWebsock() {
 // initialize web communication
-    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], 'admin');
+    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName);
     rtc.on("_join", function (data) {
         console.log("init data : " + JSON.stringify(data));
     });
