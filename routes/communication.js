@@ -138,7 +138,7 @@ function getPlayerIndex(playerName, players) {
 SkyRTC.prototype.initAdminData = function () {
     var that = this;
     if (that.admin) {
-        var data = that.getBasicData();
+        var data = that.getBasicData(that.admin.tableNumber);
         var message = {
             "eventName": "_join",
             "data": data
@@ -148,7 +148,7 @@ SkyRTC.prototype.initAdminData = function () {
 }
 SkyRTC.prototype.initGuestData = function (guest) {
     var that = this;
-    var data = that.getBasicData();
+    var data = that.getBasicData(that.guests[guest].tableNumber);
     var message = {
         "eventName": "_join",
         "data": data
@@ -156,30 +156,29 @@ SkyRTC.prototype.initGuestData = function (guest) {
     that.guests[guest].send(JSON.stringify(message), errorCb);
 
 }
-SkyRTC.prototype.getBasicData = function () {
+SkyRTC.prototype.getBasicData = function (tableNumber) {
     var that = this;
     var players = [];
     var table = {};
     var data = {};
-    if (that.admin) {
-        var desTable = that.table[that.admin.tableNumber];
-        if (desTable) {
-            for (var i = 0; i < desTable.players.length; i++) {
-                var player = {};
-                player['playerName'] = desTable.players[i]['playerName'];
-                player['chips'] = desTable.players[i]['chips'];
-                player['folded'] = desTable.players[i]['folded'];
-                player['allIn'] = desTable.players[i]['allIn'];
-                player['cards'] = desTable.players[i]['cards'];
-                players.push(player);
-            }
-            table["tableNumber"] = desTable.tableNumber;
-            table["roundName"] = desTable.roundName;
-            table["board"] = desTable.game.board;
-            data.players = players;
-            data.table = table;
+    var desTable = that.table[tableNumber];
+    if (desTable) {
+        for (var i = 0; i < desTable.players.length; i++) {
+            var player = {};
+            player['playerName'] = desTable.players[i]['playerName'];
+            player['chips'] = desTable.players[i]['chips'];
+            player['folded'] = desTable.players[i]['folded'];
+            player['allIn'] = desTable.players[i]['allIn'];
+            player['cards'] = desTable.players[i]['cards'];
+            players.push(player);
         }
+        table["tableNumber"] = desTable.tableNumber;
+        table["roundName"] = desTable.roundName;
+        table["board"] = desTable.game.board;
+        data.players = players;
+        data.table = table;
     }
+
     return data;
 }
 SkyRTC.prototype.notificationAdmin = function () {
@@ -270,7 +269,7 @@ SkyRTC.prototype.initTable = function () {
             }
             that.getPlayerAction(message);
             if (that.admin) {
-                var data = that.getBasicData();
+                var data = that.getBasicData(data.tableNumber);
                 var message2 = {
                     "eventName": "__deal",
                     "data": data
