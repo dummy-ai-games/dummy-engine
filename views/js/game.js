@@ -11,6 +11,8 @@ if (url.length > 1) {
     var params = url[1].split("&");
     if (params.length > 0)
         playerName = params[0].split("=")[1];
+    if (params.length > 1)
+        tableNumber = params[1].split("=")[1];
 }
 
 (function () {
@@ -20,7 +22,7 @@ if (url.length > 1) {
 // game communication with back-end
 function initWebsock() {
 // initialize web communication
-    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName);
+    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName,tableNumber);
     rtc.on("_join", function (data) {
         console.log("init data : " + JSON.stringify(data));
     });

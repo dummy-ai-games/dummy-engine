@@ -28,13 +28,15 @@ function SkyRTC() {
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
-        var table = data.tableNumber || 0;
+        var tableNumber = data.tableNumber || 0;
         if (playerName)
             socket.id = playerName;
+        if (tableNumber)
+            socket.tableNumber = tableNumber;
 
         if (playerName == 'admin') {
             that.admin = socket;
-            that.admin.tableNumber = table;
+            that.admin.tableNumber = tableNumber;
             that.initAdminData();
         } else if (that.playerAndTable[socket.id]) {
             that.playerNumber++;
@@ -159,7 +161,7 @@ SkyRTC.prototype.getBasicData = function () {
     var players = [];
     var table = {};
     var data = {};
-    if(that.admin) {
+    if (that.admin) {
         var desTable = that.table[that.admin.tableNumber];
         if (desTable) {
             for (var i = 0; i < desTable.players.length; i++) {
@@ -196,14 +198,18 @@ SkyRTC.prototype.notificationAdmin = function () {
 
 SkyRTC.prototype.notificationGuest = function () {
     var that = this;
-    var players = [];
-    for (var playerName in that.players)
-        players.push(playerName);
-    var message = {
-        "eventName": "_new_peer",
-        "data": players
+    var tableAndPlayer = {};
+    for (var playerName in that.players) {
+        if (!tableAndPlayer[that.players[playerName].tableNumber])
+            tableAndPlayer[that.players[playerName].tableNumber] = [];
+        tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
     }
+
     for (var guest in that.guests) {
+        var message = {
+            "eventName": "_new_peer",
+            "data": tableAndPlayer[that.guests[guest].tableNumber]
+        }
         that.guests[guest].send(JSON.stringify(message), errorCb);
     }
 }
@@ -227,13 +233,16 @@ SkyRTC.prototype.startGame = function () {
             console.log(that.table);
             message = {
                 "eventName": "startGame",
-                "data": {"msg": "table " + i + " need at least " + that.table.minPlayers + " users to attend"}
+                "data": {
+                    "msg": "table " + i + " need at least " + that.table.minPlayers + " users to attend",
+                    "tableNumber": i
+                }
             }
         } else {
             that.table[i].StartGame();
             message = {
                 "eventName": "startGame",
-                "data": {"msg": "table " + i + " start successfully"}
+                "data": {"msg": "table " + i + " start successfully", "tableNumber": i}
             }
         }
         if (that.admin)
@@ -339,8 +348,10 @@ SkyRTC.prototype.removeSocket = function (socket) {
 
 SkyRTC.prototype.broadcastInGuests = function (message) {
     var that = this;
+    var tableNumber = message.data.tableNumber || message.data.table.tableNumber;
     for (var guest in that.guests) {
-        that.guests[guest].send(JSON.stringify(message), errorCb);
+        if (that.guests[guest].tableNumber == tableNumber)
+            that.guests[guest].send(JSON.stringify(message), errorCb);
     }
 }
 SkyRTC.prototype.broadcastInPlayers = function (message) {
@@ -383,7 +394,7 @@ SkyRTC.prototype.init = function (socket) {
     //连接关闭后从SkyRTC实例中移除连接，并通知其他连接
     socket.on('close', function () {
         that.emit('remove_peer', socket.id);
-        if (socket.id != "admin" && that.players[socket.id].tableNumber != undefined) {
+        if (that.playerAndTable[socket.id]) {
             that.exitPlayers[socket.id] = socket;
         }
         that.removeSocket(socket);
