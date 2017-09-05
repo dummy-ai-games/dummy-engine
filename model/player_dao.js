@@ -7,7 +7,7 @@ var db = require('../database/msession');
 
 exports.getPlayers = function (req, res) {
     db.collection("players", function (err, collection) {
-        collection.find({}).sort({chips: -1}).toArray(function (err, results) {
+        collection.find({}).sort({tableNumber: 1, chips: -1}).toArray(function (err, results) {
             if (!err) {
                 res.send({error_code: 0, players: results});
             } else {
