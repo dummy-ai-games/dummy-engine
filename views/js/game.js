@@ -21,7 +21,7 @@ if (url.length > 1) {
 // game communication with back-end
 function initWebsock() {
 // initialize web communication
-    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0],firstParam);
+    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], firstParam);
     rtc.on("_join", function (data) {
         console.log("init data : " + JSON.stringify(data));
     });
@@ -234,8 +234,10 @@ function updateTable(data) {
     if (data.players) {
         for (i = 0; i < data.players.length; i++) {
             players[i].id = data.players[i].playerName;
-            players[i].privateCards[0] = data.players[i].cards[0];
-            players[i].privateCards[1] = data.players[i].cards[1];
+            if (data.players[i].cards && data.players[i].cards.length == 2) {
+                players[i].privateCards[0] = data.players[i].cards[0];
+                players[i].privateCards[1] = data.players[i].cards[1];
+            }
             players[i].gold = data.players[i].chips;
         }
     }
