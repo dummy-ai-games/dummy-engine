@@ -53,9 +53,9 @@ function SkyRTC() {
 
     });
 
-    this.on('_startGame', function () {
-        winnerDao.clearTable();
-        this.startGame();
+    this.on('_startGame', function (data) {
+        //winnerDao.clearTable();
+        this.startGame(data.tableNumber);
     });
 
     this.on('_action', function (data) {
@@ -235,97 +235,99 @@ SkyRTC.prototype.notificationGuestAndPlayer = function () {
 }
 
 
-SkyRTC.prototype.startGame = function () {
+SkyRTC.prototype.startGame = function (tableNumber) {
     var that = this;
     var message;
-    that.table = {};
-
-    for (var player in this.players) {
-        var belongTable = that.players[player].tableNumber;
-        if (!that.table[belongTable]) {
-            that.table[belongTable] = new poker.Table(50, 100, 3, 10, 100, 1000);
-            that.table[belongTable].tableNumber = belongTable;
-        }
-        that.table[belongTable].AddPlayer(player);
+    try{
+        parseInt(tableNumber);
+    }catch (e){
+        console.log("table " + tableNumber + " start fail, becasue type is not correct");
+        return;
     }
-    that.initTable();
-    for (var i in that.table) {
-        if (that.table[i].playersToAdd.length < that.table[i].minPlayers) {
-            console.log(that.table);
-            message = {
-                "eventName": "startGame",
-                "data": {
-                    "msg": "table " + i + " need at least " + that.table.minPlayers + " users to attend",
-                    "tableNumber": i
-                }
+
+    that.table[tableNumber] = new poker.Table(50, 100, 3, 10, 100, 1000);
+    that.table[tableNumber].tableNumber = tableNumber;
+
+    for (var player in that.players) {
+        if (that.players[player].tableNumber == tableNumber)
+            that.table[tableNumber].AddPlayer(player);
+    }
+    that.initTable(tableNumber);
+
+    if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
+        console.log(that.table);
+        message = {
+            "eventName": "startGame",
+            "data": {
+                "msg": "table " + tableNumber + " need at least " + that.table[tableNumber].minPlayers + " users to attend",
+                "tableNumber": tableNumber
             }
-        } else {
-            that.table[i].StartGame();
-            message = {
-                "eventName": "startGame",
-                "data": {"msg": "table " + i + " start successfully", "tableNumber": i}
-            }
+        }
+    } else {
+        that.table[tableNumber].StartGame();
+        message = {
+            "eventName": "startGame",
+            "data": {"msg": "table " + tableNumber + " start successfully", "tableNumber": tableNumber}
+        }
+    }
+
+    that.broadcastInGuests(message);
+}
+
+SkyRTC.prototype.initTable = function (tableNumber) {
+    var that = this;
+
+    that.table[tableNumber].eventEmitter.on("__turn", function (data) {
+        var message = {
+            "eventName": "__action",
+            "data": data
+        }
+        that.getPlayerAction(message);
+    });
+
+    that.table[tableNumber].eventEmitter.on("__bet", function (data) {
+        var message = {
+            "eventName": "__bet",
+            "data": data
+        }
+        that.getPlayerAction(message);
+        var data = that.getBasicData(data.tableNumber);
+        var message2 = {
+            "eventName": "__deal",
+            "data": data
+        }
+        that.broadcastInGuests(message2);
+        that.broadcastInPlayers(message2);
+    });
+
+    that.table[tableNumber].eventEmitter.on("__gameOver", function (data) {
+        var message = {
+            "eventName": "__gameOver",
+            "data": data
+        }
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+    });
+
+    that.table[tableNumber].eventEmitter.on("__newRound", function (data) {
+        var message = {
+            "eventName": "__newRound",
+            "data": data
+        }
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+    });
+
+    that.table[tableNumber].eventEmitter.on("__showAction", function (data) {
+        var message = {
+            "eventName": "__showAction",
+            "data": data
         }
 
         that.broadcastInGuests(message);
-    }
+        that.broadcastInPlayers(message);
+    });
 
-}
-
-SkyRTC.prototype.initTable = function () {
-    var that = this;
-    for (var i in that.table) {
-        that.table[i].eventEmitter.on("__turn", function (data) {
-            var message = {
-                "eventName": "__action",
-                "data": data
-            }
-            that.getPlayerAction(message);
-        });
-
-        that.table[i].eventEmitter.on("__bet", function (data) {
-            var message = {
-                "eventName": "__bet",
-                "data": data
-            }
-            that.getPlayerAction(message);
-            var data = that.getBasicData(data.tableNumber);
-            var message2 = {
-                "eventName": "__deal",
-                "data": data
-            }
-            that.broadcastInGuests(message2);
-            that.broadcastInPlayers(message2);
-        });
-
-        that.table[i].eventEmitter.on("__gameOver", function (data) {
-            var message = {
-                "eventName": "__gameOver",
-                "data": data
-            }
-            that.broadcastInGuests(message);
-            that.broadcastInPlayers(message);
-        });
-
-        that.table[i].eventEmitter.on("__newRound", function (data) {
-            var message = {
-                "eventName": "__newRound",
-                "data": data
-            }
-            that.broadcastInGuests(message);
-            that.broadcastInPlayers(message);
-        });
-
-        that.table[i].eventEmitter.on("__showAction", function (data) {
-            var message = {
-                "eventName": "__showAction",
-                "data": data
-            }
-
-            that.broadcastInGuests(message);
-            that.broadcastInPlayers(message);
-        });
-    }
 }
 
 SkyRTC.prototype.getPlayerAction = function (message, isSecond) {

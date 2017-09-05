@@ -223,7 +223,7 @@ function ccLoad() {
 
 // utilities
 function startGame() {
-    rtc.startGame();
+    rtc.startGame(firstParam);
 }
 
 function updateTable(data) {
