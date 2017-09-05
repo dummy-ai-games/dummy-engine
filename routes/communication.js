@@ -307,6 +307,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         }
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
+        delete that.table[data.table.tableNumber];
     });
 
     that.table[tableNumber].eventEmitter.on("__newRound", function (data) {
