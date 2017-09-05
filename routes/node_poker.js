@@ -125,8 +125,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
 
             var data = getBasicData(that);
             data.winners = that.gameWinners;
-            that.eventEmitter.emit("__gameOver", data);
             winnerDao.addOrUpdateWinner({tableNumber: that.tableNumber, winners: that.gameWinners});
+            that.eventEmitter.emit("__gameOver", data);
         }
     });
 }
