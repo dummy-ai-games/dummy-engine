@@ -85,9 +85,12 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                 count++;
             }
         }
-        if (count > 3 && that.roundCount < 5) {
+        if (count > 3) {
             console.log("上轮结束，下一轮开始");
             that.surviveCount = count;
+            that.smallBlind = that.smallBlind * 2;
+            that.bigBlind = that.bigBlind * 2;
+            that.dealer = (that.dealer + 1) % that.players.length;
             for (var j = 0; j < that.players.length; j++) {
                 var isSurvive = true;
                 if (that.players[j].chips == 0)
