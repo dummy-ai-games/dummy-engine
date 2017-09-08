@@ -25,7 +25,7 @@ if (url.length > 1) {
 }
 rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], firstParam);
 
-rtc.on("_action", function (data) {
+rtc.on("__action", function (data) {
     console.log(data);
 
     $("#userName").text("用户名:" + data.self.playerName);
@@ -44,7 +44,7 @@ rtc.on("_action", function (data) {
     takeAction(self.cards, self.cards.concat(board), otherPlayers);
 });
 
-rtc.on("_bet", function (data) {
+rtc.on("__bet", function (data) {
     console.log(data);
 
     $("#msg").text("该回合轮到你首先押注,注意最小押注额");

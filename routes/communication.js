@@ -58,7 +58,7 @@ function SkyRTC() {
         this.startGame(data.tableNumber);
     });
 
-    this.on('_action', function (data) {
+    this.on('__action', function (data) {
         console.log("用户" + data.playerName + "采取动作" + data.action);
         var that = this;
         var action = data.action;
@@ -202,7 +202,7 @@ SkyRTC.prototype.notificationAdmin = function () {
         for (var playerName in that.players)
             players.push(playerName);
         var message = {
-            "eventName": "_new_peer",
+            "eventName": "__new_peer",
             "data": players
         }
         that.admin.send(JSON.stringify(message), errorCb);
@@ -220,14 +220,14 @@ SkyRTC.prototype.notificationGuestAndPlayer = function () {
 
     for (var guest in that.guests) {
         var message = {
-            "eventName": "_new_peer",
+            "eventName": "__new_peer",
             "data": tableAndPlayer[that.guests[guest].tableNumber]
         }
         that.guests[guest].send(JSON.stringify(message), errorCb);
     }
     for (var player in that.players) {
         var message = {
-            "eventName": "_new_peer",
+            "eventName": "__new_peer",
             "data": tableAndPlayer[that.players[player].tableNumber]
         }
         that.players[player].send(JSON.stringify(message), errorCb);

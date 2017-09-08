@@ -89,23 +89,10 @@ var SkyRTC = function () {
             that.emit('connected', socket);
         });
 
-        this.on('_new_peer', function (data) {//
-
-            that.emit('new_peer', data.socketId);
-        });
 
         this.on('_remove_peer', function (data) {
 
             that.emit("remove_peer", data.socketId);
-        });
-        this.on('__action', function (data) {
-            that.emit("_action", data);
-        });
-        this.on('__bet', function (data) {
-            that.emit("_bet", data);
-        });
-        this.on('__gameOver', function (data) {
-            that.emit("_gameOver", data);
         });
 
 
@@ -113,7 +100,7 @@ var SkyRTC = function () {
     skyrtc.prototype.Bet = function (playerName, amount) {
         var that = this;
         that.socket.send(JSON.stringify({
-            "eventName": "_action",
+            "eventName": "__action",
             "data": {
                 "action": "bet",
                 "playerName": playerName,
@@ -124,7 +111,7 @@ var SkyRTC = function () {
     skyrtc.prototype.Call = function (playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
-            "eventName": "_action",
+            "eventName": "__action",
             "data": {
                 "action": "call",
                 "playerName": playerName
@@ -134,7 +121,7 @@ var SkyRTC = function () {
     skyrtc.prototype.Check = function (playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
-            "eventName": "_action",
+            "eventName": "__action",
             "data": {
                 "action": "check",
                 "playerName": playerName
@@ -145,7 +132,7 @@ var SkyRTC = function () {
     skyrtc.prototype.Raise = function (playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
-            "eventName": "_action",
+            "eventName": "__action",
             "data": {
                 "action": "raise",
                 "playerName": playerName
@@ -156,7 +143,7 @@ var SkyRTC = function () {
     skyrtc.prototype.AllIn = function (playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
-            "eventName": "_action",
+            "eventName": "__action",
             "data": {
                 "action": "allin",
                 "playerName": playerName
@@ -167,7 +154,7 @@ var SkyRTC = function () {
     skyrtc.prototype.Fold = function (playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
-            "eventName": "_action",
+            "eventName": "__action",
             "data": {
                 "action": "fold",
                 "playerName": playerName
@@ -180,7 +167,7 @@ var SkyRTC = function () {
         that.socket.send(JSON.stringify({
             "eventName": "_startGame",
             "data": {
-                "tableNumber":tableNumber
+                "tableNumber": tableNumber
             }
         }));
     };

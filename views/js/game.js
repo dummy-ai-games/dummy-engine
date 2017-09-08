@@ -26,7 +26,7 @@ function initWebsock() {
         console.log("init data : " + JSON.stringify(data));
     });
 
-    rtc.on("_new_peer", function (data) {
+    rtc.on("__new_peer", function (data) {
         for (var i = 0; i < data.length; i++) {
             var playerName = data[i];
             console.log("用户:" + playerName + "加入");
@@ -44,7 +44,7 @@ function initWebsock() {
             }
         }
     });
-    rtc.on("_gameOver", function (data) {
+    rtc.on("__gameOver", function (data) {
         var tableNumber = data.table.tableNumber;
         var result = "table " + tableNumber + " 游戏结束，胜者如下：";
         var winners = data.winners;
@@ -131,7 +131,7 @@ function initWebsock() {
         $("#msg").show();
     });
 
-    rtc.on("_action", function (data) {
+    rtc.on("__action", function (data) {
         console.log(data);
 
         $("#userName").text("用户名:" + data.self.playerName);
@@ -153,7 +153,7 @@ function initWebsock() {
 
     });
 
-    rtc.on("_bet", function (data) {
+    rtc.on("__bet", function (data) {
         console.log(data);
 
         $("#msg").text("该回合轮到你首先押注,注意最小押注额");
