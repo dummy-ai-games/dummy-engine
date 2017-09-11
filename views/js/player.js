@@ -23,6 +23,7 @@ if (url.length > 1) {
         firstParam = params[0].split("=")[1];
 
 }
+
 rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], firstParam);
 
 rtc.on("__action", function (data) {
@@ -169,7 +170,7 @@ function takeAction(selfCard, cards, players) {
             setTimeout(function () {
                 $("#raise").click();
             }, 2000);
-        else if (gameStatus == 0)
+        else if (gameStatus != danager)
             setTimeout(function () {
                 $("#raise").click();
             }, 2000);
@@ -197,7 +198,7 @@ function takeAction(selfCard, cards, players) {
             setTimeout(function () {
                 $("#raise").click();
             }, 2000);
-        else if (gameStatus == danager && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] != selfCard[1]))
+        else if (gameStatus == danager && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] != selfCard[1]) && maxPairValue < 'I')
             setTimeout(function () {
                 $("#fold").click();
             }, 2000);
