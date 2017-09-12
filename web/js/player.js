@@ -175,7 +175,7 @@ function takeAction(selfCard, cards, players) {
             setTimeout(function () {
                 $('#raise').click();
             }, 2000);
-        else if (gameStatus === 0)
+        else if (gameStatus !== danger)
             setTimeout(function () {
                 $('#raise').click();
             }, 2000);
