@@ -15,30 +15,35 @@ var tableNumber = 0;
 
 // game communication with back-end
 function initWebsock() {
-// initialize web communication
+    // initialize web communication
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], tableNumber);
+
     rtc.on("_join", function (data) {
         console.log("init data : " + JSON.stringify(data));
     });
 
     rtc.on("__new_peer", function (data) {
-        for (var i = 0; i < data.length; i++) {
-            var playerName = data[i];
-            console.log("用户:" + playerName + "加入");
-        }
-
         console.log("player_join : " + JSON.stringify(data));
-        currentPlayers = data.length;
-        for (i = 0; i < data.length; i++) {
-            if (null == players[i]) {
-                players[i] =
-                    new Player(data[i], playerNames[i], 900);
-            } else {
-                players.id = data[i];
-                players[i].name = playerNames[i];
+
+        if (undefined !== data && null !== data) {
+            for (var i = 0; i < data.length; i++) {
+                var playerName = data[i];
+                console.log("用户:" + playerName + "加入");
+            }
+
+            currentPlayers = data.length;
+            for (i = 0; i < data.length; i++) {
+                if (null == players[i]) {
+                    players[i] =
+                        new Player(data[i], playerNames[i], 900);
+                } else {
+                    players.id = data[i];
+                    players[i].name = playerNames[i];
+                }
             }
         }
     });
+
     rtc.on("__gameOver", function (data) {
         var tableNumber = data.table.tableNumber;
         var result = "table " + tableNumber + " 游戏结束，胜者如下：";
@@ -54,6 +59,7 @@ function initWebsock() {
         updateTable(data);
         gameStatus = STATUS_GAME_FINISHED;
     });
+
     rtc.on('startGame', function (data) {
         // update in game engine
         console.log("start_game : " + JSON.stringify(data));
@@ -73,6 +79,7 @@ function initWebsock() {
         console.log("deal : " + JSON.stringify(data));
         updateTable(data);
     });
+
     rtc.on('__newRound', function (data) {
         var roundCount = data.table.roundCount;
         var tableNumber = data.table.tableNumber;
@@ -82,6 +89,7 @@ function initWebsock() {
         console.log("new_round : " + JSON.stringify(data));
         updateTable(data);
     });
+
     rtc.on('__showAction', function (data) {
         console.log("action : " + JSON.stringify(data));
 

@@ -88,25 +88,17 @@ SkyRTC.rtc.on('new_peer', function (user) {
 });
 
 SkyRTC.rtc.on('_receiveAction', function (data) {
-    if (data.action == 'Bet')
+    if (data.action == 'Bet') {
         console.log("用户" + data.playerName + "采取动作" + data.action + " ，下注:" + data.amount);
-    else
+    } else {
         console.log("用户" + data.playerName + "采取动作" + data.action);
+    }
 });
-
 
 SkyRTC.rtc.on('socket_message', function (socket, msg) {
     console.log("接收到来自" + socket.id + "的新消息：" + msg);
 });
 
-
 SkyRTC.rtc.on('error', function (error) {
     console.log("发生错误：" + error.message);
 });
-
-
-
-
-
-
-

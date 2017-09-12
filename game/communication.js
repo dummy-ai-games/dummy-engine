@@ -8,7 +8,6 @@ var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
 var poker = require('./node_poker');
-var winnerDao = require("../models/winner_dao");
 var playerDao = require("../models/player_dao");
 
 var logger = require('../poem/logging/logger4js').helper;
@@ -18,8 +17,6 @@ var ErrorCode = require('../constants/error_code.js');
 
 var enums = new Enums();
 var errorCode = new ErrorCode();
-
-
 
 var errorCb = function (rtc) {
     return function (error) {
@@ -46,6 +43,7 @@ function SkyRTC() {
             socket.tableNumber = param;
 
         if (that.playerAndTable[socket.id]) {
+            console.log("player join!!");
             that.playerNumber++;
             var exitPlayer = that.exitPlayers[socket.id];
             if (exitPlayer) {
@@ -56,16 +54,17 @@ function SkyRTC() {
             }
             that.players[socket.id] = socket;
             this.emit('new_peer', socket.id);
-            that.notificationGuestAndPlayer();
+            that.notifyGuestAndPlayer();
             that.initPlayerData(socket.id);
         } else {
+            console.log("guest join!!");
             that.guests[socket.id] = socket;
+            that.notifyGuestAndPlayer();
             that.initGuestData(socket.id);
         }
     });
 
     this.on('_startGame', function (data) {
-        //winnerDao.clearTable();
         this.startGame(data.tableNumber);
     });
 
@@ -147,6 +146,7 @@ function getPlayerIndex(playerName, players) {
 }
 
 SkyRTC.prototype.initAdminData = function () {
+    console.log("initAdminData");
     var that = this;
     if (that.admin) {
         var data = that.getBasicData(that.admin.tableNumber);
@@ -159,6 +159,7 @@ SkyRTC.prototype.initAdminData = function () {
 };
 
 SkyRTC.prototype.initGuestData = function (guest) {
+    console.log("initGuestData");
     var that = this;
     var data = that.getBasicData(that.guests[guest].tableNumber);
     var message = {
@@ -170,6 +171,7 @@ SkyRTC.prototype.initGuestData = function (guest) {
 };
 
 SkyRTC.prototype.initPlayerData = function (player) {
+    console.log("initPlayerData");
     var that = this;
     var data = that.getBasicData(that.players[player].tableNumber);
     for (var i in data.players) {
@@ -210,21 +212,7 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     return data;
 };
 
-SkyRTC.prototype.notificationAdmin = function () {
-    var that = this;
-    if (that.admin) {
-        var players = [];
-        for (var playerName in that.players)
-            players.push(playerName);
-        var message = {
-            "eventName": "__new_peer",
-            "data": players
-        };
-        that.admin.send(JSON.stringify(message), errorCb);
-    }
-};
-
-SkyRTC.prototype.notificationGuestAndPlayer = function () {
+SkyRTC.prototype.notifyGuestAndPlayer = function () {
     var that = this;
     var tableAndPlayer = {};
     for (var playerName in that.players) {
@@ -232,16 +220,16 @@ SkyRTC.prototype.notificationGuestAndPlayer = function () {
             tableAndPlayer[that.players[playerName].tableNumber] = [];
         tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
     }
-
+    var message;
     for (var guest in that.guests) {
-        var message = {
+        message = {
             "eventName": "__new_peer",
             "data": tableAndPlayer[that.guests[guest].tableNumber]
         };
         that.guests[guest].send(JSON.stringify(message), errorCb);
     }
     for (var player in that.players) {
-        var message = {
+        message = {
             "eventName": "__new_peer",
             "data": tableAndPlayer[that.players[player].tableNumber]
         };
@@ -249,14 +237,13 @@ SkyRTC.prototype.notificationGuestAndPlayer = function () {
     }
 };
 
-
 SkyRTC.prototype.startGame = function (tableNumber) {
     var that = this;
     var message;
     try{
         parseInt(tableNumber);
-    }catch (e){
-        logger.info("table " + tableNumber + " start fail, becasue type is not correct");
+    }catch (e) {
+        logger.info("table " + tableNumber + " start fail,  type is not correct");
         return;
     }
 
@@ -410,12 +397,13 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
     }
 };
 
-
 SkyRTC.prototype.init = function (socket) {
     var that = this;
     socket.id = UUID.v4();
 
     socket.on('message', function (data) {
+        console.log('message received : ' + data);
+
         var json = JSON.parse(data);
         if (json.eventName) {
             that.emit(json.eventName, json.data, socket);
@@ -433,11 +421,12 @@ SkyRTC.prototype.init = function (socket) {
     });
 
     playerDao.getAllPlayers(function(getPlayerErr, players) {
-        if (getPlayerErr.code == errorCode.SUCCESS.code) {
+        if (getPlayerErr.code === errorCode.SUCCESS.code) {
             for (var i = 0; i < players.length; i++) {
                 var player = players[i];
                 that.playerAndTable[player.playerName] = player.tableNumber;
             }
+            console.log('players and tables : ' + JSON.stringify(that.playerAndTable));
         } else {
             logger.error("no players found");
         }
