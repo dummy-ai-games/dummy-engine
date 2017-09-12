@@ -203,7 +203,7 @@ function takeAction(selfCard, cards, players) {
             setTimeout(function () {
                 $('#raise').click();
             }, 2000);
-        else if (gameStatus === danger && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] !== selfCard[1]))
+        else if (gameStatus === danger && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] !== selfCard[1]) && maxPairValue < 'I')
             setTimeout(function () {
                 $('#fold').click();
             }, 2000);
