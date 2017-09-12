@@ -1,0 +1,24 @@
+/**
+ * create by the-engine-team
+ * 2017-09-01
+ */
+
+.recordData {
+    border-bottom: 1px solid #dddddd;
+    padding: 10px 0 10px;
+    margin-left: 5px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 60px;
+}
+
+.data {
+    width: 200px;
+}
+
+.deleteBtn {
+    float: left;
+    width: 100px;
+    margin-left: 20px;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="description" content="the-engine">
+    <meta name="author" content="the-engine team">
+    <title>THE Player Management</title>
+    <link rel="stylesheet" href="./js/public/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./js/public/bower_components/bootstrap-table/dist/bootstrap-table.css">
+    <link rel="stylesheet" href="./js/public/bower_components/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="./style/player_manager.css">
+</head>
+<body>
+    <div class="container">
+        <h2>玩家管理</h2>
+        <hr>
+        <div class="starter-template" style="padding: 0;">
+            <div>
+                编辑玩家
+                <div>
+                    <input type="text" id="player_name" style="height:34px" placeholder="玩家名称">
+                    <input type="number" id="table_number" style="height:34px"  placeholder="游戏桌号">
+                    <button id="create_player_button" class="btn btn-success glyphicon glyphicon-plus" onclick="updatePlayer();" style="margin-bottom: 4px;"></button>
+                    <button id="remove_player_button" class="btn btn-danger glyphicon glyphicon-remove" onclick="removePlayer();" style="margin-bottom: 4px; display: none;"></button>
+                </div>
+                <br>
+            </div>
+            <hr>
+            <div>
+                游戏桌号：
+                <select id="tables" name="tables" style="width: 160px;" onchange="onSelectedTableChanged();">
+                    <option value="0">请选择游戏桌号</option>
+                </select>
+            </div>
+            <br>
+
+            <br>
+
+            <div id = "player_table_container" style="width: 100%">
+            </div>
+        </div>
+    </div>
+
+    <!-- hint dialog -->
+    <div class="modal fade" id="hint_dialog" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+                    <h4 data-i18n="page_code.d_hint_title" class="modal-title">提示</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="text_hint"></div>
+                </div>
+                <div class="modal-footer">
+                    <button data-i18n="page_code.d_hint_ok" type="button" class="btn btn-danger" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="./js/public/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="./js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="./js/public/bower_components/bootstrap/js/modal.js"></script>
+<script src="./js/public/bower_components/bootstrap-table/dist/bootstrap-table.js"></script>
+<script src="./js/public/bower_components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="./js/public/bower_components/select2/dist/js/select2.min.js"></script>
+<script src="./js/player_manager.js"></script>
+</html>

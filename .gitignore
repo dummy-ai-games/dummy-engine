@@ -25,6 +25,7 @@ coverage
 
 # Bower dependency directory (https://bower.io/)
 bower_components
+web/js/public/bower_components
 
 # node-waf configuration
 .lock-wscript
@@ -57,4 +58,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# WebStorm project directory
 .idea/
