@@ -88,7 +88,7 @@ function SkyRTC() {
                             if (currentTable.isBet) {
                                 var amount;
                                 try {
-                                    amount = parseInt(data.amount.replace(/(^\s*)|(\s*$)/g, ""));
+                                    amount = parseInt(data.amount);
                                 } catch (e) {
                                     logger.info(e.message);
                                     amount = currentTable.smallBlind;
