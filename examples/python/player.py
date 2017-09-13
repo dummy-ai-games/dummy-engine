@@ -14,7 +14,7 @@ def takeAction(action, data):
             "eventName": "__action",
             "data": {
                 "action": "bet",
-                "playerName": "test3",
+                "playerName": "yang2",
                 "amount": 100
             }
         }))
@@ -28,13 +28,13 @@ def takeAction(action, data):
             }
         }))
 
-if __name__ == '__main__':
-    ws = create_connection("ws://127.0.0.1:3000/")
+def doListen():
     try:
+        ws = create_connection("ws://127.0.0.1:3000/")
         ws.send(json.dumps({
             "eventName": "__join",
             "data": {
-                "playerName": "test3"
+                "param": "yang2"
             }
         }))
         while 1:
@@ -46,5 +46,9 @@ if __name__ == '__main__':
             print data
             takeAction(event_name, data)
     except Exception, e:
-        ws = create_connection("ws://127.0.0.1:3000/")
         print e.message
+        doListen()
+
+if __name__ == '__main__':
+    ws = ""
+    doListen()

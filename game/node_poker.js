@@ -48,7 +48,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         for (var i = 0; i < that.players.length; i++) {
             tempData.push({playerName: that.players[i].playerName, chips: that.players[i].chips});
         }
-        playerDao.updatePlayerChips(tempData, function() {
+        playerDao.updatePlayerChips(tempData, function () {
             // do nothing
         });
     });
@@ -181,24 +181,31 @@ function sort(data) {
 function takeAction(table, action) {
     var players = [];
     var destPlayer = {};
+    var gameBets = [];
     for (var i = 0; i < table.players.length; i++) {
         var player = {};
         player['playerName'] = table.players[i]['playerName'];
         player['chips'] = table.players[i]['chips'];
         player['folded'] = table.players[i]['folded'];
         player['allIn'] = table.players[i]['allIn'];
+        gameBets.push({
+            "playerName": table.players[i]['playerName'],
+            "roundBet": table.game.roundBets[i],
+            "bet": table.game.bets[i]
+        });
         if (i == table.currentPlayer) {
             player['cards'] = table.players[i]['cards'];
             destPlayer = player;
         } else
             players.push(player);
+
     }
+
     var data = {
         "tableNumber": table.tableNumber,
         "self": destPlayer,
         "game": {
-            "roundBets": table.game.roundBets,
-            "bets": table.game.bets,
+            "gameBets": gameBets,
             "board": table.game.board,
             "minBet": table.smallBlind,
             "roundName": table.game.roundName,
@@ -1905,7 +1912,8 @@ Player.prototype.Raise = function () {
                 if (this.chips + mybet > bet) {
                     this.chips = this.chips + mybet - bet;
                     this.table.game.bets[i] = bet;
-                    this.turnBet = {action: "raise", playerName: this.playerName, amount: bet, chips: this.chips};
+                    var addMoney = bet - mybet;
+                    this.turnBet = {action: "raise", playerName: this.playerName, amount: addMoney, chips: this.chips};
                     this.table.eventEmitter.emit("_showAction", this.turnBet);
                     this.table.raiseCount++;
                     for (i = 0; i < this.table.players.length; i += 1) {
@@ -1961,7 +1969,8 @@ Player.prototype.Call = function () {
                 this.chips = this.chips + mybet - maxBet;
                 this.table.game.bets[i] = maxBet;
                 this.talked = true;
-                this.turnBet = {action: "call", playerName: this.playerName, amount: maxBet, chips: this.chips}
+                var addMoney = maxBet - mybet;
+                this.turnBet = {action: "call", playerName: this.playerName, amount: addMoney, chips: mybet}
                 this.table.eventEmitter.emit("_showAction", this.turnBet);
                 progress(this.table);
             } else {

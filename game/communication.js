@@ -69,67 +69,71 @@ function SkyRTC() {
     });
 
     this.on('__action', function (data) {
-        logger.info("用户" + data.playerName + "采取动作" + data.action);
-        var that = this;
-        var action = data.action;
-        var playerName = data.playerName;
-        if (that.players[playerName]) {
-            var tableNum = that.players[playerName].tableNumber;
-            var currentTable = that.table[tableNum];
-            if (currentTable.timeout)
-                clearTimeout(currentTable.timeout);
-            var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
-            if (playerIndex != currentTable.currentPlayer)
-                currentTable.players[playerIndex].Fold();
-            else if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
-                try {
-                    switch (action) {
-                        case "bet":
-                            if (currentTable.isBet) {
-                                var amount;
-                                try {
-                                    amount = parseInt(data.amount);
-                                } catch (e) {
-                                    logger.info(e.message);
-                                    amount = currentTable.smallBlind;
-                                }
-                                currentTable.players[playerIndex].Bet(amount);
-                            } else
-                                currentTable.players[playerIndex].Call();
-                            break;
-                        case "call":
-                            if (currentTable.isBet)
-                                currentTable.players[playerIndex].Bet(currentTable.smallBlind);
-                            else
-                                currentTable.players[playerIndex].Call();
-                            break;
-                        case "check":
-                            currentTable.players[playerIndex].Check();
-                            break;
-                        case "raise":
-                            if (currentTable.isBet)
-                                currentTable.players[playerIndex].Bet(currentTable.smallBlind);
-                            else
-                                currentTable.players[playerIndex].Raise();
-                            break;
-                        case "allin":
-                            if (currentTable.isBet)
-                                currentTable.isBet = false;
-                            currentTable.players[playerIndex].AllIn();
-                            break;
-                        case "fold":
-                            currentTable.players[playerIndex].Fold();
-                            break;
-                        default:
-                            currentTable.players[playerIndex].Fold();
-                            break;
-                    }
-                } catch (e) {
-                    logger.info(e.message);
+        try {
+            logger.info("用户" + data.playerName + "采取动作" + data.action);
+            var that = this;
+            var action = data.action;
+            var playerName = data.playerName;
+            if (that.players[playerName]) {
+                var tableNum = that.players[playerName].tableNumber;
+                var currentTable = that.table[tableNum];
+                if (currentTable.timeout)
+                    clearTimeout(currentTable.timeout);
+                var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
+                if (playerIndex != currentTable.currentPlayer)
                     currentTable.players[playerIndex].Fold();
-                }
+                else if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
+                    try {
+                        switch (action) {
+                            case "bet":
+                                if (currentTable.isBet) {
+                                    var amount;
+                                    try {
+                                        amount = parseInt(data.amount);
+                                    } catch (e) {
+                                        logger.info(e.message);
+                                        amount = currentTable.smallBlind;
+                                    }
+                                    currentTable.players[playerIndex].Bet(amount);
+                                } else
+                                    currentTable.players[playerIndex].Call();
+                                break;
+                            case "call":
+                                if (currentTable.isBet)
+                                    currentTable.players[playerIndex].Bet(currentTable.smallBlind);
+                                else
+                                    currentTable.players[playerIndex].Call();
+                                break;
+                            case "check":
+                                currentTable.players[playerIndex].Check();
+                                break;
+                            case "raise":
+                                if (currentTable.isBet)
+                                    currentTable.players[playerIndex].Bet(currentTable.smallBlind);
+                                else
+                                    currentTable.players[playerIndex].Raise();
+                                break;
+                            case "allin":
+                                if (currentTable.isBet)
+                                    currentTable.isBet = false;
+                                currentTable.players[playerIndex].AllIn();
+                                break;
+                            case "fold":
+                                currentTable.players[playerIndex].Fold();
+                                break;
+                            default:
+                                currentTable.players[playerIndex].Fold();
+                                break;
+                        }
+                    } catch (e) {
+                        logger.info(e.message);
+                        currentTable.players[playerIndex].Fold();
+                    }
 
+                }
             }
+        } catch (e) {
+            logger.info(e.message);
         }
     });
 }
@@ -240,9 +244,9 @@ SkyRTC.prototype.notifyGuestAndPlayer = function () {
 SkyRTC.prototype.startGame = function (tableNumber) {
     var that = this;
     var message;
-    try{
+    try {
         parseInt(tableNumber);
-    }catch (e) {
+    } catch (e) {
         logger.info("table " + tableNumber + " start fail,  type is not correct");
         return;
     }
@@ -344,11 +348,11 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             that.players[player].send(JSON.stringify(message), errorCb);
         }
         /*
-        currentTable.timeout = setTimeout(function () {
-            logger.info("用户" + currentTable.players[currentTable.currentPlayer].playerName + "超时，自动放弃");
-            currentTable.players[currentTable.currentPlayer].Fold();
-        }, 5000);
-        */
+         currentTable.timeout = setTimeout(function () {
+         logger.info("用户" + currentTable.players[currentTable.currentPlayer].playerName + "超时，自动放弃");
+         currentTable.players[currentTable.currentPlayer].Fold();
+         }, 5000);
+         */
     } else if (!isSecond) {
         setTimeout(function () {
             that.getPlayerAction(message, true);
@@ -403,12 +407,15 @@ SkyRTC.prototype.init = function (socket) {
 
     socket.on('message', function (data) {
         console.log('message received : ' + data);
-
-        var json = JSON.parse(data);
-        if (json.eventName) {
-            that.emit(json.eventName, json.data, socket);
-        } else {
-            that.emit("socket_message", socket, data);
+        try {
+            var json = JSON.parse(data);
+            if (json.eventName) {
+                that.emit(json.eventName, json.data, socket);
+            } else {
+                that.emit("socket_message", socket, data);
+            }
+        }catch (e){
+            Logger.error(e.message);
         }
     });
 
@@ -420,7 +427,7 @@ SkyRTC.prototype.init = function (socket) {
         that.removeSocket(socket);
     });
 
-    playerDao.getAllPlayers(function(getPlayerErr, players) {
+    playerDao.getAllPlayers(function (getPlayerErr, players) {
         if (getPlayerErr.code === errorCode.SUCCESS.code) {
             for (var i = 0; i < players.length; i++) {
                 var player = players[i];
