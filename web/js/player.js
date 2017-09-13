@@ -20,15 +20,19 @@ var playerName = '';
 
 $(document).ready(function() {
     playerName = getParameter('name');
-    console.log('player : ' + playerName);
     $('#player_name').html(playerName);
     initRTC();
 });
 
 function initRTC() {
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName);
+
+    rtc.on('__new_peer', function(data) {
+        console.log('player join : ' + JSON.stringify(data));
+    });
+
     rtc.on('__action', function (data) {
-        console.log(data);
+        console.log('need next action : ' + JSON.stringify(data));
 
         $('#userName').text('用户名:' + data.self.playerName);
         $('#bet').prop('disabled', true);
@@ -47,7 +51,7 @@ function initRTC() {
     });
 
     rtc.on('__bet', function (data) {
-        console.log(data);
+        console.log('need to bet : ' + JSON.stringify(data));
 
         $('#msg').text('该回合轮到你首先押注,注意最小押注额');
         $('#bet').prop('disabled', false);
@@ -64,13 +68,16 @@ function initRTC() {
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
-    rtc.on('__newRound', function (data) {
+    rtc.on('__new_round', function (data) {
+        console.log('new round : ' + JSON.stringify(data));
+
         playerActions = {};
         gameStatus = 0;
     });
 
-    rtc.on('__showAction', function (data) {
-        console.log('action : ' + JSON.stringify(data.action));
+    rtc.on('__show_action', function (data) {
+        console.log('action : ' + JSON.stringify(data));
+
         var playerAction = data.action;
 
 

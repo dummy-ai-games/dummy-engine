@@ -15,6 +15,7 @@ import com.trendmicro.theclient.message.data.JoinData;
 import com.trendmicro.theclient.param.SampleConfigurator;
 import com.trendmicro.theclient.param.SampleDecoder;
 import com.trendmicro.theclient.param.SimpleEncoder;
+import com.trendmicro.theclient.playerai.PlayerAI;
 
 @ClientEndpoint(
 		configurator = SampleConfigurator.class,
@@ -31,23 +32,24 @@ public class WebSocketClient {
 		System.out.println("Client WebSocket is opening...");
 		this.session = session;
 
-		// send join message
+		// send join message here with your name
 		JoinData joinData = new JoinData("test2");
 		JoinMessage joinMessage = new JoinMessage("__join", joinData);
 		String joinString = new Gson().toJson(joinMessage);
 		send(joinString);
 	}
-	
+
 	@OnMessage
-	public void onMessage(String message){
+	public void onMessage(String message) {
 		System.out.println("received message: " + message);
-	}
-	
+		// your player AI
+        PlayerAI.getInstance().nextStep(message);
+    }
+
 	@OnClose
-	public void onClose(){
-		System.out.println("Web socket closed");
-	}
-	
+	public void onClose() {
+        System.out.println("Web socket closed");
+    }
 
     @OnError
     public void onError(Session session, Throwable t) {
@@ -55,12 +57,12 @@ public class WebSocketClient {
     }
 
 
-	public void send(Object message){
+	public void send(Object message) {
 		this.session.getAsyncRemote().sendObject(message);
 	}
 	
-	public void close() throws IOException{
-		if(this.session.isOpen()){
+	public void close() throws IOException {
+		if (this.session.isOpen()) {
 			this.session.close();
 		}
 	}

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="description" content="the-engine">
+    <meta name="author" content="the-engine team">
+    <title>Instructions</title>
+    <link rel="stylesheet" href="./js/public/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./style/instructions.css">
+</head>
+<body>
+    <div class="container">
+        <h2><b>AI开发文档</b></h2>
+        <br>
+        <div>
+            <div id="bs-example-navbar-collapse-1" class="navbar">
+                <ul class="nav navbar-nav" style="float: left;">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="font-size: 20px;"><span class="glyphicon glyphicon-menu-hamburger"></span> <span>文档索引</span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#game_summary">游戏规则</a></li>
+                            <li><a href="#server_access">服务器接入方式</a></li>
+                            <li><a href="#communication">通信机制</a></li>
+                            <li><a href="#join_game">加入游戏</a></li>
+                            <li><a href="#new_round">新一轮游戏</a></li>
+                            <li><a href="#request_for_action">服务器请求决策</a></li>
+                            <li><a href="#update_status">服务器状态更新</a></li>
+                            <li><a href="#other_affairs">其它注意事项</a></li>
+                            <li><a href="#appendixes">附表</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <a name="game_summary" style="text-decoration: none;"><h4><strong>游戏规则</strong></h4></a>
+        <ul>
+            <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由Engineer Camp组委会确定</p>
+            <p>2. 比赛分预赛和决赛两个阶段, 均采用淘汰制</p>
+            <p>3. 预赛阶段, 每桌游戏轮数不设上限, 直到一桌只剩下最终3人存活, 此3人在本桌胜出, 胜出者将和其它桌胜出玩家新凑一桌(最多10人)进行比赛, 以此类推, 最终决出10名玩家进入决赛</p>
+            <p>4. 决赛阶段10名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出签3名</p>
+            <p>5. 约定游戏过程中会有如下概念:</p>
+            <pre>
+局: 一局游戏是指参赛的10名玩家进入一张游戏桌, 持有相等的初始筹码, 对战直到本游戏桌只剩下3名玩家胜出, 而其余玩家因筹码耗尽而出局为止, 一局由多轮构成
+轮: 一轮游戏是指每次荷官重新发公共牌和私有牌, 每个玩家按回合进行决策, 直到除了一名玩家之外全部弃牌, 或者5张公共牌完全翻开为止, 决出本轮胜负并清算筹码, 一轮由多个回合构成
+回合: 一回合是指所有玩家依次take action, 称为一回合, 一个回合中有多个(分别来自各个玩家的)action
+action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 玩家通过 AI 客户端完成其中一种决策称之为一个action</pre>
+        </ul>
+        <hr>
+        <a name="server_access" style="text-decoration: none;"><h4><strong>服务器接入方式</strong></h4></a>
+        <ul>
+            <p>本游戏引擎服务器端采用 Websocket 与 客户端相连接, 游戏为多人(上限为10人)对战模式, 至多允许10个客户端接入一个游戏桌 (game board)</p>
+            <br>
+            <img style="width: 75%; height: 75%" src="./res/images/instructions/topologic.png">
+            <br>
+            <p>Websocket 接入URI:"ws://serverIP:3000"</p>
+        </ul>
+        <hr>
+        <a name="communication" style="text-decoration: none;"><h4><strong>通信机制</strong></h4></a>
+        <ul>
+            <p>客户端在成功接入 Websocket 之后, 需要向服务器提交加入请求, 附带 playerName, playerName 在整个比赛中会唯一标识参赛玩家, 请妥善保存</p>
+            <p>客户端接入服务器引擎并开始游戏之后, 服务器将向客户端发送两种不同类型的消息</p>
+            <p>1. 通知客户端AI程序 "本次action应采取动作", 即服务器端告诉玩家 "本回合轮到你采取动作了", 此消息会在轮到某个客户端采取行动时发送, 为点对点消息, 此时客户端应通过 AI 决策程序计算出一种决策并发送给服务器</p>
+            <p>2. 通知客户端AI程序当前牌桌上的状态, 此消息在任意一名玩家有所行动或者牌局发生任何变化时发送, 为广播消息, 客户端需要以此更新本地保存的牌局状态, 以助于在轮到己方行动时采取最优决策</p>
+        </ul>
+        <hr>
+        <a name="join_game" style="text-decoration: none;"><h4><strong>加入游戏</strong></h4></a>
+        <ul>
+            <p>加入游戏命令在游戏开始之前, 玩家进入游戏桌时由客户端向服务器发送, 命令格式 (JSON) 如下:</p>
+            <pre class="pre_code">
+{
+    "eventName" : "__join", 
+    "data" : {
+        "playerName" : "your name"
+    }
+}
+            </pre>
+            <p>指令说明:</p>
+            <p>1. playerName必须是组委会赋予玩家的名字, 不可冒名顶替, 一旦被程序检查出冒名行为,将取消比赛资格</p>
+            <p>2. 如果加入成功, 那么服务器会将当前牌桌上所有玩家的列表向所有在线的客户端广播一次, 广播格式如下:</p>
+            <pre>
+{
+    "eventName" : "__new_peer", 
+    "data" : ["player1", "player2", "player3", ... , "player10"]
+}</pre>
+            <p>3. __new_peer指令中的data包含在场所有玩家的名称列表</p>
+            <br>
+            <p>加入的流程如下:</p>
+            <img src="./res/images/instructions/join_message.png" style="width: 75%; height: 75%;">
+        </ul>
+        <hr>
+        <a name="new_round" style="text-decoration: none;"><h4><strong>新一轮游戏开始</strong></h4></a>
+        <ul>
+            <p>由于比赛采取不限轮次赛制(即直到每个游戏桌只剩下3名未出局玩家为止), 因此在一桌游戏开始时以及下一轮牌局开始时, 客户端都将收到服务器广播的此消息</p>
+            <pre>
+{
+    "eventName" : "__new_round", 
+    "data" : {
+        "table" : {
+            "tableNumber" : 1, 
+            "roundName" : "deal", // other options are : "flop", "turn", "river"
+            "board" : "[XX, XX, XX]"
+        }, 
+        "players" : [
+            {
+                "playerName" : "player1", 
+                "chips" : 20, 
+                "folded" : true, 
+                "allin" : false, 
+                "isSurvive" : true
+            }, 
+            {
+                "playerName" : "player2", 
+                "chips" : 0, 
+                "folded" : true, 
+                "allin" : true, 
+                "isSurvive" : false
+            }, 
+            {
+                "playerName" : "player3", 
+                "chips" : 500, 
+                "folded" : true, 
+                "allin" : false, 
+                "isSurvive" : true
+            }, 
+            ...
+        ]
+    }
+}</pre>
+            <p>指令说明:</p>
+            <p>1. data.table 字段表示当前牌桌的状态, data.table.tableNumber 表示当前的桌号, 桌号是游戏组委会在比赛之前按照分组分桌分好的一个桌号, 在比赛开始之前由组委会人员将玩家录入系统, 理论上某个玩家 (playerName) 所属的桌号是固定且唯一的, 
+            玩家客户端在发起 __join 指令表示加入时, 通过指定 playerName, 就能自动加入事先安排好的游戏桌</p>
+            <p>2. data.table.roundName 表示当前牌局的状态, 有如下取值: deal(还未发公共牌), flop(第1次发3张公共牌), turn(发第4张公共牌), river(发第5张公共牌), 详情请参考文档末尾附表</p>
+            <p>3. data.table.board 表示当前桌面上的公开牌的点数, 牌面取值请参考文档末尾附表</p>
+            <p>4. data.players 字段表示当前牌桌上所有玩家的状态, data.players[i].chips 代表当前这个玩家剩余的筹码</p>
+            <p>5. data.players[i].folded 表示玩家是否已经 fold, data.players[i].allin 表示玩家是否已经 all in, data.players[i].isSurvive 表示当前玩家是否仍在局 (false 表示输光出局) </p>
+        </ul>
+        <hr>
+        <a name="request_for_action" style="text-decoration: none;"><h4><strong>服务器请求玩家决策本次action应采取的动作(轮到某玩家行动)</strong></h4></a>
+        <ul>
+            <p>比赛过程中, 服务器会在轮到需要某玩家客户端做出决策之际向该玩家客户端发送此消息(参考"通信机制.第1条"), 此消息又分为2类: 需要玩家行动和需要玩家押注</p>
+            <p><strong>1. 需要玩家行动</strong></p>
+            <pre>
+{
+    "eventName" : "__action", 
+    "data" : {
+        "tableNumber" : 1, 
+        "self" : {
+            "playerName" : "player1", 
+            "chips" : 1000, 
+            "folded" : false, 
+            "allin" : false, 
+            "cards" : [XX, XX]
+        }, 
+        "game" : {
+            "gameBets" : [
+                {
+                    "playerName" : "player1",
+                    "roundBets": 50,
+                    "bets": 50
+                },
+                {
+                    "playerName" : "player2",
+                    "roundBets": 100,
+                    "bets": 100
+                },
+                {
+                    "playerName" : "player3",
+                    "roundBets": 200,
+                    "bets": 200
+                },
+                ...
+            ],
+            "board" : [XX, XX, XX],
+            "minBet" : 10, 
+            "raiseCount" : 0, 
+            "roundName" : "deal", // other options are : "flop", "turn", "river"
+            "otherPlayers" : [
+                {
+                    "playerName" : "player2", 
+                    "chips" : 20, 
+                    "folded" : true, 
+                    "allin" : false, 
+                    "isSurvive" : true
+                }, 
+                {
+                    "playerName" : "player3", 
+                    "chips" : 0, 
+                    "folded" : true, 
+                    "allin" : true, 
+                    "isSurvive" : false
+                }, 
+                {
+                    "playerName" : "player4", 
+                    "chips" : 500, 
+                    "folded" : true, 
+                    "allin" : false, 
+                    "isSurvive" : true
+                }, 
+                ...
+            ]
+        }
+    }
+}</pre>
+            <p>指令说明:</p>
+            <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin" 中的一种</p>
+            <p>1.1. data.self 字段表示当前己方(玩家自己)的状态, 除了 playerName, chips和几个状态之外, 通过这条信息玩家可以了解到自己的私有牌, 由于此消息是点对点发送, 因此玩家自己的私有牌不会泄露给其它玩家</p>
+            <p>1.2. data.game 表示当前牌局的状态, 其中 data.game.otherPlayers 字段中的牌桌上的所有玩家列表数据格式和内容含义均和 __new_round 指令中一致, 此处不再赘述</p>
+            <p>1.3. data.game.gameBets.roundBets 表示该玩家从<span style="color: #FF0000"><b>本局游戏</b></span>开始之后所下的赌注</p>
+            <p>1.3. data.game.gameBets.bets 表示该玩家从<span style="color: #FF0000"><b>本轮游戏</b></span>开始之后所下的赌注</p>
+            <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
+            <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
+            <p>1.7. data.game.raiseCount 字段表示本局中所有玩家总共加注 (raise) 的次数</p>
+            <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: deal(还未发公共牌), flop(第1次发3张公共牌), turn(发第4张公共牌), river(发第5张公共牌), 详情请参考文档末尾附表 </p>
+            <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise" 中的一种, 决策的数据格式如下</p>
+            <pre>
+{
+    "eventName" : "__action", 
+    "data" : {
+        "action" : "call", <span style="color: #FF0000"><b>// 还可以是 : "check", "fold", "allin", "raise", 但不能是 "bet" </b></span>
+        "playerName" : "player1"
+    }
+}</pre>
+            <br>
+            <p><strong>2. 需要玩家下注</strong></p>
+            <pre>
+{
+    "eventName" : "__bet", 
+    "data" : {
+        "tableNumber" : 1, 
+        "self" : {
+            "playerName" : "player1", 
+            "chips" : 1000, 
+            "folded" : false, 
+            "allin" : false, 
+            "cards" : [XX, XX]
+        }, 
+        "game" : {
+            "gameBets" : [
+                {
+                    "playerName" : "player1",
+                    "roundBets": 50,
+                    "bets": 50
+                },
+                {
+                    "playerName" : "player2",
+                    "roundBets": 100,
+                    "bets": 100
+                },
+                {
+                    "playerName" : "player3",
+                    "roundBets": 200,
+                    "bets": 200
+                },
+                ...
+            ],
+            "board" : [],
+            "minBet" : 10, 
+            "raiseCount" : 0, 
+            "roundName" : "deal", 
+            "otherPlayers" : [
+                {
+                    "playerName" : "player2", 
+                    "chips" : 20, 
+                    "folded" : true, 
+                    "allin" : false, 
+                    "isSurvive" : true
+                }, 
+                {
+                    "playerName" : "player3", 
+                    "chips" : 0, 
+                    "folded" : true, 
+                    "allin" : true, 
+                    "isSurvive" : false
+                }, 
+                {
+                    "playerName" : "player4", 
+                    "chips" : 500, 
+                    "folded" : true, 
+                    "allin" : false, 
+                    "isSurvive" : true
+                }, 
+                ...
+            ]
+        }
+    }
+}</pre>
+            <p>指令说明:</p>
+            <p>2.0. "需要玩家下注" 是指的系统请求玩家决策bet, 注意, 玩家客户端收到此消息之后仅可以决策bet, 但是可以选择 bet 的数值(amount)</p>
+            <p>2.1. 其它各字段含义和 __action 指令相同, 请参考 __action 指令说明</p>
+            <br>
+            <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型只能是 bet, 决策的数据格式如下, 其中包含本action下注的筹码</p>
+            <pre>
+{
+    "eventName" : "__action",
+    "data" : {
+        "action" : "bet", <span style="color: #FF0000"><b>// 这里只能是"bet"</b></span>
+        "playerName" : "player1", 
+        "amount" : 100 <span style="color: #FF0000"><b>// amount 在这里是一个强制字段</b></span>
+    }
+}</pre>
+            <br>
+            <p>服务器轮询以及玩家响应的流程如下:</p>
+            <img src="./res/images/instructions/action_message.png" style="width: 75%; height: 75%">
+        </ul>
+        <hr>
+        <a name="update_status" style="text-decoration: none;"><h4><strong>服务器更新牌桌状态</strong></h4></a>
+        <ul>
+            <p>比赛过程中, 服务器会根据牌桌上的任意状态变更(例如发牌或者有玩家采取了某种行动) 广播牌桌状态给所有玩家客户端</p>
+            <pre>
+{
+    "eventName" : "__show_action",
+    "data" : {
+        "action" : {
+            "action" : "call",
+            "playerName" : "player3",
+            "amount" : 10,
+            "chips" : 500
+        },
+        "table" : {
+            "tableNumber" : 1,
+            "roundName" : "turn",
+            "board" : [XX, XX, XX, XX]
+        },
+        "players" : [
+            {
+                "playerName" : "player1",
+                "chips" : 20,
+                "folded" : true,
+                "allin" : false,
+                "isSurvive" : true
+            },
+            {
+                "playerName" : "player2",
+                "chips" : 0,
+                "folded" : true,
+                "allin" : true,
+                "isSurvive" : false
+            },
+            {
+                "playerName" : "player3",
+                "chips" : 500,
+                "folded" : true,
+                "allin" : false,
+                "isSurvive" : true
+            },
+            ...
+        ]
+    }
+}</pre>
+            <p>指令说明:</p>
+            <p>1. __show_action 是一条服务器的广播消息, 目的是通知所有玩家(不论是否出局), 当前牌桌的状态, 便于玩家AI程序根据当前状态做出决策</p>
+            <p>2. data.action 表示当前导致牌局发生变化的任意一名玩家的行动, data.action.amount 表示当前这名玩家所追加的赌注的数值(不论是call, raise还是bet)</p>
+            <p>3. data.table 表示当前牌桌的状态, 包括公共牌的状态和已经发出的公共牌</p>
+            <p>4. data.players 表示当前所有玩家的状态, 请参考前序指令中的说明, 这里不再赘述</p>
+            <p>以下是某次回合导致牌局发生变化之后服务器和客户端交互的消息示意图</p>
+            <img src="./res/images/instructions/show_action_message.png" style="width: 75%; height: 75%;">
+        </ul>
+        <hr>
+        <a name="other_affairs" style="text-decoration: none;"><h4><strong>其它注意事项</strong></h4></a>
+        <ul>
+            <p>1. 服务器在向本次action需要行动的玩家发送 __action 请求决策之后, 会等待 5s, 决策超时时间为 5s, 如果客户端出现异常, 掉线或者在5s 之内无法做出决策, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b></p>
+            <p>2. 如果玩家在决策时发送了错误或者规定以外的指令, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b>, 请谨慎编写决策程序</p>
+            <p>3. 没有轮到某玩家的action, 此玩家却采取了行动, 此行动将自动被忽略</p>
+            <p>4. 建议玩家客户端监听掉线事件,以便在掉线之后可以随时通过 Websocket 重新加入并继续游戏</p>
+            <p>5. 每开始新的一轮时, 大小盲注会较之上一轮翻倍</p>
+            <p>6. 如果玩家在服务端发轮询动作之前离线, 系统会等待10秒, <b><span style="color: #FF0000">10秒后仍然没有等到再次接入, 将视为自动弃牌</span></b></p>
+        </ul>
+        <hr>
+        <a name="appendixes" style="text-decoration: none;"><h4><strong>附表</strong></h4></a>
+        <ul>
+            <table class="table table-striped table-bordered table-condensed">
+                <tr>
+                    <td colspan="2" style="width: 100%; height: 25px; background-color: #2F4FAF; color: #FFFFFF;">
+                        <b>玩家采取的行动约定</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; height: 25px;">
+                        <b>取值</b>
+                    </td>
+                    <td style="width: 80%; height: 25px;">
+                        <b>定义</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; height: 25px;">
+                        call
+                    </td>
+                    <td style="width: 80%; height: 25px;">
+                        跟注, 与前一位玩家押下相等的筹码<br>
+                        1. 如果玩家剩余的筹码不够, 系统将自动执行allin<br>
+                        2. 如果轮到玩家决策bet, 而发现玩家决策出call, 那么自动 bet 小盲注<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; height: 25px;">
+                        raise
+                    </td>
+                    <td style="width: 80%; height: 25px;">
+                        加注, 提高现有筹码为前一位玩家的2倍<br>
+                        1. 如果超过加注次数, 系统将自动执行 call<br>
+                        2. 如果剩余筹码不够, 系统自动执行 allin<br>
+                        3. 如果应该决策出 bet, 而发现玩家决策出 raise, 那么系统自动 bet 小盲注
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; height: 25px;">
+                        bet
+                    </td>
+                    <td style="width: 80%; height: 25px;">
+                        自由下注, 以amount参数作为下注筹码金额<br>
+                        1. 如果amount小于当前游戏规定的最小押注额, 系统将自动转换为最小押注额<br>
+                        2. 如果玩家剩余筹码不够, 自动allin<br>
+                        3. 如果该action中不能bet (即玩家收到服务器的决策请求为 __action), 而采取bet决策, 那么将实施call<br>
+                        4. amount字段如果不是数字, 那么系统自动进行弃牌操作<br>
+                        5. 金额必须是整数，如果不是整数，自动押注小盲注金额<br>
+                        6. 轮到bet的时候也可以决策为check
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; height: 25px;">
+                        check
+                    </td>
+                    <td style="width: 80%; height: 25px;">
+                        过牌, 在不需要跟注的情况下, 把押注机会传递给下一位玩家<br>
+                        1. 如果当前无法check的话, 系统会自动执行call
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; height: 25px;">
+                        fold
+                    </td>
+                    <td style="width: 80%; height: 25px;">
+                        弃牌, 放弃本轮比赛的所有手牌
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 20%; height: 25px;">
+                        allin
+                    </td>
+                    <td style="width: 80%; height: 25px;">
+                        全注, 将目前剩余的所有筹码(chips)作为注额
+                    </td>
+                </tr>
+            </table>
+            <br>
+            <p>牌面值</p>
+            <p>1. 牌面统一由2个字符组成</p>
+            <p>2. 第1个字符为数字: 取值为: 2~9, T(10), J(J), Q(Q), K(K), A(Ace)</p>
+            <p>3. 第2个字符为花色: 分别为 H(红桃), S(黑桃), C(草花), D(方块)</p>
+            <p>4. 例如: 3H -- 红桃3; TS -- 黑桃10; QC -- 草花皇后; AD -- 方块Ace</p>
+        </ul>
+        <hr>
+    </div>
+</body>
+<script src="./js/public/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="./js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="./js/instructions.js"></script>
+</html>

@@ -36,7 +36,7 @@ function SkyRTC() {
     this.playerAndTable = {};
     this.on('__join', function (data, socket) {
         var that = this;
-        var param = data.param;
+        var param = data.playerName;
         if (that.playerAndTable[param])
             socket.id = param;
         else
@@ -312,18 +312,18 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         delete that.table[data.table.tableNumber];
     });
 
-    that.table[tableNumber].eventEmitter.on("__newRound", function (data) {
+    that.table[tableNumber].eventEmitter.on("__new_round", function (data) {
         var message = {
-            "eventName": "__newRound",
+            "eventName": "__new_round",
             "data": data
         };
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
     });
 
-    that.table[tableNumber].eventEmitter.on("__showAction", function (data) {
+    that.table[tableNumber].eventEmitter.on("__show_action", function (data) {
         var message = {
-            "eventName": "__showAction",
+            "eventName": "__show_action",
             "data": data
         };
 

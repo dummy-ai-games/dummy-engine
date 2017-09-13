@@ -47,9 +47,6 @@ var SkyRTC = function () {
 
 
     /*************************服务器连接部分***************************/
-
-
-        //本地连接信道，信道为websocket，创建socket连接
     skyrtc.prototype.connect = function (server, param) {
         var socket,
             that = this;
@@ -59,7 +56,7 @@ var SkyRTC = function () {
             socket.send(JSON.stringify({
                 "eventName": "__join",
                 "data": {
-                    "param": param
+                    "playerName": param
                 }
             }));
             that.emit("socket_opened", socket);
@@ -84,18 +81,13 @@ var SkyRTC = function () {
         };
 
         this.on('_peers', function (data) {
-            //获取所有服务器上的
-
             that.emit('connected', socket);
         });
-
 
         this.on('_remove_peer', function (data) {
 
             that.emit("remove_peer", data.socketId);
         });
-
-
     };
     skyrtc.prototype.Bet = function (playerName, amount) {
         var that = this;

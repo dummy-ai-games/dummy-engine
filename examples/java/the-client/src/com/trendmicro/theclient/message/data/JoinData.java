@@ -1,17 +1,17 @@
 package com.trendmicro.theclient.message.data;
 
 public class JoinData {
-    private String param;
+    private String playerName;
 
-    public JoinData(String param) {
-        this.param = param;
+    public JoinData(String playerName) {
+        this.playerName = playerName;
     }
 
-    public String getParam() {
-        return param;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public void setParam(String param) {
-        this.param = param;
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 }

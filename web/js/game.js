@@ -80,7 +80,7 @@ function initWebsock() {
         updateTable(data);
     });
 
-    rtc.on('__newRound', function (data) {
+    rtc.on('__new_round', function (data) {
         var roundCount = data.table.roundCount;
         var tableNumber = data.table.tableNumber;
         console.log("table " + tableNumber + " 第" + roundCount + "轮开始");
@@ -90,7 +90,7 @@ function initWebsock() {
         updateTable(data);
     });
 
-    rtc.on('__showAction', function (data) {
+    rtc.on('__show_action', function (data) {
         console.log("action : " + JSON.stringify(data));
 
         var tableNumber = data.table.tableNumber;

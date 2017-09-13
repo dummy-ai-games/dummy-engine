@@ -14,7 +14,7 @@ def takeAction(action, data):
             "eventName": "__action",
             "data": {
                 "action": "bet",
-                "playerName": "yang2",
+                "playerName": "test3",
                 "amount": 100
             }
         }))
@@ -28,14 +28,13 @@ def takeAction(action, data):
             }
         }))
 
-
 if __name__ == '__main__':
     ws = create_connection("ws://127.0.0.1:3000/")
     try:
         ws.send(json.dumps({
             "eventName": "__join",
             "data": {
-                "param": "yang2"
+                "playerName": "test3"
             }
         }))
         while 1:

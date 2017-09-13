@@ -57,7 +57,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
         var myData = getBasicData(that);
         myData.action = data;
         console.log(JSON.stringify(myData));
-        that.eventEmitter.emit("__showAction", myData);
+        that.eventEmitter.emit("__show_action", myData);
     });
 
     this.eventEmitter.on("deal", function () {
@@ -103,7 +103,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             that.NewRound();
             that.roundCount++;
             var data = getBasicData(that);
-            that.eventEmitter.emit("__newRound", data);
+            that.eventEmitter.emit("__new_round", data);
         }
         else {
             console.log("gameOver, 胜者如下：");
@@ -1681,8 +1681,8 @@ function Game(smallBlind, bigBlind) {
     this.smallBlind = smallBlind;
     this.bigBlind = bigBlind;
     this.pot = 0;
-    this.roundName = 'Deal'; //Start the first round
-    this.betName = 'bet'; //bet,raise,re-raise,cap
+    this.roundName = 'Deal'; // start the first round
+    this.betName = 'bet'; // bet, raise, re-raise, cap
     this.bets = [];
     this.roundBets = [];
     this.deck = [];

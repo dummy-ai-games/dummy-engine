@@ -64,12 +64,12 @@ function initRTC() {
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
-    rtc.on('__newRound', function (data) {
+    rtc.on('__new_round', function (data) {
         playerActions = {};
         gameStatus = 0;
     });
 
-    rtc.on('__showAction', function (data) {
+    rtc.on('__show_action', function (data) {
         console.log('action : ' + JSON.stringify(data.action));
         var playerAction = data.action;
 
