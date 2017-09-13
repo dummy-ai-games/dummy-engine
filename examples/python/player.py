@@ -5,9 +5,12 @@
 import time
 import json
 from websocket import create_connection
+
 # pip install websocket-client
+ws = ""
 
 def takeAction(action, data):
+    global ws
     if action == "__bet":
         time.sleep(2)
         ws.send(json.dumps({
@@ -28,8 +31,10 @@ def takeAction(action, data):
             }
         }))
 
+
 def doListen():
     try:
+        global ws
         ws = create_connection("ws://127.0.0.1:3000/")
         ws.send(json.dumps({
             "eventName": "__join",
@@ -49,6 +54,6 @@ def doListen():
         print e.message
         doListen()
 
+
 if __name__ == '__main__':
-    ws = ""
     doListen()
