@@ -10,7 +10,6 @@ from websocket import create_connection
 ws = ""
 
 def takeAction(action, data):
-    global ws
     if action == "__bet":
         time.sleep(2)
         ws.send(json.dumps({
