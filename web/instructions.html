@@ -210,11 +210,11 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
             <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin" 中的一种</p>
             <p>1.1. data.self 字段表示当前己方(玩家自己)的状态, 除了 playerName, chips和几个状态之外, 通过这条信息玩家可以了解到自己的私有牌, 由于此消息是点对点发送, 因此玩家自己的私有牌不会泄露给其它玩家</p>
             <p>1.2. data.game 表示当前牌局的状态, 其中 data.game.otherPlayers 字段中的牌桌上的所有玩家列表数据格式和内容含义均和 __new_round 指令中一致, 此处不再赘述</p>
-            <p>1.3. data.game.gameBets.roundBets 表示该玩家从<span style="color: #FF0000"><b>本局游戏</b></span>开始之后所下的赌注</p>
-            <p>1.3. data.game.gameBets.bets 表示该玩家从<span style="color: #FF0000"><b>本轮游戏</b></span>开始之后所下的赌注</p>
+            <p>1.3. data.game.gameBets.roundBets 表示该玩家从<span style="color: #FF0000"><b>本轮游戏</b></span>开始之后所下的赌注</p>
+            <p>1.3. data.game.gameBets.bets 表示该玩家从<span style="color: #FF0000"><b>本回合游戏</b></span>开始之后所下的赌注</p>
             <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
             <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
-            <p>1.7. data.game.raiseCount 字段表示本局中所有玩家总共加注 (raise) 的次数</p>
+            <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
             <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: deal(还未发公共牌), flop(第1次发3张公共牌), turn(发第4张公共牌), river(发第5张公共牌), 详情请参考文档末尾附表 </p>
             <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise" 中的一种, 决策的数据格式如下</p>
             <pre>
@@ -298,7 +298,7 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
 {
     "eventName" : "__action",
     "data" : {
-        "action" : "bet", <span style="color: #FF0000"><b>// 这里只能是"bet"</b></span>
+        "action" : "bet", <span style="color: #FF0000"><b>// 这里建议是"bet", 也可以是check/fold/allin, 请参考附表中的说明</b></span>
         "playerName" : "player1", 
         "amount" : 100 <span style="color: #FF0000"><b>// amount 在这里是一个强制字段</b></span>
     }
@@ -366,7 +366,7 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
             <p>1. 服务器在向本次action需要行动的玩家发送 __action 请求决策之后, 会等待 5s, 决策超时时间为 5s, 如果客户端出现异常, 掉线或者在5s 之内无法做出决策, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b></p>
             <p>2. 如果玩家在决策时发送了错误或者规定以外的指令, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b>, 请谨慎编写决策程序</p>
             <p>3. 没有轮到某玩家的action, 此玩家却采取了行动, 此行动将自动被忽略</p>
-            <p>4. 建议玩家客户端监听掉线事件,以便在掉线之后可以随时通过 Websocket 重新加入并继续游戏</p>
+            <p>4. 建议玩家客户端监听掉线事件,以便在掉线之后可以随时通过 Websocket 重新加入并继续游戏, 建议在掉线重连之后立即发送 __action, call</p>
             <p>5. 每开始新的一轮时, 大小盲注会较之上一轮翻倍</p>
             <p>6. 如果玩家在服务端发轮询动作之前离线, 系统会等待10秒, <b><span style="color: #FF0000">10秒后仍然没有等到再次接入, 将视为自动弃牌</span></b></p>
         </ul>
@@ -419,7 +419,7 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
                         3. 如果该action中不能bet (即玩家收到服务器的决策请求为 __action), 而采取bet决策, 那么将实施call<br>
                         4. amount字段如果不是数字, 那么系统自动进行弃牌操作<br>
                         5. 金额必须是整数，如果不是整数，自动押注小盲注金额<br>
-                        6. 轮到bet的时候也可以决策为check
+                        6. 轮到bet的时候也可以决策为check/raise/allin
                     </td>
                 </tr>
                 <tr>
