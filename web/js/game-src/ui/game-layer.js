@@ -3,7 +3,7 @@
  * 2017-08-21
  */
 
-// logic related
+// model related
 var STATUS_WAITING_FOR_PLAYERS = 0;
 var STATUS_GAME_RUNNING = 1;
 var STATUS_GAME_FINISHED = 2;
@@ -23,7 +23,7 @@ var publicCards = [];
 var GameLayer = cc.Layer.extend({
 
     defaultFont: 'Arial',
-    // game logic variables
+    // game model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
@@ -49,6 +49,9 @@ var GameLayer = cc.Layer.extend({
     controlMenuScale: 1.0,
     cardWidth: 0.0,
     cardHeight: 0.0,
+
+    // sub layers
+    playerLayers: [],
 
     // sprites
     bgSprite: null,
@@ -104,7 +107,7 @@ var GameLayer = cc.Layer.extend({
         this.addChild(this.bgSprite);
 
         // show round N text at the center | top
-        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 32,
+        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 24,
             cc.size(this.validWidth / 8 * this.playerScale, this.validHeight / 4 * this.playerScale));
         this.roundText.setColor(cc.color(255, 255, 255, 255));
 
@@ -188,6 +191,12 @@ var GameLayer = cc.Layer.extend({
                     this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
             }
 
+            // set invisible after initialized
+            this.avatarSprites[i].setVisible(false);
+            this.nameTexts[i].setVisible(false);
+            this.moneyTexts[i].setVisible(false);
+            this.actionTexts[i].setVisible(false);
+            this.betTexts[i].setVisible(false);
 
             this.addChild(this.avatarSprites[i], 6);
             this.addChild(this.nameTexts[i], 6);
@@ -207,12 +216,12 @@ var GameLayer = cc.Layer.extend({
                 this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 16 * 6,
                     this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
                 this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 6 + 20,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height - 20));
             } else {
                 this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 16 * 14,
                     this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height));
                 this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 14 + 20,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height));
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height - 20));
             }
 
             // calculate card sprite scale for the screen
@@ -220,8 +229,11 @@ var GameLayer = cc.Layer.extend({
             this.privateCardSprites[i][0].setScale(this.privateCardScale);
             this.privateCardSprites[i][1].setScale(this.privateCardScale);
 
-            this.addChild(this.privateCardSprites[i][0], 6);
-            this.addChild(this.privateCardSprites[i][1], 7);
+            this.privateCardSprites[i][0].setVisible(false);
+            this.privateCardSprites[i][1].setVisible(false);
+
+            this.addChild(this.privateCardSprites[i][0], 7);
+            this.addChild(this.privateCardSprites[i][1], 6);
         }
 
         this.publicCardSprites = new Array();
@@ -251,6 +263,12 @@ var GameLayer = cc.Layer.extend({
         this.publicCardSprites[3].setScale(this.publicCardScale);
         this.publicCardSprites[4].setScale(this.publicCardScale);
 
+        this.publicCardSprites[0].setVisible(false);
+        this.publicCardSprites[1].setVisible(false);
+        this.publicCardSprites[2].setVisible(false);
+        this.publicCardSprites[3].setVisible(false);
+        this.publicCardSprites[4].setVisible(false);
+
         this.addChild(this.publicCardSprites[0], 6);
         this.addChild(this.publicCardSprites[1], 6);
         this.addChild(this.publicCardSprites[2], 6);
@@ -265,11 +283,11 @@ var GameLayer = cc.Layer.extend({
                 console.log("game start");
                 startGame();
             },this);
-        this.controlMenuScale = this.validHeight / 10 / this.startButton.height;
+        this.controlMenuScale = this.validHeight / 16 / this.startButton.height;
         this.startButton.setScale(this.controlMenuScale);
-        this.startButton.setAnchorPoint(0, -0.5);
+        this.startButton.setAnchorPoint(0, 0.5);
         this.controlMenu = cc.Menu.create(this.startButton);
-        this.controlMenu.setPosition(cc.p(this.validWidth / 16 * 2, this.validHeight - this.roundText.height));
+        this.controlMenu.setPosition(cc.p(this.validWidth / 16 * 2, this.validHeight - this.roundText.height / 2));
         this.addChild(this.controlMenu);
 
         // kick start the game
@@ -284,7 +302,7 @@ var GameLayer = cc.Layer.extend({
         this.doUpdate();
     },
 
-    /****** game logic ******/
+    /****** game model ******/
     reset: function() {
         // initiate players
         players = new Array();
@@ -316,7 +334,7 @@ var GameLayer = cc.Layer.extend({
             {
                 this.updateRound();
                 this.updatePlayers();
-                this.updatePublicCards();
+                this.updatePublicCards(false);
                 break;
             }
 
@@ -324,7 +342,7 @@ var GameLayer = cc.Layer.extend({
             {
                 this.updateRound();
                 this.updatePlayers();
-                this.updatePublicCards();
+                this.updatePublicCards(true);
                 break;
             }
 
@@ -332,7 +350,7 @@ var GameLayer = cc.Layer.extend({
             {
                 this.updateRound();
                 this.updatePlayers();
-                this.updatePublicCards();
+                this.updatePublicCards(true);
                 break;
             }
 
@@ -349,30 +367,49 @@ var GameLayer = cc.Layer.extend({
 
     updatePlayers: function() {
         var i;
+        // first, hide all players
+        for (i = 0; i < this.maxPlayers; i++) {
+            this.nameTexts.setVisible(false);
+            this.avatarSprites[i].setVisible(false);
+            this.nameTexts[i].setVisible(false);
+            this.moneyTexts[i].setVisible(false);
+            this.betTexts[i].setVisible(false);
+            this.actionTexts[i].setVisible(false);
+            this.privateCardSprites[i][0].setVisible(false);
+            this.privateCardSprites[i][1].setVisible(false);
+        }
+
         for (i = 0; i < currentPlayers; i++) {
-            this.nameTexts[i].setString(players[i].name);
+            this.nameTexts[i].setString(players[i].id);
+            this.nameTexts[i].setVisible(true);
 
             // update avatar
             var avatar = avartarSamples[i];
             var avatarFrame = cc.SpriteFrame.create(avatar, cc.rect(0, 0,
                 this.avatarSprites[i].width, this.avatarSprites[i].height));
             this.avatarSprites[i].setSpriteFrame(avatarFrame);
+            this.avatarSprites[i].setVisible(true);
 
-            if (players[i].status == playerStatusAlive) {
+            if (players[i].status === playerStatusAlive) {
                 this.nameTexts[i].setColor(cc.color(0, 255, 255, 255));
             } else {
                 this.nameTexts[i].setColor(cc.color(255, 0, 0, 255));
             }
+            this.nameTexts[i].setVisible(true);
 
             this.moneyTexts[i].setString(players[i].gold);
             this.betTexts[i].setString(players[i].bet);
             this.actionTexts[i].setString(players[i].action);
 
-            if (players[i].inTurn == 1) {
+            this.moneyTexts[i].setVisible(true);
+            this.betTexts[i].setVisible(true);
+
+            if (players[i].inTurn === 1) {
                 this.actionTexts[i].setColor(cc.color(255, 0, 0, 255));
             } else {
                 this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
             }
+            this.actionTexts[i].setVisible(true);
 
             // draw private cards
             var privateCard0 = players[i].privateCards[0];
@@ -389,10 +426,13 @@ var GameLayer = cc.Layer.extend({
                     this.privateCardSprites[i][1].width, this.privateCardSprites[i][1].height));
                 this.privateCardSprites[i][1].setSpriteFrame(frame2);
             }
+
+            this.privateCardSprites[i][0].setVisible(true);
+            this.privateCardSprites[i][1].setVisible(true);
         }
     },
 
-    updatePublicCards: function() {
+    updatePublicCards: function(visible) {
         var i = 0;
 
         // clear public cards
@@ -409,6 +449,7 @@ var GameLayer = cc.Layer.extend({
                         this.publicCardSprites[i].width, this.publicCardSprites[i].height));
                 this.publicCardSprites[i].setSpriteFrame(frame);
             }
+            this.publicCardSprites[i].setVisible(visible);
         }
     },
 
