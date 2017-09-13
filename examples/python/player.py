@@ -34,7 +34,7 @@ def doListen():
         ws.send(json.dumps({
             "eventName": "__join",
             "data": {
-                "param": "yang2"
+                "playerName": "yang2"
             }
         }))
         while 1:
