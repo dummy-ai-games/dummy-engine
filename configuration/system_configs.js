@@ -20,7 +20,7 @@ exports.setupEnvironment = function () {
         MONGO_DB_USER = 'admin';
         MONGO_DB_PASSWORD = '123456';
     } else if (enums.APP_PRODUCTION_MODE == env) {
-        LISTEN_PORT = "3000";
+        LISTEN_PORT = "80";
         MAIN_SERVER_ADDRESS = "127.0.0.1";
         MAIN_SERVER_PORT = 80;
         MONGO_DB_URI = "mongodb://127.0.0.1:27017/the_game";
@@ -29,7 +29,7 @@ exports.setupEnvironment = function () {
         MONGO_DB_USER = 'admin';
         MONGO_DB_PASSWORD = '123456';
     } else if (enums.APP_USERDEBUG_MODE == env) {
-        LISTEN_PORT = "3000";
+        LISTEN_PORT = "80";
         MAIN_SERVER_ADDRESS = "10.64.71.144";
         MAIN_SERVER_PORT = 80;
         MONGO_DB_URI = "mongodb://127.0.0.1:27017/the_game";
