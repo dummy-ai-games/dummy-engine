@@ -11,6 +11,7 @@ var minBet;
 var raiseCount;
 var otherPlayers;
 var playerActions = {};
+var magicNumber = "";
 var gameStatus = 0;
 var risk = 1;
 var danger = 2;
@@ -18,7 +19,7 @@ var danger = 2;
 var rtc = SkyRTC();
 var playerName = '';
 
-$(document).ready(function() {
+$(document).ready(function () {
     playerName = getParameter('name');
     console.log('player : ' + playerName);
     $('#player_name').html(playerName);
@@ -43,6 +44,7 @@ function initRTC() {
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
         otherPlayers = data.game.otherPlayers;
+        magicNumber = data.magicNumber;
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
@@ -61,6 +63,7 @@ function initRTC() {
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
         otherPlayers = data.game.otherPlayers;
+        magicNumber = data.magicNumber;
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
@@ -80,13 +83,13 @@ function initRTC() {
         var currentPlayer = playerActions[playerAction.playerName];
         currentPlayer.push(playerAction.action);
         if (data.table.roundName === 'Flop' &&
-                (playerAction.action === 'raise' || playerAction.action === 'allin') &&
-                currentPlayer.toString().indexOf('raise') === -1) {
+            (playerAction.action === 'raise' || playerAction.action === 'allin') &&
+            currentPlayer.toString().indexOf('raise') === -1) {
             gameStatus = risk;
         }
         if (data.table.roundName === 'Turn' &&
-                (playerAction.action === 'raise' || playerAction.action === 'allin') &&
-                currentPlayer.toString().indexOf('raise') === -1) {
+            (playerAction.action === 'raise' || playerAction.action === 'allin') &&
+            currentPlayer.toString().indexOf('raise') === -1) {
             gameStatus = danger;
         }
     });
@@ -239,42 +242,42 @@ function takeAction(selfCard, cards, players) {
 
 $('#bet').click(function () {
     var amount = $('#amount').val();
-    rtc.Bet(self.playerName, amount);
+    rtc.Bet(self.playerName, amount, magicNumber);
     $('#msg').text('该回合您采取的是：bet' + ',押注金额是：' + amount);
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#call').click(function () {
-    rtc.Call(self.playerName);
+    rtc.Call(self.playerName, magicNumber);
     $('#msg').text('该回合您采取的是：call');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#check').click(function () {
-    rtc.Check(self.playerName);
+    rtc.Check(self.playerName, magicNumber);
     $('#msg').text('该回合您采取的是：check');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#raise').click(function () {
-    rtc.Raise(self.playerName);
+    rtc.Raise(self.playerName, magicNumber);
     $('#msg').text('该回合您采取的是：raise');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#allin').click(function () {
-    rtc.AllIn(self.playerName);
+    rtc.AllIn(self.playerName, magicNumber);
     $('#msg').text('该回合您采取的是：allin');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#fold').click(function () {
-    rtc.Fold(self.playerName);
+    rtc.Fold(self.playerName, magicNumber);
     $('#msg').text('该回合您采取的是：fold');
     $('#msg').show();
     $('#action').hide();
@@ -282,8 +285,9 @@ $('#fold').click(function () {
 
 // utils
 function getQueryStringRegExp(name) {
-    var reg = new RegExp("(^|\\?|&|)"+ name +"=([^&]*)(\\s|&|$|)", "i");
-    if (reg.test(decodeURI(location.href))) return unescape(RegExp.$2.replace(/\+/g, " ")); return "";
+    var reg = new RegExp("(^|\\?|&|)" + name + "=([^&]*)(\\s|&|$|)", "i");
+    if (reg.test(decodeURI(location.href))) return unescape(RegExp.$2.replace(/\+/g, " "));
+    return "";
 }
 
 function getParameter(name) {

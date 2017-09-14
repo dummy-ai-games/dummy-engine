@@ -43,6 +43,10 @@ function SkyRTC() {
             socket.tableNumber = param;
 
         if (that.playerAndTable[socket.id]) {
+            if (that.players[socket.id]) {
+                logger.info("player already exist, reject");
+                return;
+            }
             logger.info("player join!!");
             that.playerNumber++;
             var exitPlayer = that.exitPlayers[socket.id];
@@ -74,15 +78,14 @@ function SkyRTC() {
             var that = this;
             var action = data.action;
             var playerName = data.playerName;
+            var magicNumber = data.magicNumber;
             if (that.players[playerName]) {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
                 if (currentTable.timeout)
                     clearTimeout(currentTable.timeout);
                 var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
-                if (playerIndex != currentTable.currentPlayer)
-                    currentTable.players[playerIndex].Fold();
-                else if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
+                if (playerIndex != -1 && currentTable.checkPlayer(playerIndex, magicNumber)) {
                     try {
                         switch (action) {
                             case "bet":
@@ -346,19 +349,17 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         logger.info("服务端轮询动作：" + JSON.stringify(message));
         if (that.players[player]) {
             that.players[player].send(JSON.stringify(message), errorCb);
+            currentTable.timeout = setTimeout(function () {
+                logger.info("用户" + currentTable.players[currentTable.currentPlayer].playerName + "超时，自动放弃");
+                currentTable.players[currentTable.currentPlayer].Fold();
+            }, 5000);
         }
-        /*
-         currentTable.timeout = setTimeout(function () {
-         logger.info("用户" + currentTable.players[currentTable.currentPlayer].playerName + "超时，自动放弃");
-         currentTable.players[currentTable.currentPlayer].Fold();
-         }, 5000);
-         */
     } else if (!isSecond) {
         setTimeout(function () {
             that.getPlayerAction(message, true);
         }, 10 * 1000);
     } else {
-        var tableNumber = that.exitPlayers[player].tableNumber;
+        var tableNumber = that.playerAndTable[player].tableNumber;
         var currentTable = that.table[tableNumber];
         currentTable.players[currentTable.currentPlayer].Fold();
     }
@@ -414,7 +415,7 @@ SkyRTC.prototype.init = function (socket) {
             } else {
                 that.emit("socket_message", socket, data);
             }
-        }catch (e){
+        } catch (e) {
             logger.error(e.message);
         }
     });

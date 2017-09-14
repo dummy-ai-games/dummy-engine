@@ -1,5 +1,5 @@
 var events = require('events');
-var util = require('util');
+var UUID = require('node-uuid');
 var playerDao = require("../models/player_dao.js");
 var winnerDao = require("../models/winner_dao.js");
 
@@ -26,6 +26,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.isBet = false;
     this.roundCount = 1;
     this.surviveCount = 0;
+    this.magicNumber = "";
 
     //Validate acceptable value ranges.
     var err;
@@ -201,9 +202,10 @@ function takeAction(table, action) {
             players.push(player);
 
     }
-
+    table.magicNumber = UUID.v4();
     var data = {
         "tableNumber": table.tableNumber,
+        "magicNumber": table.magicNumber,
         "self": destPlayer,
         "game": {
             "gameBets": gameBets,
@@ -213,13 +215,12 @@ function takeAction(table, action) {
             "otherPlayers": players
         }
     };
+
     table.eventEmitter.emit(action, data);
 }
 
-Table.prototype.checkPlayer = function (player) {
-    if (player != this.currentPlayer) {
-        this.players[player].folded = true;
-        progress(this);
+Table.prototype.checkPlayer = function (player,magicNumber) {
+    if (player != this.currentPlayer || magicNumber != this.magicNumber) {
         return false;
     }
     return true;

@@ -89,67 +89,73 @@ var SkyRTC = function () {
             that.emit("remove_peer", data.socketId);
         });
     };
-    skyrtc.prototype.Bet = function (playerName, amount) {
+    skyrtc.prototype.Bet = function (playerName, amount,magicNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
             "data": {
                 "action": "bet",
                 "playerName": playerName,
-                "amount": amount
+                "amount": amount,
+                "magicNumber":magicNumber
             }
         }));
     };
-    skyrtc.prototype.Call = function (playerName) {
+    skyrtc.prototype.Call = function (playerName,magicNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
             "data": {
                 "action": "call",
-                "playerName": playerName
+                "playerName": playerName,
+                "magicNumber":magicNumber
             }
         }));
     };
-    skyrtc.prototype.Check = function (playerName) {
+    skyrtc.prototype.Check = function (playerName,magicNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
             "data": {
                 "action": "check",
-                "playerName": playerName
+                "playerName": playerName,
+                "magicNumber":magicNumber
             }
         }));
     };
 
-    skyrtc.prototype.Raise = function (playerName) {
+    skyrtc.prototype.Raise = function (playerName,magicNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
             "data": {
                 "action": "raise",
-                "playerName": playerName
+                "playerName": playerName,
+                "magicNumber":magicNumber
             }
         }));
     };
 
-    skyrtc.prototype.AllIn = function (playerName) {
+    skyrtc.prototype.AllIn = function (playerName,magicNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
             "data": {
                 "action": "allin",
-                "playerName": playerName
+                "playerName": playerName,
+                "magicNumber":magicNumber
             }
         }));
     };
 
-    skyrtc.prototype.Fold = function (playerName) {
+    skyrtc.prototype.Fold = function (playerName,magicNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
             "data": {
                 "action": "fold",
-                "playerName": playerName
+                "playerName": playerName,
+                "magicNumber":magicNumber
             }
         }));
     };
