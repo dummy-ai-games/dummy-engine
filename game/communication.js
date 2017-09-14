@@ -44,7 +44,7 @@ function SkyRTC() {
 
         if (that.playerAndTable[socket.id]) {
             if (that.players[socket.id]) {
-                logger.info("player already exist, reject");
+                logger.info("player:" + socket.id + " already exist, reject");
                 return;
             }
             logger.info("player join!!");
