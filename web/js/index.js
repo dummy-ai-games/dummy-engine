@@ -1,8 +1,4 @@
 
-$(document).ready(function() {
-
-});
-
 function gotoTest() {
     var tableNumber = window.prompt("table number ?", "");
     if (tableNumber === null || tableNumber === "") {
