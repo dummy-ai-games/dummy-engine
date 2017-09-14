@@ -176,18 +176,18 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
             "gameBets" : [
                 {
                     "playerName" : "player1",
-                    "roundBets": 50,
-                    "bets": 50
+                    "roundBet": 50,
+                    "bet": 50
                 },
                 {
                     "playerName" : "player2",
-                    "roundBets": 100,
-                    "bets": 100
+                    "roundBet": 100,
+                    "bet": 100
                 },
                 {
                     "playerName" : "player3",
-                    "roundBets": 200,
-                    "bets": 200
+                    "roundBet": 200,
+                    "bet": 200
                 },
                 ...
             ],
@@ -226,8 +226,8 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
             <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin" 中的一种</p>
             <p>1.1. data.self 字段表示当前己方(玩家自己)的状态, 除了 playerName, chips和几个状态之外, 通过这条信息玩家可以了解到自己的私有牌, 由于此消息是点对点发送, 因此玩家自己的私有牌不会泄露给其它玩家</p>
             <p>1.2. data.game 表示当前牌局的状态, 其中 data.game.otherPlayers 字段中的牌桌上的所有玩家列表数据格式和内容含义均和 __new_round 指令中一致, 此处不再赘述</p>
-            <p>1.3. data.game.gameBets.roundBets 表示该玩家从<span style="color: #FF0000"><b>本轮游戏</b></span>开始之后所下的赌注</p>
-            <p>1.3. data.game.gameBets.bets 表示该玩家从<span style="color: #FF0000"><b>本回合游戏</b></span>开始之后所下的赌注</p>
+            <p>1.3. data.game.gameBets.roundBet 表示该玩家从<span style="color: #FF0000"><b>本轮游戏</b></span>开始之后所下的赌注</p>
+            <p>1.3. data.game.gameBets.bet 表示该玩家从<span style="color: #FF0000"><b>本回合游戏</b></span>开始之后所下的赌注</p>
             <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
             <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
             <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
@@ -259,18 +259,18 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
             "gameBets" : [
                 {
                     "playerName" : "player1",
-                    "roundBets": 50,
-                    "bets": 50
+                    "roundBet": 50,
+                    "bet": 50
                 },
                 {
                     "playerName" : "player2",
-                    "roundBets": 100,
-                    "bets": 100
+                    "roundBet": 100,
+                    "bet": 100
                 },
                 {
                     "playerName" : "player3",
-                    "roundBets": 200,
-                    "bets": 200
+                    "roundBet": 200,
+                    "bet": 200
                 },
                 ...
             ],
@@ -468,8 +468,8 @@ action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 
             <p>牌面值</p>
             <p>1. 牌面统一由2个字符组成</p>
             <p>2. 第1个字符为数字: 取值为: 2~9, T(10), J(J), Q(Q), K(K), A(Ace)</p>
-            <p>3. 第2个字符为花色: 分别为 H(红桃), S(黑桃), C(草花), D(方块)</p>
-            <p>4. 例如: 3H -- 红桃3; TS -- 黑桃10; QC -- 草花皇后; AD -- 方块Ace</p>
+            <p>3. 第2个字符为花色: 分别为 H(红心), S(黑桃), C(草花), D(方块)</p>
+            <p>4. 例如: 3H -- 红心3; TS -- 黑桃10; QC -- 草花皇后; AD -- 方块Ace</p>
         </ul>
         <hr>
     </div>
