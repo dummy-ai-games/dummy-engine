@@ -4,6 +4,8 @@
  */
 
 var db = require('../database/msession');
+var logger = require('../poem/logging/logger4js').helper;
+
 exports.addOrUpdateWinner = function (data) {
     db.collection("tables", function (err, collection) {
         collection.find({tableNumber: data.tableNumber}).toArray(function (err, results) {
@@ -14,16 +16,16 @@ exports.addOrUpdateWinner = function (data) {
                     }
                 }, function (err, result) {
                     if (result)
-                        console.log("update table "+ data.tableNumber + " winner success");
+                        logger.info("update table "+ data.tableNumber + " winner success");
                     else
-                        console.log("update table "+ data.tableNumber + " winner fail");
+                        logger.error("update table "+ data.tableNumber + " winner fail");
                 });
             } else {
                 collection.insert(data, function (err, docs) {
                     if (!err)
-                        console.log("insert table "+ data.tableNumber + " winner success");
+                        logger.info("insert table "+ data.tableNumber + " winner success");
                     else
-                        console.log("insert table "+ data.tableNumber + " winner fail" + err);
+                        logger.error("insert table "+ data.tableNumber + " winner fail" + err);
                 });
             }
         });
@@ -35,7 +37,7 @@ exports.clearTable = function () {
     db.collection("tables", function (err, collection) {
         collection.remove({}, function (err, docs) {
             if (!err)
-                console.log("remove all data success");
+                logger.info("remove all data success");
         });
     });
 };

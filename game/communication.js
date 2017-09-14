@@ -43,7 +43,7 @@ function SkyRTC() {
             socket.tableNumber = param;
 
         if (that.playerAndTable[socket.id]) {
-            console.log("player join!!");
+            logger.info("player join!!");
             that.playerNumber++;
             var exitPlayer = that.exitPlayers[socket.id];
             if (exitPlayer) {
@@ -57,7 +57,7 @@ function SkyRTC() {
             that.notifyGuestAndPlayer();
             that.initPlayerData(socket.id);
         } else {
-            console.log("guest join!!");
+            logger.info("guest join!!");
             that.guests[socket.id] = socket;
             that.notifyGuestAndPlayer();
             that.initGuestData(socket.id);
@@ -150,7 +150,7 @@ function getPlayerIndex(playerName, players) {
 }
 
 SkyRTC.prototype.initAdminData = function () {
-    console.log("initAdminData");
+    logger.info("initAdminData");
     var that = this;
     if (that.admin) {
         var data = that.getBasicData(that.admin.tableNumber);
@@ -163,7 +163,7 @@ SkyRTC.prototype.initAdminData = function () {
 };
 
 SkyRTC.prototype.initGuestData = function (guest) {
-    console.log("initGuestData");
+    logger.info("initGuestData");
     var that = this;
     var data = that.getBasicData(that.guests[guest].tableNumber);
     var message = {
@@ -175,7 +175,7 @@ SkyRTC.prototype.initGuestData = function (guest) {
 };
 
 SkyRTC.prototype.initPlayerData = function (player) {
-    console.log("initPlayerData");
+    logger.info("initPlayerData");
     var that = this;
     var data = that.getBasicData(that.players[player].tableNumber);
     for (var i in data.players) {
@@ -406,7 +406,7 @@ SkyRTC.prototype.init = function (socket) {
     socket.id = UUID.v4();
 
     socket.on('message', function (data) {
-        console.log('message received : ' + data);
+        logger.info('message received : ' + data);
         try {
             var json = JSON.parse(data);
             if (json.eventName) {
@@ -433,7 +433,7 @@ SkyRTC.prototype.init = function (socket) {
                 var player = players[i];
                 that.playerAndTable[player.playerName] = player.tableNumber;
             }
-            console.log('players and tables : ' + JSON.stringify(that.playerAndTable));
+            logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
         } else {
             logger.error("no players found");
         }

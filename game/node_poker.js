@@ -1,7 +1,7 @@
 var events = require('events');
 var util = require('util');
-var playerDao = require("../models/player_dao");
-var winnerDao = require("../models/winner_dao");
+var playerDao = require("../models/player_dao.js");
+var winnerDao = require("../models/winner_dao.js");
 
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn) {
@@ -41,7 +41,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     }
 
     this.eventEmitter.on("newRound", function () {
-        console.log("newRound");
+        logger.info("newRound");
         getNextPlayer(that);
         takeAction(that, "__turn");
         var tempData = [];
@@ -56,7 +56,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.eventEmitter.on("_showAction", function (data) {
         var myData = getBasicData(that);
         myData.action = data;
-        console.log(JSON.stringify(myData));
+        logger.info(JSON.stringify(myData));
         that.eventEmitter.emit("__show_action", myData);
     });
 
@@ -88,7 +88,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             }
         }
         if (count > 3) {
-            console.log("上轮结束，下一轮开始");
+            logger.info("上轮结束，下一轮开始");
             that.surviveCount = count;
             that.smallBlind = that.smallBlind * 2;
             that.bigBlind = that.bigBlind * 2;
@@ -106,7 +106,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
             that.eventEmitter.emit("__new_round", data);
         }
         else {
-            console.log("gameOver, 胜者如下：");
+            logger.info("gameOver, 胜者如下：");
             for (var i = 0; i < that.players.length; i++) {
                 if (that.players[i].chips > 0)
                     that.gameWinners.push({
@@ -126,7 +126,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
                     }
                 }
             }
-            console.log(JSON.stringify(that.gameWinners));
+            logger.info(JSON.stringify(that.gameWinners));
 
             var data = getBasicData(that);
             data.winners = that.gameWinners;
@@ -405,7 +405,7 @@ function checkForBankrupt(table) {
     for (i = 0; i < table.players.length; i += 1) {
         if (table.players[i].chips === 0) {
             table.gameLosers.push(table.players[i]);
-            console.log('player ' + table.players[i].playerName + ' is going bankrupt');
+            logger.info('player ' + table.players[i].playerName + ' is going bankrupt');
             table.players.splice(i, 1);
         }
     }
@@ -1632,7 +1632,7 @@ function progress(table) {
                 //checkForBankrupt(table);
                 table.eventEmitter.emit("gameOver");
             } else if (table.game.roundName === 'Turn') {
-                console.log('effective turn');
+                logger.info('effective turn');
                 table.game.roundName = 'River';
                 table.game.deck.pop(); //Burn a card
                 table.game.board.push(table.game.deck.pop()); //Turn a card
@@ -1645,7 +1645,7 @@ function progress(table) {
                 }
                 table.eventEmitter.emit("deal");
             } else if (table.game.roundName === 'Flop') {
-                console.log('effective flop');
+                logger.info('effective flop');
                 table.game.roundName = 'Turn';
                 table.game.deck.pop(); //Burn a card
                 table.game.board.push(table.game.deck.pop()); //Turn a card
@@ -1657,7 +1657,7 @@ function progress(table) {
                 }
                 table.eventEmitter.emit("deal");
             } else if (table.game.roundName === 'Deal') {
-                console.log('effective deal');
+                logger.info('effective deal');
                 table.game.roundName = 'Flop';
                 table.game.deck.pop(); // Burn a card
                 for (i = 0; i < 3; i += 1) { // Turn three cards
@@ -1872,7 +1872,7 @@ Player.prototype.Check = function () {
         this.table.eventEmitter.emit("_showAction", this.turnBet);
         progress(this.table);
     } else {
-        console.log("Check not allowed, replay please");
+        logger.info("Check not allowed, replay please");
         this.Call();
     }
 };
@@ -1897,7 +1897,7 @@ Player.prototype.Fold = function () {
 
 Player.prototype.Raise = function () {
     if (this.table.raiseCount >= 4) {
-        console.log('can not raise again --> Call !!!');
+        logger.info('can not raise again --> Call !!!');
         this.Call();
     } else {
         var maxBet, i, bet;
@@ -1922,7 +1922,7 @@ Player.prototype.Raise = function () {
                     }
                     progress(this.table);
                 } else {
-                    console.log('You don\'t have enough chips --> ALL IN !!!');
+                    logger.info('You don\'t have enough chips --> ALL IN !!!');
                     this.AllIn();
                 }
                 break;
@@ -1949,7 +1949,7 @@ Player.prototype.Bet = function (bet) {
         this.table.eventEmitter.emit("_showAction", this.turnBet);
         progress(this.table);
     } else {
-        console.log('You don\'t have enought chips --> ALL IN !!!');
+        logger.info('You don\'t have enought chips --> ALL IN !!!');
         this.AllIn();
     }
 };
@@ -1974,7 +1974,7 @@ Player.prototype.Call = function () {
                 this.table.eventEmitter.emit("_showAction", this.turnBet);
                 progress(this.table);
             } else {
-                console.log('You don\'t have enought chips --> ALL IN !!!');
+                logger.info('You don\'t have enought chips --> ALL IN !!!');
                 this.AllIn();
             }
         }
