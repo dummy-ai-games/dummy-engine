@@ -3,6 +3,7 @@ var util = require('util');
 var playerDao = require("../models/player_dao.js");
 var winnerDao = require("../models/winner_dao.js");
 
+var logger = require('../poem/logging/logger4js').helper;
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn) {
     this.smallBlind = smallBlind;
