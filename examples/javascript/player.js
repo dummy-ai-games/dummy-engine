@@ -11,7 +11,6 @@ var minBet;
 var raiseCount;
 var otherPlayers;
 var playerActions = {};
-var magicNumber = "";
 var gameStatus = 0;
 var risk = 1;
 var danger = 2;
@@ -27,7 +26,7 @@ $(document).ready(function () {
 });
 
 function initRTC() {
-    rtc.connect('ws://10.64.8.16', playerName);
+    rtc.connect('ws://localhost:3000', playerName);
     rtc.on('__action', function (data) {
         console.log(data);
 
@@ -44,7 +43,6 @@ function initRTC() {
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
         otherPlayers = data.game.otherPlayers;
-        magicNumber = data.magicNumber;
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
@@ -63,7 +61,6 @@ function initRTC() {
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
         otherPlayers = data.game.otherPlayers;
-        magicNumber = data.magicNumber;
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
@@ -242,42 +239,42 @@ function takeAction(selfCard, cards, players) {
 
 $('#bet').click(function () {
     var amount = $('#amount').val();
-    rtc.Bet(self.playerName, amount, magicNumber);
+    rtc.Bet(self.playerName, amount);
     $('#msg').text('该回合您采取的是：bet' + ',押注金额是：' + amount);
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#call').click(function () {
-    rtc.Call(self.playerName, magicNumber);
+    rtc.Call(self.playerName);
     $('#msg').text('该回合您采取的是：call');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#check').click(function () {
-    rtc.Check(self.playerName, magicNumber);
+    rtc.Check(self.playerName);
     $('#msg').text('该回合您采取的是：check');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#raise').click(function () {
-    rtc.Raise(self.playerName, magicNumber);
+    rtc.Raise(self.playerName);
     $('#msg').text('该回合您采取的是：raise');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#allin').click(function () {
-    rtc.AllIn(self.playerName, magicNumber);
+    rtc.AllIn(self.playerName);
     $('#msg').text('该回合您采取的是：allin');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#fold').click(function () {
-    rtc.Fold(self.playerName, magicNumber);
+    rtc.Fold(self.playerName);
     $('#msg').text('该回合您采取的是：fold');
     $('#msg').show();
     $('#action').hide();

@@ -78,14 +78,13 @@ function SkyRTC() {
             var that = this;
             var action = data.action;
             var playerName = data.playerName;
-            var magicNumber = data.magicNumber;
             if (that.players[playerName]) {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
-                if (currentTable.timeout)
-                    clearTimeout(currentTable.timeout);
                 var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
-                if (playerIndex != -1 && currentTable.checkPlayer(playerIndex, magicNumber)) {
+                if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
+                    if (currentTable.timeout)
+                        clearTimeout(currentTable.timeout);
                     try {
                         switch (action) {
                             case "bet":
@@ -410,10 +409,12 @@ SkyRTC.prototype.init = function (socket) {
         logger.info('message received : ' + data);
         try {
             var json = JSON.parse(data);
-            if (json.eventName) {
-                that.emit(json.eventName, json.data, socket);
-            } else {
-                that.emit("socket_message", socket, data);
+            if (json.eventName != "__action" || (json.eventName == "__action" && that.players[socket.id])) {
+                if (json.eventName) {
+                    that.emit(json.eventName, json.data, socket);
+                } else {
+                    that.emit("socket_message", socket, data);
+                }
             }
         } catch (e) {
             logger.error(e.message);

@@ -26,7 +26,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.isBet = false;
     this.roundCount = 1;
     this.surviveCount = 0;
-    this.magicNumber = "";
 
     //Validate acceptable value ranges.
     var err;
@@ -202,10 +201,9 @@ function takeAction(table, action) {
             players.push(player);
 
     }
-    table.magicNumber = UUID.v4();
+
     var data = {
         "tableNumber": table.tableNumber,
-        "magicNumber": table.magicNumber,
         "self": destPlayer,
         "game": {
             "gameBets": gameBets,
@@ -219,8 +217,8 @@ function takeAction(table, action) {
     table.eventEmitter.emit(action, data);
 }
 
-Table.prototype.checkPlayer = function (player,magicNumber) {
-    if (player != this.currentPlayer || magicNumber != this.magicNumber) {
+Table.prototype.checkPlayer = function (player) {
+    if (player != this.currentPlayer) {
         return false;
     }
     return true;
