@@ -415,7 +415,7 @@ SkyRTC.prototype.init = function (socket) {
                 that.emit("socket_message", socket, data);
             }
         }catch (e){
-            Logger.error(e.message);
+            logger.error(e.message);
         }
     });
 
