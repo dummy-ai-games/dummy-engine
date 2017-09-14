@@ -7,11 +7,18 @@ var ccTheGame;
 var rtc = SkyRTC();
 var tableNumber = 0;
 
-(function () {
-    // get table number first
-    tableNumber = getParameter('table');
+$(document).ready(function() {
     initGame();
-})();
+    $('#game_panel').hide();
+});
+
+function showTable() {
+    tableNumber = $('#table_number').val();
+    if (null !== tableNumber && "" !== tableNumber) {
+        $('#table_selection_panel').hide();
+        $('#game_panel').show();
+    }
+}
 
 // game communication with back-end
 function initWebsock() {
@@ -179,7 +186,7 @@ function initWebsock() {
 
 function initGame() {
     var d = document;
-    var container = document.getElementById('gameContainer');
+    var container = document.getElementById('game_panel');
     var winWidth, winHeight;
     var marginLeft = 20;
     var marginTop = 20;
