@@ -1,5 +1,5 @@
 var events = require('events');
-var util = require('util');
+var UUID = require('node-uuid');
 var playerDao = require("../models/player_dao.js");
 var winnerDao = require("../models/winner_dao.js");
 
@@ -213,13 +213,12 @@ function takeAction(table, action) {
             "otherPlayers": players
         }
     };
+
     table.eventEmitter.emit(action, data);
 }
 
 Table.prototype.checkPlayer = function (player) {
     if (player != this.currentPlayer) {
-        this.players[player].folded = true;
-        progress(this);
         return false;
     }
     return true;

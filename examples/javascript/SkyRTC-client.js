@@ -97,6 +97,7 @@ var SkyRTC = function () {
                 "action": "bet",
                 "playerName": playerName,
                 "amount": amount
+
             }
         }));
     };
@@ -107,6 +108,7 @@ var SkyRTC = function () {
             "data": {
                 "action": "call",
                 "playerName": playerName
+
             }
         }));
     };
@@ -117,6 +119,7 @@ var SkyRTC = function () {
             "data": {
                 "action": "check",
                 "playerName": playerName
+
             }
         }));
     };
@@ -128,6 +131,7 @@ var SkyRTC = function () {
             "data": {
                 "action": "raise",
                 "playerName": playerName
+
             }
         }));
     };
@@ -139,6 +143,7 @@ var SkyRTC = function () {
             "data": {
                 "action": "allin",
                 "playerName": playerName
+
             }
         }));
     };
@@ -150,6 +155,7 @@ var SkyRTC = function () {
             "data": {
                 "action": "fold",
                 "playerName": playerName
+
             }
         }));
     };

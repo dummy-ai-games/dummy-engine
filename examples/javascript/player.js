@@ -18,7 +18,7 @@ var danger = 2;
 var rtc = SkyRTC();
 var playerName = '';
 
-$(document).ready(function() {
+$(document).ready(function () {
     playerName = getParameter('name');
     console.log('player : ' + playerName);
     $('#player_name').html(playerName);
@@ -80,13 +80,13 @@ function initRTC() {
         var currentPlayer = playerActions[playerAction.playerName];
         currentPlayer.push(playerAction.action);
         if (data.table.roundName === 'Flop' &&
-                (playerAction.action === 'raise' || playerAction.action === 'allin') &&
-                currentPlayer.toString().indexOf('raise') === -1) {
+            (playerAction.action === 'raise' || playerAction.action === 'allin') &&
+            currentPlayer.toString().indexOf('raise') === -1) {
             gameStatus = risk;
         }
         if (data.table.roundName === 'Turn' &&
-                (playerAction.action === 'raise' || playerAction.action === 'allin') &&
-                currentPlayer.toString().indexOf('raise') === -1) {
+            (playerAction.action === 'raise' || playerAction.action === 'allin') &&
+            currentPlayer.toString().indexOf('raise') === -1) {
             gameStatus = danger;
         }
     });
@@ -282,8 +282,9 @@ $('#fold').click(function () {
 
 // utils
 function getQueryStringRegExp(name) {
-    var reg = new RegExp("(^|\\?|&|)"+ name +"=([^&]*)(\\s|&|$|)", "i");
-    if (reg.test(decodeURI(location.href))) return unescape(RegExp.$2.replace(/\+/g, " ")); return "";
+    var reg = new RegExp("(^|\\?|&|)" + name + "=([^&]*)(\\s|&|$|)", "i");
+    if (reg.test(decodeURI(location.href))) return unescape(RegExp.$2.replace(/\+/g, " "));
+    return "";
 }
 
 function getParameter(name) {
