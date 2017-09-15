@@ -1818,9 +1818,9 @@ Table.prototype.NewRound = function () {
         if (this.players[i].isSurvive) {
             this.players[i].cards.push(this.game.deck.pop());
             this.players[i].cards.push(this.game.deck.pop());
-            this.game.bets[i] = 0;
-            this.game.roundBets[i] = 0;
         }
+        this.game.bets[i] = 0;
+        this.game.roundBets[i] = 0;
     }
     //Identify Small and Big Blind player indexes
     smallBlind = this.dealer + 1;

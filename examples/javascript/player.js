@@ -239,42 +239,42 @@ function takeAction(selfCard, cards, players) {
 
 $('#bet').click(function () {
     var amount = $('#amount').val();
-    rtc.Bet(self.playerName, amount);
+    rtc.Bet(amount);
     $('#msg').text('该回合您采取的是：bet' + ',押注金额是：' + amount);
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#call').click(function () {
-    rtc.Call(self.playerName);
+    rtc.Call();
     $('#msg').text('该回合您采取的是：call');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#check').click(function () {
-    rtc.Check(self.playerName);
+    rtc.Check();
     $('#msg').text('该回合您采取的是：check');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#raise').click(function () {
-    rtc.Raise(self.playerName);
+    rtc.Raise();
     $('#msg').text('该回合您采取的是：raise');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#allin').click(function () {
-    rtc.AllIn(self.playerName);
+    rtc.AllIn();
     $('#msg').text('该回合您采取的是：allin');
     $('#msg').show();
     $('#action').hide();
 });
 
 $('#fold').click(function () {
-    rtc.Fold(self.playerName);
+    rtc.Fold();
     $('#msg').text('该回合您采取的是：fold');
     $('#msg').show();
     $('#action').hide();
