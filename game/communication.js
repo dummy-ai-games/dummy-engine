@@ -410,7 +410,7 @@ SkyRTC.prototype.init = function (socket) {
     socket.id = UUID.v4();
 
     socket.on('message', function (data) {
-            logger.info('message received : ' + data);
+            logger.info('message received from '+socket.id+' : ' + data);
             try {
                 var json = JSON.parse(data);
                 if (json.eventName) {
