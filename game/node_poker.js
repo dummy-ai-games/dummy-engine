@@ -1837,16 +1837,22 @@ Table.prototype.NewRound = function () {
     while (!this.players[bigBlind].isSurvive)
         bigBlind++;
     //Force Blind Bets
-    if (this.smallBlind >= this.players[smallBlind].chips)
-        this.players[smallBlind].AllIn();
-    else {
+    if (this.smallBlind >= this.players[smallBlind].chips) {
+        this.game.bets[smallBlind] = this.players[smallBlind].chips;
+        this.players[smallBlind].chips = 0;
+        this.players[smallBlind].allIn = true;
+        this.players[smallBlind].talked = true;
+    } else {
         this.players[smallBlind].chips -= this.smallBlind;
         this.game.bets[smallBlind] = this.smallBlind;
     }
 
-    if (this.bigBlind >= this.players[bigBlind].chips)
-        this.players[bigBlind].AllIn();
-    else {
+    if (this.bigBlind >= this.players[bigBlind].chips) {
+        this.game.bets[bigBlind] = this.players[bigBlind].chips;
+        this.players[bigBlind].chips = 0;
+        this.players[bigBlind].allIn = true;
+        this.players[bigBlind].talked = true;
+    } else {
         this.players[bigBlind].chips -= this.bigBlind;
         this.game.bets[bigBlind] = this.bigBlind;
     }
