@@ -1837,10 +1837,20 @@ Table.prototype.NewRound = function () {
     while (!this.players[bigBlind].isSurvive)
         bigBlind++;
     //Force Blind Bets
-    this.players[smallBlind].chips -= this.smallBlind;
-    this.players[bigBlind].chips -= this.bigBlind;
-    this.game.bets[smallBlind] = this.smallBlind;
-    this.game.bets[bigBlind] = this.bigBlind;
+    if (this.smallBlind >= this.players[smallBlind].chips)
+        this.players[smallBlind].AllIn();
+    else {
+        this.players[smallBlind].chips -= this.smallBlind;
+        this.game.bets[smallBlind] = this.smallBlind;
+    }
+
+    if (this.bigBlind >= this.players[bigBlind].chips)
+        this.players[bigBlind].AllIn();
+    else {
+        this.players[bigBlind].chips -= this.bigBlind;
+        this.game.bets[bigBlind] = this.bigBlind;
+    }
+
 
     // get currentPlayer
     this.currentPlayer = bigBlind;
@@ -1970,7 +1980,7 @@ Player.prototype.Call = function () {
                 this.table.game.bets[i] = maxBet;
                 this.talked = true;
                 var addMoney = maxBet - mybet;
-                this.turnBet = {action: "call", playerName: this.playerName, amount: addMoney, chips: mybet}
+                this.turnBet = {action: "call", playerName: this.playerName, amount: addMoney, chips: this.chips}
                 this.table.eventEmitter.emit("_showAction", this.turnBet);
                 progress(this.table);
             } else {

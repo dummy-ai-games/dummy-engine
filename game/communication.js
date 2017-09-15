@@ -72,12 +72,12 @@ function SkyRTC() {
         this.startGame(data.tableNumber);
     });
 
-    this.on('__action', function (data) {
+    this.on('__action', function (data, socket) {
         try {
             logger.info("用户" + data.playerName + "采取动作" + data.action);
             var that = this;
             var action = data.action;
-            var playerName = data.playerName;
+            var playerName = socket.id;
             if (that.players[playerName]) {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
@@ -406,20 +406,19 @@ SkyRTC.prototype.init = function (socket) {
     socket.id = UUID.v4();
 
     socket.on('message', function (data) {
-        logger.info('message received : ' + data);
-        try {
-            var json = JSON.parse(data);
-            if (json.eventName != "__action" || (json.eventName == "__action" && that.players[socket.id])) {
+            logger.info('message received : ' + data);
+            try {
+                var json = JSON.parse(data);
                 if (json.eventName) {
                     that.emit(json.eventName, json.data, socket);
                 } else {
                     that.emit("socket_message", socket, data);
                 }
+            } catch (e) {
+                logger.error(e.message);
             }
-        } catch (e) {
-            logger.error(e.message);
         }
-    });
+    ) ;
 
     socket.on('close', function () {
         that.emit('remove_peer', socket.id);
@@ -441,7 +440,8 @@ SkyRTC.prototype.init = function (socket) {
         }
         that.emit('new_connect', socket);
     });
-};
+}
+;
 
 exports.listen = function (server) {
     var SkyRTCServer;
