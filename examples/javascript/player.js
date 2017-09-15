@@ -26,7 +26,7 @@ $(document).ready(function() {
 });
 
 function initRTC() {
-    rtc.connect('ws://10.64.8.16', playerName);
+    rtc.connect('ws://localhost:3000', playerName);
     rtc.on('__action', function (data) {
         console.log(data);
 
