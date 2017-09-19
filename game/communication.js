@@ -107,7 +107,6 @@ function SkyRTC() {
 
     this.on('__action', function (data, socket) {
         try {
-            logger.game(socket.tableNumber, 'player: ' + socket.id + ', action: ' + data.action);
 
             var that = this;
             var action = data.action;
@@ -128,7 +127,7 @@ function SkyRTC() {
                                         amount = parseInt(data.amount);
                                     } catch (e) {
                                         logger.game(socket.tableNumber, e.message);
-                                        amount = currentTable.smallBlind;
+                                        amount = currentTable.bigBlind;
                                     }
                                     currentTable.players[playerIndex].Bet(amount);
                                 } else
@@ -287,7 +286,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         return;
     }
 
-    that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2);
+    that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2, 100);
     that.table[tableNumber].tableNumber = tableNumber;
 
     for (var player in that.players) {
@@ -440,13 +439,13 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
     for (var i = 0; i < message.data.players.length; i++) {
         cards[message.data.players[i].playerName] = message.data.players[i].cards;
         players[message.data.players[i].playerName] = message.data.players[i];
-        if (message.eventName != '__gameOver')
+        if (message.eventName != '__gameOver' && message.eventName != '__round_end')
             delete message.data.players[i].cards;
     }
     var tableNumber = message.data.table.tableNumber;
     for (var player in this.players) {
         if (this.players[player].tableNumber == tableNumber) {
-            if (message.eventName != '__gameOver') {
+            if (message.eventName != '__gameOver' && message.eventName != '__round_end') {
                 players[player].cards = cards[player];
                 this.players[player].send(JSON.stringify(message), errorCb);
                 players[player].cards = [];

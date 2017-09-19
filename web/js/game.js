@@ -90,6 +90,13 @@ function initWebsock() {
         updateTable(data);
     });
 
+    rtc.on('__round_end', function (data) {
+        var roundCount = data.table.roundCount;
+        var tableNumber = data.table.tableNumber;
+        console.log("table " + tableNumber + " 第" + roundCount + "轮结束");
+        updateTable(data);
+    });
+
     rtc.on('__show_action', function (data) {
         console.log("action : " + JSON.stringify(data));
 
