@@ -85,6 +85,26 @@ function SkyRTC() {
         this.startGame(data.tableNumber);
     });
 
+    this.on('__reload', function (data, socket) {
+        logger.game(socket.tableNumber, 'player: ' + socket.id + ', reload');
+        var that = this;
+        var playerName = socket.id;
+        var tableNum = that.players[playerName].tableNumber;
+        var currentTable = that.table[tableNum];
+        if (currentTable.isReloadTime && that.players[playerName]) {
+            var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
+            if (playerIndex != -1) {
+                var player = currentTable.players[playerIndex];
+                if (player.reloadCount < currentTable.maxReloadCount) {
+                    player.chips += currentTable.initChips;
+                    player.reloadCount++;
+                    logger.info("player: " + playerName + "  reload success");
+                } else
+                    logger.info("player: " + playerName + "  had used all reload chance");
+            }
+        }
+    });
+
     this.on('__action', function (data, socket) {
         try {
             logger.game(socket.tableNumber, 'player: ' + socket.id + ', action: ' + data.action);
@@ -219,6 +239,7 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
             player['folded'] = desTable.players[i]['folded'];
             player['allIn'] = desTable.players[i]['allIn'];
             player['cards'] = desTable.players[i]['cards'];
+            player['reloadCount'] = desTable.players[i]['reloadCount'];
             players.push(player);
         }
         table['tableNumber'] = desTable.tableNumber;
@@ -266,7 +287,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         return;
     }
 
-    that.table[tableNumber] = new poker.Table(50, 100, 3, 10, 100, 1000);
+    that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2);
     that.table[tableNumber].tableNumber = tableNumber;
 
     for (var player in that.players) {
@@ -340,6 +361,14 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInPlayers(message);
     });
 
+    that.table[tableNumber].eventEmitter.on('__start_reload', function (data) {
+        var message = {
+            'eventName': '__start_reload',
+            'data': data
+        };
+        that.broadcastInPlayersForReload(message);
+    });
+
     that.table[tableNumber].eventEmitter.on('__show_action', function (data) {
         var message = {
             'eventName': '__show_action',
@@ -396,6 +425,15 @@ SkyRTC.prototype.broadcastInGuests = function (message) {
     }
 };
 
+
+SkyRTC.prototype.broadcastInPlayersForReload = function (message) {
+    var tableNumber = message.data.tableNumber;
+    for (var player in this.players) {
+        if (this.players[player].tableNumber == tableNumber) {
+            this.players[player].send(JSON.stringify(message), errorCb);
+        }
+    }
+};
 SkyRTC.prototype.broadcastInPlayers = function (message) {
     var cards = {};
     var players = {};
@@ -423,7 +461,7 @@ SkyRTC.prototype.init = function (socket) {
     socket.id = UUID.v4();
 
     socket.on('message', function (data) {
-            logger.info('message received from '+ socket.id + ' : ' + data);
+            logger.info('message received from ' + socket.id + ' : ' + data);
             try {
                 var json = JSON.parse(data);
                 if (json.eventName) {
