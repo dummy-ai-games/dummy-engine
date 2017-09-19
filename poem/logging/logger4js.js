@@ -16,6 +16,7 @@ var logRoot = "./logs/";
 var userDebugLogFolder = "user_debug/";
 var devLogFolder = "dev/";
 var productionLogFolder = "production/";
+var gameLogFolder = "game/";
 
 var logFile = "common.log";
 
@@ -122,4 +123,16 @@ helper.fatal = function (msg) {
     } else {
         userDebugLog.fatal(msg);
     }
+};
+
+helper.game = function(gameID, msg) {
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd");
+    var logFileName = logRoot + gameLogFolder + date + '_game_' + gameID + '.txt';
+    log4js.configure({
+        appenders: { game : { type: 'file', filename: logFileName } },
+        categories: { default: { appenders: ['game'], level: 'info' } }
+    });
+
+    const logger = log4js.getLogger('game');
+    logger.info(msg);
 };

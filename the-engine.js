@@ -53,7 +53,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(session({
     cookie: { maxAge: 600000 },
-    secret: "the-engine",
+    secret: 'the-engine',
     store: new MongoStore({
         username: MONGO_DB_USER,
         password: MONGO_DB_PASSWORD,
@@ -72,7 +72,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use("/", express.static(__dirname + '/web/'));
+app.use('/', express.static(__dirname + '/web/'));
 require('./routes');
 
 SkyRTC.rtc.on('new_connect', function (socket) {
@@ -80,25 +80,25 @@ SkyRTC.rtc.on('new_connect', function (socket) {
 });
 
 SkyRTC.rtc.on('remove_peer', function (socketId) {
-    console.log(socketId + "用户离开");
+    console.log(socketId + '用户离开');
 });
 
 SkyRTC.rtc.on('new_peer', function (user) {
-    console.log("新用户" + user + "加入");
+    console.log('新用户' + user + '加入');
 });
 
 SkyRTC.rtc.on('_receiveAction', function (data) {
     if (data.action == 'Bet') {
-        console.log("用户" + data.playerName + "采取动作" + data.action + " ，下注:" + data.amount);
+        console.log('用户' + data.playerName + '采取动作' + data.action + ' ，下注:' + data.amount);
     } else {
-        console.log("用户" + data.playerName + "采取动作" + data.action);
+        console.log('用户' + data.playerName + '采取动作' + data.action);
     }
 });
 
 SkyRTC.rtc.on('socket_message', function (socket, msg) {
-    console.log("接收到来自" + socket.id + "的新消息：" + msg);
+    console.log('接收到来自' + socket.id + '的新消息：' + msg);
 });
 
 SkyRTC.rtc.on('error', function (error) {
-    console.log("发生错误：" + error.message);
+    console.log('发生错误：' + error.message);
 });
