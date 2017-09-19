@@ -47,7 +47,7 @@ function SkyRTC() {
                 logger.info("player:" + socket.id + " already exist, reject");
                 return;
             }
-            logger.info("player join!!");
+            logger.info(1, "player join!!");
             that.playerNumber++;
             var exitPlayer = that.exitPlayers[socket.id];
             if (exitPlayer) {

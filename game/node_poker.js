@@ -1,3 +1,8 @@
+/**
+ * Created by the-engine-team
+ * 2017-08-21
+ */
+
 var events = require('events');
 var UUID = require('node-uuid');
 var playerDao = require("../models/player_dao.js");
@@ -27,7 +32,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, minBuyIn, maxBuyIn)
     this.roundCount = 1;
     this.surviveCount = 0;
 
-    //Validate acceptable value ranges.
+    // Validate acceptable value ranges.
     var err;
     if (minPlayers < 3) { //require at least two players to start a game.
         err = new Error(101, 'Parameter [minPlayers] must be a postive integer of a minimum value of 2.');
@@ -1965,7 +1970,7 @@ Player.prototype.Bet = function (bet) {
         this.table.eventEmitter.emit("_showAction", this.turnBet);
         progress(this.table);
     } else {
-        logger.info('You don\'t have enought chips --> ALL IN !!!');
+        logger.info('You don\'t have enough chips --> ALL IN !!!');
         this.AllIn();
     }
 };
@@ -1990,7 +1995,7 @@ Player.prototype.Call = function () {
                 this.table.eventEmitter.emit("_showAction", this.turnBet);
                 progress(this.table);
             } else {
-                logger.info('You don\'t have enought chips --> ALL IN !!!');
+                logger.info('You don\'t have enough chips --> ALL IN !!!');
                 this.AllIn();
             }
         }
