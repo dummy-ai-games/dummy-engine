@@ -16,11 +16,8 @@ var logRoot = "./logs/";
 var userDebugLogFolder = "user_debug/";
 var devLogFolder = "dev/";
 var productionLogFolder = "production/";
-var gameLogFolder = "game/";
 
 var logFile = "common.log";
-var gameID = "";
-var gameLogFile = "game.log";
 
 log4js.configure({
     appenders: {
@@ -51,21 +48,13 @@ log4js.configure({
             pattern: "-yyyy-MM-dd",
             alwaysIncludePattern: false,
             maxLogSize: 1024
-        },
-        gameLog: {
-            type: "dateFile",
-            filename: logRoot + gameLogFolder + gameID + gameLogFile,
-            pattern: "-yyyy-MM-dd",
-            alwaysIncludePattern: false,
-            maxLogSize: 1024
         }
     },
     categories: {
         default: {appenders: ['userProductionLog', 'default'], level: 'info'},
         userProductionLog: {appenders: ['userProductionLog'], level: 'info'},
         userDebugLog: {appenders: ['userDebugLog'], level: 'info'},
-        userDevelopmentLog: {appenders: ['userDevelopmentLog'], level: 'info'},
-        gameLog: {appenders: ['gameLog'], level: 'info'}
+        userDevelopmentLog: {appenders: ['userDevelopmentLog'], level: 'info'}
     },
     replaceConsole: true
 });
@@ -73,7 +62,6 @@ log4js.configure({
 var userProductionLog = log4js.getLogger('userProductionLog');
 var userDebugLog = log4js.getLogger('userDebugLog');
 var userDevelopmentLog = log4js.getLogger('userDevelopmentLog');
-var gameLog = log4js.getLogger('gameLog');
 
 helper.info = function (msg) {
     if (enums.APP_DEVELOPMENT_MODE == ENV) {
@@ -134,9 +122,4 @@ helper.fatal = function (msg) {
     } else {
         userDebugLog.fatal(msg);
     }
-};
-
-helper.game = function (id, msg) {
-    gameID = id;
-    gameLog.info(msg);
 };
