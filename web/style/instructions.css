@@ -1,4 +1,8 @@
 
+body {
+    overflow-y: scroll;
+}
+
 pre {
     white-space: pre-wrap; /* css-3 */
     white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
@@ -48,4 +52,35 @@ pre {
 .masthead-nav > .active > a,
 .masthead-nav > .active > a:hover,
 .masthead-nav > .active > a:focus {
+}
+
+.tag {
+    font-size: 14px;
+    font-weight: normal;
+    padding: .3em .4em .4em;
+    margin: 0 .1em;
+}
+
+.tag a {
+    color: #bbb;
+    cursor: pointer;
+    opacity: 0.6;
+}
+.tag a:hover {
+    opacity: 1.0
+}
+.tag .remove {
+    vertical-align: bottom;
+    top: 0;
+}
+.tag a {
+    margin: 0 0 0 .3em;
+}
+.tag a .glyphicon-white {
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.new_content {
+    color: #FF3F00
 }

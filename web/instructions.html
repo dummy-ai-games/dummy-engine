@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="./style/instructions.css">
 </head>
 <body>
-    <div class="container" style="margin-top: 0;">
+    <div class="container">
         <h3 class="masthead-brand" style="float: left; margin-top: 40px;">Texas Hold'em AI Game</h3>
         <div class="cover-container">
             <div class="masthead clearfix">
@@ -21,7 +21,7 @@
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="./index.html">主页</a></li>
-                            <li class="active"><a href="#">文档</a></li>
+                            <li class="active"><a href="#">文档<img src="./res/images/red-dot-md.png"></a></li>
                             <li><a href="#" onclick="gotoTest();">测试</a></li>
                             <li><a href="./players.html">玩家管理</a></li>
                         </ul>
@@ -29,7 +29,8 @@
                 </div>
             </div>
         </div>
-        <h2>文档</h2>
+        <h2>文档 V1.0.1</h2>
+        <h4>2017-09-20</h4>
         <br>
         <div>
             <ul class="nav nav-tabs" id="main_tab">
@@ -42,19 +43,35 @@
             <br>
             <div class="tab-content">
                 <div class="tab-pane active" id="game_instruction">
-                    <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
-                    <hr>
-                    <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017 组委会确定</p>
-                    <p>2. 比赛分预赛和决赛两个阶段, 均采用淘汰制</p>
-                    <p>3. 预赛阶段, 每桌游戏轮数不设上限, 直到一桌只剩下最终3人存活, 此3人在本桌胜出, 胜出者将和其它桌胜出玩家新凑一桌(最多10人)进行比赛, 以此类推, 最终决出10名玩家进入决赛</p>
-                    <p>4. 决赛阶段10名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前N名 (N <= 3 视情况而定)</p>
-                    <p>5. 约定游戏过程中会有如下概念:</p>
+                    <span class="tag label label-info" id="tip">
+                        <span>请玩家仔细阅读文档,文档在每个版本更新时会用<span class="new_content"> 橙色 </span>字体标识出修改部分,修改的部分保留1个版本 </span>
+                        ; <b><u>加黑的下划线内容</u></b> 表示待定参数,这些参数将在比赛前夕敲定下来
+                        <a><i class="remove glyphicon glyphicon-remove glyphicon-white" onclick="hideTip();"></i></a>
+                    </span>
+                    <br>
+                    <br>
+                    <span class="tag label label-success">开发平台和组织比赛不易,如果有平台有BUG或者比赛规程有疏漏,还请各位玩家通过合理渠道向我们反馈,感谢！</span>
+                    <br>
+                    <br>
+                    <a style="text-decoration: none;"><h4><strong>约定术语</strong></h4></a>
+                    <p>约定游戏过程中会有如下概念:</p>
                     <ul>
-                        <li> 局: 一局游戏是指参赛的10名玩家进入一张游戏桌, 持有相等的初始筹码, 对战直到本游戏桌只剩下小于等于3名玩家胜出, 而其余玩家因筹码耗尽而出局为止, 一局由多轮构成</li>
-                        <li> 轮: 一轮游戏是指每次荷官重新发公共牌和私有牌, 每个玩家按回合进行决策, 直到除了一名玩家之外全部弃牌, 或者5张公共牌完全翻开为止, 决出本轮胜负并清算筹码, 一轮由多个回合构成</li>
-                        <li> 回合: 一回合是指所有玩家依次take action, 称为一回合, 一个回合中有多个(分别来自各个玩家的)action</li>
-                        <li> action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 玩家通过 AI 客户端完成其中一种决策称之为一个action</li>
+                        <p>1. 局: 一局游戏是指参赛的10名玩家进入一张游戏桌, 持有相等的初始筹码, 对战直到本游戏桌只剩下小于等于3名玩家胜出, 而其余玩家因筹码耗尽而出局为止, 一局由多圈构成</p>
+                        <p><span class="new_content">2. 圈 : 一圈是指 dealer(一轮中默认大小盲注位置) 围绕牌桌在每个未出局的玩家手上都出现一次为止为一圈,一圈由多轮构成,在一圈过程中大小盲住数额相等,但是下一圈开始时大小盲住翻倍</span></p>
+                        <p>3. 轮: 一轮游戏是指每次荷官重新发公共牌和私有牌, 每个玩家按回合进行决策, 直到除了一名玩家之外全部弃牌, 或者5张公共牌完全翻开为止, 决出本轮胜负并清算筹码, 一轮由多个回合构成</p>
+                        <p>4. 回合: 一回合是指所有玩家依次take action, 称为一回合, 一个回合中有多个(分别来自各个玩家的)action</p>
+                        <p>5. action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 玩家通过 AI 客户端完成其中一种决策称之为一个action</p>
                     </ul>
+                    <hr>
+
+                    <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
+                    <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017 组委会确定</p>
+                    <p>2. 比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
+                    <p><span class="new_content"> 3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>10</u></b> 圈为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>30</u></b> 人进入复赛 </span></p>
+                    <p><span class="new_content"> 4. 复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛 </span></p>
+                    <p>5. 决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
+                    <p><span class="new_content"> 6. dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></span></p>
+                    <p><span class="new_content"> 7. 每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</span></p>
                     <hr>
                     <a name="server_access" style="text-decoration: none;"><h4><strong>服务器接入方式</strong></h4></a>
                     <ul>
@@ -83,9 +100,12 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="font-size: 16px;"><span class="glyphicon glyphicon-menu-hamburger"></span> <span>索引</span></a>
                                 <ul class="dropdown-menu">
                                     <li><a href="#join_game">加入游戏</a></li>
-                                    <li><a href="#new_round">新一轮游戏</a></li>
+                                    <li><a href="#new_round">新一轮开始</a></li>
+                                    <li><a href="#reload">索取筹码</a></li>
                                     <li><a href="#request_for_action">服务器请求决策</a></li>
                                     <li><a href="#update_status">服务器状态更新</a></li>
+                                    <li><a href="#round_end">每一轮结束</a></li>
+                                    <li><a href="#game_over">游戏(一局)结束</a></li>
                                     <li><a href="#other_affairs">其它注意事项</a></li>
                                     <li><a href="#appendixes">附表</a></li>
                                 </ul>
@@ -100,7 +120,10 @@
 {
     "eventName" : "__join",
     "data" : {
-        "playerName" : "your name"
+        "playerName" : "0123456789ABCDEF" <span class="new_content">// 为了防止冒名作弊, 这个名字是比赛系统预先分配给每个参赛玩家的私有名字, 请玩家牢记并只在<b>自己的程序中</b>使用
+                                          // 这个名字目前在测试平台上并不启用，在比赛前夕会通过私密的方式通告给每个参赛玩家
+                                          // 每个玩家的私有名会对应一个展示名(由组委会事先录入), 比赛当日大屏幕上显示的为展示名以区分玩家
+                                          // 以下文档中所有涉及到的 playerName 均为<b>私有名</b>, 为了阅读方便, 文档中暂时用类似 bobi, cicy, geoge 等拟名代替</span>
     }
 }</pre>
                         <p>指令说明:</p>
@@ -109,7 +132,7 @@
                         <pre>
 {
     "eventName" : "__new_peer",
-    "data" : ["player1", "player2", "player3", ... , "player10"]
+    "data" : ["bobi", "cicy", "geoge", ... , "someone"]
 }</pre>
                         <p>3. __new_peer指令中的data包含在场所有玩家的名称列表</p>
                         <br>
@@ -117,9 +140,9 @@
                         <img src="./res/images/instructions/join_message.png" style="width: 75%; height: 75%;">
                     </ul>
                     <hr>
-                    <a name="new_round" style="text-decoration: none;"><h4><strong>新一轮游戏开始</strong></h4></a>
+                    <a name="new_round" style="text-decoration: none;"><h4><strong>新一轮开始</strong></h4></a>
                     <ul>
-                        <p>由于比赛采取不限轮次赛制(即直到每个游戏桌只剩下小于等于3名未出局玩家为止), 因此在一桌游戏开始时以及下一轮牌局开始时, 客户端都将收到服务器广播的此消息</p>
+                        <p>在一桌游戏开始时以及下一轮牌局开始时, 客户端都将收到服务器广播的 __new_round 消息</p>
                         <pre>
 {
     "eventName" : "__new_round",
@@ -131,21 +154,21 @@
         },
         "players" : [
             {
-                "playerName" : "player1",
+                "playerName" : "bobi",
                 "chips" : 20,
                 "folded" : true,
                 "allin" : false,
                 "isSurvive" : true
             },
             {
-                "playerName" : "player2",
+                "playerName" : "cicy",
                 "chips" : 0,
                 "folded" : true,
                 "allin" : true,
                 "isSurvive" : false
             },
             {
-                "playerName" : "player3",
+                "playerName" : "geoge",
                 "chips" : 500,
                 "folded" : true,
                 "allin" : false,
@@ -164,6 +187,56 @@
                         <p>5. data.players[i].folded 表示玩家是否已经 fold, data.players[i].allin 表示玩家是否已经 all in, data.players[i].isSurvive 表示当前玩家是否仍在局 (false 表示输光出局) </p>
                     </ul>
                     <hr>
+                    <span class="new_content">
+                    <a name="reload" style="text-decoration: none;" class="new_content"><h4><strong>索取筹码</strong></h4></a>
+                    <ul>
+                        <p>在每一轮(除第1轮外)开始的时候, 服务器会发送询问玩家是否要索取筹码, 每局比赛中每次可以索取 1000 筹码, 最多索取 2 次</p>
+                        <p>服务器发送的请求格式如下:</p>
+<pre>
+{
+    "eventName" : "__start_reload",
+    "data" : {
+        "players": [
+            {
+                "playerName": "bobi",
+                "chips": 960,
+                "folded": false,
+                "allIn": false,
+                "isSurvive": true,
+                "reloadCount": 0
+            },
+            {
+                "playerName": "cicy",
+                "chips": 960,
+                "folded": false,
+                "allIn": false,
+                "isSurvive": true,
+                "reloadCount": 0
+            },
+            {
+                "playerName": "geoge",
+                "chips": 960,
+                "folded": false,
+                "allIn": false,
+                "isSurvive": true,
+                "reloadCount": 0
+            },
+            ...
+        ],
+        "tableNumber": "1"
+    }
+}</pre>
+                        <p>指令说明:</p>
+                        <p>1. 这条命令中包含当前所有玩家的剩余筹码以及已经索取筹码的次数</p>
+                        <p>2. 如果你需要索取筹码, 这条命令需要在 <b><u>10</u></b> 秒内回复, 如果不回复, 那么服务器将自动忽略, 但是如果当前你已经没有筹码, 且索取次数在2次以内, 服务器将自动为你索取 1000 筹码</p>
+                        <p>3. 回复指令如下:</p>
+<pre>
+{
+    "eventName" : "__reload"
+}</pre>
+                    </ul>
+                    </span>
+                    <hr>
                     <a name="request_for_action" style="text-decoration: none;"><h4><strong>服务器请求玩家决策本次action应采取的动作(轮到某玩家行动)</strong></h4></a>
                     <ul>
                         <p>比赛过程中, 服务器会在轮到需要某玩家客户端做出决策之际向该玩家客户端发送此消息(参考"通信机制.第1条"), 此消息又分为2类: 需要玩家行动和需要玩家押注</p>
@@ -174,7 +247,7 @@
     "data" : {
         "tableNumber" : 1,
         "self" : {
-            "playerName" : "player1",
+            "playerName" : "bobi",
             "chips" : 1000,
             "folded" : false,
             "allin" : false,
@@ -183,17 +256,17 @@
         "game" : {
             "gameBets" : [
                 {
-                    "playerName" : "player1",
+                    "playerName" : "bobi",
                     "roundBet": 50,
                     "bet": 50
                 },
                 {
-                    "playerName" : "player2",
+                    "playerName" : "cicy",
                     "roundBet": 100,
                     "bet": 100
                 },
                 {
-                    "playerName" : "player3",
+                    "playerName" : "geoge",
                     "roundBet": 200,
                     "bet": 200
                 },
@@ -205,21 +278,21 @@
             "roundName" : "deal", // other options are : "flop", "turn", "river"
             "otherPlayers" : [
                 {
-                    "playerName" : "player2",
+                    "playerName" : "cicy",
                     "chips" : 20,
                     "folded" : true,
                     "allin" : false,
                     "isSurvive" : true
                 },
                 {
-                    "playerName" : "player3",
+                    "playerName" : "geoge",
                     "chips" : 0,
                     "folded" : true,
                     "allin" : true,
                     "isSurvive" : false
                 },
                 {
-                    "playerName" : "player4",
+                    "playerName" : "alex",
                     "chips" : 500,
                     "folded" : true,
                     "allin" : false,
@@ -234,8 +307,8 @@
                         <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin" 中的一种</p>
                         <p>1.1. data.self 字段表示当前己方(玩家自己)的状态, 除了 playerName, chips和几个状态之外, 通过这条信息玩家可以了解到自己的私有牌, 由于此消息是点对点发送, 因此玩家自己的私有牌不会泄露给其它玩家</p>
                         <p>1.2. data.game 表示当前牌局的状态, 其中 data.game.otherPlayers 字段中的牌桌上的所有玩家列表数据格式和内容含义均和 __new_round 指令中一致, 此处不再赘述</p>
-                        <p>1.3. data.game.gameBets.roundBet 表示该玩家从<span style="color: #FF0000"><b>本轮游戏</b></span>开始之后所下的赌注</p>
-                        <p>1.3. data.game.gameBets.bet 表示该玩家从<span style="color: #FF0000"><b>本回合游戏</b></span>开始之后所下的赌注</p>
+                        <p>1.3. data.game.gameBets.roundBet 表示该玩家从本轮游戏开始之后所下的赌注</p>
+                        <p>1.3. data.game.gameBets.bet 表示该玩家从本回合游戏开始之后所下的赌注</p>
                         <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
                         <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
                         <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
@@ -245,8 +318,8 @@
 {
     "eventName" : "__action",
     "data" : {
-        "action" : "call", <span style="color: #FF0000"><b>// 还可以是 : "check", "fold", "allin", "raise", 但不能是 "bet" </b></span>
-        "playerName" : "player1"
+        "action" : "call" // 还可以是 : "check", "fold", "allin", "raise" 中的其中一种, 但不能是 "bet"
+        <span class="new_content"><s>"playerName" : "bobi"</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数 </span>
     }
 }</pre>
                         <br>
@@ -257,7 +330,7 @@
     "data" : {
         "tableNumber" : 1,
         "self" : {
-            "playerName" : "player1",
+            "playerName" : "bobi",
             "chips" : 1000,
             "folded" : false,
             "allin" : false,
@@ -266,17 +339,17 @@
         "game" : {
             "gameBets" : [
                 {
-                    "playerName" : "player1",
+                    "playerName" : "bobi",
                     "roundBet": 50,
                     "bet": 50
                 },
                 {
-                    "playerName" : "player2",
+                    "playerName" : "cicy",
                     "roundBet": 100,
                     "bet": 100
                 },
                 {
-                    "playerName" : "player3",
+                    "playerName" : "geoge",
                     "roundBet": 200,
                     "bet": 200
                 },
@@ -288,21 +361,21 @@
             "roundName" : "deal",
             "otherPlayers" : [
                 {
-                    "playerName" : "player2",
+                    "playerName" : "cicy",
                     "chips" : 20,
                     "folded" : true,
                     "allin" : false,
                     "isSurvive" : true
                 },
                 {
-                    "playerName" : "player3",
+                    "playerName" : "geoge",
                     "chips" : 0,
                     "folded" : true,
                     "allin" : true,
                     "isSurvive" : false
                 },
                 {
-                    "playerName" : "player4",
+                    "playerName" : "alex",
                     "chips" : 500,
                     "folded" : true,
                     "allin" : false,
@@ -322,9 +395,9 @@
 {
     "eventName" : "__action",
     "data" : {
-        "action" : "bet", <span style="color: #FF0000"><b>// 这里建议是"bet", 也可以是check/fold/allin, 请参考附表中的说明</b></span>
-        "playerName" : "player1",
-        "amount" : 100 <span style="color: #FF0000"><b>// amount 在这里是一个强制字段</b></span>
+        "action" : "bet", // 这里建议是"bet", 也可以是 "check", "fold", "allin" 中的其中一种, 请参考附表中的说明
+        <span class="new_content"><s>"playerName" : "bobi",</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数 </span>
+        "amount" : 100 // amount 在这里是一个强制字段
     }
 }</pre>
                         <br>
@@ -341,7 +414,7 @@
     "data" : {
         "action" : {
             "action" : "call",
-            "playerName" : "player3",
+            "playerName" : "alex",
             "amount" : 10,
             "chips" : 500
         },
@@ -352,21 +425,21 @@
         },
         "players" : [
             {
-                "playerName" : "player1",
+                "playerName" : "bobi",
                 "chips" : 20,
                 "folded" : true,
                 "allin" : false,
                 "isSurvive" : true
             },
             {
-                "playerName" : "player2",
+                "playerName" : "cicy",
                 "chips" : 0,
                 "folded" : true,
                 "allin" : true,
                 "isSurvive" : false
             },
             {
-                "playerName" : "player3",
+                "playerName" : "geoge",
                 "chips" : 500,
                 "folded" : true,
                 "allin" : false,
@@ -384,6 +457,60 @@
                         <p>以下是某次回合导致牌局发生变化之后服务器和客户端交互的消息示意图</p>
                         <img src="./res/images/instructions/show_action_message.png" style="width: 75%; height: 75%;">
                     </ul>
+                    <hr>
+                    <span class="new_content">
+                    <a name="update_status" style="text-decoration: none;" class="new_content"><h4><strong>每一轮结束</strong></h4></a>
+                    <ul>
+                        <p>在每一轮结束的时候, 服务器会向所有玩家广播这一轮所有玩家的状态, 包括玩家手牌</p>
+                        <pre>
+{
+    "eventName" : "__round_end",
+    "data" : {
+        "players": [
+            {
+                "playerName": "bobi",
+                "chips": 960,
+                "folded": true,
+                "allIn": false,
+                "cards": [
+                    "JH",
+                    "9D"
+                ],
+                "isSurvive": true,
+                "reloadCount": 0
+            },
+            {
+                "playerName": "cicy",
+                "chips": 1280,
+                "folded": true,
+                "allIn": false,
+                "cards": [
+                    "AD",
+                    "TD"
+                ],
+                "isSurvive": true,
+                "reloadCount": 0
+            },
+            ...
+        ],
+        "table": {
+            "tableNumber": "1",
+            "board": [
+                "QS",
+                "TS",
+                "AH",
+                "5S",
+                "9H"
+            ],
+            "roundCount": 1
+        }
+}</pre>
+                        <p>指令说明:</p>
+                        <p>1. __round_end 是一条服务器的广播消息, 目的是让玩家知道本轮所有其他玩家的手牌以及公开牌, 为玩家准备下一轮策略做准备</p>
+                        <p>2. data.player[i].cards 表示已经结束掉的这轮里的玩家的手牌</p>
+                        <p>3. 这一条信息不需要玩家回复</p>
+                    </ul>
+                    </span>
                     <hr>
                     <a name="other_affairs" style="text-decoration: none;"><h4><strong>其它注意事项</strong></h4></a>
                     <ul>
@@ -442,7 +569,7 @@
                                     2. 如果玩家剩余筹码不够, 自动allin<br>
                                     3. 如果该action中不能bet (即玩家收到服务器的决策请求为 __action), 而采取bet决策, 那么将实施call<br>
                                     4. amount字段如果不是数字, 那么系统自动进行弃牌操作<br>
-                                    5. 金额必须是整数，如果不是整数，自动押注小盲注金额<br>
+                                    5. 金额必须是整数,如果不是整数,自动押注小盲注金额<br>
                                     6. 轮到bet的时候也可以决策为check/raise/allin
                                 </td>
                             </tr>
@@ -479,27 +606,25 @@
                         <p>3. 第2个字符为花色: 分别为 H(红心), S(黑桃), C(草花), D(方块)</p>
                         <p>4. 例如: 3H -- 红心3; TS -- 黑桃10; QC -- 草花皇后; AD -- 方块Ace</p>
                     </ul>
-                    <hr>
                 </div>
                 <div class="tab-pane" id="example">
                     <a style="text-decoration: none;"><h4><strong>示例代码</strong></h4></a>
                     <hr>
                     <p><span>请开发者自行修改示例代码中的 Socket 地址和接入用户名信息以方便自助测试</span></p>
-                    <p><span style="color: #FF0000">由于平台开发人力有限，示例代码会随着平台的开发不断更新版本，目前只是放出最基础的能和服务器通信的版本供大家参考，示例代码的更新消息请参考和关注平台更新日志</span></p>
                     <div class="row">
                         <div class="col-md-4">
-                            <h2>Javascript</h2>
+                            <h2>Javascript V1.0.1 <img src="./res/images/red-dot-md.png"></h2>
                             <p>启动方式：双击用浏览器打开 player.html, 并附加URL参数name=your_name, <br>例如: file:///D:/player.html?name=bobi<br><br></p>
                             <p><a class="btn btn-large btn-default" href="./example/js-example.zip" role="button">js 示例下载 &raquo;</a></p>
                         </div>
                         <div class="col-md-4">
-                            <h2>Python</h2>
-                            <p>启动方式：请自行修改代码中的 ws 和所有 playerName 变量值，然后运行 python player.py 接入游戏<br><br><br></p>
+                            <h2>Python V1.0.1 <img src="./res/images/red-dot-md.png"></h2>
+                            <p>启动方式：请参考 <a href="https://pypi.python.org/pypi/websocket-client/0.7.0">https://pypi.python.org/pypi/websocket-client/0.7.0</a> 先安装 Python 的 websocket 插件, 自行修改代码中的 ws 和所有 playerName 变量值,然后运行 python player.py 接入游戏</p>
                             <p><a class="btn btn-default" href="./example/python-example.zip" role="button">python 示例下载 &raquo;</a></p>
                         </div>
                         <div class="col-md-4">
-                            <h2>Java</h2>
-                            <p>启动方式：请自行修改代码中的 URI 和 JoinData 以及 ActionData 中的 playerName 字段，编译生成 .jar 文件之后使用 java -jar player.jar 接入游戏 (example的IDE环境为 idea, 工程可编译生成 artifact : player.jar)</p>
+                            <h2>Java V1.0.0</h2>
+                            <p>启动方式：请自行修改代码中的 URI 和 JoinData 以及 ActionData 中的 playerName 字段,编译生成 .jar 文件之后使用 java -jar player.jar 接入游戏 (example的IDE环境为 idea, 工程可编译生成 artifact : player.jar)</p>
                             <p><a class="btn btn-default" href="./example/java-example.zip" role="button">java 示例下载 &raquo;</a></p>
                         </div>
                     </div>
@@ -507,21 +632,40 @@
                 <div class="tab-pane" id="faq">
                     <a style="text-decoration: none;"><h4><strong>FAQ</strong></h4></a>
                     <hr>
-                    <div>Task force工作人员正在整理中，请期待...</div>
+                    <div>Task force工作人员正在整理中,请期待...</div>
                 </div>
                 <div class="tab-pane" id="release_note">
                     <a style="text-decoration: none;"><h4><strong>平台更新日志</strong></h4></a>
                     <hr>
                     <div>
-                        2017-09-15<br>
+                        <h4>2017-09-20</h4>
+                        更新了比赛规则, 允许一局多圈制, 每圈盲注翻倍, 允许玩家在每轮结束之后索取筹码(reload)<br>
+                        加入了 __round_end 指令, 用于在每轮结束之后告知玩家牌桌状态<br>
+                        加入了 __start_reload 和 __reload 指令, 用于让玩家索取筹码<br>
+                        添加了游戏日志功能, 内测期间玩家可以下载指定桌的当天比赛后台日志用于 debug<br>
+                        更新了 js, Python 示例代码<br>
+                        修正 bug 若干<br>
+                    </div>
+                    <br>
+                    <div>
+                        <h4>2017-09-15</h4>
                         发布了javascript, python和java example
                     </div>
                     <br>
                     <div>
-                        2017-09-14<br>
+                        <h4>2017-09-14</h4>
                         THE-engine V1.0.0上线
                     </div>
                 </div>
+            </div>
+        </div>
+        <hr>
+        <div style="width: 100%; text-align: center;">
+            <div class="inner">
+                <p>开发者 (技术支持联系):
+                    <a href="mailto:bobi_zhou@trendmicro.com.cn; jieping_yang@trendmicro.com.cn" style="text-decoration: none;"> Bobi Zhou, JiePing Yang </a>
+                </p>
+                <a data-toggle="tooltip" data-placement="right" style="text-decoration: none;" href="#"> CDC Engineering Camp 2017 组委会 </a>
             </div>
         </div>
     </div>

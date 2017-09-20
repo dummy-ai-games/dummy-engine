@@ -3,6 +3,10 @@
  * 2017-09-01
  */
 
+body {
+    overflow-y: scroll;
+}
+
 .recordData {
     border-bottom: 1px solid #dddddd;
     padding: 10px 0 10px;

@@ -1,20 +1,18 @@
-var SkyRTC = function () {
+/**
+ * Created by the-engine-team
+ * 2017-09-20
+ */
 
-    /**********************************************************/
-    /*                                                        */
-    /*                       事件处理器                       */
-    /*                                                        */
-    /**********************************************************/
+var SkyRTC = function () {
     function EventEmitter() {
         this.events = {};
     }
 
-    //绑定事件函数
     EventEmitter.prototype.on = function (eventName, callback) {
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(callback);
     };
-    //触发事件函数
+
     EventEmitter.prototype.emit = function (eventName, _) {
         var events = this.events[eventName],
             args = Array.prototype.slice.call(arguments, 1),
@@ -28,25 +26,13 @@ var SkyRTC = function () {
         }
     };
 
-
-    /**********************************************************/
-    /*                                                        */
-    /*                   流及信道建立部分                     */
-    /*                                                        */
-    /**********************************************************/
-
-
-    /*******************基础部分*********************/
     function skyrtc() {
-        //本地WebSocket连接
         this.socket = null;
     }
 
-    //继承自事件处理器，提供绑定事件和触发事件的功能
     skyrtc.prototype = new EventEmitter();
 
 
-    /*************************服务器连接部分***************************/
     skyrtc.prototype.connect = function (server, param) {
         var socket,
             that = this;
@@ -89,6 +75,7 @@ var SkyRTC = function () {
             that.emit("remove_peer", data.socketId);
         });
     };
+
     skyrtc.prototype.Bet = function (amount) {
         var that = this;
         that.socket.send(JSON.stringify({
@@ -100,6 +87,7 @@ var SkyRTC = function () {
             }
         }));
     };
+
     skyrtc.prototype.Call = function () {
         var that = this;
         that.socket.send(JSON.stringify({
@@ -111,6 +99,7 @@ var SkyRTC = function () {
             }
         }));
     };
+
     skyrtc.prototype.Check = function () {
         var that = this;
         that.socket.send(JSON.stringify({
@@ -139,8 +128,6 @@ var SkyRTC = function () {
             "eventName": "__action",
             "data": {
                 "action": "allin"
-
-
             }
         }));
     };
@@ -166,6 +153,12 @@ var SkyRTC = function () {
         }));
     };
 
+    skyrtc.prototype.Reload = function() {
+        var that = this;
+        that.socket.send(JSON.stringify({
+            "eventName": "__reload"
+        }));
+    };
 
     return new skyrtc();
 };

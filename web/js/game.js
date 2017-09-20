@@ -44,7 +44,7 @@ function initWebsock() {
         }
     });
 
-    rtc.on("__gameOver", function (data) {
+    rtc.on("__game_over", function (data) {
         var tableNumber = data.table.tableNumber;
         var result = "table " + tableNumber + " 游戏结束，胜者如下：";
         var winners = data.winners;

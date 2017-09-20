@@ -16,7 +16,7 @@ def takeAction(action, data):
             "eventName": "__action",
             "data": {
                 "action": "bet",
-                "playerName": "yang2",
+                "playerName": "player1",
                 "amount": 100
             }
         }))
@@ -26,7 +26,7 @@ def takeAction(action, data):
             "eventName": "__action",
             "data": {
                 "action": "call",
-                "playerName": "yang2"
+                "playerName": "player1"
             }
         }))
 
@@ -38,7 +38,7 @@ def doListen():
         ws.send(json.dumps({
             "eventName": "__join",
             "data": {
-                "playerName": "yang2"
+                "playerName": "player1"
             }
         }))
         while 1:

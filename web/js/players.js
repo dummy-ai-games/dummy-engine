@@ -63,7 +63,7 @@ function loadPlayersByTable() {
         method: 'get',
         url: url,
         cache: false,
-        height: 600,
+        height: 420,
         pagination: true,
         pageSize: 50,
         pageList: [10, 25, 50, 100, 200],

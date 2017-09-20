@@ -90,6 +90,15 @@ function initRTC() {
             gameStatus = danger;
         }
     });
+
+    rtc.on('__start_reload', function (data) {
+        console.log('received start reload request:' + JSON.stringify(data));
+        reload();
+    });
+
+    rtc.on('__round_end', function(data) {
+        console.log('received round end:' + JSON.stringify(data));
+    });
 }
 
 function takeAction(selfCard, cards, players) {
@@ -234,7 +243,10 @@ function takeAction(selfCard, cards, players) {
         setTimeout(function () {
             $('#call').click();
         }, 2000);
+}
 
+function reload() {
+    rtc.Reload();
 }
 
 $('#bet').click(function () {
