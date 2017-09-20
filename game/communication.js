@@ -408,7 +408,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             that.getPlayerAction(message, true);
         }, 10 * 1000);
     } else {
-        var tableNumber = that.playerAndTable[player].tableNumber;
+        var tableNumber = that.playerAndTable[player];
         var currentTable = that.table[tableNumber];
 
         // bug fix - crash after players quit
