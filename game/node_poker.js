@@ -2139,6 +2139,7 @@ function logGame(tableNumber, msg) {
         ]
     });
     logger.info(msg);
+    logger.close();
 }
 
 exports.Table = Table;
