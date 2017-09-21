@@ -8,6 +8,10 @@ var UUID = require('node-uuid');
 var playerDao = require('../models/player_dao.js');
 var winnerDao = require('../models/winner_dao.js');
 var logger = require('../poem/logging/logger4js').helper;
+var dateUtils = require('../poem/utils/date_utils');
+var winston = require('winston');
+
+var logRoot = "./logs/";
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloadCount, maxRoundCount) {
     this.smallBlind = smallBlind;
@@ -2126,7 +2130,7 @@ function rankHands(hands) {
 
 function logGame(tableNumber, msg) {
     var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd");
-    var logFileName = logRoot + gameLogFolder + date + '_game_' + tableNumber + '.txt';
+    var logFileName = logRoot + "game/" + date + '_game_' + tableNumber + '.txt';
 
     var logger = new (winston.Logger)({
         transports: [
