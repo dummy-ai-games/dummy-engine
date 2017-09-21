@@ -21,9 +21,9 @@
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="./index.html">主页</a></li>
-                            <li class="active"><a href="#">文档<img src="./res/images/red-dot-md.png"></a></li>
+                            <li class="active"><a href="#">文档</a></li>
                             <li><a href="#" onclick="gotoTest();">测试</a></li>
-                            <li><a href="./players.html">玩家管理</a></li>
+                            <li><a href="./players.html">玩家管理<img src="./res/images/red-dot-md.png"></a></li>
                         </ul>
                     </nav>
                 </div>
@@ -35,7 +35,7 @@
         <div>
             <ul class="nav nav-tabs" id="main_tab">
                 <li class="active" style="cursor: pointer;"><a data-target="#game_instruction" data-toggle="tab">比赛规则</a></li>
-                <li style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">API说明</a></li>
+                <li style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
                 <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">示例代码</a></li>
                 <li style="cursor: pointer;"><a data-target="#faq" data-toggle="tab">FAQ</a></li>
                 <li style="cursor: pointer;"><a data-target="#release_note" data-toggle="tab">平台更新日志</a></li>
@@ -48,10 +48,7 @@
                         ; <b><u>加黑的下划线内容</u></b> 表示待定参数,这些参数将在比赛前夕敲定下来
                         <a><i class="remove glyphicon glyphicon-remove glyphicon-white" onclick="hideTip();"></i></a>
                     </span>
-                    <br>
-                    <br>
-                    <span class="tag label label-success">开发平台和组织比赛不易,如果有平台有BUG或者比赛规程有疏漏,还请各位玩家通过合理渠道向我们反馈,感谢！</span>
-                    <br>
+                    <!-- <span class="tag label label-success">如果遇到平台 BUG, 还请各位玩家积极向我们反馈,谢谢！</span> -->
                     <br>
                     <a style="text-decoration: none;"><h4><strong>约定术语</strong></h4></a>
                     <p>约定游戏过程中会有如下概念:</p>
@@ -65,7 +62,7 @@
                     <hr>
 
                     <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
-                    <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017 组委会确定</p>
+                    <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017  Task Force确定</p>
                     <p>2. 比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
                     <p><span class="new_content"> 3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>10</u></b> 圈为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>30</u></b> 人进入复赛 </span></p>
                     <p><span class="new_content"> 4. 复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛 </span></p>
@@ -93,7 +90,7 @@
                 </div>
 
                 <div class="tab-pane" id="api_doc">
-                    <a style="text-decoration: none;"><h4><strong>API说明</strong></h4></a>
+                    <a style="text-decoration: none;"><h4><strong>开发规范</strong></h4></a>
                     <div id="bs-example-navbar-collapse-2" class="navbar">
                         <ul class="nav navbar-nav" style="float: left;">
                             <li class="dropdown">
@@ -122,12 +119,12 @@
     "data" : {
         "playerName" : "0123456789ABCDEF" <span class="new_content">// 为了防止冒名作弊, 这个名字是比赛系统预先分配给每个参赛玩家的私有名字, 请玩家牢记并只在<b>自己的程序中</b>使用
                                           // 这个名字目前在测试平台上并不启用，在比赛前夕会通过私密的方式通告给每个参赛玩家
-                                          // 每个玩家的私有名会对应一个展示名(由组委会事先录入), 比赛当日大屏幕上显示的为展示名以区分玩家
+                                          // 每个玩家的私有名会对应一个展示名(由 Task Force事先录入), 比赛当日大屏幕上显示的为展示名以区分玩家
                                           // 以下文档中所有涉及到的 playerName 均为<b>私有名</b>, 为了阅读方便, 文档中暂时用类似 bobi, cicy, geoge 等拟名代替</span>
     }
 }</pre>
                         <p>指令说明:</p>
-                        <p>1. playerName必须是组委会赋予玩家的名字, 不可冒名顶替, 一旦被程序检查出冒名行为,将取消比赛资格</p>
+                        <p>1. playerName必须是 Task Force赋予玩家的名字, 不可冒名顶替, 一旦被程序检查出冒名行为,将取消比赛资格</p>
                         <p>2. 如果加入成功, 那么服务器会将当前牌桌上所有玩家的列表向所有在线的客户端广播一次, 广播格式如下:</p>
                         <pre>
 {
@@ -149,7 +146,7 @@
     "data" : {
         "table" : {
             "tableNumber" : 1,
-            "roundName" : "deal", // other options are : "flop", "turn", "river"
+            "roundName" : "deal", // 其它可选项为 : "flop", "turn", "river"
             "board" : "[XX, XX, XX]"
         },
         "players" : [
@@ -179,7 +176,7 @@
     }
 }</pre>
                         <p>指令说明:</p>
-                        <p>1. data.table 字段表示当前牌桌的状态, data.table.tableNumber 表示当前的桌号, 桌号是游戏组委会在比赛之前按照分组分桌分好的一个桌号, 在比赛开始之前由组委会人员将玩家录入系统, 理论上某个玩家 (playerName) 所属的桌号是固定且唯一的,
+                        <p>1. data.table 字段表示当前牌桌的状态, data.table.tableNumber 表示当前的桌号, 桌号是游戏 Task Force在比赛之前按照分组分桌分好的一个桌号, 在比赛开始之前由 Task Force人员将玩家录入系统, 理论上某个玩家 (playerName) 所属的桌号是固定且唯一的,
                             玩家客户端在发起 __join 指令表示加入时, 通过指定 playerName, 就能自动加入事先安排好的游戏桌</p>
                         <p>2. data.table.roundName 表示当前牌局的状态, 有如下取值: deal(还未发公共牌), flop(第1次发3张公共牌), turn(发第4张公共牌), river(发第5张公共牌), 详情请参考文档末尾附表</p>
                         <p>3. data.table.board 表示当前桌面上的公开牌的点数, 牌面取值请参考文档末尾附表</p>
@@ -275,7 +272,7 @@
             "board" : [XX, XX, XX],
             "minBet" : 10,
             "raiseCount" : 0,
-            "roundName" : "deal", // other options are : "flop", "turn", "river"
+            "roundName" : "deal", // 其它可选项为 : "flop", "turn", "river"
             "otherPlayers" : [
                 {
                     "playerName" : "cicy",
@@ -514,12 +511,12 @@
                     <hr>
                     <a name="other_affairs" style="text-decoration: none;"><h4><strong>其它注意事项</strong></h4></a>
                     <ul>
-                        <p>1. 服务器在向本次action需要行动的玩家发送 __action 请求决策之后, 会等待 5s, 决策超时时间为 5s, 如果客户端出现异常, 掉线或者在5s 之内无法做出决策, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b></p>
+                        <p>1. 服务器在向本次action需要行动的玩家发送 __action 请求决策之后, 会等待 <b><u>5秒</u></b>, 决策超时时间为 <b><u>5秒</u></b>, 如果客户端出现异常, 掉线或者在超时时间之内无法做出决策, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b></p>
                         <p>2. 如果玩家在决策时发送了错误或者规定以外的指令, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b>, 请谨慎编写决策程序</p>
                         <p>3. 没有轮到某玩家的action, 此玩家却采取了行动, 此行动将自动被忽略</p>
                         <p>4. 建议玩家客户端监听掉线事件,以便在掉线之后可以随时通过 Websocket 重新加入并继续游戏, 建议在掉线重连之后立即发送 __action, call</p>
                         <p>5. 每开始新的一轮时, 大小盲注会较之上一轮翻倍</p>
-                        <p>6. 如果玩家在服务端发轮询动作之前离线, 系统会等待10秒, <b><span style="color: #FF0000">10秒后仍然没有等到再次接入, 将视为自动弃牌</span></b></p>
+                        <p>6. 如果玩家在服务端发轮询动作之前离线, 系统会等待 <b><u>10秒</u></b>, <b><span style="color: #FF0000"> <b><u>10秒</u></b> 后仍然没有等到再次接入, 将视为自动弃牌</span></b></p>
                     </ul>
                     <hr>
                     <a name="appendixes" style="text-decoration: none;"><h4><strong>附表</strong></h4></a>
@@ -600,7 +597,7 @@
                             </tr>
                         </table>
                         <br>
-                        <p>牌面值</p>
+                        <p><b>牌面值</b></p>
                         <p>1. 牌面统一由2个字符组成</p>
                         <p>2. 第1个字符为数字: 取值为: 2~9, T(10), J(J), Q(Q), K(K), A(Ace)</p>
                         <p>3. 第2个字符为花色: 分别为 H(红心), S(黑桃), C(草花), D(方块)</p>
@@ -665,12 +662,12 @@
                 <p>开发者 (技术支持联系):
                     <a href="mailto:bobi_zhou@trendmicro.com.cn; jieping_yang@trendmicro.com.cn" style="text-decoration: none;"> Bobi Zhou, JiePing Yang </a>
                 </p>
-                <a data-toggle="tooltip" data-placement="right" style="text-decoration: none;" href="#"> CDC Engineering Camp 2017 组委会 </a>
+                <a data-toggle="tooltip" data-placement="right" style="text-decoration: none;" href="#"> CDC Engineering Camp 2017  Task Force </a>
             </div>
         </div>
     </div>
 </body>
 <script src="./js/public/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="./js/instructions.js"></script>
+<script src="js/document.js"></script>
 </html>

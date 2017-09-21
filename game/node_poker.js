@@ -33,7 +33,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.isReloadTime = false;
     this.maxRoundCount = maxRoundCount;
 
-
     // Validate acceptable value ranges.
     var err;
     if (minPlayers < 3) { // Require at least 3 players to start a game.
@@ -49,7 +48,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     }
 
     this.eventEmitter.on('newRound', function () {
-        logger.game(that.tableNumber, 'new round : ' + that.roundCount);
+        logGame(that.tableNumber, 'new round : ' + that.roundCount);
         getNextPlayer(that);
         takeAction(that, '__turn');
         var tempData = [];
@@ -64,7 +63,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.eventEmitter.on('_showAction', function (data) {
         var myData = getBasicData(that);
         myData.action = data;
-        logger.game(that.tableNumber, JSON.stringify(myData));
+        logGame(that.tableNumber, JSON.stringify(myData));
         that.eventEmitter.emit('__show_action', myData);
     });
 
@@ -101,10 +100,18 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 count++;
             }
         }
-        if (count > that.players.length / 2 && count >= that.minPlayers && count < that.maxRoundCount) {
+
+        // debug
+        logger.info("********");
+        logger.info("count = " + count + ", players.length / 2 = " + that.players.length / 2);
+        logger.info("minPlayers = " + that.minPlayers);
+        logger.info("roundCount = " + that.roundCount + ", maxRoundCount = " + that.maxRoundCount);
+        logger.info("********");
+
+        if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
             data = getBasicData(that);
             that.eventEmitter.emit('__round_end', data);
-            logger.game(that.tableNumber, 'a new round started');
+            logGame(that.tableNumber, 'a new round started');
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++) {
                 var isSurvive = true;
@@ -133,7 +140,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 that.NewRound();
             }, 10 * 1000);
         } else {
-            logger.game(that.tableNumber, 'game over, winners are: ');
+            logGame(that.tableNumber, 'game over, winners are: ');
             for (i = 0; i < that.players.length; i++) {
                 var player = that.players[i];
                 player.chips += (that.maxReloadCount - player.reloadCount) * that.initChips;
@@ -145,7 +152,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                     });
             }
             sort(that.gameWinners);
-            logger.game(that.tableNumber, JSON.stringify(that.gameWinners));
+            logGame(that.tableNumber, JSON.stringify(that.gameWinners));
             data = getBasicData(that);
             data.winners = that.gameWinners;
             winnerDao.addOrUpdateWinner({tableNumber: that.tableNumber, winners: that.gameWinners});
@@ -452,7 +459,7 @@ function checkForBankrupt(table) {
     for (i = 0; i < table.players.length; i += 1) {
         if (table.players[i].chips === 0) {
             table.gameLosers.push(table.players[i]);
-            logger.game(table.tableNumber, 'player: ' + table.players[i].playerName + ' is going bankrupt');
+            logGame(table.tableNumber, 'player: ' + table.players[i].playerName + ' is going bankrupt');
             table.players.splice(i, 1);
         }
     }
@@ -1682,7 +1689,7 @@ function progress(table) {
                  */
                 table.eventEmitter.emit('gameOver');
             } else if (table.game.roundName === 'Turn') {
-                logger.game(table.tableNumber, 'effective turn');
+                logGame(table.tableNumber, 'effective turn');
                 table.game.roundName = 'River';
                 table.game.deck.pop(); // Burn a card
                 table.game.board.push(table.game.deck.pop()); // Turn a card
@@ -1697,7 +1704,7 @@ function progress(table) {
                 }
                 table.eventEmitter.emit('deal');
             } else if (table.game.roundName === 'Flop') {
-                logger.game(table.tableNumber, 'effective flop');
+                logGame(table.tableNumber, 'effective flop');
                 table.game.roundName = 'Turn';
                 table.game.deck.pop(); // Burn a card
                 table.game.board.push(table.game.deck.pop()); // Turn a card
@@ -1709,7 +1716,7 @@ function progress(table) {
                 }
                 table.eventEmitter.emit('deal');
             } else if (table.game.roundName === 'Deal') {
-                logger.game(table.tableNumber, 'effective deal');
+                logGame(table.tableNumber, 'effective deal');
                 table.game.roundName = 'Flop';
                 table.game.deck.pop(); // Burn a card
                 for (i = 0; i < 3; i += 1) { // Turn three cards
@@ -1941,10 +1948,10 @@ Player.prototype.Check = function () {
         // Attempt to progress the game
         this.turnBet = {action: 'check', playerName: this.playerName, chips: this.chips};
         this.table.eventEmitter.emit('_showAction', this.turnBet);
-        logger.game(this.table.tableNumber, 'player: ' + this.playerName + ' CHECK');
+        logGame(this.table.tableNumber, 'player: ' + this.playerName + ' CHECK');
         progress(this.table);
     } else {
-        logger.game(this.table.tableNumber, 'Check not allowed, replay please');
+        logGame(this.table.tableNumber, 'Check not allowed, replay please');
         this.Call();
     }
 };
@@ -1963,7 +1970,7 @@ Player.prototype.Fold = function () {
     // Mark the player as folded
     this.folded = true;
     this.turnBet = {action: 'fold', playerName: this.playerName, chips: this.chips};
-    logger.game(this.table.tableNumber, 'player: ' + this.playerName + ' FOLD');
+    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' FOLD');
     this.table.eventEmitter.emit('_showAction', this.turnBet);
     this.table.surviveCount--;
     // Attempt to progress the game
@@ -1973,7 +1980,7 @@ Player.prototype.Fold = function () {
 Player.prototype.Raise = function () {
 
     if (this.table.raiseCount >= 4) {
-        logger.game(this.table.tableNumber, 'can not raise again --> Call !!!');
+        logGame(this.table.tableNumber, 'can not raise again --> Call !!!');
         this.Call();
     } else {
         var maxBet, i, bet;
@@ -1992,7 +1999,7 @@ Player.prototype.Raise = function () {
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
                     this.table.eventEmitter.emit('_showAction', this.turnBet);
                     this.table.raiseCount++;
-                    logger.game(this.table.tableNumber, 'player: ' + this.playerName + ' RAISE, current raise count = ' +
+                    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' RAISE, current raise count = ' +
                         this.table.raiseCount);
                     var playerCount = 0;
                     for (i = 0; i < this.table.players.length; i += 1) {
@@ -2005,7 +2012,7 @@ Player.prototype.Raise = function () {
                         this.talked = true;
                     progress(this.table);
                 } else {
-                    logger.game(this.table.tableNumber, 'You do not have enough chips : (your chips: ' +
+                    logGame(this.table.tableNumber, 'You do not have enough chips : (your chips: ' +
                         this.chips + ', my bet: ' + myBet + ', bet: ' + bet + ') --> ALL IN !!!');
                     this.AllIn();
                 }
@@ -2020,7 +2027,7 @@ Player.prototype.Bet = function (bet) {
     this.table.isBet = false;
     var i;
     if (bet < this.table.bigBlind) {
-        logger.game(this.table.tableNumber, 'player: ' +
+        logGame(this.table.tableNumber, 'player: ' +
             this.playerName + ', bet < small blind, adjust to small blind: ' + this.table.smallBlind);
 
         bet = this.table.bigBlind;
@@ -2036,10 +2043,10 @@ Player.prototype.Bet = function (bet) {
         // Attempt to progress the game
         this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips}
         this.table.eventEmitter.emit('_showAction', this.turnBet);
-        logger.game(this.table.tableNumber, 'player: ' + this.playerName + ' BET: ' + bet);
+        logGame(this.table.tableNumber, 'player: ' + this.playerName + ' BET: ' + bet);
         progress(this.table);
     } else {
-        logger.game(this.table.tableNumber, 'You do not have enough chips (your chips: ' + this.chips + ') --> ALL IN !!!');
+        logGame(this.table.tableNumber, 'You do not have enough chips (your chips: ' + this.chips + ') --> ALL IN !!!');
         this.AllIn();
     }
 };
@@ -2063,10 +2070,10 @@ Player.prototype.Call = function () {
                 var addMoney = maxBet - myBet;
                 this.turnBet = {action: 'call', playerName: this.playerName, amount: addMoney, chips: this.chips};
                 this.table.eventEmitter.emit('_showAction', this.turnBet);
-                logger.game(this.table.tableNumber, 'player: ' + this.playerName + ' CALL');
+                logGame(this.table.tableNumber, 'player: ' + this.playerName + ' CALL');
                 progress(this.table);
             } else {
-                logger.game(this.table.tableNumber, 'You do not have enough chips (your chips: ' + this.chips + ') --> ALL IN !!!');
+                logGame(this.table.tableNumber, 'You do not have enough chips (your chips: ' + this.chips + ') --> ALL IN !!!');
                 this.AllIn();
             }
         }
@@ -2077,7 +2084,7 @@ Player.prototype.Call = function () {
 Player.prototype.AllIn = function () {
     var i, allInValue = 0;
 
-    logger.game(this.table.tableNumber, 'player: ' + this.playerName + ' ALLIN');
+    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' ALLIN');
 
     for (i = 0; i < this.table.players.length; i += 1) {
         if (this === this.table.players[i]) {
@@ -2107,6 +2114,19 @@ function rankHands(hands) {
     }
 
     return hands;
+}
+
+function logGame(tableNumber, msg) {
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd");
+    var logFileName = logRoot + gameLogFolder + date + '_game_' + tableNumber + '.txt';
+
+    var logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.Console)(),
+            new (winston.transports.File)({ filename: logFileName })
+        ]
+    });
+    logger.info(msg);
 }
 
 exports.Table = Table;

@@ -46,11 +46,7 @@ function SkyRTC() {
 
         if (that.playerAndTable[socket.id]) {
             if (that.players[socket.id]) {
-                if (socket.tableNumber) {
-                    logger.game(socket.tableNumber, 'player: ' + socket.id + ' already exist, reject');
-                } else {
-                    logger.warn('player: ' + socket.id + ' already exist, reject');
-                }
+                logger.warn('player: ' + socket.id + ' already exist, reject');
                 return;
             }
             that.playerNumber++;
@@ -62,19 +58,14 @@ function SkyRTC() {
                 socket.tableNumber = that.playerAndTable[socket.id];
             }
 
-            logger.game(socket.tableNumber, ' player : ' + data.playerName + ' join!!');
+            logger.info('player : ' + data.playerName + ' join!!');
 
             that.players[socket.id] = socket;
             this.emit('new_peer', socket.id);
             that.notifyGuestAndPlayer();
             that.initPlayerData(socket.id);
         } else {
-            if (socket.tableNumber) {
-                logger.game(socket.tableNumber, 'guest join!!');
-            } else {
-                logger.info('guest join!!');
-            }
-
+            logger.info('guest join!!');
             that.guests[socket.id] = socket;
             that.notifyGuestAndPlayer();
             that.initGuestData(socket.id);
@@ -86,7 +77,7 @@ function SkyRTC() {
     });
 
     this.on('__reload', function (data, socket) {
-        logger.game(socket.tableNumber, 'player: ' + socket.id + ', reload');
+        logger.info('player: ' + socket.id + ', reload');
         var that = this;
         var playerName = socket.id;
         var tableNum = that.players[playerName].tableNumber;
@@ -126,7 +117,7 @@ function SkyRTC() {
                                     try {
                                         amount = parseInt(data.amount);
                                     } catch (e) {
-                                        logger.game(socket.tableNumber, e.message);
+                                        logger.error(e.message);
                                         amount = currentTable.bigBlind;
                                     }
                                     currentTable.players[playerIndex].Bet(amount);
@@ -161,13 +152,13 @@ function SkyRTC() {
                                 break;
                         }
                     } catch (e) {
-                        logger.game(socket.tableNumber, e.message);
+                        logger.error(e.message);
                         currentTable.players[playerIndex].Fold();
                     }
                 }
             }
         } catch (e) {
-            logger.game(socket.tableNumber, e.message);
+            logger.error(e.message);
         }
     });
 }
@@ -283,7 +274,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     try {
         parseInt(tableNumber);
     } catch (e) {
-        logger.game(tableNumber, 'table : ' + tableNumber + ' start fail, type is not correct');
+        logger.error('table : ' + tableNumber + ' start fail, type is not correct');
         return;
     }
 
@@ -297,7 +288,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     that.initTable(tableNumber);
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
-        logger.game(tableNumber, that.table);
+        logger.info(that.table);
         message = {
             'eventName': 'startGame',
             'data': {
@@ -395,11 +386,11 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     if (that.players[player]) {
         var tableNumber = that.players[player].tableNumber;
         var currentTable = that.table[tableNumber];
-        logger.game(tableNumber, 'server request: ' + JSON.stringify(message));
+        logger.info('server request: ' + JSON.stringify(message));
         if (that.players[player]) {
             that.players[player].send(JSON.stringify(message), errorCb);
             currentTable.timeout = setTimeout(function () {
-                logger.game(tableNumber, 'player response: ' + currentTable.players[currentTable.currentPlayer].playerName + ', response timeout, auto FOLD');
+                logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName + ', response timeout, auto FOLD');
                 currentTable.players[currentTable.currentPlayer].Fold();
             }, 5000);
         }
@@ -483,7 +474,7 @@ SkyRTC.prototype.init = function (socket) {
                     that.emit('socket_message', socket, data);
                 }
             } catch (e) {
-                logger.game(socket.tableNumber, e.message);
+                logger.error(e.message);
             }
         }
     );

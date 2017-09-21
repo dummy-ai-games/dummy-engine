@@ -6,7 +6,6 @@
 var constants = require('../configuration/constants');
 var Enums = require('../configuration/enums');
 var log4js = require('log4js');
-var dateUtils = require('../utils/date_utils');
 var enums = new Enums();
 
 var helper = helper || {};
@@ -16,7 +15,6 @@ var logRoot = "./logs/";
 var userDebugLogFolder = "user_debug/";
 var devLogFolder = "dev/";
 var productionLogFolder = "production/";
-var gameLogFolder = "game/";
 
 var logFile = "common.log";
 
@@ -66,8 +64,7 @@ var userDevelopmentLog = log4js.getLogger('userDevelopmentLog');
 
 helper.info = function (msg) {
     if (enums.APP_DEVELOPMENT_MODE == ENV) {
-        var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss.S");
-        console.log(date + " " + msg);
+        console.log(msg);
     } else if (enums.APP_PRODUCTION_MODE == ENV) {
         userProductionLog.info(msg);
     } else {
@@ -123,16 +120,4 @@ helper.fatal = function (msg) {
     } else {
         userDebugLog.fatal(msg);
     }
-};
-
-helper.game = function(gameID, msg) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd");
-    var logFileName = logRoot + gameLogFolder + date + '_game_' + gameID + '.txt';
-    log4js.configure({
-        appenders: { game : { type: 'file', filename: logFileName } },
-        categories: { default: { appenders: ['game'], level: 'info' } }
-    });
-
-    const logger = log4js.getLogger('game');
-    logger.info(msg);
 };
