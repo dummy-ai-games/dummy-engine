@@ -6,17 +6,19 @@
 var ccTheGame;
 var rtc = SkyRTC();
 var tableNumber = 0;
+var playerName = "";
 
 (function () {
     // get table number first
     tableNumber = getParameter('table');
+    playerName = getParameter("name");
     initGame();
 })();
 
 // game communication with back-end
 function initWebsock() {
     // initialize web communication
-    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], tableNumber);
+    rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName,tableNumber);
 
     rtc.on("_join", function (data) {
         console.log("init data : " + JSON.stringify(data));

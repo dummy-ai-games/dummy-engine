@@ -36,13 +36,15 @@ function SkyRTC() {
     this.playerAndTable = {};
     this.on('__join', function (data, socket) {
         var that = this;
-        var param = data.playerName;
-        logger.info('on __join, param = ' + param);
-        if (that.playerAndTable[param]) {
-            socket.id = param;
-        } else {
-            socket.tableNumber = param;
-        }
+        var playerName = data.playerName;
+        var table = data.table;
+        logger.info('on __join, playerName = ' + playerName+" table="+table);
+        if (that.playerAndTable[playerName]) {
+            socket.id = playerName;
+        } else if (table) {
+            socket.tableNumber = table;
+        } else
+            return;
 
         if (that.playerAndTable[socket.id]) {
             if (that.players[socket.id]) {

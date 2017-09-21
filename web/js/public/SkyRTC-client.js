@@ -47,7 +47,7 @@ var SkyRTC = function () {
 
 
     /*************************服务器连接部分***************************/
-    skyrtc.prototype.connect = function (server, param) {
+    skyrtc.prototype.connect = function (server, playerName,table) {
         var socket,
             that = this;
 
@@ -56,7 +56,8 @@ var SkyRTC = function () {
             socket.send(JSON.stringify({
                 "eventName": "__join",
                 "data": {
-                    "playerName": param
+                    "playerName": playerName,
+                    "table":table
                 }
             }));
             that.emit("socket_opened", socket);
