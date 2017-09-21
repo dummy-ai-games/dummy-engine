@@ -112,7 +112,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                     isSurvive = false;
                 that.players[j] =
                     new Player(that.players[j].playerName, that.players[j].chips,
-                                that, isSurvive, that.players[j].reloadCount);
+                        that, isSurvive, that.players[j].reloadCount);
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
 
@@ -202,9 +202,9 @@ function getNextPlayer(table) {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ?
             (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
     } while (!table.players[table.currentPlayer].isSurvive ||
-        table.players[table.currentPlayer].folded ||
-        table.players[table.currentPlayer].allIn ||
-        (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] === maxBet));
+    table.players[table.currentPlayer].folded ||
+    table.players[table.currentPlayer].allIn ||
+    (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] === maxBet));
 }
 
 function getNextDealer(players, startIndex) {
@@ -447,17 +447,17 @@ function checkForWinner(table) {
 }
 
 /*
-function checkForBankrupt(table) {
-    var i;
-    for (i = 0; i < table.players.length; i += 1) {
-        if (table.players[i].chips === 0) {
-            table.gameLosers.push(table.players[i]);
-            logger.game(table.tableNumber, 'player: ' + table.players[i].playerName + ' is going bankrupt');
-            table.players.splice(i, 1);
-        }
-    }
-}
-*/
+ function checkForBankrupt(table) {
+ var i;
+ for (i = 0; i < table.players.length; i += 1) {
+ if (table.players[i].chips === 0) {
+ table.gameLosers.push(table.players[i]);
+ logger.game(table.tableNumber, 'player: ' + table.players[i].playerName + ' is going bankrupt');
+ table.players.splice(i, 1);
+ }
+ }
+ }
+ */
 
 function Hand(cards) {
     this.cards = cards;
@@ -1882,15 +1882,25 @@ Table.prototype.NewRound = function () {
     if (smallBlind >= this.players.length) {
         smallBlind = 0;
     }
-    while (!this.players[smallBlind].isSurvive)
+    while (!this.players[smallBlind].isSurvive) {
         smallBlind++;
+        //fix bug out of index
+        if (smallBlind >= this.players.length) {
+            smallBlind = 0;
+        }
+    }
 
     bigBlind = smallBlind + 1;
     if (bigBlind >= this.players.length) {
         bigBlind -= this.players.length;
     }
-    while (!this.players[bigBlind].isSurvive)
+    while (!this.players[bigBlind].isSurvive) {
         bigBlind++;
+        //fix bug out of index
+        if (bigBlind >= this.players.length) {
+            bigBlind -= this.players.length;
+        }
+    }
     // Force Blind Bets
     if (this.smallBlind >= this.players[smallBlind].chips) {
         this.game.bets[smallBlind] = this.players[smallBlind].chips;
