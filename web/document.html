@@ -53,7 +53,7 @@
                     <a style="text-decoration: none;"><h4><strong>约定术语</strong></h4></a>
                     <p>约定游戏过程中会有如下概念:</p>
                     <ul>
-                        <p>1. 局: 一局游戏是指参赛的10名玩家进入一张游戏桌, 持有相等的初始筹码, 对战直到本游戏桌只剩下小于等于3名玩家胜出, 而其余玩家因筹码耗尽而出局为止, 一局由多圈构成</p>
+                        <p>1. 局: 一局游戏是指参赛的10名玩家进入一张游戏桌, 持有相等的初始筹码, 对战直到本游戏桌只剩下 <b><u>不多于半数</u></b> 玩家胜出, 而其余玩家因筹码耗尽而出局为止, 一局由多圈构成</p>
                         <p><span class="new_content">2. 圈 : 一圈是指 dealer(一轮中默认大小盲注位置) 围绕牌桌在每个未出局的玩家手上都出现一次为止为一圈,一圈由多轮构成,在一圈过程中大小盲住数额相等,但是下一圈开始时大小盲住翻倍</span></p>
                         <p>3. 轮: 一轮游戏是指每次荷官重新发公共牌和私有牌, 每个玩家按回合进行决策, 直到除了一名玩家之外全部弃牌, 或者5张公共牌完全翻开为止, 决出本轮胜负并清算筹码, 一轮由多个回合构成</p>
                         <p>4. 回合: 一回合是指所有玩家依次take action, 称为一回合, 一个回合中有多个(分别来自各个玩家的)action</p>
@@ -64,7 +64,7 @@
                     <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
                     <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017  Task Force确定</p>
                     <p>2. 比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
-                    <p><span class="new_content"> 3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>10</u></b> 圈为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>30</u></b> 人进入复赛 </span></p>
+                    <p><span class="new_content"> 3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>100轮</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>30</u></b> 人进入复赛 </span></p>
                     <p><span class="new_content"> 4. 复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛 </span></p>
                     <p>5. 决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
                     <p><span class="new_content"> 6. dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></span></p>
@@ -118,7 +118,7 @@
     "eventName" : "__join",
     "data" : {
         "playerName" : "0123456789ABCDEF" <span class="new_content">// 为了防止冒名作弊, 这个名字是比赛系统预先分配给每个参赛玩家的私有名字, 请玩家牢记并只在<b>自己的程序中</b>使用
-                                          // 这个名字目前在测试平台上并不启用，在比赛前夕会通过私密的方式通告给每个参赛玩家
+                                          // 这个名字目前在测试平台上并不启用, 在比赛前夕会通过私密的方式通告给每个参赛玩家
                                           // 每个玩家的私有名会对应一个展示名(由 Task Force事先录入), 比赛当日大屏幕上显示的为展示名以区分玩家
                                           // 以下文档中所有涉及到的 playerName 均为<b>私有名</b>, 为了阅读方便, 文档中暂时用类似 bobi, cicy, geoge 等拟名代替</span>
     }
@@ -146,7 +146,7 @@
     "data" : {
         "table" : {
             "tableNumber" : 1,
-            "roundName" : "deal", // 其它可选项为 : "flop", "turn", "river"
+            "roundName" : "Deal", // 其它可选项为 : "Flop", "Turn", "River"
             "board" : "[XX, XX, XX]"
         },
         "players" : [
@@ -178,7 +178,7 @@
                         <p>指令说明:</p>
                         <p>1. data.table 字段表示当前牌桌的状态, data.table.tableNumber 表示当前的桌号, 桌号是游戏 Task Force在比赛之前按照分组分桌分好的一个桌号, 在比赛开始之前由 Task Force人员将玩家录入系统, 理论上某个玩家 (playerName) 所属的桌号是固定且唯一的,
                             玩家客户端在发起 __join 指令表示加入时, 通过指定 playerName, 就能自动加入事先安排好的游戏桌</p>
-                        <p>2. data.table.roundName 表示当前牌局的状态, 有如下取值: deal(还未发公共牌), flop(第1次发3张公共牌), turn(发第4张公共牌), river(发第5张公共牌), 详情请参考文档末尾附表</p>
+                        <p>2. data.table.roundName 表示当前牌局的状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表</p>
                         <p>3. data.table.board 表示当前桌面上的公开牌的点数, 牌面取值请参考文档末尾附表</p>
                         <p>4. data.players 字段表示当前牌桌上所有玩家的状态, data.players[i].chips 代表当前这个玩家剩余的筹码</p>
                         <p>5. data.players[i].folded 表示玩家是否已经 fold, data.players[i].allin 表示玩家是否已经 all in, data.players[i].isSurvive 表示当前玩家是否仍在局 (false 表示输光出局) </p>
@@ -272,7 +272,7 @@
             "board" : [XX, XX, XX],
             "minBet" : 10,
             "raiseCount" : 0,
-            "roundName" : "deal", // 其它可选项为 : "flop", "turn", "river"
+            "roundName" : "Deal", // 其它可选项为 : "Flop", "Turn", "River"
             "otherPlayers" : [
                 {
                     "playerName" : "cicy",
@@ -309,7 +309,7 @@
                         <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
                         <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
                         <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
-                        <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: deal(还未发公共牌), flop(第1次发3张公共牌), turn(发第4张公共牌), river(发第5张公共牌), 详情请参考文档末尾附表 </p>
+                        <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
                         <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise" 中的一种, 决策的数据格式如下</p>
                         <pre>
 {
@@ -355,7 +355,7 @@
             "board" : [],
             "minBet" : 10,
             "raiseCount" : 0,
-            "roundName" : "deal",
+            "roundName" : "Deal",
             "otherPlayers" : [
                 {
                     "playerName" : "cicy",
@@ -417,7 +417,7 @@
         },
         "table" : {
             "tableNumber" : 1,
-            "roundName" : "turn",
+            "roundName" : "Turn",
             "board" : [XX, XX, XX, XX]
         },
         "players" : [
@@ -456,7 +456,7 @@
                     </ul>
                     <hr>
                     <span class="new_content">
-                    <a name="update_status" style="text-decoration: none;" class="new_content"><h4><strong>每一轮结束</strong></h4></a>
+                    <a name="round_end" style="text-decoration: none;" class="new_content"><h4><strong>每一轮结束</strong></h4></a>
                     <ul>
                         <p>在每一轮结束的时候, 服务器会向所有玩家广播这一轮所有玩家的状态, 包括玩家手牌</p>
                         <pre>
@@ -509,13 +509,132 @@
                     </ul>
                     </span>
                     <hr>
+                    <span class="new_content">
+                    <a name="game_over" style="text-decoration: none;" class="new_content"><h4><strong>游戏(一局)结束</strong></h4></a>
+                    <ul>
+                        <p>游戏结束的时候, 服务器会向所有玩家广播以下消息</p>
+<pre>
+{
+    "players":
+    [
+        {
+            "playerName": "bobi",
+            "chips": 0,
+            "folded": false,
+            "allIn": true,
+            "cards": [
+                "3S",
+                "3C"
+            ],
+            "isSurvive": true,
+            "reloadCount": 2
+        },
+        {
+            "playerName": "cicy",
+            "chips": 15900,
+            "folded": true,
+            "allIn": true,
+            "cards": [
+                "AD",
+                "QH"
+            ],
+            "isSurvive": true,
+            "reloadCount": 2
+        },
+        {
+            "playerName": "alex",
+            "chips": 0,
+            "folded": true,
+            "allIn": true,
+            "cards": [
+                "JH",
+                "8D"
+            ],
+            "isSurvive": true,
+            "reloadCount": 2
+        },
+        ...
+    ],
+    "table": {
+        "tableNumber": "1",
+        "board": [
+            "8S",
+            "QC",
+            "QS",
+            "QD",
+            "2S"
+        ],
+        "roundCount": 16
+    },
+    "winners": [
+        {
+            "playerName": "andy",
+            "hand": {
+                "cards": [
+                    "AD",
+                    "QH",
+                    "8S",
+                    "QC",
+                    "QS",
+                    "QD",
+                    "2S"
+                ],
+                "rank": 290.2048,
+                "message": "Four of a kind"
+            },
+            "chips": 15900
+        },
+        {
+            "playerName": "lance1",
+            "hand": {
+                "cards": [
+                    "8H",
+                    "KS",
+                    "8S",
+                    "QC",
+                    "QS",
+                    "QD",
+                    "2S"
+                ],
+                "rank": 250,
+                "message": "Full House"
+            },
+            "chips": 1360
+        },
+        {
+            "playerName": "tryest",
+            "hand": {
+                "cards": [
+                    "9D",
+                    "JD",
+                    "8S",
+                    "QC",
+                    "QS",
+                    "QD",
+                    "2S"
+                ],
+                "rank": 110.032,
+                "message": "Three of a Kind"
+            },
+            "chips": 740
+        }
+    ]
+}</pre>
+                        <p>指令说明</p>
+                        <p>1. __game_over 是一条服务器的广播消息, 这里表示比赛(预赛或者复赛或者决赛)结束, 玩家可以退出比赛</p>
+                        <p>2. winners中的信息表示每个玩家最后一轮的手牌以及最终赢得的筹码数</p>
+                        <p>3. 这一条信息不需要玩家回复</p>
+                    </ul>
+                    </span>
+
+                    <hr>
                     <a name="other_affairs" style="text-decoration: none;"><h4><strong>其它注意事项</strong></h4></a>
                     <ul>
                         <p>1. 服务器在向本次action需要行动的玩家发送 __action 请求决策之后, 会等待 <b><u>5秒</u></b>, 决策超时时间为 <b><u>5秒</u></b>, 如果客户端出现异常, 掉线或者在超时时间之内无法做出决策, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b></p>
                         <p>2. 如果玩家在决策时发送了错误或者规定以外的指令, <b><span style="color: #FF0000">服务器会对该玩家采取弃牌操作</span></b>, 请谨慎编写决策程序</p>
                         <p>3. 没有轮到某玩家的action, 此玩家却采取了行动, 此行动将自动被忽略</p>
                         <p>4. 建议玩家客户端监听掉线事件,以便在掉线之后可以随时通过 Websocket 重新加入并继续游戏, 建议在掉线重连之后立即发送 __action, call</p>
-                        <p>5. 每开始新的一轮时, 大小盲注会较之上一轮翻倍</p>
+                        <p>5. 每开始新的一圈时, 大小盲注会较之上一圈翻倍</p>
                         <p>6. 如果玩家在服务端发轮询动作之前离线, 系统会等待 <b><u>10秒</u></b>, <b><span style="color: #FF0000"> <b><u>10秒</u></b> 后仍然没有等到再次接入, 将视为自动弃牌</span></b></p>
                     </ul>
                     <hr>
@@ -553,7 +672,7 @@
                                     加注, 提高现有筹码为前一位玩家的2倍<br>
                                     1. 如果超过加注次数(每回合上限为4次), 系统将自动执行 call<br>
                                     2. 如果剩余筹码不够, 系统自动执行 allin<br>
-                                    3. 如果应该决策出 bet, 而发现玩家决策出 raise, 那么系统自动 bet 小盲注
+                                    3. 如果应该决策出 bet, 而发现玩家决策出 raise, 那么系统自动 bet 大盲注
                                 </td>
                             </tr>
                             <tr>
@@ -561,13 +680,13 @@
                                     bet
                                 </td>
                                 <td style="width: 80%; height: 25px;">
-                                    自由下注, 以amount参数作为下注筹码金额<br>
-                                    1. 如果amount小于当前游戏规定的最小押注额, 系统将自动转换为最小押注额<br>
-                                    2. 如果玩家剩余筹码不够, 自动allin<br>
-                                    3. 如果该action中不能bet (即玩家收到服务器的决策请求为 __action), 而采取bet决策, 那么将实施call<br>
-                                    4. amount字段如果不是数字, 那么系统自动进行弃牌操作<br>
-                                    5. 金额必须是整数,如果不是整数,自动押注小盲注金额<br>
-                                    6. 轮到bet的时候也可以决策为check/raise/allin
+                                    自由下注, 以 amount 参数作为下注筹码金额<br>
+                                    1. 如果 amount 小于当前游戏规定的最小押注额, 系统将自动转换为最小押注额<br>
+                                    2. 如果玩家剩余筹码不够, 自动 allin<br>
+                                    3. 如果该 action 中不能 bet (即玩家收到服务器的决策请求为 __action), 而采取bet决策, 那么将实施 call<br>
+                                    4. amount 字段如果不是数字, 那么系统自动进行弃牌操作<br>
+                                    5. 金额必须是整数,如果不是整数,自动押注大盲注金额<br>
+                                    6. 轮到bet的时候也可以决策为 check/raise/allin
                                 </td>
                             </tr>
                             <tr>

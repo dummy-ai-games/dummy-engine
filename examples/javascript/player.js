@@ -99,6 +99,10 @@ function initRTC() {
     rtc.on('__round_end', function(data) {
         console.log('received round end:' + JSON.stringify(data));
     });
+
+    rtc.on('__game_over', function(data) {
+        console.log('received game over:' + JSON.stringify(data));
+    });
 }
 
 function takeAction(selfCard, cards, players) {
