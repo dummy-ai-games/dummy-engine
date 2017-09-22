@@ -38,7 +38,7 @@ function SkyRTC() {
         var that = this;
         var playerName = data.playerName;
         var table = data.table;
-        logger.info('on __join, playerName = ' + playerName+" table="+table);
+        logger.info('on __join, playerName = ' + playerName + " table=" + table);
         if (that.playerAndTable[playerName]) {
             socket.id = playerName;
         } else if (table) {
@@ -100,6 +100,8 @@ function SkyRTC() {
     });
 
     this.on('__action', function (data, socket) {
+        var timestamp = new Date().getTime();
+        logger.info("receive action,time is " + timestamp);
         try {
             var that = this;
             var action = data.action;
@@ -391,6 +393,8 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         logger.info('server request: ' + JSON.stringify(message));
         if (that.players[player]) {
             that.players[player].send(JSON.stringify(message), errorCb);
+            var timestamp = new Date().getTime();
+            logger.info("get player action,time is " + timestamp);
             currentTable.timeout = setTimeout(function () {
                 logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName + ', response timeout, auto FOLD');
                 currentTable.players[currentTable.currentPlayer].Fold();
