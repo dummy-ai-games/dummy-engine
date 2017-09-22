@@ -394,7 +394,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         if (that.players[player]) {
             that.players[player].send(JSON.stringify(message), errorCb);
             var timestamp = new Date().getTime();
-            logger.info("get player action,time is " + timestamp);
+            logger.info("send player action,time is " + timestamp);
             currentTable.timeout = setTimeout(function () {
                 logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName + ', response timeout, auto FOLD');
                 currentTable.players[currentTable.currentPlayer].Fold();
