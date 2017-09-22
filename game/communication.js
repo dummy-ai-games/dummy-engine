@@ -392,13 +392,18 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         var currentTable = that.table[tableNumber];
         logger.info('server request: ' + JSON.stringify(message));
         if (that.players[player]) {
-            that.players[player].send(JSON.stringify(message), errorCb);
-            var timestamp = new Date().getTime();
-            logger.info("send player action,time is " + timestamp);
-            currentTable.timeout = setTimeout(function () {
-                logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName + ', response timeout, auto FOLD');
-                currentTable.players[currentTable.currentPlayer].Fold();
-            }, 5000);
+            that.players[player].send(JSON.stringify(message), function (error) {
+                if (error) {
+                    that.getPlayerAction(message);
+                } else {
+                    var timestamp = new Date().getTime();
+                    logger.info("send player action,time is " + timestamp);
+                    currentTable.timeout = setTimeout(function () {
+                        logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName + ', response timeout, auto FOLD');
+                        currentTable.players[currentTable.currentPlayer].Fold();
+                    }, 5000);
+                }
+            });
         }
     } else if (!isSecond) {
         setTimeout(function () {
