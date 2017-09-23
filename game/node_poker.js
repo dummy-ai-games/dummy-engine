@@ -2100,7 +2100,7 @@ Player.prototype.Call = function () {
 };
 
 Player.prototype.AllIn = function () {
-    var i, allInValue = 0, mybet;
+    var i, allInValue = 0, mybet = 0;
 
     logGame(this.table.tableNumber, 'player: ' + this.playerName + ' ALLIN');
 

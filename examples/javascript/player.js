@@ -18,6 +18,8 @@ var danger = 2;
 var rtc = SkyRTC();
 var playerName = '';
 
+
+
 $(document).ready(function () {
     playerName = getParameter('name');
     console.log('player : ' + playerName);
@@ -26,7 +28,7 @@ $(document).ready(function () {
 });
 
 function initRTC() {
-    rtc.connect('ws://thegame.trendmicro.com.cn', playerName);
+    rtc.connect('ws://localhost:3000', playerName);
     rtc.on('__action', function (data) {
         console.log(data);
 
