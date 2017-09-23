@@ -36,6 +36,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.surviveCount = 0;
     this.isReloadTime = false;
     this.maxRoundCount = maxRoundCount;
+    this.firstDealer = 0;
 
     // Validate acceptable value ranges.
     var err;
@@ -115,17 +116,13 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 var isSurvive = true;
                 if (that.players[j].chips === 0)
                     isSurvive = false;
-                that.players[j] =
-                    new Player(that.players[j].playerName, that.players[j].chips,
-                        that, isSurvive, that.players[j].reloadCount);
+                that.players[j] = new Player(that.players[j].playerName, that.players[j].chips,
+                    that, isSurvive, that.players[j].reloadCount);
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
+            var nextDealer = getNextDealer(that);
+            console.log("current dealer is:"+that.dealer+" next is:"+nextDealer);
 
-            var nextDealer = getNextDealer(that.players, that.dealer);
-            if (nextDealer <= that.dealer) {
-                that.smallBlind = that.smallBlind * 2;
-                that.bigBlind = that.bigBlind * 2;
-            }
             that.dealer = nextDealer;
             that.roundCount++;
             that.isReloadTime = true;
@@ -212,11 +209,20 @@ function getNextPlayer(table) {
     (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] === maxBet));
 }
 
-function getNextDealer(players, startIndex) {
-    var index = startIndex;
+function getNextDealer(table) {
+    var index = table.dealer;
+    var players = table.players;
+    var isNeedModifyFirstDealer = false;
     do {
         index = (index >= players.length - 1) ? (index - players.length + 1) : index + 1;
+        if (index == table.firstDealer) {
+            table.smallBlind = table.smallBlind * 2;
+            table.bigBlind = table.bigBlind * 2;
+            isNeedModifyFirstDealer = true;
+        }
     } while (!players[index].isSurvive);
+    if (isNeedModifyFirstDealer)
+        table.firstDealer = index;
     return index;
 }
 
@@ -1839,6 +1845,7 @@ Table.prototype.StartGame = function () {
     if (!this.game) {
         this.playersToRemove = [];
         this.dealer = Math.round(Math.random() * (this.surviveCount));
+        this.firstDealer = this.dealer;
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
     }

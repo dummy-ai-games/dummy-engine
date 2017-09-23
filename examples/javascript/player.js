@@ -111,7 +111,7 @@ function takeAction(selfCard, cards, players) {
     if (cards.length === 2) {
         setTimeout(function () {
             $('#call').click();
-        }, 2000);
+        }, 100);
         return;
     }
     var handRanks = [];
@@ -185,19 +185,19 @@ function takeAction(selfCard, cards, players) {
         if (handRanks.indexOf('T') > -1 && handRanks.indexOf('J') > -1 && handRanks.indexOf('Q') > -1 && handRanks.indexOf('K') > -1 && handRanks.indexOf('A') > -1)
             setTimeout(function () {
                 $('#allin').click();
-            }, 2000);
+            }, 100);
         else if (isTonghua && isShunzi)
             setTimeout(function () {
                 $('#raise').click();
-            }, 2000);
+            }, 100);
         else if (gameStatus !== danger)
             setTimeout(function () {
                 $('#raise').click();
-            }, 2000);
+            }, 100);
         else
             setTimeout(function () {
                 $('#call').click();
-            }, 2000);
+            }, 100);
         return;
     }
 
@@ -205,11 +205,11 @@ function takeAction(selfCard, cards, players) {
         if (gameStatus !== danger)
             setTimeout(function () {
                 $('#raise').click();
-            }, 2000);
+            }, 100);
         else
             setTimeout(function () {
                 $('#call').click();
-            }, 2000);
+            }, 100);
         return;
     }
 
@@ -217,15 +217,15 @@ function takeAction(selfCard, cards, players) {
         if (isSantiao && (pairNumber > 1 || maxPairValue > '9') && gameStatus !== danger)
             setTimeout(function () {
                 $('#raise').click();
-            }, 2000);
+            }, 100);
         else if (gameStatus === danger && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] !== selfCard[1]) && maxPairValue < 'I')
             setTimeout(function () {
                 $('#fold').click();
-            }, 2000);
+            }, 100);
         else
             setTimeout(function () {
                 $('#call').click();
-            }, 2000);
+            }, 100);
         return;
     }
 
@@ -233,22 +233,22 @@ function takeAction(selfCard, cards, players) {
         if ((gameStatus === risk && maxPairValue < '6') || (gameStatus === danger && maxPairValue < 'I'))
             setTimeout(function () {
                 $('#fold').click();
-            }, 2000);
+            }, 100);
         else
             setTimeout(function () {
                 $('#call').click();
-            }, 2000);
+            }, 100);
         return;
     }
 
     if (cards.length > 5)
         setTimeout(function () {
             $('#fold').click();
-        }, 2000);
+        }, 100);
     else
         setTimeout(function () {
             $('#call').click();
-        }, 2000);
+        }, 100);
 }
 
 function reload() {
