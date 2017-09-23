@@ -165,6 +165,16 @@ var SkyRTC = function () {
         }));
     };
 
+    skyrtc.prototype.Reload = function () {
+        var that = this;
+        that.socket.send(JSON.stringify({
+            "eventName": "__reload",
+            "data": {
+
+            }
+        }));
+    };
+
 
     return new skyrtc();
 };
