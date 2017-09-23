@@ -294,7 +294,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
         logger.info(that.table);
         message = {
-            'eventName': 'startGame',
+            'eventName': '__game_start',
             'data': {
                 'msg': 'table ' + tableNumber + ' need at least ' + that.table[tableNumber].minPlayers + ' users to attend',
                 'tableNumber': tableNumber
@@ -303,7 +303,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     } else {
         that.table[tableNumber].StartGame();
         message = {
-            'eventName': 'startGame',
+            'eventName': '__game_start',
             'data': {'msg': 'table ' + tableNumber + ' start successfully', 'tableNumber': tableNumber}
         }
     }

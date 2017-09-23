@@ -13,8 +13,6 @@ var gameStatus = STATUS_WAITING_FOR_PLAYERS;
 var currentRound = 1;
 var players = [];
 var currentPlayers = 0;
-var playerNames = ["AlphaGo", "BetaCat", "Cinderella", "DonaldDuck", "Eva",
-     "Floyd", "Gadget", "HelloWorld", "II", "JonSnow"];
 
 var publicCards = [];
 
@@ -28,7 +26,7 @@ var GameLayer = cc.Layer.extend({
     validWidth: 0,
     validHeight: 0,
 
-    defaultMoneyInit: 900,
+    defaultMoneyInit: 1000,
     defaultBetInit: 0,
     playerMax: 10,
     publicCardMax: 5,
@@ -205,7 +203,7 @@ var GameLayer = cc.Layer.extend({
             this.addChild(this.betTexts[i], 6);
 
             // create private card sprite
-            this.privateCardSprites[i] = new Array();
+            this.privateCardSprites[i] = [];
             this.privateCardSprites[i][0] = cc.Sprite.create(s_p_back);
             this.privateCardSprites[i][1] = cc.Sprite.create(s_p_back);
 
@@ -236,7 +234,7 @@ var GameLayer = cc.Layer.extend({
             this.addChild(this.privateCardSprites[i][1], 6);
         }
 
-        this.publicCardSprites = new Array();
+        this.publicCardSprites = [];
         this.publicCardSprites[0] = cc.Sprite.create(s_p_empty);
         this.publicCardSprites[1] = cc.Sprite.create(s_p_empty);
         this.publicCardSprites[2] = cc.Sprite.create(s_p_empty);
@@ -292,7 +290,7 @@ var GameLayer = cc.Layer.extend({
 
         // kick start the game
         // test public card change display frame
-        publicCards = new Array();
+        publicCards = [];
         this.reset();
         this.scheduleUpdate();
     },
@@ -305,7 +303,7 @@ var GameLayer = cc.Layer.extend({
     /****** game model ******/
     reset: function() {
         // initiate players
-        players = new Array();
+        players = [];
         currentPlayers = 0;
         gameStatus = STATUS_WAITING_FOR_PLAYERS;
     },
@@ -331,28 +329,20 @@ var GameLayer = cc.Layer.extend({
     doUpdate: function() {
         switch(gameStatus) {
             case STATUS_WAITING_FOR_PLAYERS:
-            {
                 this.updateRound();
                 this.updatePlayers();
                 this.updatePublicCards(false);
                 break;
-            }
-
             case STATUS_GAME_RUNNING:
-            {
                 this.updateRound();
                 this.updatePlayers();
                 this.updatePublicCards(true);
                 break;
-            }
-
             case STATUS_GAME_FINISHED:
-            {
                 this.updateRound();
                 this.updatePlayers();
                 this.updatePublicCards(true);
                 break;
-            }
 
             default:
             {
@@ -433,19 +423,19 @@ var GameLayer = cc.Layer.extend({
     },
 
     updatePublicCards: function(visible) {
-        var i = 0;
-
+        var i;
         // clear public cards
+        var frame;
         for (i = 0; i < this.publicCardMax; i++) {
-            var frame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
+            frame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
                 this.publicCardSprites[i].width, this.publicCardSprites[i].height));
             this.publicCardSprites[i].setSpriteFrame(frame);
         }
 
         for (i = 0; i < this.publicCardMax; i++) {
-            if (publicCards[i] != null) {
+            if (publicCards[i]) {
                 var cardName = pokerMap.get(publicCards[i]);
-                var frame = cc.SpriteFrame.create(cardName, cc.rect(0, 0,
+                frame = cc.SpriteFrame.create(cardName, cc.rect(0, 0,
                         this.publicCardSprites[i].width, this.publicCardSprites[i].height));
                 this.publicCardSprites[i].setSpriteFrame(frame);
             }

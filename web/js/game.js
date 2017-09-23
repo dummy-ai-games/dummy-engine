@@ -20,27 +20,23 @@ function initWebsock() {
     // initialize web communication
     rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName,tableNumber);
 
-    rtc.on("_join", function (data) {
-        console.log("init data : " + JSON.stringify(data));
-    });
-
     rtc.on("__new_peer", function (data) {
         console.log("player_join : " + JSON.stringify(data));
 
         if (undefined !== data && null !== data) {
             for (var i = 0; i < data.length; i++) {
                 var playerName = data[i];
-                console.log("用户:" + playerName + "加入");
+                console.log("player: " + playerName + ", joined");
             }
 
             currentPlayers = data.length;
             for (i = 0; i < data.length; i++) {
-                if (null == players[i]) {
+                if (!players[i]) {
                     players[i] =
-                        new Player(data[i], playerNames[i], 900);
+                        new Player(data[i], data[i], 1000);
                 } else {
-                    players.id = data[i];
-                    players[i].name = playerNames[i];
+                    players[i].id = data[i];
+                    players[i].name = data[i];
                 }
             }
         }
@@ -48,11 +44,11 @@ function initWebsock() {
 
     rtc.on("__game_over", function (data) {
         var tableNumber = data.table.tableNumber;
-        var result = "table " + tableNumber + " 游戏结束，胜者如下：";
+        var result = "table " + tableNumber + " game over, winners: ";
         var winners = data.winners;
         for (var i in winners) {
             var player = winners[i];
-            result += "用户:" + player.playerName + ",最终金额:" + player.chips + "\n";
+            result += "player:" + player.playerName + ", chips: " + player.chips + "\n";
         }
         console.log(result);
 
@@ -60,9 +56,14 @@ function initWebsock() {
         console.log("finish_game : " + JSON.stringify(data));
         updateTable(data);
         gameStatus = STATUS_GAME_FINISHED;
+
+        // auto start another game in 3s
+        setTimeout(function () {
+            startGame();
+        }, 3000);
     });
 
-    rtc.on('startGame', function (data) {
+    rtc.on('__game_start', function (data) {
         // update in game engine
         console.log("start_game : " + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
@@ -75,9 +76,10 @@ function initWebsock() {
         for (var index in board_card) {
             board += board_card[index] + ",";
         }
-        console.log("table " + tableNumber + " 当前公共牌：" + board);
+        console.log("table " + tableNumber + ", public cards:" + board);
 
         // update in game engine
+        gameStatus = STATUS_GAME_RUNNING;
         console.log("deal : " + JSON.stringify(data));
         updateTable(data);
     });
@@ -85,7 +87,8 @@ function initWebsock() {
     rtc.on('__new_round', function (data) {
         var roundCount = data.table.roundCount;
         var tableNumber = data.table.tableNumber;
-        console.log("table " + tableNumber + " 第" + roundCount + "轮开始");
+        gameStatus = STATUS_GAME_RUNNING;
+        console.log("table " + tableNumber + ", new round: " + roundCount);
 
         // update in game engine
         console.log("new_round : " + JSON.stringify(data));
@@ -95,34 +98,37 @@ function initWebsock() {
     rtc.on('__round_end', function (data) {
         var roundCount = data.table.roundCount;
         var tableNumber = data.table.tableNumber;
-        console.log("table " + tableNumber + " 第" + roundCount + "轮结束");
+        gameStatus = STATUS_GAME_RUNNING;
+        console.log("table " + tableNumber + ", round finished: " + roundCount);
         updateTable(data);
     });
 
     rtc.on('__show_action', function (data) {
         console.log("action : " + JSON.stringify(data));
 
+        gameStatus = STATUS_GAME_RUNNING;
+
         var tableNumber = data.table.tableNumber;
         var roundAction = data.action;
 
         var playerIndex = findPlayerIndexById(data.action.playerName);
 
-        if (roundAction.action == "check" ||
-            roundAction.action == "fold" ||
-            roundAction.action == "raise" ||
-            roundAction.action == "call") {
-            console.log("table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action);
+        if (roundAction.action === "check" ||
+            roundAction.action === "fold" ||
+            roundAction.action === "raise" ||
+            roundAction.action === "call") {
+            console.log("table " + tableNumber + ", player: " + roundAction.playerName + " take action: " + roundAction.action);
             // update in game engine
-            if (playerIndex != -1) {
+            if (playerIndex !== -1) {
                 players[playerIndex].setAction(roundAction.action);
                 if (data.action.amount) {
                     players[playerIndex].setBet(data.action.amount);
                 }
             }
         } else {
-            console.log("table " + tableNumber + " 玩家：" + roundAction.playerName + " 采取动作：" + roundAction.action + ", 押注金额：" + roundAction.amount);
+            console.log("table " + tableNumber + ", player:" + roundAction.playerName + " take action:" + roundAction.action + ", bet amount: " + roundAction.amount);
             // update in game engine
-            if (playerIndex != -1) {
+            if (playerIndex !== -1) {
                 players[playerIndex].setAction(roundAction.action);
                 if (data.action.amount) {
                     players[playerIndex].setBet(data.action.amount);
@@ -131,58 +137,13 @@ function initWebsock() {
         }
         // set in turn
         for (var i = 0; i < currentPlayers; i++) {
-            if (playerIndex == i) {
+            if (playerIndex === i) {
                 players[i].setInTurn();
             } else {
                 players[i].clearInTurn();
             }
         }
-
         updateTable(data);
-
-        $("#msg").show();
-    });
-
-    rtc.on("__action", function (data) {
-        console.log(data);
-
-        $("#userName").text("用户名:" + data.self.playerName);
-        $("#bet").prop("disabled", true);
-        $("#msg").text("该回合轮到你了");
-        $("#msg").show();
-        $("#amount").val("");
-        $("#action").show();
-        self = data.self;
-        roundBets = data.game.roundBets;
-        bets = data.game.bets;
-        board = data.game.board;
-        minBet = data.game.minBet;
-        raiseCount = data.game.raiseCount;
-        otherPlayers = data.game.otherPlayers;
-        setTimeout(function () {
-            rtc.Call(self.playerName);
-        }, 2000);
-
-    });
-
-    rtc.on("__bet", function (data) {
-        console.log(data);
-
-        $("#msg").text("该回合轮到你首先押注,注意最小押注额");
-        $("#bet").prop("disabled", false);
-        $("#msg").show();
-        $("#amount").val("");
-        $("#action").show();
-        self = data.self;
-        roundBets = data.game.roundBets;
-        bets = data.game.bets;
-        board = data.game.board;
-        minBet = data.game.minBet;
-        raiseCount = data.game.raiseCount;
-        otherPlayers = data.game.otherPlayers;
-        setTimeout(function () {
-            rtc.Call(self.playerName);
-        }, 2000);
     });
 }
 
@@ -200,7 +161,7 @@ function initGame() {
         s.innerHTML = '<h2>Your browser does not support HTML5 !</h2>' +
             '<p>Google Chrome is a browser that combines a minimal design with sophisticated technology to make the web faster, safer, and easier.Click the logo to download.</p>' +
             '<a href="http://www.google.com/chrome" target="_blank">' +
-            '<img game-src="http://www.google.com/intl/zh-CN/chrome/assets/common/images/chrome_logo_2x.png" border="0"/></a>';
+            '<img src="http://www.google.com/intl/zh-CN/chrome/assets/common/images/chrome_logo_2x.png" border="0"/></a>';
         var p = d.getElementById(c.tag).parentNode;
         p.style.background = 'none';
         p.style.border = 'none';
@@ -246,7 +207,7 @@ function updateTable(data) {
     if (data.players) {
         for (i = 0; i < data.players.length; i++) {
             players[i].id = data.players[i].playerName;
-            if (data.players[i].cards && data.players[i].cards.length == 2) {
+            if (data.players[i].cards && data.players[i].cards.length === 2) {
                 players[i].privateCards[0] = data.players[i].cards[0];
                 players[i].privateCards[1] = data.players[i].cards[1];
             }
@@ -254,16 +215,18 @@ function updateTable(data) {
         }
     }
     if (data.table) {
-        publicCards = new Array();
+        publicCards = [];
         for (i = 0; i < data.table.board.length; i++) {
             publicCards[i] = data.table.board[i];
         }
+    } else {
+        console.log("data.table is null");
     }
 }
 
 function findPlayerIndexById(id) {
     for (var i = 0; i < players.length; i++) {
-        if (players[i].id == id) {
+        if (players[i].id === id) {
             return i;
         }
     }
