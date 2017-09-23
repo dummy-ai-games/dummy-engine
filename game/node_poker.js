@@ -368,10 +368,9 @@ function getMaxBet(bets) {
     return maxBet;
 }
 
-function checkForEndOfRound(table) {
-    var maxBet, i, endOfRound;
+function checkForEndOfRound(table, maxBet) {
+    var i, endOfRound;
     endOfRound = true;
-    maxBet = getMaxBet(table.game.bets);
     // For each player, check
     for (i = 0; i < table.players.length; i += 1) {
         if (table.players[i].isSurvive && table.players[i].folded === false) {
@@ -396,16 +395,6 @@ function checkForAllInPlayer(table, winners) {
     return allInPlayer;
 }
 
-function getAllInPlayer(table) {
-    var i, allInPlayer;
-    allInPlayer = [];
-    for (i = 0; i < table.players.length; i += 1) {
-        if (table.players[i].allIn === true) {
-            allInPlayer.push(i);
-        }
-    }
-    return allInPlayer;
-}
 
 function checkForWinner(table) {
     var i, j, k, l, maxRank, winners, part, prize, allInPlayer, minBets, roundEnd;
@@ -426,21 +415,6 @@ function checkForWinner(table) {
 
     part = 0;
     prize = 0;
-    if (winners.length == 0) {
-        //when allin player allinValue < other player roundBets and other player fold
-        allInPlayer = getAllInPlayer(table);
-        for (l = 0; l < table.game.roundBets.length; l += 1) {
-            prize += table.game.roundBets[l];
-            table.game.roundBets[l] = 0;
-        }
-        if (allInPlayer.length > 0) {
-            var winnerPrize = Math.round(prize * 100 / allInPlayer.length) / 100;
-            for (var j = 0; j < allInPlayer.length; j++) {
-                table.players[allInPlayer[j]].chips += winnerPrize;
-            }
-        }
-        return;
-    }
     allInPlayer = checkForAllInPlayer(table, winners);
 
     if (allInPlayer.length > 0) {
@@ -1697,8 +1671,10 @@ function rankHand(hand) {
 
 function progress(table) {
     var i, j, cards, hand;
+    var maxBet;
+    maxBet = getMaxBet(table.game.bets);
     if (table.game) {
-        if (checkForEndOfRound(table) === true) {
+        if (checkForEndOfRound(table, maxBet) === true) {
             // Move all bets to the pot
             for (i = 0; i < table.game.bets.length; i += 1) {
                 table.game.pot += parseInt(table.game.bets[i], 10);
@@ -1765,9 +1741,11 @@ function progress(table) {
             }
         } else {
             getNextPlayer(table);
-            if (table.surviveCount == 1)
+            if (table.surviveCount == 1 && table.game.bets[table.currentPlayer] >= maxBet) {
+                //fix bug: when allinValue < maxBet and other player all fold will cause money divide problem, at this
+                //situation the last player should not fold, so we have player default action call
                 table.players[table.currentPlayer].Call();
-            else if (table.isBet)
+            } else if (table.isBet)
                 takeAction(table, '__bet');
             else
                 takeAction(table, '__turn');
@@ -2125,6 +2103,7 @@ Player.prototype.AllIn = function () {
     var i, allInValue = 0;
 
     logGame(this.table.tableNumber, 'player: ' + this.playerName + ' ALLIN');
+    allInValue = this.chips;
 
     for (i = 0; i < this.table.players.length; i += 1) {
         if (this === this.table.players[i]) {
@@ -2134,6 +2113,13 @@ Player.prototype.AllIn = function () {
                 this.table.players[i].chips = 0;
                 this.allIn = true;
                 this.talked = true;
+                this.table.surviveCount--;
+            }
+        }else {
+            var bet = this.table.game.bets[i];
+            var player = this.table.players[i];
+            if (player.isSurvive && !player.folded && !player.allIn && bet < allInValue) {
+                player.talked = false;
             }
         }
     }
