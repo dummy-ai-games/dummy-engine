@@ -72,13 +72,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     });
 
     this.eventEmitter.on('deal', function () {
-        var playerCount = 0;
-        for (var i in that.players) {
-            if (!that.players[i].folded && !that.players[i].allIn && that.players[i].isSurvive) {
-                playerCount++;
-            }
-        }
-        if (playerCount <= 1 || that.surviveCount === 1) {
+        if (that.surviveCount <= 1) {
             for (var j = 0; j < that.players.length; j++)
                 that.players[j].talked = true;
             progress(that);
