@@ -2100,10 +2100,10 @@ Player.prototype.Call = function () {
 };
 
 Player.prototype.AllIn = function () {
-    var i, allInValue = 0;
+    var i, allInValue = 0, mybet;
 
     logGame(this.table.tableNumber, 'player: ' + this.playerName + ' ALLIN');
-    allInValue = this.chips;
+
 
     for (i = 0; i < this.table.players.length; i += 1) {
         if (this === this.table.players[i]) {
@@ -2114,13 +2114,18 @@ Player.prototype.AllIn = function () {
                 this.allIn = true;
                 this.talked = true;
                 this.table.surviveCount--;
+                mybet = this.table.game.bets[i];
             }
-        }else {
-            var bet = this.table.game.bets[i];
-            var player = this.table.players[i];
-            if (player.isSurvive && !player.folded && !player.allIn && bet < allInValue) {
-                player.talked = false;
-            }
+            break;
+        }
+    }
+
+    //if player bet < mybet, the player need to call
+    for (i = 0; i < this.table.players.length; i++) {
+        var bet = this.table.game.bets[i];
+        var player = this.table.players[i];
+        if (player.isSurvive && !player.folded && !player.allIn && bet < mybet) {
+            player.talked = false;
         }
     }
 
