@@ -396,6 +396,17 @@ function checkForAllInPlayer(table, winners) {
     return allInPlayer;
 }
 
+function getAllInPlayer(table) {
+    var i, allInPlayer;
+    allInPlayer = [];
+    for (i = 0; i < table.players.length; i += 1) {
+        if (table.players[i].allIn === true) {
+            allInPlayer.push(i);
+        }
+    }
+    return allInPlayer;
+}
+
 function checkForWinner(table) {
     var i, j, k, l, maxRank, winners, part, prize, allInPlayer, minBets, roundEnd;
     // Identify winner(s)
@@ -412,9 +423,26 @@ function checkForWinner(table) {
         }
     }
 
+
     part = 0;
     prize = 0;
+    if (winners.length == 0) {
+        //when allin player allinValue < other player roundBets and other player fold
+        allInPlayer = getAllInPlayer(table);
+        for (l = 0; l < table.game.roundBets.length; l += 1) {
+            prize += table.game.roundBets[l];
+            table.game.roundBets[l] = 0;
+        }
+        if (allInPlayer.length > 0) {
+            var winnerPrize = Math.round(prize * 100 / allInPlayer.length) / 100;
+            for (var j = 0; j < allInPlayer.length; j++) {
+                table.players[allInPlayer[j]].chips += winnerPrize;
+            }
+        }
+        return;
+    }
     allInPlayer = checkForAllInPlayer(table, winners);
+
     if (allInPlayer.length > 0) {
         minBets = table.game.roundBets[winners[0]];
         for (j = 1; j < allInPlayer.length; j += 1) {
@@ -2135,7 +2163,7 @@ function logGame(tableNumber, msg) {
     var logger = new (winston.Logger)({
         transports: [
             new (winston.transports.Console)(),
-            new (winston.transports.File)({ filename: logFileName })
+            new (winston.transports.File)({filename: logFileName})
         ]
     });
     logger.info(msg);
