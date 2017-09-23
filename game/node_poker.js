@@ -1923,6 +1923,7 @@ Table.prototype.NewRound = function () {
         this.players[smallBlind].chips = 0;
         this.players[smallBlind].allIn = true;
         this.players[smallBlind].talked = true;
+        this.surviveCount--;
     } else {
         this.players[smallBlind].chips -= this.smallBlind;
         this.game.bets[smallBlind] = this.smallBlind;
@@ -1933,6 +1934,7 @@ Table.prototype.NewRound = function () {
         this.players[bigBlind].chips = 0;
         this.players[bigBlind].allIn = true;
         this.players[bigBlind].talked = true;
+        this.surviveCount--;
     } else {
         this.players[bigBlind].chips -= this.bigBlind;
         this.game.bets[bigBlind] = this.bigBlind;
