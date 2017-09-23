@@ -1,6 +1,6 @@
 /**
  * Created by the-engine-team
- * 2017-08-29
+ * 2017-09-23
  */
 
 var self;
@@ -18,6 +18,8 @@ var danger = 2;
 var rtc = SkyRTC();
 var playerName = '';
 
+var CALL_IN_TIME = 500;
+
 $(document).ready(function () {
     playerName = getParameter('name');
     console.log('player : ' + playerName);
@@ -26,16 +28,9 @@ $(document).ready(function () {
 });
 
 function initRTC() {
-    rtc.connect('ws://thegame.trendmicro.com.cn', playerName);
+    rtc.connect('ws://localhost:3000', playerName);
     rtc.on('__action', function (data) {
         console.log(data);
-
-        $('#userName').text('用户名:' + data.self.playerName);
-        $('#bet').prop('disabled', true);
-        $('#msg').text('该回合轮到你了');
-        $('#msg').show();
-        $('#amount').val('');
-        $('#action').show();
         self = data.self;
         roundBets = data.game.roundBets;
         bets = data.game.bets;
@@ -48,12 +43,6 @@ function initRTC() {
 
     rtc.on('__bet', function (data) {
         console.log(data);
-
-        $('#msg').text('该回合轮到你首先押注,注意最小押注额');
-        $('#bet').prop('disabled', false);
-        $('#msg').show();
-        $('#amount').val('');
-        $('#action').show();
         self = data.self;
         roundBets = data.game.roundBets;
         bets = data.game.bets;
@@ -108,8 +97,8 @@ function initRTC() {
 function takeAction(selfCard, cards, players) {
     if (cards.length === 2) {
         setTimeout(function () {
-            $('#call').click();
-        }, 2000);
+            call();
+        }, CALL_IN_TIME);
         return;
     }
     var handRanks = [];
@@ -182,119 +171,100 @@ function takeAction(selfCard, cards, players) {
     if (isTonghua || isShunzi) {
         if (handRanks.indexOf('T') > -1 && handRanks.indexOf('J') > -1 && handRanks.indexOf('Q') > -1 && handRanks.indexOf('K') > -1 && handRanks.indexOf('A') > -1)
             setTimeout(function () {
-                $('#allin').click();
-            }, 2000);
+                allin();
+            }, CALL_IN_TIME);
         else if (isTonghua && isShunzi)
             setTimeout(function () {
-                $('#raise').click();
-            }, 2000);
+                raise();
+            }, CALL_IN_TIME);
         else if (gameStatus !== danger)
             setTimeout(function () {
-                $('#raise').click();
-            }, 2000);
+                raise();
+            }, CALL_IN_TIME);
         else
             setTimeout(function () {
-                $('#call').click();
-            }, 2000);
+                call();
+            }, CALL_IN_TIME);
         return;
     }
 
     if (isSitiao) {
         if (gameStatus !== danger)
             setTimeout(function () {
-                $('#raise').click();
-            }, 2000);
+                raise();
+            }, CALL_IN_TIME);
         else
             setTimeout(function () {
-                $('#call').click();
-            }, 2000);
+                call();
+            }, CALL_IN_TIME);
         return;
     }
 
     if (isSantiao || pairNumber > 1) {
         if (isSantiao && (pairNumber > 1 || maxPairValue > '9') && gameStatus !== danger)
             setTimeout(function () {
-                $('#raise').click();
-            }, 2000);
+                raise();
+            }, CALL_IN_TIME);
         else if (gameStatus === danger && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] !== selfCard[1]) && maxPairValue < 'I')
             setTimeout(function () {
-                $('#fold').click();
-            }, 2000);
+                fold();
+            }, CALL_IN_TIME);
         else
             setTimeout(function () {
-                $('#call').click();
-            }, 2000);
+                call();
+            }, CALL_IN_TIME);
         return;
     }
 
     if (pairNumber > 0 && (pairValue.toString().indexOf(selfCard[0]) > -1 || pairValue.toString().indexOf(selfCard[1]) > -1)) {
         if ((gameStatus === risk && maxPairValue < '6') || (gameStatus === danger && maxPairValue < 'I'))
             setTimeout(function () {
-                $('#fold').click();
-            }, 2000);
+                fold();
+            }, CALL_IN_TIME);
         else
             setTimeout(function () {
-                $('#call').click();
-            }, 2000);
+                call();
+            }, CALL_IN_TIME);
         return;
     }
 
     if (cards.length > 5)
         setTimeout(function () {
-            $('#fold').click();
-        }, 2000);
+            fold();
+        }, CALL_IN_TIME);
     else
         setTimeout(function () {
-            $('#call').click();
-        }, 2000);
+            call();
+        }, CALL_IN_TIME);
 }
 
 function reload() {
     rtc.Reload();
 }
 
-$('#bet').click(function () {
-    var amount = $('#amount').val();
-    rtc.Bet(amount);
-    $('#msg').text('该回合您采取的是：bet' + ',押注金额是：' + amount);
-    $('#msg').show();
-    $('#action').hide();
-});
+function bet() {
+    rtc.Bet(100);
+}
 
-$('#call').click(function () {
+function call() {
     rtc.Call();
-    $('#msg').text('该回合您采取的是：call');
-    $('#msg').show();
-    $('#action').hide();
-});
+}
 
-$('#check').click(function () {
-    rtc.Check();
-    $('#msg').text('该回合您采取的是：check');
-    $('#msg').show();
-    $('#action').hide();
-});
+function check() {
+    rtc.check();
+}
 
-$('#raise').click(function () {
+function raise() {
     rtc.Raise();
-    $('#msg').text('该回合您采取的是：raise');
-    $('#msg').show();
-    $('#action').hide();
-});
+}
 
-$('#allin').click(function () {
+function allin() {
     rtc.AllIn();
-    $('#msg').text('该回合您采取的是：allin');
-    $('#msg').show();
-    $('#action').hide();
-});
+}
 
-$('#fold').click(function () {
+function fold() {
     rtc.Fold();
-    $('#msg').text('该回合您采取的是：fold');
-    $('#msg').show();
-    $('#action').hide();
-});
+}
 
 // utils
 function getQueryStringRegExp(name) {
