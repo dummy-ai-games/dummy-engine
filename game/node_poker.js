@@ -121,7 +121,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
             var nextDealer = getNextDealer(that);
-            console.log("current dealer is:"+that.dealer+" next is:"+nextDealer);
+            logGame(that.tableNumber,"current dealer is:"+that.dealer+" next is:"+nextDealer);
 
             that.dealer = nextDealer;
             that.roundCount++;
