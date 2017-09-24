@@ -87,12 +87,14 @@ exports.deletePlayer = function (req, res) {
  * return :     File redirect
  */
 exports.dumpLog = function (req, res) {
+    /*
     var date = req.query.log_date;
     var tableNumber = req.query.table_number;
-
     var filePath = __dirname + "/../logs/game/" + date + "_game_" + tableNumber + ".txt";
     // serve file redirect to client
     res.download(filePath, "");
+    */
+    res.end();
 };
 
 /**

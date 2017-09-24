@@ -132,6 +132,7 @@ function onSelectedTableChanged() {
     }
 }
 
+/*
 function dumpLog() {
     currentTableNumber = $('#tables').val();
     var logDate = $('#dump_log_date').val();
@@ -145,6 +146,7 @@ function dumpLog() {
         '_blank'
     );
 }
+*/
 
 // UI related functions
 function gotoTest() {

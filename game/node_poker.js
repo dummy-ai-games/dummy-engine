@@ -464,7 +464,7 @@ function checkForBankrupt(table) {
     for (i = 0; i < table.players.length; i += 1) {
         if (table.players[i].chips === 0) {
             table.gameLosers.push(table.players[i]);
-            logger.game(table.tableNumber, 'player: ' + table.players[i].playerName + ' is going bankrupt');
+            logger.info(table.tableNumber, 'player: ' + table.players[i].playerName + ' is going bankrupt');
             table.players.splice(i, 1);
         }
     }
@@ -2149,23 +2149,26 @@ function rankHands(hands) {
     return hands;
 }
 
-var logger = null;
+var gameLogger = null;
 function logGame(tableNumber, msg) {
+    /*
     var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd");
     var logFileName = logRoot + "game/" + date + '_game_' + tableNumber + '.txt';
 
-    if (null !== logger) {
-        logger.close();
+    if (null !== gameLogger) {
+        gameLogger.close();
     }
-    logger = new (winston.Logger)({
+    gameLogger = new (winston.Logger)({
         transports: [
             new (winston.transports.Console)(),
             new (winston.transports.File)({filename: logFileName})
         ]
     });
     var logDate = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
-    logger.info(logDate + ": " + msg);
-    logger.close();
+    gameLogger.info(logDate + ": " + msg);
+    gameLogger.close();
+    */
+    logger.info(msg);
 }
 
 exports.Table = Table;
