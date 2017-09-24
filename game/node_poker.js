@@ -2099,7 +2099,6 @@ Player.prototype.Call = function () {
             }
         }
     }
-
 };
 
 Player.prototype.AllIn = function () {
@@ -2123,7 +2122,7 @@ Player.prototype.AllIn = function () {
         }
     }
 
-    //if player bet < mybet, the player need to call
+    // if player bet < mybet, the player need to call
     for (i = 0; i < this.table.players.length; i++) {
         var bet = this.table.game.bets[i];
         var player = this.table.players[i];
@@ -2150,17 +2149,22 @@ function rankHands(hands) {
     return hands;
 }
 
+var logger = null;
 function logGame(tableNumber, msg) {
     var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd");
     var logFileName = logRoot + "game/" + date + '_game_' + tableNumber + '.txt';
 
-    var logger = new (winston.Logger)({
+    if (null !== logger) {
+        logger.close();
+    }
+    logger = new (winston.Logger)({
         transports: [
             new (winston.transports.Console)(),
             new (winston.transports.File)({filename: logFileName})
         ]
     });
-    logger.info(msg);
+    var logDate = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    logger.info(logDate + ": " + msg);
     logger.close();
 }
 

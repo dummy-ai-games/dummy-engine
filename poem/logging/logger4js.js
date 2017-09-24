@@ -7,6 +7,7 @@ var constants = require('../configuration/constants');
 var Enums = require('../configuration/enums');
 var log4js = require('log4js');
 var enums = new Enums();
+var dateUtils = require('../utils/date_utils');
 
 var helper = helper || {};
 exports.helper = helper;
@@ -63,61 +64,67 @@ var userDebugLog = log4js.getLogger('userDebugLog');
 var userDevelopmentLog = log4js.getLogger('userDevelopmentLog');
 
 helper.info = function (msg) {
-    if (enums.APP_DEVELOPMENT_MODE == ENV) {
-        console.log(msg);
-    } else if (enums.APP_PRODUCTION_MODE == ENV) {
-        userProductionLog.info(msg);
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    if (enums.APP_DEVELOPMENT_MODE === ENV) {
+        console.log(date + ": " + msg);
+    } else if (enums.APP_PRODUCTION_MODE === ENV) {
+        userProductionLog.info(date + ": " + msg);
     } else {
-        userDebugLog.info(msg);
+        userDebugLog.info(date + ": " + msg);
     }
 };
 
 helper.error = function (msg) {
-    if (enums.APP_DEVELOPMENT_MODE == ENV) {
-        console.log(msg);
-    } else if (enums.APP_PRODUCTION_MODE == ENV) {
-        userProductionLog.error(msg);
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    if (enums.APP_DEVELOPMENT_MODE === ENV) {
+        console.log(date + ": " + msg);
+    } else if (enums.APP_PRODUCTION_MODE === ENV) {
+        userProductionLog.error(date + ": " + msg);
     } else {
-        userDebugLog.error(msg);
+        userDebugLog.error(date + ": " + msg);
     }
 };
 
 helper.warn = function (msg) {
-    if (enums.APP_DEVELOPMENT_MODE == ENV) {
-        console.log(msg);
-    } else if (enums.APP_PRODUCTION_MODE == ENV) {
-        userProductionLog.warn(msg);
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    if (enums.APP_DEVELOPMENT_MODE === ENV) {
+        console.log(date + ": " + msg);
+    } else if (enums.APP_PRODUCTION_MODE === ENV) {
+        userProductionLog.warn(date + ": " + msg);
     } else {
-        userDebugLog.warn(msg);
+        userDebugLog.warn(date + ": " + msg);
     }
 };
 
 helper.debug = function (msg) {
-    if (enums.APP_DEVELOPMENT_MODE == ENV) {
-        console.log(msg);
-    } else if (enums.APP_PRODUCTION_MODE == ENV) {
-        userProductionLog.debug(msg);
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    if (enums.APP_DEVELOPMENT_MODE === ENV) {
+        console.log(date + ": " + msg);
+    } else if (enums.APP_PRODUCTION_MODE === ENV) {
+        userProductionLog.debug(date + ": " + msg);
     } else {
-        userDebugLog.debug(msg);
+        userDebugLog.debug(date + ": " + msg);
     }
 };
 
 helper.trace = function (msg) {
-    if (enums.APP_DEVELOPMENT_MODE == ENV) {
-        console.log(msg);
-    } else if (enums.APP_PRODUCTION_MODE == ENV) {
-        userProductionLog.trace(msg);
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    if (enums.APP_DEVELOPMENT_MODE === ENV) {
+        console.log(date + ": " + msg);
+    } else if (enums.APP_PRODUCTION_MODE === ENV) {
+        userProductionLog.trace(date + ": " + msg);
     } else {
-        userDebugLog.trace(msg);
+        userDebugLog.trace(date + ": " + msg);
     }
 };
 
 helper.fatal = function (msg) {
-    if (enums.APP_DEVELOPMENT_MODE == ENV) {
-        console.log(msg);
-    } else if (enums.APP_PRODUCTION_MODE == ENV) {
-        userProductionLog.fatal(msg);
+    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    if (enums.APP_DEVELOPMENT_MODE === ENV) {
+        console.log(date + ": " + msg);
+    } else if (enums.APP_PRODUCTION_MODE === ENV) {
+        userProductionLog.fatal(date + ": " + msg);
     } else {
-        userDebugLog.fatal(msg);
+        userDebugLog.fatal(date + ": " + msg);
     }
 };

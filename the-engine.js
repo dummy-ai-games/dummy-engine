@@ -76,29 +76,29 @@ app.use('/', express.static(__dirname + '/web/'));
 require('./routes');
 
 SkyRTC.rtc.on('new_connect', function (socket) {
-    console.log('创建新连接');
+    console.log('New connection');
 });
 
 SkyRTC.rtc.on('remove_peer', function (socketId) {
-    console.log(socketId + '用户离开');
+    console.log(socketId + ' of player left');
 });
 
 SkyRTC.rtc.on('new_peer', function (user) {
-    console.log('新用户' + user + '加入');
+    console.log('new player: ' + user + ' join');
 });
 
 SkyRTC.rtc.on('_receiveAction', function (data) {
-    if (data.action == 'Bet') {
-        console.log('用户' + data.playerName + '采取动作' + data.action + ' ，下注:' + data.amount);
+    if (data.action === 'Bet') {
+        console.log('player ' + data.playerName + ', take action: ' + data.action + ', amount:' + data.amount);
     } else {
-        console.log('用户' + data.playerName + '采取动作' + data.action);
+        console.log('player ' + data.playerName + ', take action: ' + data.action);
     }
 });
 
 SkyRTC.rtc.on('socket_message', function (socket, msg) {
-    console.log('接收到来自' + socket.id + '的新消息：' + msg);
+    console.log('message received from ' + socket.id + ': ' + msg);
 });
 
 SkyRTC.rtc.on('error', function (error) {
-    console.log('发生错误：' + error.message);
+    console.log('error occurred: ' + error.message);
 });
