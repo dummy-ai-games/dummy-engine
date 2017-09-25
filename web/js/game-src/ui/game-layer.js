@@ -19,7 +19,6 @@ var publicCards = [];
 // visualization related
 
 var GameLayer = cc.Layer.extend({
-
     defaultFont: 'Arial',
     // game model variables
     size: null,
