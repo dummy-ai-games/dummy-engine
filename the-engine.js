@@ -75,6 +75,8 @@ app.use(function (req, res, next) {
 app.use('/', express.static(__dirname + '/web/'));
 require('./routes');
 
+
+// web socket communication
 SkyRTC.rtc.on('new_connect', function (socket) {
     console.log('New connection');
 });
@@ -85,14 +87,6 @@ SkyRTC.rtc.on('remove_peer', function (socketId) {
 
 SkyRTC.rtc.on('new_peer', function (user) {
     console.log('new player: ' + user + ' join');
-});
-
-SkyRTC.rtc.on('_receiveAction', function (data) {
-    if (data.action === 'Bet') {
-        console.log('player ' + data.playerName + ', take action: ' + data.action + ', amount:' + data.amount);
-    } else {
-        console.log('player ' + data.playerName + ', take action: ' + data.action);
-    }
 });
 
 SkyRTC.rtc.on('socket_message', function (socket, msg) {

@@ -6,11 +6,12 @@
 var playerStatusAlive = 0;
 var playerStatusDead = 1;
 
-var Player = function(_id, _name, _gold) {
+var Player = function(_id, _name, _displayName, _chips) {
     this.id = _id;
     this.name = _name;
+    this.displayName = _displayName;
     this.status = playerStatusAlive;
-    this.gold = _gold;
+    this.chips = _chips;
     this.bet = 0;
     this.privateCards = [];
     this.action = "No Action";
@@ -20,11 +21,15 @@ var Player = function(_id, _name, _gold) {
 // UX flow control on player
 Player.prototype.setBet = function (_bet) {
     this.bet = _bet;
-    this.gold -= _bet;
+    this.chips -= _bet;
 };
 
-Player.prototype.die = function () {
-    this.status = playerStatusDead;
+Player.prototype.setName = function(_name) {
+    this.name = _name;
+};
+
+Player.prototype.setDisplayName = function(_displayName) {
+    this.displayName = _displayName;
 };
 
 Player.prototype.setAction = function(_action) {

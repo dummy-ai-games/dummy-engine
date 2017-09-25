@@ -44,7 +44,7 @@ exports.getAllTables = function (callback) {
             if (!err) {
                 for (var i = 0; i < results.length; i++) {
                     var player = results[i];
-                    if (tables[player.tableNumber] == undefined)
+                    if (tables[player.tableNumber] === undefined)
                         tables[player.tableNumber] = [];
                     var table = tables[player.tableNumber];
                     table.push(player.playerName);
@@ -88,6 +88,7 @@ exports.updatePlayer = function(conditions, newPlayer, callback) {
         collection.update(conditions, {
             $set: {
                 playerName: newPlayer.playerName,
+                displayName: newPlayer.displayName,
                 tableNumber: newPlayer.tableNumber
             }
         }, function (err, result) {

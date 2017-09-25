@@ -60,7 +60,6 @@ var GameLayer = cc.Layer.extend({
     // buttons
     startButton: null,
 
-
     // menus
     controlMenu: null,
 
@@ -370,7 +369,7 @@ var GameLayer = cc.Layer.extend({
         }
 
         for (i = 0; i < currentPlayers; i++) {
-            this.nameTexts[i].setString(players[i].id);
+            this.nameTexts[i].setString(players[i].displayName);
             this.nameTexts[i].setVisible(true);
 
             // update avatar
@@ -387,7 +386,7 @@ var GameLayer = cc.Layer.extend({
             }
             this.nameTexts[i].setVisible(true);
 
-            this.moneyTexts[i].setString(players[i].gold);
+            this.moneyTexts[i].setString(players[i].chips);
             this.betTexts[i].setString(players[i].bet);
             this.actionTexts[i].setString(players[i].action);
 

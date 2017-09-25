@@ -14,11 +14,15 @@ $(document).ready(function() {
 function initUI() {
     $('#tables').select2({
     });
+
+    $('#display_name_tip').tooltip();
+
     $(".form_datetime").datetimepicker({
         format: 'yyyy-mm-dd',
         minView: '2',
         maxView: '2'
     });
+
     var today = formatDate(new Date(), "yyyy-MM-dd");
     $('#dump_log_date').val(today);
 }
@@ -41,6 +45,7 @@ function loadTables() {
                 refreshTables(response.entity);
                 if (0 === currentTableNumber) {
                     currentTableNumber = response.entity[0].tableNumber;
+                    $('#table_number').val(currentTableNumber);
                     loadPlayersByTable();
                 }
             } else {
@@ -56,8 +61,9 @@ function loadTables() {
 function loadPlayersByTable() {
     var url;
     url = '/player/get_players?table_number='+currentTableNumber;
-    $('#player_table_container').empty();
-    $('#player_table_container').append('<table id="player_table" data-row-style="rowStyle"></table>');
+    var tableContainer = $('#player_table_container');
+    tableContainer.empty();
+    tableContainer.append('<table id="player_table" data-row-style="rowStyle"></table>');
 
     $('#player_table').bootstrapTable({
         method: 'get',
@@ -90,8 +96,15 @@ function loadPlayersByTable() {
             title: 'ID',
             align: 'left',
             valign: 'middle',
+            visible: false,
             sortable: true
-        },{
+        }, {
+            field: 'displayName',
+            title: '游戏名',
+            align: 'left',
+            valign: 'middle',
+            sortable: true
+        }, {
             field: 'tableNumber',
             title: '游戏桌号',
             align: 'left',
@@ -100,7 +113,7 @@ function loadPlayersByTable() {
         }]
     }).on('check.bs.table', function (e, row) {
         onPlayerSelected(row);
-    }).on('uncheck.bs.table', function (e, row) {
+    }).on('uncheck.bs.table', function () {
         onPlayerUnselected();
     });
 }
@@ -129,6 +142,7 @@ function onSelectedTableChanged() {
     currentTableNumber = $('#tables').val();
     if (0 !== currentTableNumber) {
         loadPlayersByTable();
+        $('#table_number').val(currentTableNumber);
     }
 }
 
@@ -158,31 +172,37 @@ function gotoTest() {
 }
 
 function refreshTables(tablesList) {
-    $('#tables')
+    var tables = $('#tables');
+    tables
         .find('option')
         .remove()
         .end();
 
     if (tablesList.length > 0) {
         $.each(tablesList, function (i, table) {
-            $('#tables').append($('<option>', {
+            tables.append($('<option>', {
                 value: table.tableNumber,
                 text : table.tableNumber
             }));
         });
     } else {
-        $('#tables').append($('<option>', {
+        tables.append($('<option>', {
             value: 0,
             text : '请选择游戏桌号'
         }));
     }
 
-    $('#tables').select2({});
+    tables.select2({});
 }
 
 function updatePlayer() {
-    var playerName = $('#player_name').val();
-    var tableNumber = $('#table_number').val();
+    var playerNameInput = $('#player_name');
+    var tableNumberInput = $('#table_number');
+    var displayNameInput = $('#display_name');
+
+    var playerName = playerNameInput.val();
+    var tableNumber = tableNumberInput.val();
+    var displayName = displayNameInput.val();
 
     if (null === playerName ||
         null === tableNumber ||
@@ -192,10 +212,16 @@ function updatePlayer() {
         return;
     }
 
+    if (null === displayName || "" === displayName) {
+        displayName = playerName;
+        displayNameInput.val(displayName);
+    }
+
     if (null === selectedPlayer) {
-        selectedPlayer = new Object();
+        selectedPlayer = {};
     }
     selectedPlayer.playerName = playerName;
+    selectedPlayer.displayName = displayName;
     selectedPlayer.tableNumber = tableNumber;
 
     $.ajax({
@@ -208,7 +234,7 @@ function updatePlayer() {
             if(response.status.code === 0) {
                 popUpHintDialog('添加玩家成功');
                 currentTableNumber = selectedPlayer.tableNumber;
-                $('#table_number').val(currentTableNumber);
+                tableNumberInput.val(currentTableNumber);
                 onPlayerUnselected();
                 loadTables();
                 loadPlayersByTable();
@@ -262,7 +288,8 @@ function removePlayer() {
 }
 
 function popUpHintDialog(hint) {
-    $('#text_hint').empty();
-    $('#text_hint').append(hint);
+    var textHint = $('#text_hint');
+    textHint.empty();
+    textHint.append(hint);
     $('#hint_dialog').modal();
 }

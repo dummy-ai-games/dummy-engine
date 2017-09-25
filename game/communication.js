@@ -38,7 +38,7 @@ function SkyRTC() {
         var that = this;
         var playerName = data.playerName;
         var table = data.table;
-        logger.info('on __join, playerName = ' + playerName + " table=" + table);
+        logger.info('on __join, playerName = ' + playerName + ', table=' + table);
         if (that.playerAndTable[playerName]) {
             socket.id = playerName;
         } else if (table) {
@@ -91,9 +91,9 @@ function SkyRTC() {
                 if (player.reloadCount < currentTable.maxReloadCount) {
                     player.chips += currentTable.initChips;
                     player.reloadCount++;
-                    logger.info("player: " + playerName + "  reload success");
+                    logger.info('player: ' + playerName + '  reload success');
                 } else {
-                    logger.info("player: " + playerName + "  had used all reload chance");
+                    logger.info('player: ' + playerName + '  had used all reload chance');
                 }
             }
         }
@@ -101,7 +101,7 @@ function SkyRTC() {
 
     this.on('__action', function (data, socket) {
         var timestamp = new Date().getTime();
-        logger.info("receive action,time is " + timestamp);
+        logger.info('receive action,time is ' + timestamp);
         try {
             var that = this;
             var action = data.action;
@@ -217,7 +217,6 @@ SkyRTC.prototype.initPlayerData = function (player) {
         'data': data
     };
     that.players[player].send(JSON.stringify(message), errorCb);
-
 };
 
 SkyRTC.prototype.getBasicData = function (tableNumber) {
@@ -251,8 +250,9 @@ SkyRTC.prototype.notifyGuestAndPlayer = function () {
     var that = this;
     var tableAndPlayer = {};
     for (var playerName in that.players) {
-        if (!tableAndPlayer[that.players[playerName].tableNumber])
+        if (!tableAndPlayer[that.players[playerName].tableNumber]) {
             tableAndPlayer[that.players[playerName].tableNumber] = [];
+        }
         tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
     }
     var message;
@@ -387,9 +387,11 @@ SkyRTC.prototype.initTable = function (tableNumber) {
 SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var that = this;
     var player = message.data.self.playerName;
+    var tableNumber;
+    var currentTable;
     if (that.players[player]) {
-        var tableNumber = that.players[player].tableNumber;
-        var currentTable = that.table[tableNumber];
+        tableNumber = that.players[player].tableNumber;
+        currentTable = that.table[tableNumber];
         logger.info('server request: ' + JSON.stringify(message));
         if (that.players[player]) {
             that.players[player].send(JSON.stringify(message), function (error) {
@@ -397,9 +399,10 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                     that.getPlayerAction(message);
                 } else {
                     var timestamp = new Date().getTime();
-                    logger.info("send player action,time is " + timestamp);
+                    logger.info('send player action,time is ' + timestamp);
                     currentTable.timeout = setTimeout(function () {
-                        logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName + ', response timeout, auto FOLD');
+                        logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName +
+                            ', response timeout, auto FOLD');
                         currentTable.players[currentTable.currentPlayer].Fold();
                     }, 5000);
                 }
@@ -410,8 +413,8 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             that.getPlayerAction(message, true);
         }, 10 * 1000);
     } else {
-        var tableNumber = that.playerAndTable[player];
-        var currentTable = that.table[tableNumber];
+        tableNumber = that.playerAndTable[player];
+        currentTable = that.table[tableNumber];
 
         // bug fix - crash after players quit
         if (currentTable) {

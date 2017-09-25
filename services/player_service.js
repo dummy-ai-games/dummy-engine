@@ -50,6 +50,23 @@ exports.getPlayers = function (req, res) {
 };
 
 /**
+ * function :   List players
+ * parameter :
+ * return :     PlayerResponse
+ */
+exports.listPlayers = function (req, res) {
+    var tableNumber = req.body.table_number;
+
+    var playersResponse = new PlayersResponse();
+    playerLogic.getPlayersWorkUnit(tableNumber, function (getPlayersErr, players) {
+        playersResponse.status = getPlayersErr;
+        playersResponse.entity = players;
+        res.send(playersResponse);
+        res.end();
+    });
+};
+
+/**
  * function :   Update player
  * parameter :  Player object
  * return :     ServiceResponse

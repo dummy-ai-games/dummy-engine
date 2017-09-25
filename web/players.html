@@ -38,8 +38,10 @@
             <div>
                 编辑玩家
                 <div>
-                    <input type="text" id="player_name" style="height:34px" placeholder="玩家名称">
-                    <input type="number" id="table_number" style="height:34px"  placeholder="游戏桌号">
+                    <input type="text" id="player_name" style="height:34px" placeholder="玩家名称">&nbsp;&nbsp;
+                    <input type="text" id="display_name" style="height:34px" placeholder="游戏中的名称">
+                    <span id="display_name_tip" class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="请参考文档.比赛规则-8"></span>&nbsp;&nbsp;&nbsp;
+                    <input type="number" id="table_number" style="height:34px; width: 64px;"  placeholder="游戏桌号">
                     <button id="create_player_button" class="btn btn-success glyphicon glyphicon-plus" onclick="updatePlayer();" style="margin-bottom: 4px;"></button>
                     <button id="remove_player_button" class="btn btn-danger glyphicon glyphicon-remove" onclick="removePlayer();" style="margin-bottom: 4px; display: none;"></button>
                 </div>
@@ -89,6 +91,7 @@
 <script src="./js/public/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/js/modal.js"></script>
+<script src="./js/public/bower_components/bootstrap/js/tooltip.js"></script>
 <script src="./js/public/bower_components/bootstrap-table/dist/bootstrap-table.js"></script>
 <script src="./js/public/bower_components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
 <script src="./js/public/bower_components/select2/dist/js/select2.min.js"></script>

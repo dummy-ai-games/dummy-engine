@@ -26,6 +26,17 @@ exports.getPlayersWorkUnit = function(tableNumber, callback) {
     };
 
     Player.getPlayers(conditions, function(getPlayersErr, players) {
+        if (errorCode.SUCCESS.code === getPlayersErr.code && null !== players && players.length > 0) {
+            for (var i = 0; i < players.length; i++) {
+                logger.info("player[" + i + "].displayName = " + players[i].displayName);
+                if (undefined === players[i].displayName ||
+                    null === players[i].displayName ||
+                    "" === players[i].displayName) {
+                    players[i].displayName = players[i].playerName;
+                }
+            }
+        }
+        logger.info("get players : " + JSON.stringify(players));
         callback(getPlayersErr, players);
     });
 };
