@@ -87,7 +87,7 @@ var GameLayer = cc.Layer.extend({
         var i;
         for (i = 0; i < this.playerMax; i++) {
             this.moneyInitiates[i] = "left: " + this.defaultMoneyInit;
-            this.actionInitiates[i] = "No Action";
+            this.actionInitiates[i] = "-";
             this.betInitiates[i] = "bet: " + this.defaultBetInit;
         }
 
@@ -126,7 +126,7 @@ var GameLayer = cc.Layer.extend({
             this.moneyTexts[i] = new cc.LabelTTF("0", this.defaultFont, 24,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
-            this.actionTexts[i] = new cc.LabelTTF("No Action", this.defaultFont, 24,
+            this.actionTexts[i] = new cc.LabelTTF("-", this.defaultFont, 24,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.betTexts[i] = new cc.LabelTTF("0", this.defaultFont, 24,
@@ -212,13 +212,13 @@ var GameLayer = cc.Layer.extend({
             if (i < 5) {
                 this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 16 * 6,
                     this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
-                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 6 + 20,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height - 20));
+                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 6 - 20,
+                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height + 20));
             } else {
                 this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 16 * 14,
                     this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height));
-                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 14 + 20,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height - 20));
+                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 16 * 14 - 20,
+                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height + 20));
             }
 
             // calculate card sprite scale for the screen
@@ -379,13 +379,15 @@ var GameLayer = cc.Layer.extend({
             this.avatarSprites[i].setSpriteFrame(avatarFrame);
             this.avatarSprites[i].setVisible(true);
 
-            if (players[i].status === playerStatusAlive) {
-                this.nameTexts[i].setColor(cc.color(0, 255, 255, 255));
-            } else {
-                this.nameTexts[i].setColor(cc.color(255, 0, 0, 255));
+            if (undefined !== players[i].isSurvive) {
+                if (players[i].isSurvive === true) {
+                    this.nameTexts[i].setColor(cc.color(0, 255, 255, 255));
+                } else {
+                    this.nameTexts[i].setColor(cc.color(255, 0, 0, 255));
+                }
             }
-            this.nameTexts[i].setVisible(true);
 
+            this.nameTexts[i].setVisible(true);
             this.moneyTexts[i].setString(players[i].chips);
             this.betTexts[i].setString(players[i].bet);
             this.actionTexts[i].setString(players[i].action);
@@ -394,9 +396,11 @@ var GameLayer = cc.Layer.extend({
             this.betTexts[i].setVisible(true);
 
             if (players[i].inTurn === 1) {
-                this.actionTexts[i].setColor(cc.color(255, 0, 0, 255));
+                this.actionTexts[i].setColor(cc.color(255, 128, 0, 255));
+                this.actionTexts[i].setFontSize(48);
             } else {
                 this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
+                this.actionTexts[i].setFontSize(24);
             }
             this.actionTexts[i].setVisible(true);
 

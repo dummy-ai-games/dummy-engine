@@ -3,18 +3,15 @@
  * 2017-08-22
  */
 
-var playerStatusAlive = 0;
-var playerStatusDead = 1;
-
 var Player = function(_id, _name, _displayName, _chips) {
     this.id = _id;
     this.name = _name;
     this.displayName = _displayName;
-    this.status = playerStatusAlive;
+    this.isSurvive = true;
     this.chips = _chips;
     this.bet = 0;
     this.privateCards = [];
-    this.action = "No Action";
+    this.action = "-";
     this.inTurn = 0;
 };
 

@@ -29,7 +29,7 @@
                 </div>
             </div>
         </div>
-        <h2>文档 V1.0.1</h2>
+        <h2>文档 V1.0.2</h2>
         <h4>2017-09-20</h4>
         <br>
         <div>
@@ -54,7 +54,7 @@
                     <p>约定游戏过程中会有如下概念:</p>
                     <ul>
                         <p>1. 局: 一局游戏是指参赛的10名玩家进入一张游戏桌, 持有相等的初始筹码, 对战直到本游戏桌只剩下 <b><u>不多于半数</u></b> 玩家胜出, 而其余玩家因筹码耗尽而出局为止, 一局由多圈构成</p>
-                        <p><span class="new_content">2. 圈 : 一圈是指 dealer(一轮中默认大小盲注位置) 围绕牌桌在每个未出局的玩家手上都出现一次为止为一圈,一圈由多轮构成,在一圈过程中大小盲住数额相等,但是下一圈开始时大小盲住翻倍</span></p>
+                        <p>2. 圈 : 一圈是指 dealer(一轮中默认大小盲注位置) 围绕牌桌在每个未出局的玩家手上都出现一次为止为一圈,一圈由多轮构成,在一圈过程中大小盲住数额相等,但是下一圈开始时大小盲住翻倍</p>
                         <p>3. 轮: 一轮游戏是指每次荷官重新发公共牌和私有牌, 每个玩家按回合进行决策, 直到除了一名玩家之外全部弃牌, 或者5张公共牌完全翻开为止, 决出本轮胜负并清算筹码, 一轮由多个回合构成</p>
                         <p>4. 回合: 一回合是指所有玩家依次take action, 称为一回合, 一个回合中有多个(分别来自各个玩家的)action</p>
                         <p>5. action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 玩家通过 AI 客户端完成其中一种决策称之为一个action</p>
@@ -64,11 +64,12 @@
                     <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
                     <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017  Task Force确定</p>
                     <p>2. 比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
-                    <p><span class="new_content"> 3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>100轮</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>30</u></b> 人进入复赛 </span></p>
-                    <p><span class="new_content"> 4. 复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛 </span></p>
+                    <p>3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>100轮</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>30</u></b> 人进入复赛</p>
+                    <p>4. 复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛</p>
                     <p>5. 决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
-                    <p><span class="new_content"> 6. dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></span></p>
-                    <p><span class="new_content"> 7. 每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</span></p>
+                    <p>6. dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></p>
+                    <p>7. 每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</p>
+                    <p><span class="new_content">8. 为了确保比赛时使用其它队玩家名作弊干扰比赛, 比赛前组委会会将一个随机生成的私有玩家名通过线下方式告知各组组长, 比赛时使用私有名接入游戏, 游戏面板中则显示昵称(游戏名)</span></p>
                     <hr>
                     <a name="server_access" style="text-decoration: none;"><h4><strong>服务器接入方式</strong></h4></a>
                     <ul>
@@ -117,10 +118,10 @@
 {
     "eventName" : "__join",
     "data" : {
-        "playerName" : "0123456789ABCDEF" <span class="new_content">// 为了防止冒名作弊, 这个名字是比赛系统预先分配给每个参赛玩家的私有名字, 请玩家牢记并只在<b>自己的程序中</b>使用
+        "playerName" : "0123456789ABCDEF" // 为了防止冒名作弊, 这个名字是比赛系统预先分配给每个参赛玩家的私有名字, 请玩家牢记并只在<b>自己的程序中</b>使用
                                           // 这个名字目前在测试平台上并不启用, 在比赛前夕会通过私密的方式通告给每个参赛玩家
                                           // 每个玩家的私有名会对应一个展示名(由 Task Force事先录入), 比赛当日大屏幕上显示的为展示名以区分玩家
-                                          // 以下文档中所有涉及到的 playerName 均为<b>私有名</b>, 为了阅读方便, 文档中暂时用类似 bobi, cicy, geoge 等拟名代替</span>
+                                          // 以下文档中所有涉及到的 playerName 均为<b>私有名</b>, 为了阅读方便, 文档中暂时用类似 bobi, cicy, geoge 等拟名代替
     }
 }</pre>
                         <p>指令说明:</p>
@@ -139,7 +140,7 @@
                     <hr>
                     <a name="new_round" style="text-decoration: none;"><h4><strong>新一轮开始</strong></h4></a>
                     <ul>
-                        <p>在一桌游戏开始时以及下一轮牌局开始时, 客户端都将收到服务器广播的 __new_round 消息</p>
+                        <p><span class="new_content">在除了第1轮之外的</span>游戏开始时, 客户端都将收到服务器广播的 __new_round 消息</p>
                         <pre>
 {
     "eventName" : "__new_round",
@@ -184,8 +185,7 @@
                         <p>5. data.players[i].folded 表示玩家是否已经 fold, data.players[i].allin 表示玩家是否已经 all in, data.players[i].isSurvive 表示当前玩家是否仍在局 (false 表示输光出局) </p>
                     </ul>
                     <hr>
-                    <span class="new_content">
-                    <a name="reload" style="text-decoration: none;" class="new_content"><h4><strong>索取筹码</strong></h4></a>
+                    <a name="reload" style="text-decoration: none;"><h4><strong>索取筹码</strong></h4></a>
                     <ul>
                         <p>在每一轮(除第1轮外)开始的时候, 服务器会发送询问玩家是否要索取筹码, 每局比赛中每次可以索取 1000 筹码, 最多索取 2 次</p>
                         <p>服务器发送的请求格式如下:</p>
@@ -232,7 +232,6 @@
     "eventName" : "__reload"
 }</pre>
                     </ul>
-                    </span>
                     <hr>
                     <a name="request_for_action" style="text-decoration: none;"><h4><strong>服务器请求玩家决策本次action应采取的动作(轮到某玩家行动)</strong></h4></a>
                     <ul>
@@ -248,7 +247,8 @@
             "chips" : 1000,
             "folded" : false,
             "allin" : false,
-            "cards" : [XX, XX]
+            "cards" : [XX, XX],
+            "isSurvive" : true
         },
         "game" : {
             "gameBets" : [
@@ -311,12 +311,12 @@
                         <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
                         <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
                         <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise" 中的一种, 决策的数据格式如下</p>
-                        <pre>
+<pre>
 {
     "eventName" : "__action",
     "data" : {
         "action" : "call" // 还可以是 : "check", "fold", "allin", "raise" 中的其中一种, 但不能是 "bet"
-        <span class="new_content"><s>"playerName" : "bobi"</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数 </span>
+        <s>"playerName" : "bobi"</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数
     }
 }</pre>
                         <br>
@@ -331,7 +331,8 @@
             "chips" : 1000,
             "folded" : false,
             "allin" : false,
-            "cards" : [XX, XX]
+            "cards" : [XX, XX],
+            "isSurvive" : true
         },
         "game" : {
             "gameBets" : [
@@ -393,7 +394,7 @@
     "eventName" : "__action",
     "data" : {
         "action" : "bet", // 这里建议是"bet", 也可以是 "check", "fold", "allin" 中的其中一种, 请参考附表中的说明
-        <span class="new_content"><s>"playerName" : "bobi",</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数 </span>
+        <s>"playerName" : "bobi",</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数
         "amount" : 100 // amount 在这里是一个强制字段
     }
 }</pre>
@@ -455,8 +456,7 @@
                         <img src="res/images/document/show_action_message.png" style="width: 75%; height: 75%;">
                     </ul>
                     <hr>
-                    <span class="new_content">
-                    <a name="round_end" style="text-decoration: none;" class="new_content"><h4><strong>每一轮结束</strong></h4></a>
+                    <a name="round_end" style="text-decoration: none;"><h4><strong>每一轮结束</strong></h4></a>
                     <ul>
                         <p>在每一轮结束的时候, 服务器会向所有玩家广播这一轮所有玩家的状态, 包括玩家手牌</p>
                         <pre>
@@ -507,125 +507,125 @@
                         <p>2. data.player[i].cards 表示已经结束掉的这轮里的玩家的手牌</p>
                         <p>3. 这一条信息不需要玩家回复</p>
                     </ul>
-                    </span>
                     <hr>
-                    <span class="new_content">
-                    <a name="game_over" style="text-decoration: none;" class="new_content"><h4><strong>游戏(一局)结束</strong></h4></a>
+                    <a name="game_over" style="text-decoration: none;"><h4><strong>游戏(一局)结束</strong></h4></a>
                     <ul>
                         <p>游戏结束的时候, 服务器会向所有玩家广播以下消息</p>
 <pre>
 {
-    "players":
-    [
-        {
-            "playerName": "bobi",
-            "chips": 0,
-            "folded": false,
-            "allIn": true,
-            "cards": [
-                "3S",
-                "3C"
-            ],
-            "isSurvive": true,
-            "reloadCount": 2
-        },
-        {
-            "playerName": "cicy",
-            "chips": 15900,
-            "folded": true,
-            "allIn": true,
-            "cards": [
-                "AD",
-                "QH"
-            ],
-            "isSurvive": true,
-            "reloadCount": 2
-        },
-        {
-            "playerName": "alex",
-            "chips": 0,
-            "folded": true,
-            "allIn": true,
-            "cards": [
-                "JH",
-                "8D"
-            ],
-            "isSurvive": true,
-            "reloadCount": 2
-        },
-        ...
-    ],
-    "table": {
-        "tableNumber": "1",
-        "board": [
-            "8S",
-            "QC",
-            "QS",
-            "QD",
-            "2S"
-        ],
-        "roundCount": 16
-    },
-    "winners": [
-        {
-            "playerName": "andy",
-            "hand": {
+    "eventName" : "__game_over",
+    "data" : {
+        "players":
+        [
+            {
+                "playerName": "bobi",
+                "chips": 0,
+                "folded": false,
+                "allIn": true,
+                "cards": [
+                    "3S",
+                    "3C"
+                ],
+                "isSurvive": true,
+                "reloadCount": 2
+            },
+            {
+                "playerName": "cicy",
+                "chips": 15900,
+                "folded": true,
+                "allIn": true,
                 "cards": [
                     "AD",
-                    "QH",
-                    "8S",
-                    "QC",
-                    "QS",
-                    "QD",
-                    "2S"
+                    "QH"
                 ],
-                "rank": 290.2048,
-                "message": "Four of a kind"
+                "isSurvive": true,
+                "reloadCount": 2
             },
-            "chips": 15900
-        },
-        {
-            "playerName": "lance1",
-            "hand": {
+            {
+                "playerName": "alex",
+                "chips": 0,
+                "folded": true,
+                "allIn": true,
                 "cards": [
-                    "8H",
-                    "KS",
-                    "8S",
-                    "QC",
-                    "QS",
-                    "QD",
-                    "2S"
+                    "JH",
+                    "8D"
                 ],
-                "rank": 250,
-                "message": "Full House"
+                "isSurvive": true,
+                "reloadCount": 2
             },
-            "chips": 1360
+            ...
+        ],
+        "table": {
+            "tableNumber": "1",
+            "board": [
+                "8S",
+                "QC",
+                "QS",
+                "QD",
+                "2S"
+            ],
+            "roundCount": 16
         },
-        {
-            "playerName": "tryest",
-            "hand": {
-                "cards": [
-                    "9D",
-                    "JD",
-                    "8S",
-                    "QC",
-                    "QS",
-                    "QD",
-                    "2S"
-                ],
-                "rank": 110.032,
-                "message": "Three of a Kind"
+        "winners": [
+            {
+                "playerName": "andy",
+                "hand": {
+                    "cards": [
+                        "AD",
+                        "QH",
+                        "8S",
+                        "QC",
+                        "QS",
+                        "QD",
+                        "2S"
+                    ],
+                    "rank": 290.2048,
+                    "message": "Four of a kind"
+                },
+                "chips": 15900
             },
-            "chips": 740
-        }
-    ]
+            {
+                "playerName": "lance1",
+                "hand": {
+                    "cards": [
+                        "8H",
+                        "KS",
+                        "8S",
+                        "QC",
+                        "QS",
+                        "QD",
+                        "2S"
+                    ],
+                    "rank": 250,
+                    "message": "Full House"
+                },
+                "chips": 1360
+            },
+            {
+                "playerName": "tryest",
+                "hand": {
+                    "cards": [
+                        "9D",
+                        "JD",
+                        "8S",
+                        "QC",
+                        "QS",
+                        "QD",
+                        "2S"
+                    ],
+                    "rank": 110.032,
+                    "message": "Three of a Kind"
+                },
+                "chips": 740
+            }
+        ]
+    }
 }</pre>
                         <p>指令说明</p>
                         <p>1. __game_over 是一条服务器的广播消息, 这里表示比赛(预赛或者复赛或者决赛)结束, 玩家可以退出比赛</p>
                         <p>2. winners中的信息表示每个玩家最后一轮的手牌以及最终赢得的筹码数</p>
                         <p>3. 这一条信息不需要玩家回复</p>
                     </ul>
-                    </span>
 
                     <hr>
                     <a name="other_affairs" style="text-decoration: none;"><h4><strong>其它注意事项</strong></h4></a>
@@ -729,7 +729,7 @@
                     <p><span>请开发者自行修改示例代码中的 Socket 地址和接入用户名信息以方便自助测试</span></p>
                     <div class="row">
                         <div class="col-md-4">
-                            <h2>Javascript V1.0.1 <img src="./res/images/red-dot-md.png"></h2>
+                            <h2>Javascript V1.0.2 <img src="./res/images/red-dot-md.png"></h2>
                             <p>启动方式：双击用浏览器打开 player.html, 并附加URL参数name=your_name, <br>例如: file:///D:/player.html?name=bobi<br><br></p>
                             <p><a class="btn btn-large btn-default" href="./example/js-example.zip" role="button">js 示例下载 &raquo;</a></p>
                         </div>
@@ -754,7 +754,16 @@
                     <a style="text-decoration: none;"><h4><strong>平台更新日志</strong></h4></a>
                     <hr>
                     <div>
-                        <h4>2017-09-20</h4>
+                        <h4>V1.0.2 (2017-09-25)</h4>
+                        修正了小, 大盲注每一圈翻倍的bug<br>
+                        修正了因 game logger 打开文件太多引起崩溃的bug, 1.0.2版本暂时不提供日志下载功能<br>
+                        修正了allin相关的一些规则上的bug<br>
+                        其它系统bug修复<br>
+                        新增了游戏昵称概念(正式比赛时用)<br>
+                    </div>
+                    <br>
+                    <div>
+                        <h4>V1.0.1 (2017-09-20)</h4>
                         更新了比赛规则, 允许一局多圈制, 每圈盲注翻倍, 允许玩家在每轮结束之后索取筹码(reload)<br>
                         加入了 __round_end 指令, 用于在每轮结束之后告知玩家牌桌状态<br>
                         加入了 __start_reload 和 __reload 指令, 用于让玩家索取筹码<br>
@@ -764,12 +773,12 @@
                     </div>
                     <br>
                     <div>
-                        <h4>2017-09-15</h4>
+                        <h4>V1.0.0 (2017-09-15)</h4>
                         发布了javascript, python和java example
                     </div>
                     <br>
                     <div>
-                        <h4>2017-09-14</h4>
+                        <h4>V1.0.0 (2017-09-14)</h4>
                         THE-engine V1.0.0上线
                     </div>
                 </div>

@@ -89,7 +89,7 @@ function initWebsock() {
 
         // update in game engine
         console.log('finish_game : ' + JSON.stringify(data));
-        updateTable(data);
+        updateGame(data, true);
         gameStatus = STATUS_GAME_FINISHED;
 
         // auto start another game in 3s
@@ -116,7 +116,7 @@ function initWebsock() {
         // update in game engine
         gameStatus = STATUS_GAME_RUNNING;
         console.log('deal : ' + JSON.stringify(data));
-        updateTable(data);
+        updateGame(data, false);
     });
 
     rtc.on('__new_round', function (data) {
@@ -127,7 +127,7 @@ function initWebsock() {
 
         // update in game engine
         console.log('new_round : ' + JSON.stringify(data));
-        updateTable(data);
+        updateGame(data, true);
     });
 
     rtc.on('__round_end', function (data) {
@@ -135,7 +135,7 @@ function initWebsock() {
         var tableNumber = data.table.tableNumber;
         gameStatus = STATUS_GAME_RUNNING;
         console.log('table ' + tableNumber + ', round finished: ' + roundCount);
-        updateTable(data);
+        updateGame(data, false);
     });
 
     rtc.on('__show_action', function (data) {
@@ -178,7 +178,7 @@ function initWebsock() {
                 players[i].clearInTurn();
             }
         }
-        updateTable(data);
+        updateGame(data, false);
     });
 }
 
@@ -235,7 +235,7 @@ function startGame() {
     rtc.startGame(tableNumber);
 }
 
-function updateTable(data) {
+function updateGame(data, isNewRound) {
     var i;
 
     // update round
@@ -254,6 +254,12 @@ function updateTable(data) {
                 players[i].privateCards[1] = data.players[i].cards[1];
             }
             players[i].chips = data.players[i].chips;
+            players[i].isSurvive = data.players[i].isSurvive;
+
+            // reset action when received __new_round
+            if (isNewRound) {
+                players[i].setAction("-");
+            }
         }
     }
 
@@ -279,7 +285,6 @@ function findPlayerIndexById(id) {
 
 function findDBPlayerNameById(playerName) {
     if (dbPlayers) {
-        console.log("findDBPlayerNameById, playerName = " + playerName + ", dbPlayers = " + JSON.stringify(dbPlayers));
         for (var i = 0; i < dbPlayers.length; i++) {
             if (dbPlayers[i].playerName === playerName) {
                 if (dbPlayers[i].displayName) {

@@ -133,7 +133,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 that.eventEmitter.emit('__new_round', data);
                 that.isReloadTime = false;
                 that.NewRound();
-            }, 10 * 1000);
+            }, 3 * 1000);
         } else {
             logGame(that.tableNumber, 'game over, winners are: ');
             for (i = 0; i < that.players.length; i++) {
@@ -215,7 +215,7 @@ function getNextDealer(table) {
     var isNeedModifyFirstDealer = false;
     do {
         index = (index >= players.length - 1) ? (index - players.length + 1) : index + 1;
-        if (index == table.firstDealer) {
+        if (index === table.firstDealer) {
             table.smallBlind = table.smallBlind * 2;
             table.bigBlind = table.bigBlind * 2;
             isNeedModifyFirstDealer = true;
@@ -248,6 +248,8 @@ function takeAction(table, action) {
         player['chips'] = table.players[i]['chips'];
         player['folded'] = table.players[i]['folded'];
         player['allIn'] = table.players[i]['allIn'];
+        player['isSurvive'] = table.players[i]['isSurvive'];
+        player['reloadCount'] = table.players[i]['reloadCount'];
         gameBets.push({
             'playerName': table.players[i]['playerName'],
             'roundBet': table.game.roundBets[i],
@@ -1741,7 +1743,7 @@ function progress(table) {
             }
         } else {
             getNextPlayer(table);
-            if (table.surviveCount == 1 && table.game.bets[table.currentPlayer] >= maxBet) {
+            if (table.surviveCount === 1 && table.game.bets[table.currentPlayer] >= maxBet) {
                 //fix bug: when allinValue < maxBet and other player all fold will cause money divide problem, at this
                 //situation the last player should not fold, so we have player default action call
                 table.players[table.currentPlayer].Call();
