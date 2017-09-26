@@ -168,6 +168,8 @@ function getBasicData(table) {
     var players = [];
     var mytable = {};
     var data = {};
+    var sbPlayerIndex = 0;
+    var bbPlayerIndex = 0;
     for (var i = 0; i < table.players.length; i++) {
         var player = {};
         player['playerName'] = table.players[i]['playerName'];
@@ -179,10 +181,22 @@ function getBasicData(table) {
         player['reloadCount'] = table.players[i]['reloadCount'];
         players.push(player);
     }
+    sbPlayerIndex = table.findSmallBlind();
+    bbPlayerIndex = table.findBigBlind(sbPlayerIndex);
+
     mytable['tableNumber'] = table.tableNumber;
     mytable['roundName'] = table.roundName;
     mytable['board'] = table.game.board;
     mytable['roundCount'] = table.roundCount;
+    mytable['smallBlind'] = {
+        player: table.players[sbPlayerIndex].playerName,
+        amount: table.smallBlind
+    };
+    mytable['bigBlind'] = {
+        player: table.players[bbPlayerIndex].playerName,
+        amount: table.bigBlind
+    };
+
     data.players = players;
     data.table = mytable;
     return data;
@@ -1904,29 +1918,9 @@ Table.prototype.NewRound = function() {
         this.game.roundBets[i] = 0;
     }
     // Identify Small and Big Blind player indexes
-    smallBlind = this.dealer;
-    if (smallBlind >= this.players.length) {
-        smallBlind = 0;
-    }
-    while (!this.players[smallBlind].isSurvive) {
-        smallBlind++;
-        //fix bug out of index
-        if (smallBlind >= this.players.length) {
-            smallBlind = 0;
-        }
-    }
+    smallBlind = this.findSmallBlind();
+    bigBlind = this.findBigBlind(smallBlind);
 
-    bigBlind = smallBlind + 1;
-    if (bigBlind >= this.players.length) {
-        bigBlind -= this.players.length;
-    }
-    while (!this.players[bigBlind].isSurvive) {
-        bigBlind++;
-        //fix bug out of index
-        if (bigBlind >= this.players.length) {
-            bigBlind -= this.players.length;
-        }
-    }
     // Force Blind Bets
     if (this.smallBlind >= this.players[smallBlind].chips) {
         this.game.bets[smallBlind] = this.players[smallBlind].chips;
@@ -1953,6 +1947,36 @@ Table.prototype.NewRound = function() {
     // Get currentPlayer
     this.currentPlayer = bigBlind;
     this.eventEmitter.emit('newRound');
+};
+
+Table.prototype.findSmallBlind = function() {
+    var smallBlind = this.dealer;
+    if (smallBlind >= this.players.length) {
+        smallBlind = 0;
+    }
+    while (!this.players[smallBlind].isSurvive) {
+        smallBlind++;
+        //fix bug out of index
+        if (smallBlind >= this.players.length) {
+            smallBlind = 0;
+        }
+    }
+    return smallBlind;
+};
+
+Table.prototype.findBigBlind = function(smallBlind) {
+    var bigBlind = smallBlind + 1;
+    if (bigBlind >= this.players.length) {
+        bigBlind -= this.players.length;
+    }
+    while (!this.players[bigBlind].isSurvive) {
+        bigBlind++;
+        //fix bug out of index
+        if (bigBlind >= this.players.length) {
+            bigBlind -= this.players.length;
+        }
+    }
+    return bigBlind;
 };
 
 Table.prototype.start1stRound = function() {
