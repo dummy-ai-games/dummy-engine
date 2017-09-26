@@ -21,6 +21,14 @@ Player.prototype.setBet = function (_bet) {
     this.chips -= _bet;
 };
 
+Player.prototype.setChips = function(_chips) {
+    this.chips = _chips;
+};
+
+Player.prototype.setSurvive = function(_isSurvive) {
+    this.isSurvive = _isSurvive;
+};
+
 Player.prototype.setName = function(_name) {
     this.name = _name;
 };
