@@ -37,6 +37,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.isReloadTime = false;
     this.maxRoundCount = maxRoundCount;
     this.firstDealer = 0;
+    this.isStart = false;
 
     // Validate acceptable value ranges.
     var err;
@@ -144,6 +145,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }, 3 * 1000);
         } else {
             logGame(that.tableNumber, 'game over, winners are: ');
+            that.isStart = false;
             for (i = 0; i < that.players.length; i++) {
                 var player = that.players[i];
                 player.chips += (that.maxReloadCount - player.reloadCount) * that.initChips;
@@ -1855,6 +1857,7 @@ Table.prototype.StartGame = function() {
         this.playersToRemove = [];
         this.dealer = Math.round(Math.random() * (this.surviveCount));
         this.firstDealer = this.dealer;
+        this.isStart = true;
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
     }
