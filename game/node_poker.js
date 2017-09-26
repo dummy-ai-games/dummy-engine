@@ -241,10 +241,13 @@ function getNextDealer(table) {
             table.smallBlind = table.smallBlind * 2;
             table.bigBlind = table.bigBlind * 2;
             isNeedModifyFirstDealer = true;
+            logger.info("small/big blind x 2");
         }
     } while (!players[index].isSurvive);
-    if (isNeedModifyFirstDealer)
+    if (isNeedModifyFirstDealer) {
         table.firstDealer = index;
+        logger.info("move first dealer to " + index);
+    }
     return index;
 }
 
