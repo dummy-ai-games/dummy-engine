@@ -38,6 +38,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.maxRoundCount = maxRoundCount;
     this.firstDealer = 0;
     this.isStart = false;
+    this.smallBlindIndex = 0;
+    this.bigBlindIndex = 0;
 
     // Validate acceptable value ranges.
     var err;
@@ -182,8 +184,8 @@ function getBasicData(table) {
         player['reloadCount'] = table.players[i]['reloadCount'];
         players.push(player);
     }
-    sbPlayerIndex = table.findSmallBlind();
-    bbPlayerIndex = table.findBigBlind(sbPlayerIndex);
+    sbPlayerIndex = table.smallBlindIndex;
+    bbPlayerIndex = table.bigBlindIndex;
 
     mytable['tableNumber'] = table.tableNumber;
     mytable['roundName'] = table.roundName;
@@ -1929,6 +1931,8 @@ Table.prototype.NewRound = function () {
     // Identify Small and Big Blind player indexes
     smallBlindIndex = this.findSmallBlind();
     bigBlindIndex = this.findBigBlind(smallBlindIndex);
+    this.smallBlindIndex = smallBlindIndex;
+    this.bigBlindIndex = bigBlindIndex;
     // Force Blind Bets
     if (this.smallBlind >= this.players[smallBlindIndex].chips) {
         this.game.bets[smallBlindIndex] = this.players[smallBlindIndex].chips;
