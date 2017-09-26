@@ -231,22 +231,22 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     var desTable = that.table[tableNumber];
     if (desTable) {
         /*
-        for (var i = 0; i < desTable.players.length; i++) {
-            var player = {};
-            player['playerName'] = desTable.players[i]['playerName'];
-            player['chips'] = desTable.players[i]['chips'];
-            player['folded'] = desTable.players[i]['folded'];
-            player['allIn'] = desTable.players[i]['allIn'];
-            player['cards'] = desTable.players[i]['cards'];
-            player['reloadCount'] = desTable.players[i]['reloadCount'];
-            players.push(player);
-        }
-        table['tableNumber'] = desTable.tableNumber;
-        table['roundName'] = desTable.roundName;
-        table['board'] = desTable.game.board;
-        data.players = players;
-        data.table = table;
-        */
+         for (var i = 0; i < desTable.players.length; i++) {
+         var player = {};
+         player['playerName'] = desTable.players[i]['playerName'];
+         player['chips'] = desTable.players[i]['chips'];
+         player['folded'] = desTable.players[i]['folded'];
+         player['allIn'] = desTable.players[i]['allIn'];
+         player['cards'] = desTable.players[i]['cards'];
+         player['reloadCount'] = desTable.players[i]['reloadCount'];
+         players.push(player);
+         }
+         table['tableNumber'] = desTable.tableNumber;
+         table['roundName'] = desTable.roundName;
+         table['board'] = desTable.game.board;
+         data.players = players;
+         data.table = table;
+         */
         data = poker.getBasicData(desTable);
     }
 
@@ -425,8 +425,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                     logger.info('send player action,time is ' + timestamp);
                     currentTable.timeout = setTimeout(function () {
                         if (currentTable.isStart) {
-                            logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName +
-                                ', response timeout, auto FOLD');
+                            logger.info("table " + tableNumber +" player " + player + " response timeout, auto FOLD");
                             currentTable.players[currentTable.currentPlayer].Fold();
                         }
                     }, 5000);
@@ -442,6 +441,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     } else {
         // bug fix - crash after players quit
         if (currentTable && currentTable.isStart) {
+            logger.info("table " + tableNumber + " player " + player + " response timeout, auto fold");
             currentTable.players[currentTable.currentPlayer].Fold();
         }
     }
