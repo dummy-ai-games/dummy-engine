@@ -189,11 +189,11 @@ function getBasicData(table) {
     mytable['board'] = table.game.board;
     mytable['roundCount'] = table.roundCount;
     mytable['smallBlind'] = {
-        player: table.players[sbPlayerIndex].playerName,
+        playerName: table.players[sbPlayerIndex].playerName,
         amount: table.smallBlind
     };
     mytable['bigBlind'] = {
-        player: table.players[bbPlayerIndex].playerName,
+        playerName: table.players[bbPlayerIndex].playerName,
         amount: table.bigBlind
     };
 
@@ -2213,3 +2213,4 @@ function logGame(tableNumber, msg) {
 }
 
 exports.Table = Table;
+exports.getBasicData = getBasicData;

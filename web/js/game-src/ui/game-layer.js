@@ -16,6 +16,9 @@ var currentPlayers = 0;
 
 var publicCards = [];
 
+var currentSmallBlind = 0;
+var currentBigBlind = 0;
+
 // visualization related
 
 var GameLayer = cc.Layer.extend({

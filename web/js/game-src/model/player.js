@@ -13,6 +13,8 @@ var Player = function(_id, _name, _displayName, _chips) {
     this.privateCards = [];
     this.action = "-";
     this.inTurn = 0;
+    this.isSmallBlind = false;
+    this.isBigBlind = false;
 };
 
 // UX flow control on player

@@ -227,6 +227,7 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     var data = {};
     var desTable = that.table[tableNumber];
     if (desTable) {
+        /*
         for (var i = 0; i < desTable.players.length; i++) {
             var player = {};
             player['playerName'] = desTable.players[i]['playerName'];
@@ -242,6 +243,8 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
         table['board'] = desTable.game.board;
         data.players = players;
         data.table = table;
+        */
+        data = poker.getBasicData(desTable);
     }
 
     return data;

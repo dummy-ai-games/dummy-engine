@@ -67,7 +67,6 @@ function initWebsock() {
                 var playerDisplayName = findDBPlayerNameById(data[i]);
                 console.log("playerDisplayName on join = " + playerDisplayName);
                 if (!players[i]) {
-
                     players[i] =
                         new Player(data[i], data[i], playerDisplayName, 1000);
                 } else {
@@ -258,6 +257,19 @@ function updateGame(data, isNewRound) {
             }
             players[i].setChips(data.players[i].chips);
             players[i].setSurvive(data.players[i].isSurvive);
+
+            if (data.table) {
+                players[i].isSmallBlind = players[i].name === data.table.smallBlind.playerName;
+                players[i].isBigBlind = players[i].name === data.table.bigBlind.playerName;
+            }
+
+            if (true === players[i].isSmallBlind) {
+                console.log(players[i].name + " is small blind");
+            }
+
+            if (true === players[i].isBigBlind) {
+                console.log(players[i].name + " is big blind");
+            }
 
             // reset action when received __new_round
             if (isNewRound) {
