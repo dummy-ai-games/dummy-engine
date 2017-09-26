@@ -1929,12 +1929,12 @@ Table.prototype.NewRound = function () {
 
     smallBlindIndex = this.findSmallBlind();
     bigBlindIndex = this.findBigBlind(smallBlindIndex);
+    this.smallBlindIndex = smallBlindIndex;
+    this.bigBlindIndex = bigBlindIndex;
     var data = getBasicData(this);
     this.eventEmitter.emit('__new_round', data);//add first round notification
     // Identify Small and Big Blind player indexes
 
-    this.smallBlindIndex = smallBlindIndex;
-    this.bigBlindIndex = bigBlindIndex;
     // Force Blind Bets
     if (this.smallBlind >= this.players[smallBlindIndex].chips) {
         this.game.bets[smallBlindIndex] = this.players[smallBlindIndex].chips;
