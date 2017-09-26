@@ -94,11 +94,11 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
      that.NewRound();
      });*/
 
-    this.eventEmitter.on('gameOver', function () {
+    this.eventEmitter.on('roundEnd', function () {
         var count = 0;
         var i;
         var data;
-        logger.info("received gameOver");
+        logger.info("received roundEnd");
         for (i = 0; i < that.players.length; i++) {
             if (that.players[i].chips <= 0 && that.players[i].reloadCount < that.maxReloadCount) {
                 that.players[i].reloadCount++;
@@ -138,11 +138,9 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logger.info("start reload time");
             setTimeout(function () {
-                var data = getBasicData(that);
-                that.eventEmitter.emit('__new_round', data);
                 that.isReloadTime = false;
                 that.NewRound();
-            }, 3 * 1000);
+            }, 5 * 1000);
         } else {
             logGame(that.tableNumber, 'game over, winners are: ');
             that.isStart = false;
@@ -1723,7 +1721,7 @@ function progress(table) {
                 /*
                  checkForBankrupt(table);
                  */
-                table.eventEmitter.emit('gameOver');
+                table.eventEmitter.emit('roundEnd');
             } else if (table.game.roundName === 'Turn') {
                 logGame(table.tableNumber, 'effective turn');
                 table.game.roundName = 'River';
@@ -1925,6 +1923,9 @@ Table.prototype.NewRound = function () {
         this.game.bets[i] = 0;
         this.game.roundBets[i] = 0;
     }
+
+    var data = getBasicData(this);
+    this.eventEmitter.emit('__new_round', data);//add first round notification
     // Identify Small and Big Blind player indexes
     smallBlindIndex = this.findSmallBlind();
     bigBlindIndex = this.findBigBlind(smallBlindIndex);
