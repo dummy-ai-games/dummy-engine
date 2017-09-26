@@ -325,8 +325,8 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     // that.broadcastInPlayers(message);
 
     // also broadcast __new_round message to all
-   /* logger.info("force preparing round 1 for table: " + tableNumber);
-    that.table[tableNumber].start1stRound();*/
+    /* logger.info("force preparing round 1 for table: " + tableNumber);
+     that.table[tableNumber].start1stRound();*/
 };
 
 SkyRTC.prototype.initTable = function (tableNumber) {
@@ -421,18 +421,18 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                     var timestamp = new Date().getTime();
                     logger.info('send player action,time is ' + timestamp);
                     currentTable.timeout = setTimeout(function () {
-                        if(currentTable.isStart) {
+                        if (currentTable.isStart) {
                             logger.info('player response: ' + currentTable.players[currentTable.currentPlayer].playerName +
                                 ', response timeout, auto FOLD');
                             currentTable.players[currentTable.currentPlayer].Fold();
                         }
-                    }, 50000);
+                    }, 5000);
                 }
             });
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
-            if(currentTable.isStart) {
+            if (currentTable.isStart) {
                 that.getPlayerAction(message, true);
             }
         }, 10 * 1000);
