@@ -8,11 +8,13 @@ var rtc = SkyRTC();
 var tableNumber = 0;
 var playerName = '';
 var dbPlayers = [];
+var autoRestart = 0;
 
 (function () {
     // get table number first
     tableNumber = getParameter('table');
     playerName = getParameter('name');
+    autoRestart = getParameter('auto') || 0;
     initGame();
 })();
 
@@ -92,10 +94,12 @@ function initWebsock() {
         updateGame(data, true);
         gameStatus = STATUS_GAME_FINISHED;
 
-        // auto start another game in 3s
-        setTimeout(function () {
-            startGame();
-        }, 3000);
+        if (1 === autoRestart) {
+            // auto start another game in 3s
+            setTimeout(function () {
+                startGame();
+            }, 3000);
+        }
     });
 
     rtc.on('__game_start', function (data) {
@@ -247,18 +251,18 @@ function updateGame(data, isNewRound) {
     if (data.players) {
         for (i = 0; i < data.players.length; i++) {
             players[i].id = data.players[i].playerName;
-            players[i].displayName = findDBPlayerNameById(data.players[i].playerName);
-            console.log('player[' + i + '].displayName = ' + players[i].displayName);
+            players[i].setDisplayName(findDBPlayerNameById(data.players[i].playerName));
             if (data.players[i].cards && data.players[i].cards.length === 2) {
                 players[i].privateCards[0] = data.players[i].cards[0];
                 players[i].privateCards[1] = data.players[i].cards[1];
             }
-            players[i].chips = data.players[i].chips;
-            players[i].isSurvive = data.players[i].isSurvive;
+            players[i].setChips(data.players[i].chips);
+            players[i].setSurvive(data.players[i].isSurvive);
 
             // reset action when received __new_round
             if (isNewRound) {
                 players[i].setAction("-");
+                players[i].setBet(0);
             }
         }
     }
