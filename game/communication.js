@@ -21,6 +21,7 @@ var errorCode = new ErrorCode();
 var errorCb = function (rtc) {
     return function (error) {
         if (error) {
+            logger.error('server internal error occurred: ' + error);
             rtc.emit('error', error);
         }
     };
@@ -74,7 +75,7 @@ function SkyRTC() {
         }
     });
 
-    this.on('_startGame', function (data) {
+    this.on('__start_game', function (data) {
         this.startGame(data.tableNumber);
     });
 
@@ -282,6 +283,9 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         return;
     }
 
+    logger.info("game start for table: " + tableNumber);
+
+    // initialize game parameters
     that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2, 100);
     that.table[tableNumber].tableNumber = tableNumber;
 
@@ -290,6 +294,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
             that.table[tableNumber].AddPlayer(player);
     }
     that.initTable(tableNumber);
+    logger.info("init table done");
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
         logger.info(that.table);
@@ -307,8 +312,14 @@ SkyRTC.prototype.startGame = function (tableNumber) {
             'data': {'msg': 'table ' + tableNumber + ' start successfully', 'tableNumber': tableNumber}
         }
     }
+    logger.info('broadcast __game_start');
 
     that.broadcastInGuests(message);
+    // that.broadcastInPlayers(message);
+
+    // also broadcast __new_round message to all
+    logger.info("force preparing round 1 for table: " + tableNumber);
+    that.table[tableNumber].start1stRound();
 };
 
 SkyRTC.prototype.initTable = function (tableNumber) {
@@ -381,7 +392,6 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
     });
-
 };
 
 SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
@@ -396,6 +406,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         if (that.players[player]) {
             that.players[player].send(JSON.stringify(message), function (error) {
                 if (error) {
+                    logger.error('server send error: ' + JSON.stringify(error));
                     that.getPlayerAction(message);
                 } else {
                     var timestamp = new Date().getTime();

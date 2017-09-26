@@ -28,9 +28,10 @@ $(document).ready(function () {
 });
 
 function initRTC() {
-    rtc.connect('ws://116.62.203.120', playerName);
+    rtc.connect('ws://localhost:3000', playerName);
+
     rtc.on('__action', function (data) {
-        console.log(data);
+        console.log('action: ' + JSON.stringify(data));
         self = data.self;
         roundBets = data.game.roundBets;
         bets = data.game.bets;
@@ -54,6 +55,7 @@ function initRTC() {
     });
 
     rtc.on('__new_round', function (data) {
+        console.log('new round: ' + JSON.stringify(data));
         playerActions = {};
         gameStatus = 0;
     });
@@ -81,16 +83,16 @@ function initRTC() {
     });
 
     rtc.on('__start_reload', function (data) {
-        console.log('received start reload request:' + JSON.stringify(data));
+        console.log('start reload:' + JSON.stringify(data));
         reload();
     });
 
     rtc.on('__round_end', function(data) {
-        console.log('received round end:' + JSON.stringify(data));
+        console.log('round end:' + JSON.stringify(data));
     });
 
     rtc.on('__game_over', function(data) {
-        console.log('received game over:' + JSON.stringify(data));
+        console.log('game over:' + JSON.stringify(data));
     });
 }
 
