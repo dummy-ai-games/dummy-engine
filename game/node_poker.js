@@ -133,6 +133,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             logger.info("start reload time");
             setTimeout(function () {
                 that.isReloadTime = false;
+                that.isBet = false;
                 that.NewRound();
             }, 5 * 1000);
         } else {
@@ -1932,6 +1933,12 @@ Table.prototype.NewRound = function () {
     bigBlindIndex = this.findBigBlind(smallBlindIndex);
     this.smallBlindIndex = smallBlindIndex;
     this.bigBlindIndex = bigBlindIndex;
+
+    /*
+    var data = getBasicData(this);
+    this.eventEmitter.emit('__new_round', data);//add first round notification
+    */
+    // Identify Small and Big Blind player indexes
     // Force Blind Bets
     if (this.smallBlind >= this.players[smallBlindIndex].chips) {
         this.game.bets[smallBlindIndex] = this.players[smallBlindIndex].chips;
