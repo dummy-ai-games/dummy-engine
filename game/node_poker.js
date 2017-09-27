@@ -1877,7 +1877,7 @@ Table.prototype.StartGame = function () {
     console.log("start game");
     if (!this.game) {
         this.playersToRemove = [];
-        this.dealer = Math.round(Math.random() * (this.surviveCount));
+        this.dealer = parseInt(Math.random() * (this.surviveCount));
         this.firstDealer = this.dealer;
         this.isStart = true;
         this.game = new Game(this.smallBlind, this.bigBlind);
