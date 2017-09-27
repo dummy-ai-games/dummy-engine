@@ -1,0 +1,60 @@
+{
+    "players": [
+        {
+            "playerName": "bobi",
+            "chips": 1080,
+            "folded": true,
+            "allIn": false,
+            "cards": [
+                "3C",
+                "5C"
+            ],
+            "isSurvive": true,
+            "reloadCount": 0
+        },
+        {
+            "playerName": "cicy",
+            "chips": 960,
+            "folded": true,
+            "allIn": false,
+            "cards": [
+                "QS",
+                "7C"
+            ],
+            "isSurvive": true,
+            "reloadCount": 0
+        },
+        {
+            "playerName": "geoge",
+            "chips": 960,
+            "folded": true,
+            "allIn": false,
+            "cards": [
+                "KS",
+                "8D"
+            ],
+            "isSurvive": true,
+            "reloadCount": 0
+        }
+    ],
+    "table": {
+        "tableNumber": "1",
+        "roundName": "Showdown",
+        "board": [
+            "AD",
+            "4S",
+            "2C",
+            "9S",
+            "5H"
+        ],
+        "roundCount": 1,
+        "smallBlind": {
+            "playerName": "bobi",
+            "amount": 10
+        },
+        "bigBlind": {
+            "playerName": "cicy",
+            "amount": 20
+        }
+    }
+}

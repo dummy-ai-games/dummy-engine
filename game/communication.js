@@ -325,11 +325,9 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     logger.info('broadcast __game_start');
 
     that.broadcastInGuests(message);
-    // that.broadcastInPlayers(message);
 
-    // also broadcast __new_round message to all
-    /* logger.info("force preparing round 1 for table: " + tableNumber);
-     that.table[tableNumber].start1stRound();*/
+    // TODO: a little bit tweak, should be optimized
+    that.table[tableNumber].NewRound();
 };
 
 SkyRTC.prototype.initTable = function (tableNumber) {
@@ -429,7 +427,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                                 ', response timeout, auto FOLD');
                             currentTable.players[currentTable.currentPlayer].Fold();
                         }
-                    }, 5000);
+                    }, 60 * 1000); // for BETA test, set to 1min, for official game, set to 2s
                 }
             });
         }
@@ -438,7 +436,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             if (currentTable.isStart) {
                 that.getPlayerAction(message, true);
             }
-        }, 10 * 1000);
+        }, 10 * 1000); // for BETA test, set to 10s
     } else {
         // bug fix - crash after players quit
         if (currentTable && currentTable.isStart) {
@@ -520,7 +518,7 @@ SkyRTC.prototype.init = function (socket) {
     socket.on('close', function () {
         that.emit('remove_peer', socket.id);
         var tableNumber = that.playerAndTable[socket.id];
-        if (tableNumber && that.table[tableNumber].isStart) {
+        if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
             that.exitPlayers[socket.id] = socket.tableNumber;
         }
         that.removeSocket(socket);

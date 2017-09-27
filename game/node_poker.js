@@ -89,13 +89,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         }
     });
 
-    /*this.eventEmitter.on('1stRound', function () {
-     var data = getBasicData(that);
-     that.eventEmitter.emit('__new_round', data);
-     that.isReloadTime = false;
-     that.NewRound();
-     });*/
-
     this.eventEmitter.on('roundEnd', function () {
         var count = 0;
         var i;
@@ -133,7 +126,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.game = new Game(that.smallBlind, that.bigBlind);
             var nextDealer = getNextDealer(that);
             logGame(that.tableNumber, "current dealer is:" + that.dealer + " next is:" + nextDealer);
-
             that.dealer = nextDealer;
             that.roundCount++;
             that.isReloadTime = true;
@@ -188,7 +180,7 @@ function getBasicData(table) {
     bbPlayerIndex = table.bigBlindIndex;
 
     mytable['tableNumber'] = table.tableNumber;
-    mytable['roundName'] = table.roundName;
+    mytable['roundName'] = table.game.roundName;
     mytable['board'] = table.game.board;
     mytable['roundCount'] = table.roundCount;
     if (-1 !== sbPlayerIndex) {
@@ -287,10 +279,13 @@ function takeAction(table, action) {
         if (i === table.currentPlayer) {
             player['cards'] = table.players[i]['cards'];
             destPlayer = player;
-        } else
+        } else {
             players.push(player);
-
+        }
     }
+
+    var sbPlayerIndex = table.smallBlindIndex;
+    var bbPlayerIndex = table.bigBlindIndex;
 
     var data = {
         'tableNumber': table.tableNumber,
@@ -300,7 +295,15 @@ function takeAction(table, action) {
             'board': table.game.board,
             'minBet': table.bigBlind,
             'roundName': table.game.roundName,
-            'otherPlayers': players
+            'otherPlayers': players,
+            'smallBlind': {
+                playerName: table.players[sbPlayerIndex].playerName,
+                amount: table.smallBlind
+            },
+            'bigBlind': {
+                playerName: table.players[bbPlayerIndex].playerName,
+                amount: table.bigBlind
+            }
         }
     };
 
@@ -426,7 +429,6 @@ function checkForAllInPlayer(table, winners) {
     return allInPlayer;
 }
 
-
 function checkForWinner(table) {
     var i, j, k, l, maxRank, winners, part, prize, allInPlayer, minBets, roundEnd;
     // Identify winner(s)
@@ -457,7 +459,6 @@ function checkForWinner(table) {
         part = parseInt(minBets, 10);
     } else {
         part = parseInt(table.game.roundBets[winners[0]], 10);
-
     }
     for (l = 0; l < table.game.roundBets.length; l += 1) {
         if (table.game.roundBets[l] > part) {
@@ -1872,13 +1873,13 @@ Table.prototype.initNewRound = function () {
 
 Table.prototype.StartGame = function () {
     // If there is no current game and we have enough players, start a new game.
+    console.log("start game");
     if (!this.game) {
         this.playersToRemove = [];
         this.dealer = Math.round(Math.random() * (this.surviveCount));
         this.firstDealer = this.dealer;
         this.isStart = true;
         this.game = new Game(this.smallBlind, this.bigBlind);
-        this.NewRound();
     }
 };
 
@@ -1926,8 +1927,6 @@ Table.prototype.NewRound = function () {
         this.game.roundBets[i] = 0;
     }
 
-    var data = getBasicData(this);
-    this.eventEmitter.emit('__new_round', data);//add first round notification
     // Identify Small and Big Blind player indexes
     smallBlindIndex = this.findSmallBlind();
     bigBlindIndex = this.findBigBlind(smallBlindIndex);
@@ -1959,6 +1958,10 @@ Table.prototype.NewRound = function () {
     // Get currentPlayer
     this.currentPlayer = bigBlindIndex;
     this.eventEmitter.emit('newRound');
+
+    // emit __new_round message after small blind and big blind is decided
+    var data = getBasicData(this);
+    this.eventEmitter.emit('__new_round', data);//add first round notification
 };
 
 Table.prototype.findSmallBlind = function() {
@@ -2223,3 +2226,6 @@ function logGame(tableNumber, msg) {
 
 exports.Table = Table;
 exports.getBasicData = getBasicData;
+exports.getPlayerReloadData = getPlayerReloadData;
+exports.getNextPlayer = getNextPlayer;
+exports.getNextDealer = getNextDealer;

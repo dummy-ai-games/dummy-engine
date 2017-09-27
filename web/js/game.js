@@ -246,6 +246,19 @@ function updateGame(data, isNewRound) {
         currentRound = data.table.roundCount;
     }
 
+    // update table
+    if (data.table) {
+        publicCards = [];
+        for (i = 0; i < data.table.board.length; i++) {
+            publicCards[i] = data.table.board[i];
+        }
+        currentSmallBlind = data.table.smallBlind.amount;
+        currentBigBlind = data.table.bigBlind.amount;
+        console.log("current small blind = " + currentSmallBlind + ", current big blind = " + currentBigBlind);
+    } else {
+        console.log('data.table is null');
+    }
+
     // update players
     if (data.players) {
         for (i = 0; i < data.players.length; i++) {
@@ -255,6 +268,12 @@ function updateGame(data, isNewRound) {
                 players[i].privateCards[0] = data.players[i].cards[0];
                 players[i].privateCards[1] = data.players[i].cards[1];
             }
+            // reset action when received __new_round
+            if (isNewRound) {
+                players[i].setAction("-");
+                players[i].setBet(0);
+            }
+
             players[i].setChips(data.players[i].chips);
             players[i].setSurvive(data.players[i].isSurvive);
 
@@ -264,29 +283,18 @@ function updateGame(data, isNewRound) {
             }
 
             if (true === players[i].isSmallBlind) {
-                console.log(players[i].name + " is small blind");
+                console.log(players[i].name + " is small blind : " + currentSmallBlind);
+                players[i].setBet(currentSmallBlind);
             }
 
             if (true === players[i].isBigBlind) {
-                console.log(players[i].name + " is big blind");
+                console.log(players[i].name + " is big blind : " + currentBigBlind);
+                players[i].setBet(currentBigBlind);
             }
 
-            // reset action when received __new_round
-            if (isNewRound) {
-                players[i].setAction("-");
-                players[i].setBet(0);
-            }
+            // get float 1
+            players[i].setChips(players[i].chips.toFixed(1));
         }
-    }
-
-    // update table
-    if (data.table) {
-        publicCards = [];
-        for (i = 0; i < data.table.board.length; i++) {
-            publicCards[i] = data.table.board[i];
-        }
-    } else {
-        console.log('data.table is null');
     }
 }
 

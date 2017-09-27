@@ -1,0 +1,51 @@
+{
+    "players": [
+        {
+            "playerName": "bobi",
+            "chips": 980,
+            "folded": false,
+            "allIn": false,
+            "isSurvive": true,
+            "reloadCount": 0,
+            "cards": [
+                "QS",
+                "QC"
+            ]
+        },
+        {
+            "playerName": "cicy",
+            "chips": 990,
+            "folded": false,
+            "allIn": false,
+            "isSurvive": true,
+            "reloadCount": 0
+        },
+        {
+            "playerName": "geoge",
+            "chips": 980,
+            "folded": false,
+            "allIn": false,
+            "isSurvive": true,
+            "reloadCount": 0
+        }
+    ],
+    "table": {
+        "tableNumber": "1",
+        "board": [],
+        "roundCount": 1,
+        "smallBlind": {
+            "playerName": "cicy",
+            "amount": 10
+        },
+        "bigBlind": {
+            "playerName": "geoge",
+            "amount": 20
+        }
+    },
+    "action": {
+        "action": "call",
+        "playerName": "bobi",
+        "amount": 20,
+        "chips": 980
+    }
+}

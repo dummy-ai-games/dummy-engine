@@ -29,7 +29,7 @@
                 </div>
             </div>
         </div>
-        <h2>文档 V1.0.2</h2>
+        <h2>文档 V1.0.3</h2>
         <h4>2017-09-25</h4>
         <br>
         <div>
@@ -64,7 +64,7 @@
                     <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
                     <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017  Task Force确定</p>
                     <p>2. 比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
-                    <p>3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>100轮</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>30</u></b> 人进入复赛</p>
+                    <p>3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>10圈</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>至多30名</u></b> 进入复赛</p>
                     <p>4. 复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛</p>
                     <p>5. 决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
                     <p>6. dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></p>
@@ -140,15 +140,26 @@
                     <hr>
                     <a name="new_round" style="text-decoration: none;"><h4><strong>新一轮开始</strong></h4></a>
                     <ul>
-                        <p><span class="new_content">在除了第1轮之外的</span>游戏开始时, 客户端都将收到服务器广播的 __new_round 消息</p>
+                        <p>游戏开始时, 客户端都将收到服务器广播的 __new_round 消息</p>
                         <pre>
 {
     "eventName" : "__new_round",
     "data" : {
-        "table" : {
-            "tableNumber" : 1,
-            "roundName" : "Deal", // 其它可选项为 : "Flop", "Turn", "River"
-            "board" : "[XX, XX, XX]"
+        "table": {
+            "tableNumber": "1",
+            "roundName": "Deal",
+            "board": [],
+            "roundCount": 1,
+            <span class="new_content">
+            "smallBlind": {
+                "playerName": "bobi",
+                "amount": 10
+            },
+            "bigBlind": {
+                "playerName": "cicy",
+                "amount": 20
+            }
+            </span>
         },
         "players" : [
             {
@@ -251,6 +262,16 @@
             "isSurvive" : true
         },
         "game" : {
+            <span class="new_content">
+            "smallBlind": {
+                "playerName": "bobi",
+                "amount": 10
+            },
+            "bigBlind": {
+                "playerName": "cicy",
+                "amount": 20
+            },
+            </span>
             "gameBets" : [
                 {
                     "playerName" : "bobi",
@@ -310,6 +331,7 @@
                         <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
                         <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
                         <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
+                        <p class="new_content">1.9 data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
                         <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise" 中的一种, 决策的数据格式如下</p>
 <pre>
 {
@@ -335,6 +357,16 @@
             "isSurvive" : true
         },
         "game" : {
+            <span class="new_content">
+            "smallBlind": {
+                "playerName": "bobi",
+                "amount": 10
+            },
+            "bigBlind": {
+                "playerName": "cicy",
+                "amount": 20
+            },
+            </span>
             "gameBets" : [
                 {
                     "playerName" : "bobi",
@@ -419,7 +451,18 @@
         "table" : {
             "tableNumber" : 1,
             "roundName" : "Turn",
-            "board" : [XX, XX, XX, XX]
+            "board" : [XX, XX, XX, XX],
+            "roundCount": 1,
+            <span class="new_content">
+            "smallBlind": {
+                "playerName": "geoge",
+                "amount": 10
+            },
+            "bigBlind": {
+                "playerName": "bobi",
+                "amount": 20
+            }
+            </span>
         },
         "players" : [
             {
@@ -452,6 +495,7 @@
                         <p>2. data.action 表示当前导致牌局发生变化的任意一名玩家的行动, data.action.amount 表示当前这名玩家所追加的赌注的数值(不论是call, raise还是bet)</p>
                         <p>3. data.table 表示当前牌桌的状态, 包括公共牌的状态和已经发出的公共牌</p>
                         <p>4. data.players 表示当前所有玩家的状态, 请参考前序指令中的说明, 这里不再赘述</p>
+                        <p class="new_content">5 data.table.smallBlind 和 data.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
                         <p>以下是某次回合导致牌局发生变化之后服务器和客户端交互的消息示意图</p>
                         <img src="res/images/document/show_action_message.png" style="width: 75%; height: 75%;">
                     </ul>
@@ -492,15 +536,27 @@
         ],
         "table": {
             "tableNumber": "1",
+            "roundName": "Showdown",
             "board": [
-                "QS",
-                "TS",
-                "AH",
-                "5S",
-                "9H"
+                "AD",
+                "4S",
+                "2C",
+                "9S",
+                "5H"
             ],
-            "roundCount": 1
+            "roundCount": 1,
+            <span class="new_content">
+            "smallBlind": {
+                "playerName": "bobi",
+                "amount": 10
+            },
+            "bigBlind": {
+                "playerName": "cicy",
+                "amount": 20
+            }
+            </span>
         }
+    }
 }</pre>
                         <p>指令说明:</p>
                         <p>1. __round_end 是一条服务器的广播消息, 目的是让玩家知道本轮所有其他玩家的手牌以及公开牌, 为玩家准备下一轮策略做准备</p>
@@ -557,14 +613,25 @@
         ],
         "table": {
             "tableNumber": "1",
+            "roundName": "Showdown",
             "board": [
-                "8S",
-                "QC",
-                "QS",
-                "QD",
-                "2S"
+                "AD",
+                "4S",
+                "2C",
+                "9S",
+                "5H"
             ],
-            "roundCount": 16
+            "roundCount": 16,
+            <span class="new_content">
+            "smallBlind": {
+                "playerName": "bobi",
+                "amount": 10
+            },
+            "bigBlind": {
+                "playerName": "cicy",
+                "amount": 20
+            }
+            </span>
         },
         "winners": [
             {
@@ -729,7 +796,7 @@
                     <p><span>请开发者自行修改示例代码中的 Socket 地址和接入用户名信息以方便自助测试</span></p>
                     <div class="row">
                         <div class="col-md-4">
-                            <h2>Javascript V1.0.2 <img src="./res/images/red-dot-md.png"></h2>
+                            <h2>Javascript V1.0.1 <img src="./res/images/red-dot-md.png"></h2>
                             <p>启动方式：双击用浏览器打开 player.html, 并附加URL参数name=your_name, <br>例如: file:///D:/player.html?name=bobi<br><br></p>
                             <p><a class="btn btn-large btn-default" href="./example/js-example.zip" role="button">js 示例下载 &raquo;</a></p>
                         </div>
@@ -753,6 +820,14 @@
                 <div class="tab-pane" id="release_note">
                     <a style="text-decoration: none;"><h4><strong>平台更新日志</strong></h4></a>
                     <hr>
+                    <div>
+                        <h4>V1.0.3 (2017-09-27)</h4>
+                        修正了一些异常操作引起的crash<br>
+                        dealer和大、小盲注的位置及数额将反馈到玩家和观众前端, 请注意看文档更新<br>
+                        目前服务器等待玩家超时时间暂时设置为1min(正式比赛时会调整为2s), 方便部分测试玩家手动发送指令<br>
+                        第一轮游戏开始时也会有__new_round通知了
+                    </div>
+                    <br>
                     <div>
                         <h4>V1.0.2 (2017-09-25)</h4>
                         修正了小, 大盲注每一圈翻倍的bug<br>

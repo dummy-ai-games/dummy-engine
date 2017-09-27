@@ -67,6 +67,8 @@ var GameLayer = cc.Layer.extend({
 
     // texts
     roundText: null,
+    smallBlindText: null,
+    bitBlindText: null,
     nameTexts: [],
     moneyTexts: [],
     actionTexts: [],
@@ -106,7 +108,7 @@ var GameLayer = cc.Layer.extend({
         this.addChild(this.bgSprite);
 
         // show round N text at the center | top
-        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 24,
+        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 20,
             cc.size(this.validWidth / 8 * this.playerScale, this.validHeight / 4 * this.playerScale));
         this.roundText.setColor(cc.color(255, 255, 255, 255));
 
@@ -120,18 +122,18 @@ var GameLayer = cc.Layer.extend({
         // initialize N empty players
         for (i = 0; i < this.playerMax; i++) {
 
-            this.nameTexts[i] = new cc.LabelTTF("Wait...", this.defaultFont, 24,
+            this.nameTexts[i] = new cc.LabelTTF("Wait...", this.defaultFont, 20,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.avatarSprites[i] = new cc.Sprite.create(s_a_avatar_none);
 
-            this.moneyTexts[i] = new cc.LabelTTF("0", this.defaultFont, 24,
+            this.moneyTexts[i] = new cc.LabelTTF("0", this.defaultFont, 20,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
-            this.actionTexts[i] = new cc.LabelTTF("-", this.defaultFont, 24,
+            this.actionTexts[i] = new cc.LabelTTF("-", this.defaultFont, 20,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
-            this.betTexts[i] = new cc.LabelTTF("0", this.defaultFont, 24,
+            this.betTexts[i] = new cc.LabelTTF("0", this.defaultFont, 20,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.nameTexts[i].setColor(cc.color(255, 255, 255, 255));
@@ -274,6 +276,29 @@ var GameLayer = cc.Layer.extend({
         this.addChild(this.publicCardSprites[3], 6);
         this.addChild(this.publicCardSprites[4], 6);
 
+        // add small/big blind text
+        this.smallBlindText = new cc.LabelTTF("SB: " + currentSmallBlind, this.defaultFont, 20,
+            cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 4 * this.playerScale));
+        this.smallBlindText.setColor(cc.color(255, 255, 0, 255));
+
+        this.smallBlindText.setAnchorPoint(0, 0);
+        this.smallBlindText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT);
+        this.smallBlindText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.smallBlindText.boundingWidth = this.validWidth / 16 * this.playerScale;
+        this.smallBlindText.setPosition(this.validWidth / 16  * 12, this.validHeight - this.roundText.height);
+        this.addChild(this.smallBlindText, 6);
+
+        this.bigBlindText = new cc.LabelTTF("BB: " + currentBigBlind, this.defaultFont, 20,
+            cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 4 * this.playerScale));
+        this.bigBlindText.setColor(cc.color(255, 127, 127, 255));
+
+        this.bigBlindText.setAnchorPoint(0, 0);
+        this.bigBlindText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT);
+        this.bigBlindText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.bigBlindText.boundingWidth = this.validWidth / 16 * this.playerScale;
+        this.bigBlindText.setPosition(this.validWidth / 16  * 14, this.validHeight - this.roundText.height);
+        this.addChild(this.bigBlindText, 6);
+
         // add game start button
         this.startButton = cc.MenuItemImage.create(
             btn_start,
@@ -332,17 +357,17 @@ var GameLayer = cc.Layer.extend({
             case STATUS_WAITING_FOR_PLAYERS:
                 this.updateRound();
                 this.updatePlayers();
-                this.updatePublicCards(false);
+                this.updateTable(false);
                 break;
             case STATUS_GAME_RUNNING:
                 this.updateRound();
                 this.updatePlayers();
-                this.updatePublicCards(true);
+                this.updateTable(true);
                 break;
             case STATUS_GAME_FINISHED:
                 this.updateRound();
                 this.updatePlayers();
-                this.updatePublicCards(true);
+                this.updateTable(true);
                 break;
 
             default:
@@ -383,10 +408,17 @@ var GameLayer = cc.Layer.extend({
 
             if (undefined !== players[i].isSurvive) {
                 if (players[i].isSurvive === true) {
-                    this.nameTexts[i].setColor(cc.color(0, 255, 255, 255));
+                    this.nameTexts[i].setColor(cc.color(255, 255, 255, 255));
                 } else {
                     this.nameTexts[i].setColor(cc.color(255, 0, 0, 255));
                 }
+            }
+
+            if (undefined !== players[i].isSmallBlind && true === players[i].isSmallBlind) {
+                this.nameTexts[i].setColor(cc.color(255, 255, 0, 255));
+            }
+            if (undefined !== players[i].isBigBlind && true === players[i].isBigBlind) {
+                this.nameTexts[i].setColor(cc.color(255, 128, 128, 255));
             }
 
             this.nameTexts[i].setVisible(true);
@@ -402,7 +434,7 @@ var GameLayer = cc.Layer.extend({
                 this.actionTexts[i].setFontSize(48);
             } else {
                 this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
-                this.actionTexts[i].setFontSize(24);
+                this.actionTexts[i].setFontSize(20);
             }
             this.actionTexts[i].setVisible(true);
 
@@ -427,7 +459,7 @@ var GameLayer = cc.Layer.extend({
         }
     },
 
-    updatePublicCards: function(visible) {
+    updateTable: function(visible) {
         var i;
         // clear public cards
         var frame;
@@ -446,6 +478,10 @@ var GameLayer = cc.Layer.extend({
             }
             this.publicCardSprites[i].setVisible(visible);
         }
+
+        // update small blind and big blind
+        this.smallBlindText.setString("SB: " + currentSmallBlind);
+        this.bigBlindText.setString("BB: " + currentBigBlind);
     },
 
     updateBg: function() {

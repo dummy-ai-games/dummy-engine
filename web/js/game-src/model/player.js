@@ -10,6 +10,7 @@ var Player = function(_id, _name, _displayName, _chips) {
     this.isSurvive = true;
     this.chips = _chips;
     this.bet = 0;
+    this.accumulate = 0;
     this.privateCards = [];
     this.action = "-";
     this.inTurn = 0;
@@ -20,6 +21,7 @@ var Player = function(_id, _name, _displayName, _chips) {
 // UX flow control on player
 Player.prototype.setBet = function (_bet) {
     this.bet = _bet;
+    this.accumulate += _bet;
     this.chips -= _bet;
 };
 

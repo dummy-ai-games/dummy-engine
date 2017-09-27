@@ -43,7 +43,7 @@ function initRTC() {
     });
 
     rtc.on('__bet', function (data) {
-        console.log(data);
+        console.log('bet: ' + JSON.stringify(data));
         self = data.self;
         roundBets = data.game.roundBets;
         bets = data.game.bets;
@@ -61,7 +61,7 @@ function initRTC() {
     });
 
     rtc.on('__show_action', function (data) {
-        console.log('action : ' + JSON.stringify(data.action));
+        console.log('show action : ' + JSON.stringify(data));
         var playerAction = data.action;
 
 
