@@ -2132,7 +2132,7 @@ Player.prototype.Bet = function (bet) {
                     logGame(this.table.tableNumber, 'player: ' + this.playerName + ' BET: ' + bet);
                     progress(this.table);
                 } else {
-                    logGame(this.table.tableNumber, 'bet value:' + this.chips + ' lower than min need bet:) -->Auto Call !!!');
+                    logGame(this.table.tableNumber, 'bet value:' + bet + ' lower than min need bet:) -->Auto Call !!!');
                     this.Call();
                 }
                 break;
