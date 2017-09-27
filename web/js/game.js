@@ -155,20 +155,24 @@ function initWebsock() {
             roundAction.action === 'fold' ||
             roundAction.action === 'raise' ||
             roundAction.action === 'call') {
-            console.log('table ' + tableNumber + ', player: ' + roundAction.playerName + ' take action: ' + roundAction.action);
+            console.log('table ' + tableNumber + ', player: ' + roundAction.playerName +
+                ' take action: ' + roundAction.action);
             // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setAction(roundAction.action);
-                if (data.action.amount) {
-                    players[playerIndex].setBet(data.action.amount);
+                if (roundAction.action === 'fold') {
+                    players[playerIndex].setBet(0);
+                } else if (roundAction.amount) {
+                    players[playerIndex].setBet(roundAction.amount);
                 }
             }
         } else {
-            console.log('table ' + tableNumber + ', player:' + roundAction.playerName + ' take action:' + roundAction.action + ', bet amount: ' + roundAction.amount);
+            console.log('table ' + tableNumber + ', player:' + roundAction.playerName + ' take action:' +
+                roundAction.action + ', bet amount: ' + roundAction.amount);
             // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setAction(roundAction.action);
-                if (data.action.amount) {
+                if (roundAction.amount) {
                     players[playerIndex].setBet(data.action.amount);
                 }
             }
@@ -268,10 +272,19 @@ function updateGame(data, isNewRound) {
                 players[i].privateCards[0] = data.players[i].cards[0];
                 players[i].privateCards[1] = data.players[i].cards[1];
             }
+            players[i].setAccRoundBet(data.players[i].roundBet);
+            players[i].setAccBet(data.players[i].bet);
+
+            // set player accumulate
+            var accumulate = players[i].accRoundBet + players[i].accBet;
+            players[i].setAccumulate(accumulate);
             // reset action when received __new_round
             if (isNewRound) {
                 players[i].setAction("-");
                 players[i].setBet(0);
+                players[i].setAccRoundBet(0);
+                players[i].setAccBet(0);
+                players[i].setAccumulate(0);
             }
 
             players[i].setChips(data.players[i].chips);
@@ -282,15 +295,18 @@ function updateGame(data, isNewRound) {
                 players[i].isBigBlind = players[i].name === data.table.bigBlind.playerName;
             }
 
+            // let blind be blind : )
+            /*
             if (true === players[i].isSmallBlind) {
                 console.log(players[i].name + " is small blind : " + currentSmallBlind);
-                players[i].setBet(currentSmallBlind);
+                players[i].setBlind(currentSmallBlind);
             }
 
             if (true === players[i].isBigBlind) {
                 console.log(players[i].name + " is big blind : " + currentBigBlind);
-                players[i].setBet(currentBigBlind);
+                players[i].setBlind(currentBigBlind);
             }
+            */
 
             // get float 1
             players[i].setChips(players[i].chips.toFixed(1));

@@ -476,13 +476,13 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
     for (var i = 0; i < message.data.players.length; i++) {
         cards[message.data.players[i].playerName] = message.data.players[i].cards;
         playersData[message.data.players[i].playerName] = message.data.players[i];
-        if (message.eventName != '__game_over' && message.eventName != '__round_end')
+        if (message.eventName !== '__game_over' && message.eventName !== '__round_end')
             delete message.data.players[i].cards;
     }
     var tableNumber = message.data.table.tableNumber;
     for (var player in this.players) {
-        if (this.players[player].tableNumber == tableNumber) {
-            if (message.eventName != '__game_over' && message.eventName != '__round_end') {
+        if (this.players[player].tableNumber === tableNumber) {
+            if (message.eventName !== '__game_over' && message.eventName !== '__round_end') {
                 playersData[player].cards = cards[player];
                 this.players[player].send(JSON.stringify(message), errorCb);
                 playersData[player].cards = [];

@@ -18,7 +18,7 @@ var danger = 2;
 var rtc = SkyRTC();
 var playerName = '';
 
-var CALL_IN_TIME = 100;
+var CALL_IN_TIME = 5000;
 
 $(document).ready(function () {
     playerName = getParameter('name');
@@ -28,7 +28,7 @@ $(document).ready(function () {
 });
 
 function initRTC() {
-    rtc.connect('ws://116.62.203.120', playerName);
+    rtc.connect('ws://localhost:3000', playerName);
 
     rtc.on('__action', function (data) {
         console.log('action: ' + JSON.stringify(data));

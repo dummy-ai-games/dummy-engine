@@ -161,10 +161,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
 function getBasicData(table) {
     var players = [];
-    var mytable = {};
+    var myTable = {};
     var data = {};
-    var sbPlayerIndex = -1;
-    var bbPlayerIndex = -1;
 
     for (var i = 0; i < table.players.length; i++) {
         var player = {};
@@ -175,30 +173,35 @@ function getBasicData(table) {
         player['cards'] = table.players[i]['cards'];
         player['isSurvive'] = table.players[i]['isSurvive'];
         player['reloadCount'] = table.players[i]['reloadCount'];
+        // include bets info
+        if (table.game) {
+            player['roundBet'] = table.game.roundBets[i];
+            player['bet'] = table.game.bets[i];
+        }
         players.push(player);
     }
-    sbPlayerIndex = table.smallBlindIndex;
-    bbPlayerIndex = table.bigBlindIndex;
+    var sbPlayerIndex = table.smallBlindIndex;
+    var bbPlayerIndex = table.bigBlindIndex;
 
-    mytable['tableNumber'] = table.tableNumber;
-    mytable['roundName'] = table.game.roundName;
-    mytable['board'] = table.game.board;
-    mytable['roundCount'] = table.roundCount;
+    myTable['tableNumber'] = table.tableNumber;
+    myTable['roundName'] = table.game.roundName;
+    myTable['board'] = table.game.board;
+    myTable['roundCount'] = table.roundCount;
     if (-1 !== sbPlayerIndex) {
-        mytable['smallBlind'] = {
+        myTable['smallBlind'] = {
             playerName: table.players[sbPlayerIndex].playerName,
             amount: table.smallBlind
         };
     }
 
     if (-1 !== bbPlayerIndex) {
-        mytable['bigBlind'] = {
+        myTable['bigBlind'] = {
             playerName: table.players[bbPlayerIndex].playerName,
             amount: table.bigBlind
         };
     }
     data.players = players;
-    data.table = mytable;
+    data.table = myTable;
     return data;
 }
 

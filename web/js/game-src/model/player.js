@@ -19,10 +19,28 @@ var Player = function(_id, _name, _displayName, _chips) {
 };
 
 // UX flow control on player
-Player.prototype.setBet = function (_bet) {
+Player.prototype.setBet = function(_bet) {
     this.bet = _bet;
-    this.accumulate += _bet;
-    this.chips -= _bet;
+};
+
+Player.prototype.setChips = function(_chips) {
+    this.chips = _chips;
+};
+
+Player.prototype.setAccRoundBet = function(_accRoundBet) {
+    this.accRoundBet = _accRoundBet;
+};
+
+Player.prototype.setAccBet = function(_accBet) {
+    this.accBet = _accBet;
+};
+
+Player.prototype.setAccumulate = function(_accumulate) {
+    this.accumulate = _accumulate;
+};
+
+Player.prototype.setBlind = function(_smallBlind) {
+    this.bet = _smallBlind;
 };
 
 Player.prototype.setChips = function(_chips) {
