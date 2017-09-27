@@ -120,21 +120,18 @@ function SkyRTC() {
                     try {
                         switch (action) {
                             case 'bet':
-                                if (currentTable.isBet) {
-                                    var amount;
-                                    try {
-                                        amount = parseInt(data.amount);
-                                    } catch (e) {
-                                        logger.error(e.message);
-                                        amount = currentTable.bigBlind;
-                                    }
-                                    currentTable.players[playerIndex].Bet(amount);
-                                } else
-                                    currentTable.players[playerIndex].Call();
+                                var amount;
+                                try {
+                                    amount = parseInt(data.amount);
+                                } catch (e) {
+                                    logger.error(e.message);
+                                    amount = currentTable.bigBlind;
+                                }
+                                currentTable.players[playerIndex].Bet(amount);
                                 break;
                             case 'call':
                                 if (currentTable.isBet)
-                                    currentTable.players[playerIndex].Bet(currentTable.smallBlind);
+                                    currentTable.players[playerIndex].Bet(currentTable.bigBlind);
                                 else
                                     currentTable.players[playerIndex].Call();
                                 break;
@@ -143,7 +140,7 @@ function SkyRTC() {
                                 break;
                             case 'raise':
                                 if (currentTable.isBet)
-                                    currentTable.players[playerIndex].Bet(currentTable.smallBlind);
+                                    currentTable.players[playerIndex].Bet(currentTable.bigBlind);
                                 else
                                     currentTable.players[playerIndex].Raise();
                                 break;
@@ -423,7 +420,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                     logger.info('send player action,time is ' + timestamp);
                     currentTable.timeout = setTimeout(function () {
                         if (currentTable.isStart) {
-                            logger.info("table " + tableNumber +" player " + player + " response timeout, auto FOLD");
+                            logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
                             currentTable.players[currentTable.currentPlayer].Fold();
                         }
                     }, 60 * 1000); // for BETA test, set to 1min, for official game, set to 2s

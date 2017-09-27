@@ -1934,10 +1934,6 @@ Table.prototype.NewRound = function () {
     this.smallBlindIndex = smallBlindIndex;
     this.bigBlindIndex = bigBlindIndex;
 
-    /*
-    var data = getBasicData(this);
-    this.eventEmitter.emit('__new_round', data);//add first round notification
-    */
     // Identify Small and Big Blind player indexes
     // Force Blind Bets
     if (this.smallBlind >= this.players[smallBlindIndex].chips) {
@@ -1948,6 +1944,8 @@ Table.prototype.NewRound = function () {
         this.surviveCount--;
     } else {
         this.players[smallBlindIndex].chips -= this.smallBlind;
+        if (this.players[smallBlindIndex].chips % 1 != 0)
+            this.players[smallBlindIndex].chips = this.players[smallBlindIndex].chips.toFixed(2);
         this.game.bets[smallBlindIndex] = this.smallBlind;
     }
 
@@ -1959,19 +1957,22 @@ Table.prototype.NewRound = function () {
         this.surviveCount--;
     } else {
         this.players[bigBlindIndex].chips -= this.bigBlind;
+        if (this.players[bigBlindIndex].chips % 1 != 0)
+            this.players[bigBlindIndex].chips = this.players[bigBlindIndex].chips.toFixed(2);
         this.game.bets[bigBlindIndex] = this.bigBlind;
     }
-
-    // Get currentPlayer
-    this.currentPlayer = bigBlindIndex;
-    this.eventEmitter.emit('newRound');
 
     // emit __new_round message after small blind and big blind is decided
     var data = getBasicData(this);
     this.eventEmitter.emit('__new_round', data);//add first round notification
+
+
+    // Get currentPlayer
+    this.currentPlayer = bigBlindIndex;
+    this.eventEmitter.emit('newRound');
 };
 
-Table.prototype.findSmallBlind = function() {
+Table.prototype.findSmallBlind = function () {
     var smallBlind = this.dealer;
     if (smallBlind >= this.players.length) {
         smallBlind = 0;
@@ -1986,7 +1987,7 @@ Table.prototype.findSmallBlind = function() {
     return smallBlind;
 };
 
-Table.prototype.findBigBlind = function(smallBindIndex) {
+Table.prototype.findBigBlind = function (smallBindIndex) {
     var bigBlind = smallBindIndex + 1;
     if (bigBlind >= this.players.length) {
         bigBlind -= this.players.length;
@@ -2002,9 +2003,9 @@ Table.prototype.findBigBlind = function(smallBindIndex) {
 };
 
 /*Table.prototype.start1stRound = function () {
-    // emit a fake gameOver to kick off the 1st round
-    this.eventEmitter.emit('1stRound');
-};*/
+ // emit a fake gameOver to kick off the 1st round
+ this.eventEmitter.emit('1stRound');
+ };*/
 
 Player.prototype.GetChips = function (cash) {
     this.chips += cash;
@@ -2075,6 +2076,8 @@ Player.prototype.Raise = function () {
                 bet = 2 * maxBet;
                 if (this.chips + myBet > bet) {
                     this.chips = this.chips + myBet - bet;
+                    if (this.chips % 1 != 0)
+                        this.chips = this.chips.toFixed(2);
                     this.table.game.bets[i] = bet;
                     var addMoney = bet - myBet;
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
@@ -2104,7 +2107,7 @@ Player.prototype.Raise = function () {
 };
 
 Player.prototype.Bet = function (bet) {
-
+    var maxBet = getMaxBet(this.table.game.bets);
     this.table.isBet = false;
     var i;
     if (bet < this.table.bigBlind) {
@@ -2116,16 +2119,25 @@ Player.prototype.Bet = function (bet) {
     if (this.chips > bet) {
         for (i = 0; i < this.table.players.length; i += 1) {
             if (this === this.table.players[i]) {
-                this.table.game.bets[i] += bet;
-                this.table.players[i].chips -= bet;
-                this.talked = true;
+                var myBet = this.table.game.bets[i];
+                if (myBet + bet > maxBet) {
+                    this.table.game.bets[i] += bet;
+                    this.table.players[i].chips -= bet;
+                    if (this.table.players[i].chips % 1 != 0)
+                        this.table.players[i].chips = this.table.players[i].chips.toFixed(2);
+                    this.talked = true;
+                    // Attempt to progress the game
+                    this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips}
+                    this.table.eventEmitter.emit('showAction', this.turnBet);
+                    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' BET: ' + bet);
+                    progress(this.table);
+                } else {
+                    logGame(this.table.tableNumber, 'bet value:' + this.chips + ' lower than min need bet:) -->Auto Call !!!');
+                    this.Call();
+                }
+                break;
             }
         }
-        // Attempt to progress the game
-        this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips}
-        this.table.eventEmitter.emit('showAction', this.turnBet);
-        logGame(this.table.tableNumber, 'player: ' + this.playerName + ' BET: ' + bet);
-        progress(this.table);
     } else {
         logGame(this.table.tableNumber, 'You do not have enough chips (your chips: ' + this.chips + ') --> ALL IN !!!');
         this.AllIn();
@@ -2146,6 +2158,8 @@ Player.prototype.Call = function () {
             }
             if (this.chips + myBet > maxBet) {
                 this.chips = this.chips + myBet - maxBet;
+                if (this.chips % 1 != 0)
+                    this.chips = this.chips.toFixed(2);
                 this.table.game.bets[i] = maxBet;
                 this.talked = true;
                 var addMoney = maxBet - myBet;
