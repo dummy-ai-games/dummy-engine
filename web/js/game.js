@@ -15,6 +15,7 @@ var autoRestart = 0;
     tableNumber = getParameter('table');
     playerName = getParameter('name');
     autoRestart = getParameter('auto') || 0;
+    console.log("auto restart = " + autoRestart);
     initGame();
 })();
 
