@@ -254,18 +254,13 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     return data;
 };
 
-function sendMessage(socket, message, errorFunc) {
-    var callBack = errorFunc || errorCb;
+function sendMessage(socket, message) {
     try {
         if (socket)
-            socket.send(JSON.stringify(message), callBack);
-        else if (errorFunc)
-            errorFunc();
+            socket.send(JSON.stringify(message), errorCb);
     } catch (e) {
         var player = socket ? socket.id : "";
         logger.error("player:" + player + " socket error, msg:" + e.message);
-        if (errorFunc)
-            errorFunc();
     }
 }
 
@@ -470,22 +465,15 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     if (that.players[player]) {
         logger.info('server request: ' + JSON.stringify(message));
         if (that.players[player]) {
-            var errorFunc = function (error) {
-                if (error) {
-                    logger.error('server send error: ' + JSON.stringify(error));
-                    that.getPlayerAction(message);
-                } else {
-                    var timestamp = new Date().getTime();
-                    logger.info('send player action,time is ' + timestamp);
-                    currentTable.timeout = setTimeout(function () {
-                        if (currentTable.isStart) {
-                            logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
-                            currentTable.players[currentTable.currentPlayer].Fold();
-                        }
-                    }, 60 * 1000); // for BETA test, set to 1min, for official game, set to 2s
+            sendMessage(that.players[player], message);
+            var timestamp = new Date().getTime();
+            logger.info('send player action,time is ' + timestamp);
+            currentTable.timeout = setTimeout(function () {
+                if (currentTable.isStart) {
+                    logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
+                    currentTable.players[currentTable.currentPlayer].Fold();
                 }
-            }
-            sendMessage(that.players[player], message, errorFunc);
+            }, 60 * 1000); // for BETA test, set to 1min, for official game, set to 2s
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
