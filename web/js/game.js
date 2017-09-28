@@ -8,15 +8,15 @@ var rtc = SkyRTC();
 var tableNumber = 0;
 var playerName = '';
 var dbPlayers = [];
-var autoRestart = 0;
+var autoStart = 0;
 var winWidth, winHeight;
 
 (function () {
     // get table number first
     tableNumber = getParameter('table');
     playerName = getParameter('name');
-    autoRestart = getParameter('auto') || 0;
-    console.log("auto restart = " + autoRestart);
+    autoStart = getParameter('auto') || 0;
+    console.log("auto restart = " + autoStart);
     initGame();
 })();
 
@@ -95,7 +95,7 @@ function initWebsock() {
         updateGame(data, true);
         gameStatus = STATUS_GAME_FINISHED;
 
-        {
+        if (undefined !== autoStart && (autoStart === 1 || autoStart === '1')) {
             // auto start another game in 3s
             setTimeout(function () {
                 startGame();
