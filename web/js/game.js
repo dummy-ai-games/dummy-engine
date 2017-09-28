@@ -9,6 +9,7 @@ var tableNumber = 0;
 var playerName = '';
 var dbPlayers = [];
 var autoRestart = 0;
+var winWidth, winHeight;
 
 (function () {
     // get table number first
@@ -94,7 +95,7 @@ function initWebsock() {
         updateGame(data, true);
         gameStatus = STATUS_GAME_FINISHED;
 
-        if (1 === autoRestart) {
+        {
             // auto start another game in 3s
             setTimeout(function () {
                 startGame();
@@ -106,6 +107,12 @@ function initWebsock() {
         // update in game engine
         console.log('start_game : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
+    });
+
+    rtc.on('__game_stop', function (data) {
+        // update in game engine
+        console.log('stop_game : ' + JSON.stringify(data));
+        gameStatus = STATUS_WAITING_FOR_PLAYERS;
     });
 
     rtc.on('__deal', function (data) {
@@ -193,11 +200,12 @@ function initWebsock() {
 function initGame() {
     var d = document;
     var container = document.getElementById('gameContainer');
-    var winWidth, winHeight;
-    var marginLeft = 20;
-    var marginTop = 20;
-    winWidth = document.documentElement.clientWidth - marginLeft;
-    winHeight = document.documentElement.clientHeight - marginTop;
+
+    var marginLeft = getElementLeft(document.getElementById("gameContainer"));
+    var marginTop = getElementTop(document.getElementById("gameContainer"));
+
+    winWidth = document.documentElement.clientWidth - marginLeft * 2;
+    winHeight = document.documentElement.clientHeight - marginTop - 20;
     container.innerHTML = '<canvas id="gameCanvas" width="' + winWidth + '" height="' + winHeight + '"></canvas>';
     if (!d.createElement('canvas').getContext) {
         var s = d.createElement('div');
@@ -241,6 +249,10 @@ function ccLoad() {
 // utilities
 function startGame() {
     rtc.startGame(tableNumber);
+}
+
+function stopGame() {
+    rtc.stopGame(tableNumber);
 }
 
 function updateGame(data, isNewRound) {
@@ -338,4 +350,25 @@ function findDBPlayerNameById(playerName) {
     } else {
         return playerName;
     }
+}
+
+// UI helper
+function getElementLeft(element) {
+    var actualLeft = element.offsetLeft;
+    var current = element.offsetParent;
+    while (current !== null){
+        actualLeft += current.offsetLeft;
+        current = current.offsetParent;
+    }
+    return actualLeft;
+}
+
+function getElementTop(element) {
+    var actualTop = element.offsetTop;
+    var current = element.offsetParent;
+    while (current !== null){
+        actualTop += current.offsetTop;
+        current = current.offsetParent;
+    }
+    return actualTop;
 }

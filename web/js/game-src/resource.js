@@ -3,7 +3,7 @@
  * 2017-08-21
  */
 
-var bg = "./res/images/game_bg.jpg";
+var bg = "./res/images/game_bg.png";
 
 var s_p_2C = "./res/images/poker/2C.png";
 var s_p_2D = "./res/images/poker/2D.png";
@@ -59,8 +59,10 @@ var s_p_AH = "./res/images/poker/AH.png";
 var s_p_AS = "./res/images/poker/AS.png";
 var s_p_empty = "./res/images/poker/empty.png";
 var s_p_back = "./res/images/poker/back.png";
-var btn_start = "./res/images/start.png";
-var btn_start_clicked = "./res/images/start_clicked.png";
+var btn_play = "./res/images/play.png";
+var btn_play_clicked = "./res/images/play_clicked.png";
+var btn_stop =  "./res/images/stop.png";
+var btn_stop_clicked = "./res/images/stop_clicked.png";
 
 var s_a_avatar_0 = "./res/images/avatars/player_0.png";
 var s_a_avatar_1 = "./res/images/avatars/player_1.png";
@@ -207,5 +209,5 @@ var resources = [
     s_a_avatar_8,
     s_a_avatar_9,
     s_a_avatar_none,
-    btn_start,
-    btn_start_clicked];
+    btn_play,
+    btn_play_clicked];

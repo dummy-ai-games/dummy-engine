@@ -1,4 +1,4 @@
-var SkyRTC = function () {
+var SkyRTC = function() {
 
     /**********************************************************/
     /*                                                        */
@@ -10,12 +10,12 @@ var SkyRTC = function () {
     }
 
     //绑定事件函数
-    EventEmitter.prototype.on = function (eventName, callback) {
+    EventEmitter.prototype.on = function(eventName, callback) {
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(callback);
     };
     //触发事件函数
-    EventEmitter.prototype.emit = function (eventName, _) {
+    EventEmitter.prototype.emit = function(eventName, _) {
         var events = this.events[eventName],
             args = Array.prototype.slice.call(arguments, 1),
             i, m;
@@ -47,12 +47,12 @@ var SkyRTC = function () {
 
 
     /*************************服务器连接部分***************************/
-    skyrtc.prototype.connect = function (server, playerName,table) {
+    skyrtc.prototype.connect = function(server, playerName,table) {
         var socket,
             that = this;
 
         socket = this.socket = new WebSocket(server);
-        socket.onopen = function () {
+        socket.onopen = function() {
             socket.send(JSON.stringify({
                 "eventName": "__join",
                 "data": {
@@ -63,7 +63,7 @@ var SkyRTC = function () {
             that.emit("socket_opened", socket);
         };
 
-        socket.onmessage = function (message) {
+        socket.onmessage = function(message) {
             var json = JSON.parse(message.data);
             if (json.eventName) {
                 that.emit(json.eventName, json.data);
@@ -72,25 +72,25 @@ var SkyRTC = function () {
             }
         };
 
-        socket.onerror = function (error) {
+        socket.onerror = function(error) {
             that.emit("socket_error", error, socket);
         };
 
-        socket.onclose = function (data) {
+        socket.onclose = function(data) {
 
             that.emit('socket_closed', socket);
         };
 
-        this.on('_peers', function (data) {
+        this.on('_peers', function(data) {
             that.emit('connected', socket);
         });
 
-        this.on('_remove_peer', function (data) {
+        this.on('_remove_peer', function(data) {
 
             that.emit("remove_peer", data.socketId);
         });
     };
-    skyrtc.prototype.Bet = function (playerName, amount) {
+    skyrtc.prototype.Bet = function(playerName, amount) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -101,7 +101,7 @@ var SkyRTC = function () {
             }
         }));
     };
-    skyrtc.prototype.Call = function (playerName) {
+    skyrtc.prototype.Call = function(playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -111,7 +111,7 @@ var SkyRTC = function () {
             }
         }));
     };
-    skyrtc.prototype.Check = function (playerName) {
+    skyrtc.prototype.Check = function(playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -122,7 +122,7 @@ var SkyRTC = function () {
         }));
     };
 
-    skyrtc.prototype.Raise = function (playerName) {
+    skyrtc.prototype.Raise = function(playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -133,7 +133,7 @@ var SkyRTC = function () {
         }));
     };
 
-    skyrtc.prototype.AllIn = function (playerName) {
+    skyrtc.prototype.AllIn = function(playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -144,7 +144,7 @@ var SkyRTC = function () {
         }));
     };
 
-    skyrtc.prototype.Fold = function (playerName) {
+    skyrtc.prototype.Fold = function(playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -155,7 +155,7 @@ var SkyRTC = function () {
         }));
     };
 
-    skyrtc.prototype.startGame = function (tableNumber) {
+    skyrtc.prototype.startGame = function(tableNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__start_game",
@@ -165,7 +165,17 @@ var SkyRTC = function () {
         }));
     };
 
-    skyrtc.prototype.Reload = function () {
+    skyrtc.prototype.stopGame = function(tableNumber) {
+        var that = this;
+        that.socket.send(JSON.stringify({
+            "eventName": "__stop_game",
+            "data": {
+                "tableNumber": tableNumber
+            }
+        }));
+    };
+
+    skyrtc.prototype.Reload = function() {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__reload",

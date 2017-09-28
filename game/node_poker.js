@@ -55,7 +55,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         return err;
     }
 
-    this.eventEmitter.on('newRound', function () {
+    this.eventEmitter.on('newRound', function() {
         logGame(that.tableNumber, 'new round : ' + that.roundCount);
         getNextPlayer(that);
         takeAction(that, '__turn');
@@ -63,19 +63,19 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         for (var i = 0; i < that.players.length; i++) {
             tempData.push({playerName: that.players[i].playerName, chips: that.players[i].chips});
         }
-        playerDao.updatePlayerChips(tempData, function () {
+        playerDao.updatePlayerChips(tempData, function() {
             // Do nothing
         });
     });
 
-    this.eventEmitter.on('showAction', function (data) {
+    this.eventEmitter.on('showAction', function(data) {
         var myData = getBasicData(that);
         myData.action = data;
         logGame(that.tableNumber, JSON.stringify(myData));
         that.eventEmitter.emit('__show_action', myData);
     });
 
-    this.eventEmitter.on('deal', function () {
+    this.eventEmitter.on('deal', function() {
         if (that.surviveCount <= 1) {
             for (var j = 0; j < that.players.length; j++)
                 that.players[j].talked = true;
@@ -89,7 +89,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         }
     });
 
-    this.eventEmitter.on('roundEnd', function () {
+    this.eventEmitter.on('roundEnd', function() {
         var count = 0;
         var i;
         var data;
@@ -131,7 +131,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.isReloadTime = true;
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logger.info("start reload time");
-            setTimeout(function () {
+            setTimeout(function() {
                 that.isReloadTime = false;
                 that.isBet = false;
                 that.NewRound();
@@ -314,7 +314,7 @@ function takeAction(table, action) {
     table.eventEmitter.emit(action, data);
 }
 
-Table.prototype.checkPlayer = function (player) {
+Table.prototype.checkPlayer = function(player) {
     return player === this.currentPlayer;
 };
 
@@ -1805,7 +1805,7 @@ function Game(smallBlind, bigBlind) {
  * Helper Methods Public
  */
 // NewRound helper
-Table.prototype.getHandForPlayerName = function (playerName) {
+Table.prototype.getHandForPlayerName = function(playerName) {
     for (var i in this.players) {
         if (this.players[i].playerName === playerName) {
             return this.players[i].cards;
@@ -1814,33 +1814,33 @@ Table.prototype.getHandForPlayerName = function (playerName) {
     return [];
 };
 
-Table.prototype.getDeal = function () {
+Table.prototype.getDeal = function() {
     return this.game.board;
 };
 
-Table.prototype.getEventEmitter = function () {
+Table.prototype.getEventEmitter = function() {
     return this.eventEmitter;
 };
 
-Table.prototype.getCurrentPlayer = function () {
+Table.prototype.getCurrentPlayer = function() {
     return this.players[this.currentPlayer].playerName;
 };
 
-Table.prototype.getPreviousPlayerAction = function () {
+Table.prototype.getPreviousPlayerAction = function() {
     return this.turnBet;
 };
 
 // Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
 
-Table.prototype.getWinners = function () {
+Table.prototype.getWinners = function() {
     return this.gameWinners;
 };
 
-Table.prototype.getLosers = function () {
+Table.prototype.getLosers = function() {
     return this.gameLosers;
 };
 
-Table.prototype.getAllHands = function () {
+Table.prototype.getAllHands = function() {
     var all = this.losers.concat(this.players);
     var allHands = [];
     for (var i in all) {
@@ -1853,7 +1853,7 @@ Table.prototype.getAllHands = function () {
     return allHands;
 };
 
-Table.prototype.initNewRound = function () {
+Table.prototype.initNewRound = function() {
     var i;
     this.dealer += 1;
     if (this.dealer >= this.players.length) {
@@ -1875,7 +1875,7 @@ Table.prototype.initNewRound = function () {
     this.NewRound();
 };
 
-Table.prototype.StartGame = function () {
+Table.prototype.StartGame = function() {
     // If there is no current game and we have enough players, start a new game.
     console.log("start game");
     if (!this.game) {
@@ -1884,17 +1884,25 @@ Table.prototype.StartGame = function () {
         this.firstDealer = this.dealer;
         this.isStart = true;
         this.game = new Game(this.smallBlind, this.bigBlind);
+        this.NewRound();
     }
 };
 
-Table.prototype.AddPlayer = function (playerName) {
+Table.prototype.StopGame = function() {
+    console.log("stop game");
+    if (!this.game) {
+        this.isStart = false;
+    }
+};
+
+Table.prototype.AddPlayer = function(playerName) {
     var that = this;
     var player = new Player(playerName, that.initChips, this, true, 0);
     this.playersToAdd.push(player);
     this.surviveCount++;
 };
 
-Table.prototype.removePlayer = function (playerName) {
+Table.prototype.removePlayer = function(playerName) {
     for (var i in this.players) {
         if (this.players[i].playerName === playerName) {
             this.playersToRemove.push(i);
@@ -1908,7 +1916,7 @@ Table.prototype.removePlayer = function (playerName) {
     }
 };
 
-Table.prototype.NewRound = function () {
+Table.prototype.NewRound = function() {
     // Add players in waiting list
     var removeIndex = 0;
     var i;
@@ -1975,7 +1983,7 @@ Table.prototype.NewRound = function () {
     this.eventEmitter.emit('newRound');
 };
 
-Table.prototype.findSmallBlind = function () {
+Table.prototype.findSmallBlind = function() {
     var smallBlind = this.dealer;
     if (smallBlind >= this.players.length) {
         smallBlind = 0;
@@ -1990,7 +1998,7 @@ Table.prototype.findSmallBlind = function () {
     return smallBlind;
 };
 
-Table.prototype.findBigBlind = function (smallBindIndex) {
+Table.prototype.findBigBlind = function(smallBindIndex) {
     var bigBlind = smallBindIndex + 1;
     if (bigBlind >= this.players.length) {
         bigBlind -= this.players.length;
@@ -2005,17 +2013,17 @@ Table.prototype.findBigBlind = function (smallBindIndex) {
     return bigBlind;
 };
 
-/*Table.prototype.start1stRound = function () {
+/*Table.prototype.start1stRound = function() {
  // emit a fake gameOver to kick off the 1st round
  this.eventEmitter.emit('1stRound');
  };*/
 
-Player.prototype.GetChips = function (cash) {
+Player.prototype.GetChips = function(cash) {
     this.chips += cash;
 };
 
 // Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
-Player.prototype.Check = function () {
+Player.prototype.Check = function() {
     var checkAllow, v, i;
 
     checkAllow = true;
@@ -2042,7 +2050,7 @@ Player.prototype.Check = function () {
     }
 };
 
-Player.prototype.Fold = function () {
+Player.prototype.Fold = function() {
     var i, bet;
 
     // Move any current bet into the pot
@@ -2062,7 +2070,7 @@ Player.prototype.Fold = function () {
     progress(this.table);
 };
 
-Player.prototype.Raise = function () {
+Player.prototype.Raise = function() {
 
     if (this.table.raiseCount >= 4) {
         logGame(this.table.tableNumber, 'can not raise again --> Call !!!');
@@ -2109,7 +2117,7 @@ Player.prototype.Raise = function () {
     }
 };
 
-Player.prototype.Bet = function (bet) {
+Player.prototype.Bet = function(bet) {
     var maxBet = getMaxBet(this.table.game.bets);
     this.table.isBet = false;
     var i;
@@ -2147,7 +2155,7 @@ Player.prototype.Bet = function (bet) {
     }
 };
 
-Player.prototype.Call = function () {
+Player.prototype.Call = function() {
     var maxBet, i;
 
     maxBet = getMaxBet(this.table.game.bets);
@@ -2178,7 +2186,7 @@ Player.prototype.Call = function () {
     }
 };
 
-Player.prototype.AllIn = function () {
+Player.prototype.AllIn = function() {
     var i, allInValue = 0, mybet = 0;
 
     logGame(this.table.tableNumber, 'player: ' + this.playerName + ' ALLIN');
