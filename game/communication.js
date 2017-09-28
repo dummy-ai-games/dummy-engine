@@ -263,14 +263,16 @@ function sendMessage(socket, message, errorFunc) {
         var player = socket ? socket.id : "";
         logger.error("player:" + player + " socket error, msg:" + e.message);
         setTimeout(function () {
+            var isError = false;
             try {
                 if (socket)
                     socket.send(JSON.stringify(message), callBack);
             } catch (e) {
+                isError = true;
                 logger.error("player:" + player + " socket error again, msg:" + e.message);
-                if (errorFunc)
-                    errorFunc();
             }
+            if (isError && errorFunc)
+                errorFunc();
         }, 2000);
     }
 }
