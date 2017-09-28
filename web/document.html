@@ -337,7 +337,7 @@
 {
     "eventName" : "__action",
     "data" : {
-        "action" : "call" // 还可以是 : "check", "fold", "allin", "raise" 中的其中一种, <span class="new_content">最新规则中允许是 "bet", bet 中的 amount 注额加上玩家当前已下注额之后不得小于当前最大注额</span>
+        "action" : "call" // 还可以是 : "check", "fold", "allin", "raise", "bet" 中的其中一种, <span class="new_content">最新规则中允许是 "bet", bet 中的 amount 注额加上玩家当前已下注额之后不得小于当前最大注额</span>
         <s>"playerName" : "bobi"</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数
     }
 }</pre>
