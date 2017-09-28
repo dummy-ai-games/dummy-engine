@@ -271,7 +271,7 @@ SkyRTC.prototype.sendMessage = function(socket, message) {
             that.removeSocket(socket);
         }
     }
-}
+};
 
 SkyRTC.prototype.notifyJoin = function() {
     var that = this;
@@ -318,7 +318,7 @@ SkyRTC.prototype.notifyLeft = function() {
             'eventName': '__left',
             'data': tableAndPlayer[that.guests[guest].tableNumber]
         };
-        sendMessage(that.guests[guest], message);
+        that.sendMessage(that.guests[guest], message);
     }
     for (var player in that.players) {
         if (undefined === tableAndPlayer[that.players[player].tableNumber]) {
@@ -328,7 +328,7 @@ SkyRTC.prototype.notifyLeft = function() {
             'eventName': '__left',
             'data': tableAndPlayer[that.players[player].tableNumber]
         };
-        sendMessage(that.players[player], message);
+        that.sendMessage(that.players[player], message);
     }
 };
 
