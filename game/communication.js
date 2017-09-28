@@ -571,6 +571,11 @@ SkyRTC.prototype.init = function (socket) {
 
     socket.on('error', function (err) {
         logger.info("player:" + socket.id + " sokcet error, msg:", err);
+        var tableNumber = that.playerAndTable[socket.id];
+        if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
+            that.exitPlayers[socket.id] = socket.tableNumber;
+        }
+        that.removeSocket(socket);
     });
 
     socket.on('close', function () {
