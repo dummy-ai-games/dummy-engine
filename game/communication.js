@@ -309,7 +309,7 @@ SkyRTC.prototype.startGame = function(tableNumber) {
     logger.info('broadcast __game_start');
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
-        logger.info(that.table);
+        logger.info('table ' + tableNumber + ' start fail, it need at least ' + that.table[tableNumber].minPlayers + ' users to attend');
         message = {
             'eventName': '__game_start',
             'data': {
