@@ -293,7 +293,7 @@ function takeAction(table, action) {
             'board': table.game.board,
             'minBet': table.bigBlind,
             'roundName': table.game.roundName,
-            'otherPlayers': players,
+            'players': players,
             'smallBlind': {
                 playerName: table.players[sbPlayerIndex].playerName,
                 amount: table.smallBlind
