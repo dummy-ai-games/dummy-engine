@@ -306,26 +306,31 @@ SkyRTC.prototype.startGame = function(tableNumber) {
     }
     that.initTable(tableNumber);
     logger.info("init table done");
+    logger.info('broadcast __game_start');
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
-        logger.info(that.table);
+        logger.info('table ' + tableNumber + ' start fail, it need at least ' + that.table[tableNumber].minPlayers + ' users to attend');
         message = {
             'eventName': '__game_start',
             'data': {
                 'msg': 'table ' + tableNumber + ' need at least ' + that.table[tableNumber].minPlayers + ' users to attend',
-                'tableNumber': tableNumber
+                'tableNumber': tableNumber,
+                'error_code': 0
             }
         }
-    } else {
-        that.table[tableNumber].StartGame();
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+    } else {        
         message = {
             'eventName': '__game_start',
-            'data': {'msg': 'table ' + tableNumber + ' started successfully', 'tableNumber': tableNumber}
+            'data': {'msg': 'table ' + tableNumber + ' started successfully', 'tableNumber': tableNumber, 'error_code': 1}
         }
-    }
-    logger.info('broadcast __game_start');
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+        that.table[tableNumber].StartGame();
+    }  
 
-    that.broadcastInGuests(message);
+    
 };
 
 SkyRTC.prototype.stopGame = function(tableNumber) {
@@ -506,23 +511,32 @@ SkyRTC.prototype.broadcastInPlayersForReload = function(message) {
 };
 
 SkyRTC.prototype.broadcastInPlayers = function(message) {
-    var cards = {};
-    var playersData = {};
-    for (var i = 0; i < message.data.players.length; i++) {
-        cards[message.data.players[i].playerName] = message.data.players[i].cards;
-        playersData[message.data.players[i].playerName] = message.data.players[i];
-        if (message.eventName !== '__game_over' && message.eventName !== '__round_end')
-            delete message.data.players[i].cards;
-    }
-    var tableNumber = message.data.table.tableNumber;
-    for (var player in this.players) {
-        if (this.players[player].tableNumber === tableNumber) {
-            if (message.eventName !== '__game_over' && message.eventName !== '__round_end') {
-                playersData[player].cards = cards[player];
-                this.players[player].send(JSON.stringify(message), errorCb);
-                playersData[player].cards = [];
-            } else {
-                this.players[player].send(JSON.stringify(message), errorCb);
+    if(message.eventName == "__game_start"){
+        var tableNumber = message.data.tableNumber;
+        for (var player in this.players) {
+            if (this.players[player].tableNumber == tableNumber) {
+                 this.players[player].send(JSON.stringify(message), errorCb);
+            }
+        }
+    }else{
+        var cards = {};
+        var playersData = {};
+        for (var i = 0; i < message.data.players.length; i++) {
+            cards[message.data.players[i].playerName] = message.data.players[i].cards;
+            playersData[message.data.players[i].playerName] = message.data.players[i];
+            if (message.eventName !== '__game_over' && message.eventName !== '__round_end')
+                delete message.data.players[i].cards;
+        }
+        var tableNumber = message.data.table.tableNumber;
+        for (var player in this.players) {
+            if (this.players[player].tableNumber === tableNumber) {
+                if (message.eventName !== '__game_over' && message.eventName !== '__round_end') {
+                    playersData[player].cards = cards[player];
+                    this.players[player].send(JSON.stringify(message), errorCb);
+                    playersData[player].cards = [];
+                } else {
+                    this.players[player].send(JSON.stringify(message), errorCb);
+                }
             }
         }
     }
