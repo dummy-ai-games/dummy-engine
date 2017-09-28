@@ -267,7 +267,9 @@ function sendMessage(socket, message, errorFunc) {
                 if (socket)
                     socket.send(JSON.stringify(message), callBack);
             } catch (e) {
-                logger.error("player:" + player + " socket error, msg:" + e.message);
+                logger.error("player:" + player + " socket error again, msg:" + e.message);
+                if (errorFunc)
+                    errorFunc();
             }
         }, 2000);
     }
