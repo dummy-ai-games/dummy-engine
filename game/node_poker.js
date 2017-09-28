@@ -1955,7 +1955,7 @@ Table.prototype.NewRound = function() {
         this.surviveCount--;
     } else {
         this.players[smallBlindIndex].chips -= this.smallBlind;
-        if (this.players[smallBlindIndex].chips % 1 != 0)
+        if (this.players[smallBlindIndex].chips % 1 !== 0)
             this.players[smallBlindIndex].chips = this.players[smallBlindIndex].chips.toFixed(2);
         this.game.bets[smallBlindIndex] = this.smallBlind;
     }
@@ -1968,7 +1968,7 @@ Table.prototype.NewRound = function() {
         this.surviveCount--;
     } else {
         this.players[bigBlindIndex].chips -= this.bigBlind;
-        if (this.players[bigBlindIndex].chips % 1 != 0)
+        if (this.players[bigBlindIndex].chips % 1 !== 0)
             this.players[bigBlindIndex].chips = this.players[bigBlindIndex].chips.toFixed(2);
         this.game.bets[bigBlindIndex] = this.bigBlind;
     }
@@ -1976,7 +1976,6 @@ Table.prototype.NewRound = function() {
     // emit __new_round message after small blind and big blind is decided
     var data = getBasicData(this);
     this.eventEmitter.emit('__new_round', data);//add first round notification
-
 
     // Get currentPlayer
     this.currentPlayer = bigBlindIndex;
@@ -2013,10 +2012,12 @@ Table.prototype.findBigBlind = function(smallBindIndex) {
     return bigBlind;
 };
 
-/*Table.prototype.start1stRound = function() {
+/*
+Table.prototype.start1stRound = function() {
  // emit a fake gameOver to kick off the 1st round
  this.eventEmitter.emit('1stRound');
- };*/
+ };
+ */
 
 Player.prototype.GetChips = function(cash) {
     this.chips += cash;
