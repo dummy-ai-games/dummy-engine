@@ -153,12 +153,10 @@ function initWebsock() {
         console.log('action : ' + JSON.stringify(data));
 
         gameStatus = STATUS_GAME_RUNNING;
-
         var tableNumber = data.table.tableNumber;
         var roundAction = data.action;
 
         var playerIndex = findPlayerIndexById(data.action.playerName);
-
         if (roundAction.action === 'check' ||
             roundAction.action === 'fold' ||
             roundAction.action === 'raise' ||

@@ -69,7 +69,7 @@
                     <p>5. 决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
                     <p>6. dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></p>
                     <p>7. 每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</p>
-                    <p><span class="new_content">8. 为了确保比赛时使用其它队玩家名作弊干扰比赛, 比赛前组委会会将一个随机生成的私有玩家名通过线下方式告知各组组长, 比赛时使用私有名接入游戏, 游戏面板中则显示昵称(游戏名)</span></p>
+                    <p>8. 为了确保比赛时使用其它队玩家名作弊干扰比赛, 比赛前组委会会将一个随机生成的私有玩家名通过线下方式告知各组组长, 比赛时使用私有名接入游戏, 游戏面板中则显示昵称(游戏名)</p>
                     <hr>
                     <a name="server_access" style="text-decoration: none;"><h4><strong>服务器接入方式</strong></h4></a>
                     <ul>
@@ -150,7 +150,6 @@
             "roundName": "Deal",
             "board": [],
             "roundCount": 1,
-            <span class="new_content">
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -159,7 +158,6 @@
                 "playerName": "cicy",
                 "amount": 20
             }
-            </span>
         },
         "players" : [
             {
@@ -167,21 +165,36 @@
                 "chips" : 20,
                 "folded" : true,
                 "allin" : false,
-                "isSurvive" : true
+                "isSurvive" : true,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             {
                 "playerName" : "cicy",
                 "chips" : 0,
                 "folded" : true,
                 "allin" : true,
-                "isSurvive" : false
+                "isSurvive" : false,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             {
                 "playerName" : "geoge",
                 "chips" : 500,
                 "folded" : true,
                 "allin" : false,
-                "isSurvive" : true
+                "isSurvive" : true,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             ...
         ]
@@ -236,7 +249,7 @@
 }</pre>
                         <p>指令说明:</p>
                         <p>1. 这条命令中包含当前所有玩家的剩余筹码以及已经索取筹码的次数</p>
-                        <p>2. 如果你需要索取筹码, 这条命令需要在 <b class="new_content"><u>3</u></b> 秒内回复, 如果不回复, 那么服务器将自动忽略, 但是如果当前你已经没有筹码, 且索取次数在2次以内, 服务器将自动为你索取 1000 筹码</p>
+                        <p>2. 如果你需要索取筹码, 这条命令需要在 <b><u>3</u></b> 秒内回复, 如果不回复, 那么服务器将自动忽略, 但是如果当前你已经没有筹码, 且索取次数在2次以内, 服务器将自动为你索取 1000 筹码</p>
                         <p>3. 回复指令如下:</p>
 <pre>
 {
@@ -262,7 +275,6 @@
             "isSurvive" : true
         },
         "game" : {
-            <span class="new_content">
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -271,7 +283,6 @@
                 "playerName": "cicy",
                 "amount": 20
             },
-            </span>
             "gameBets" : [
                 {
                     "playerName" : "bobi",
@@ -300,21 +311,36 @@
                     "chips" : 20,
                     "folded" : true,
                     "allin" : false,
-                    "isSurvive" : true
+                    "isSurvive" : true,
+                    <span class="new_content">
+                    "reloadCount" : 2,
+                    "roundBet" : 40,
+                    "bet" : 40
+                    </span>
                 },
                 {
                     "playerName" : "geoge",
                     "chips" : 0,
                     "folded" : true,
                     "allin" : true,
-                    "isSurvive" : false
+                    "isSurvive" : false,
+                    <span class="new_content">
+                    "reloadCount" : 2,
+                    "roundBet" : 40,
+                    "bet" : 40
+                    </span>
                 },
                 {
                     "playerName" : "alex",
                     "chips" : 500,
                     "folded" : true,
                     "allin" : false,
-                    "isSurvive" : true
+                    "isSurvive" : true,
+                    <span class="new_content">
+                    "reloadCount" : 2,
+                    "roundBet" : 40,
+                    "bet" : 40
+                    </span>
                 },
                 ...
             ]
@@ -322,17 +348,17 @@
     }
 }</pre>
                         <p>指令说明:</p>
-                        <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin" 中的一种</p>
+                        <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin", <span class="new_content">"bet"</span> 中的一种</p>
                         <p>1.1. data.self 字段表示当前己方(玩家自己)的状态, 除了 playerName, chips和几个状态之外, 通过这条信息玩家可以了解到自己的私有牌, 由于此消息是点对点发送, 因此玩家自己的私有牌不会泄露给其它玩家</p>
                         <p>1.2. data.game 表示当前牌局的状态, 其中 data.game.otherPlayers 字段中的牌桌上的所有玩家列表数据格式和内容含义均和 __new_round 指令中一致, 此处不再赘述</p>
-                        <p>1.3. data.game.gameBets.roundBet 表示该玩家从本轮游戏开始之后所下的赌注</p>
+                        <p>1.3. data.game.gameBets.roundBet 表示该玩家从本轮游戏开始之后所下的赌注(不包括本回合)</p>
                         <p>1.3. data.game.gameBets.bet 表示该玩家从本回合游戏开始之后所下的赌注</p>
                         <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
                         <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
                         <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
                         <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
-                        <p class="new_content">1.9 data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
-                        <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise" 中的一种, 决策的数据格式如下</p>
+                        <p>1.9 data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
+                        <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise", <span class="new_content">"bet"</span> 中的一种, 决策的数据格式如下</p>
 <pre>
 {
     "eventName" : "__action",
@@ -357,7 +383,6 @@
             "isSurvive" : true
         },
         "game" : {
-            <span class="new_content">
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -366,7 +391,6 @@
                 "playerName": "cicy",
                 "amount": 20
             },
-            </span>
             "gameBets" : [
                 {
                     "playerName" : "bobi",
@@ -395,21 +419,36 @@
                     "chips" : 20,
                     "folded" : true,
                     "allin" : false,
-                    "isSurvive" : true
+                    "isSurvive" : true,
+                    <span class="new_content">
+                    "reloadCount" : 2,
+                    "roundBet" : 40,
+                    "bet" : 40
+                    </span>
                 },
                 {
                     "playerName" : "geoge",
                     "chips" : 0,
                     "folded" : true,
                     "allin" : true,
-                    "isSurvive" : false
+                    "isSurvive" : false,
+                    <span class="new_content">
+                    "reloadCount" : 2,
+                    "roundBet" : 40,
+                    "bet" : 40
+                    </span>
                 },
                 {
                     "playerName" : "alex",
                     "chips" : 500,
                     "folded" : true,
                     "allin" : false,
-                    "isSurvive" : true
+                    "isSurvive" : true,
+                    <span class="new_content">
+                    "reloadCount" : 2,
+                    "roundBet" : 40,
+                    "bet" : 40
+                    </span>
                 },
                 ...
             ]
@@ -453,7 +492,6 @@
             "roundName" : "Turn",
             "board" : [XX, XX, XX, XX],
             "roundCount": 1,
-            <span class="new_content">
             "smallBlind": {
                 "playerName": "geoge",
                 "amount": 10
@@ -462,7 +500,6 @@
                 "playerName": "bobi",
                 "amount": 20
             }
-            </span>
         },
         "players" : [
             {
@@ -470,21 +507,36 @@
                 "chips" : 20,
                 "folded" : true,
                 "allin" : false,
-                "isSurvive" : true
+                "isSurvive" : true,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             {
                 "playerName" : "cicy",
                 "chips" : 0,
                 "folded" : true,
                 "allin" : true,
-                "isSurvive" : false
+                "isSurvive" : false,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             {
                 "playerName" : "geoge",
                 "chips" : 500,
                 "folded" : true,
                 "allin" : false,
-                "isSurvive" : true
+                "isSurvive" : true,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             ...
         ]
@@ -495,7 +547,7 @@
                         <p>2. data.action 表示当前导致牌局发生变化的任意一名玩家的行动, data.action.amount 表示当前这名玩家所追加的赌注的数值(不论是call, raise还是bet)</p>
                         <p>3. data.table 表示当前牌桌的状态, 包括公共牌的状态和已经发出的公共牌</p>
                         <p>4. data.players 表示当前所有玩家的状态, 请参考前序指令中的说明, 这里不再赘述</p>
-                        <p class="new_content">5 data.table.smallBlind 和 data.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
+                        <p>5 data.table.smallBlind 和 data.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
                         <p>以下是某次回合导致牌局发生变化之后服务器和客户端交互的消息示意图</p>
                         <img src="res/images/document/show_action_message.png" style="width: 75%; height: 75%;">
                     </ul>
@@ -545,7 +597,6 @@
                 "5H"
             ],
             "roundCount": 1,
-            <span class="new_content">
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -554,7 +605,6 @@
                 "playerName": "cicy",
                 "amount": 20
             }
-            </span>
         }
     }
 }</pre>
@@ -583,7 +633,12 @@
                     "3C"
                 ],
                 "isSurvive": true,
-                "reloadCount": 2
+                "reloadCount": 2,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             {
                 "playerName": "cicy",
@@ -595,7 +650,12 @@
                     "QH"
                 ],
                 "isSurvive": true,
-                "reloadCount": 2
+                "reloadCount": 2,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             {
                 "playerName": "alex",
@@ -607,7 +667,12 @@
                     "8D"
                 ],
                 "isSurvive": true,
-                "reloadCount": 2
+                "reloadCount": 2,
+                <span class="new_content">
+                "reloadCount" : 2,
+                "roundBet" : 40,
+                "bet" : 40
+                </span>
             },
             ...
         ],
@@ -622,7 +687,6 @@
                 "5H"
             ],
             "roundCount": 16,
-            <span class="new_content">
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -631,7 +695,6 @@
                 "playerName": "cicy",
                 "amount": 20
             }
-            </span>
         },
         "winners": [
             {
@@ -815,7 +878,28 @@
                 <div class="tab-pane" id="faq">
                     <a style="text-decoration: none;"><h4><strong>FAQ</strong></h4></a>
                     <hr>
-                    <div>Task force工作人员正在整理中,请期待...</div>
+                    <p class="question">
+                        Q: 德州扑克的一般规则参照
+                    </p>
+                    <p class="answer">
+                        A:
+                        <a href="https://www.pokerstars.com/zht/poker/games/texas-holdem/?no_redirect=1">参考1</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.intellipoker.tw/articles/?id=45">参考2</a>
+                    </p>
+                    <hr>
+                    <p class="question">
+                        Q: 为什么需要有reload操作, 而不是一开始就为每名玩家分配3000筹码?
+                    </p>
+                    <p class="answer">
+                        A: 因为会影响到玩家决策allin
+                    </p>
+                    <hr>
+                    <p class="question">
+                        Q:
+                    </p>
+                    <p class="answer">
+                        A:
+                    </p>
                 </div>
                 <div class="tab-pane" id="release_note">
                     <a style="text-decoration: none;"><h4><strong>平台更新日志</strong></h4></a>
