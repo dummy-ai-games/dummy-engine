@@ -267,6 +267,8 @@ function sendMessage(socket, message, errorFunc) {
             try {
                 if (socket)
                     socket.send(JSON.stringify(message), callBack);
+                else
+                    isError = true;
             } catch (e) {
                 isError = true;
                 logger.error("player:" + player + " socket error again, msg:" + e.message);
