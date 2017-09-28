@@ -98,7 +98,7 @@ var GameLayer = cc.LayerColor.extend({
         this.size = cc.size(this.validWidth, this.validHeight);
 
         // show round N text at the center | top
-        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 32,
+        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 28,
             cc.size(this.validWidth / 8 * this.playerScale, this.validHeight / 4 * this.playerScale));
         this.roundText.setColor(cc.color(255, 255, 255, 255));
 
@@ -111,21 +111,21 @@ var GameLayer = cc.LayerColor.extend({
         // initialize N empty players
         for (i = 0; i < this.playerMax; i++) {
 
-            this.nameTexts[i] = new cc.LabelTTF("Wait...", this.defaultFont, 20,
+            this.nameTexts[i] = new cc.LabelTTF("Wait...", this.defaultFont, 18,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.avatarSprites[i] = new cc.Sprite.create(s_a_avatar_none);
 
-            this.moneyTexts[i] = new cc.LabelTTF("0", this.defaultFont, 20,
+            this.moneyTexts[i] = new cc.LabelTTF("0", this.defaultFont, 18,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
-            this.actionTexts[i] = new cc.LabelTTF("-", this.defaultFont, 20,
+            this.actionTexts[i] = new cc.LabelTTF("-", this.defaultFont, 18,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
-            this.betTexts[i] = new cc.LabelTTF("bet:0", this.defaultFont, 20,
+            this.betTexts[i] = new cc.LabelTTF("bet:0", this.defaultFont, 16,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
-            this.accumulateTexts[i] = new cc.LabelTTF("acc:0", this.defaultFont, 20,
+            this.accumulateTexts[i] = new cc.LabelTTF("acc:0", this.defaultFont, 16,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
 
             this.nameTexts[i].setColor(cc.color(255, 255, 255, 255));
@@ -447,10 +447,10 @@ var GameLayer = cc.LayerColor.extend({
 
             if (players[i].inTurn === 1) {
                 this.actionTexts[i].setColor(cc.color(255, 128, 0, 255));
-                this.actionTexts[i].setFontSize(28);
+                this.actionTexts[i].setFontSize(24);
             } else {
                 this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
-                this.actionTexts[i].setFontSize(20);
+                this.actionTexts[i].setFontSize(18);
             }
             this.actionTexts[i].setVisible(true);
 
