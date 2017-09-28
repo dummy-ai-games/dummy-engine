@@ -259,23 +259,13 @@ function sendMessage(socket, message, errorFunc) {
     try {
         if (socket)
             socket.send(JSON.stringify(message), callBack);
+        else if (errorFunc)
+            errorFunc();
     } catch (e) {
         var player = socket ? socket.id : "";
         logger.error("player:" + player + " socket error, msg:" + e.message);
-        setTimeout(function () {
-            var isError = false;
-            try {
-                if (socket)
-                    socket.send(JSON.stringify(message), callBack);
-                else
-                    isError = true;
-            } catch (e) {
-                isError = true;
-                logger.error("player:" + player + " socket error again, msg:" + e.message);
-            }
-            if (isError && errorFunc)
-                errorFunc();
-        }, 2000);
+        if (errorFunc)
+            errorFunc();
     }
 }
 
