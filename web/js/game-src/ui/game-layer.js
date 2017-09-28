@@ -30,7 +30,7 @@ var GameLayer = cc.LayerColor.extend({
 
     defaultMoneyInit: 1000,
     defaultBetInit: 0,
-    playerMax: 10,
+    maxPlayers: 10,
     publicCardMax: 5,
     privateCardMax: 2,
     currentPublicCard: 0,
@@ -87,7 +87,7 @@ var GameLayer = cc.LayerColor.extend({
         this._super(cc.color(51, 51, 51, 255));
         // initiate sprite layout on gameCanvas
         var i;
-        for (i = 0; i < this.playerMax; i++) {
+        for (i = 0; i < this.maxPlayers; i++) {
             this.moneyInitiates[i] = "left: " + this.defaultMoneyInit;
             this.actionInitiates[i] = "-";
             this.betInitiates[i] = "bet: " + this.defaultBetInit;
@@ -109,7 +109,7 @@ var GameLayer = cc.LayerColor.extend({
         this.addChild(this.roundText, 6);
 
         // initialize N empty players
-        for (i = 0; i < this.playerMax; i++) {
+        for (i = 0; i < this.maxPlayers; i++) {
 
             this.nameTexts[i] = new cc.LabelTTF("Wait...", this.defaultFont, 18,
                 cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
@@ -398,27 +398,16 @@ var GameLayer = cc.LayerColor.extend({
         var i;
         // first, hide all players
         for (i = 0; i < this.maxPlayers; i++) {
-            this.nameTexts.setVisible(false);
-            this.avatarSprites[i].setVisible(false);
-            this.nameTexts[i].setVisible(false);
-            this.moneyTexts[i].setVisible(false);
-            this.betTexts[i].setVisible(false);
-            this.accumulateTexts[i].setVisible(false);
-            this.actionTexts[i].setVisible(false);
-            this.privateCardSprites[i][0].setVisible(false);
-            this.privateCardSprites[i][1].setVisible(false);
+            this.showPlayer(i, false);
         }
 
         for (i = 0; i < currentPlayers; i++) {
             this.nameTexts[i].setString(players[i].displayName);
-            this.nameTexts[i].setVisible(true);
-
             // update avatar
             var avatar = avartarSamples[i];
             var avatarFrame = cc.SpriteFrame.create(avatar, cc.rect(0, 0,
                 this.avatarSprites[i].width, this.avatarSprites[i].height));
             this.avatarSprites[i].setSpriteFrame(avatarFrame);
-            this.avatarSprites[i].setVisible(true);
 
             if (undefined !== players[i].isSurvive) {
                 if (players[i].isSurvive === true) {
@@ -435,15 +424,10 @@ var GameLayer = cc.LayerColor.extend({
                 this.nameTexts[i].setColor(cc.color(255, 128, 128, 255));
             }
 
-            this.nameTexts[i].setVisible(true);
             this.moneyTexts[i].setString(players[i].chips);
             this.betTexts[i].setString("bet:" + players[i].bet);
             this.accumulateTexts[i].setString("acc:" + players[i].accumulate);
             this.actionTexts[i].setString(players[i].action);
-
-            this.moneyTexts[i].setVisible(true);
-            this.betTexts[i].setVisible(true);
-            this.accumulateTexts[i].setVisible(true);
 
             if (players[i].inTurn === 1) {
                 this.actionTexts[i].setColor(cc.color(255, 128, 0, 255));
@@ -452,7 +436,6 @@ var GameLayer = cc.LayerColor.extend({
                 this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
                 this.actionTexts[i].setFontSize(18);
             }
-            this.actionTexts[i].setVisible(true);
 
             // draw private cards
             var privateCard0 = players[i].privateCards[0];
@@ -469,8 +452,7 @@ var GameLayer = cc.LayerColor.extend({
                     this.privateCardSprites[i][1].width, this.privateCardSprites[i][1].height));
                 this.privateCardSprites[i][1].setSpriteFrame(frame2);
             }
-            this.privateCardSprites[i][0].setVisible(true);
-            this.privateCardSprites[i][1].setVisible(true);
+            this.showPlayer(i, true);
         }
     },
 
@@ -500,5 +482,17 @@ var GameLayer = cc.LayerColor.extend({
 
     updateBg: function() {
         // do not update background in this game
+    },
+
+    // UI helpers
+    showPlayer: function(i, show) {
+        this.avatarSprites[i].setVisible(show);
+        this.nameTexts[i].setVisible(show);
+        this.moneyTexts[i].setVisible(show);
+        this.betTexts[i].setVisible(show);
+        this.accumulateTexts[i].setVisible(show);
+        this.actionTexts[i].setVisible(show);
+        this.privateCardSprites[i][0].setVisible(show);
+        this.privateCardSprites[i][1].setVisible(show);
     }
 });

@@ -74,25 +74,3 @@ app.use(function (req, res, next) {
 
 app.use('/', express.static(__dirname + '/web/'));
 require('./routes');
-
-
-// web socket communication
-SkyRTC.rtc.on('new_connect', function (socket) {
-    console.log('New connection');
-});
-
-SkyRTC.rtc.on('remove_peer', function (socketId) {
-    console.log(socketId + ' of player left');
-});
-
-SkyRTC.rtc.on('new_peer', function (user) {
-    console.log('new player: ' + user + ' join');
-});
-
-SkyRTC.rtc.on('socket_message', function (socket, msg) {
-    console.log('message received from ' + socket.id + ': ' + msg);
-});
-
-SkyRTC.rtc.on('error', function (error) {
-    console.log('error occurred: ' + error.message);
-});

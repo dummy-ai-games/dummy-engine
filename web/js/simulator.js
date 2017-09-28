@@ -9,7 +9,7 @@ var bets;
 var board;
 var minBet;
 var raiseCount;
-var otherPlayers;
+var players;
 var playerActions = {};
 var gameStatus = 0;
 var risk = 1;
@@ -28,7 +28,7 @@ $(document).ready(function () {
 });
 
 function initRTC() {
-    rtc.connect('ws://116.62.203.120', playerName);
+    rtc.connect('ws://localhost:3000', playerName);
 
     rtc.on('__action', function (data) {
         console.log('action: ' + JSON.stringify(data));
@@ -38,8 +38,8 @@ function initRTC() {
         board = data.game.board;
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
-        otherPlayers = data.game.otherPlayers;
-        takeAction(self.cards, self.cards.concat(board), otherPlayers);
+        players = data.game.players;
+        takeAction(self.cards, self.cards.concat(board), players);
     });
 
     rtc.on('__bet', function (data) {
@@ -50,8 +50,8 @@ function initRTC() {
         board = data.game.board;
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
-        otherPlayers = data.game.otherPlayers;
-        takeAction(self.cards, self.cards.concat(board), otherPlayers);
+        players = data.game.players;
+        takeAction(self.cards, self.cards.concat(board), players);
     });
 
     rtc.on('__new_round', function (data) {

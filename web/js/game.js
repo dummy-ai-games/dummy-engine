@@ -11,7 +11,7 @@ var dbPlayers = [];
 var autoStart = 0;
 var winWidth, winHeight;
 
-(function () {
+(function() {
     // get table number first
     tableNumber = getParameter('table');
     playerName = getParameter('name');
@@ -30,7 +30,7 @@ function initPlayerInfo() {
             table_number: tableNumber
         },
         timeout: 20000,
-        success: function (response) {
+        success: function(response) {
             if(response.status.code === 0) {
                 console.log("get db players: " + JSON.stringify(response.entity));
                 dbPlayers = response.entity;
@@ -39,7 +39,7 @@ function initPlayerInfo() {
             }
             initWebsock();
         },
-        error: function () {
+        error: function() {
             console.log('list player failed, use player name as display name');
             initWebsock();
         }
@@ -51,23 +51,40 @@ function initWebsock() {
     // initialize web communication
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName,tableNumber);
 
-    rtc.on('__new_peer', function (data) {
+    rtc.on('__new_peer', function(data) {
         if (data) {
-            console.log('player_join : ' + JSON.stringify(data));
+            console.log('player join : ' + JSON.stringify(data));
         } else {
-            console.log('guest_join');
+            console.log('guest join');
         }
 
         if (undefined !== data && null !== data) {
-            for (var i = 0; i < data.length; i++) {
-                var playerName = data[i];
-                console.log('player: ' + playerName + ', joined');
-            }
-
             currentPlayers = data.length;
-            for (i = 0; i < data.length; i++) {
+            for (var i = 0; i < data.length; i++) {
                 var playerDisplayName = findDBPlayerNameById(data[i]);
-                console.log("playerDisplayName on join = " + playerDisplayName);
+                if (!players[i]) {
+                    players[i] =
+                        new Player(data[i], data[i], playerDisplayName, 1000);
+                } else {
+                    players[i].id = data[i];
+                    players[i].name = data[i];
+                    players[i].displayName = playerDisplayName;
+                }
+            }
+        }
+    });
+    
+    rtc.on('__left', function(data) {
+        if (undefined !== data && null !== data) {
+            console.log('player left : ' + JSON.stringify(data));
+        } else {
+            console.log('guest left');
+        }
+
+        if (undefined !== data && null !== data) {
+            currentPlayers = data.length;
+            for (var i = 0; i < data.length; i++) {
+                var playerDisplayName = findDBPlayerNameById(data[i]);
                 if (!players[i]) {
                     players[i] =
                         new Player(data[i], data[i], playerDisplayName, 1000);
@@ -80,77 +97,60 @@ function initWebsock() {
         }
     });
 
-    rtc.on('__game_over', function (data) {
-        var tableNumber = data.table.tableNumber;
-        var result = 'table ' + tableNumber + ' game over, winners: ';
-        var winners = data.winners;
-        for (var i in winners) {
-            var player = winners[i];
-            result += 'player:' + player.playerName + ', chips: ' + player.chips + '\n';
-        }
-        console.log(result);
-
-        // update in game engine
-        console.log('finish_game : ' + JSON.stringify(data));
+    rtc.on('__game_over', function(data) {
+        console.log('game over : ' + JSON.stringify(data));
         updateGame(data, true);
         gameStatus = STATUS_GAME_FINISHED;
 
         if (undefined !== autoStart && (autoStart === 1 || autoStart === '1')) {
             // auto start another game in 3s
-            setTimeout(function () {
+            setTimeout(function() {
                 startGame();
             }, 3000);
         }
     });
 
-    rtc.on('__game_start', function (data) {
+    rtc.on('__game_start', function(data) {
         // update in game engine
-        console.log('start_game : ' + JSON.stringify(data));
+        console.log('game start : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
     });
 
-    rtc.on('__game_stop', function (data) {
+    rtc.on('__game_stop', function(data) {
         // update in game engine
-        console.log('stop_game : ' + JSON.stringify(data));
+        console.log('game stop : ' + JSON.stringify(data));
         gameStatus = STATUS_WAITING_FOR_PLAYERS;
     });
 
-    rtc.on('__deal', function (data) {
-        var tableNumber = data.table.tableNumber;
+    rtc.on('__deal', function(data) {
+        console.log('deal : ' + JSON.stringify(data));
         var board_card = data.table.board;
         var board = '';
         for (var index in board_card) {
             board += board_card[index] + ',';
         }
-        console.log('table ' + tableNumber + ', public cards:' + board);
 
         // update in game engine
         gameStatus = STATUS_GAME_RUNNING;
-        console.log('deal : ' + JSON.stringify(data));
         updateGame(data, false);
     });
 
-    rtc.on('__new_round', function (data) {
-        var roundCount = data.table.roundCount;
-        var tableNumber = data.table.tableNumber;
+    rtc.on('__new_round', function(data) {
+        console.log('new round : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
-        console.log('table ' + tableNumber + ', new round: ' + roundCount);
 
         // update in game engine
-        console.log('new_round : ' + JSON.stringify(data));
         updateGame(data, true);
     });
 
-    rtc.on('__round_end', function (data) {
-        var roundCount = data.table.roundCount;
-        var tableNumber = data.table.tableNumber;
+    rtc.on('__round_end', function(data) {
+        console.log('round end : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
-        console.log('table ' + tableNumber + ', round finished: ' + roundCount);
         updateGame(data, false);
     });
 
-    rtc.on('__show_action', function (data) {
-        console.log('action : ' + JSON.stringify(data));
+    rtc.on('__show_action', function(data) {
+        console.log('show action : ' + JSON.stringify(data));
 
         gameStatus = STATUS_GAME_RUNNING;
         var tableNumber = data.table.tableNumber;
@@ -161,8 +161,6 @@ function initWebsock() {
             roundAction.action === 'fold' ||
             roundAction.action === 'raise' ||
             roundAction.action === 'call') {
-            console.log('table ' + tableNumber + ', player: ' + roundAction.playerName +
-                ' take action: ' + roundAction.action);
             // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setAction(roundAction.action);
@@ -173,8 +171,6 @@ function initWebsock() {
                 }
             }
         } else {
-            console.log('table ' + tableNumber + ', player:' + roundAction.playerName + ' take action:' +
-                roundAction.action + ', bet amount: ' + roundAction.amount);
             // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setAction(roundAction.action);
@@ -220,17 +216,17 @@ function initGame() {
         d.body.style.background = '#000000';
         return;
     }
-    window.addEventListener('DOMContentLoaded', function () {
+    window.addEventListener('DOMContentLoaded', function() {
         ccLoad();
     });
 }
 
 function ccLoad() {
-    cc.game.onStart = function () {
+    cc.game.onStart = function() {
         //load resources
-        cc.LoaderScene.preload(resources, function () {
+        cc.LoaderScene.preload(resources, function() {
             var LSScene = cc.Scene.extend({
-                onEnter: function () {
+                onEnter: function() {
                     this._super();
                     ccTheGame = new GameLayer();
                     ccTheGame.init();
@@ -276,6 +272,7 @@ function updateGame(data, isNewRound) {
 
     // update players
     if (data.players) {
+        currentPlayers = data.players.length;
         for (i = 0; i < data.players.length; i++) {
             players[i].id = data.players[i].playerName;
             players[i].setDisplayName(findDBPlayerNameById(data.players[i].playerName));
@@ -305,19 +302,6 @@ function updateGame(data, isNewRound) {
                 players[i].isSmallBlind = players[i].name === data.table.smallBlind.playerName;
                 players[i].isBigBlind = players[i].name === data.table.bigBlind.playerName;
             }
-
-            // let blind be blind : )
-            /*
-            if (true === players[i].isSmallBlind) {
-                console.log(players[i].name + " is small blind : " + currentSmallBlind);
-                players[i].setBlind(currentSmallBlind);
-            }
-
-            if (true === players[i].isBigBlind) {
-                console.log(players[i].name + " is big blind : " + currentBigBlind);
-                players[i].setBlind(currentBigBlind);
-            }
-            */
 
             // get float 1
             players[i].setChips(players[i].chips.toFixed(1));
