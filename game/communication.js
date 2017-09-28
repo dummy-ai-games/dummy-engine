@@ -193,7 +193,7 @@ SkyRTC.prototype.initAdminData = function () {
             'eventName': '_join',
             'data': data
         };
-        sendMessage(that.admin, message);
+        that.sendMessage(that.admin, message);
     }
 };
 
@@ -205,7 +205,7 @@ SkyRTC.prototype.initGuestData = function (guest) {
         'eventName': '_join',
         'data': data
     };
-    sendMessage(that.guests[guest], message);
+    that.sendMessage(that.guests[guest], message);
 
 };
 
@@ -221,7 +221,7 @@ SkyRTC.prototype.initPlayerData = function (player) {
         'eventName': '_join',
         'data': data
     };
-    sendMessage(that.players[player], message);
+    that.sendMessage(that.players[player], message);
 };
 
 SkyRTC.prototype.getBasicData = function (tableNumber) {
@@ -254,13 +254,21 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     return data;
 };
 
-function sendMessage(socket, message) {
+SkyRTC.prototype.sendMessage = function(socket, message) {
+    var that = this;
     try {
         if (socket)
             socket.send(JSON.stringify(message), errorCb);
     } catch (e) {
         var player = socket ? socket.id : "";
         logger.error("player:" + player + " socket error, msg:" + e.message);
+        if(socket) {
+            var tableNumber = that.playerAndTable[socket.id];
+            if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
+                that.exitPlayers[socket.id] = socket.tableNumber;
+            }
+            that.removeSocket(socket);
+        }
     }
 }
 
@@ -279,14 +287,14 @@ SkyRTC.prototype.notifyGuestAndPlayer = function () {
             'eventName': '__new_peer',
             'data': tableAndPlayer[that.guests[guest].tableNumber]
         };
-        sendMessage(that.guests[guest], message);
+        that.sendMessage(that.guests[guest], message);
     }
     for (var player in that.players) {
         message = {
             'eventName': '__new_peer',
             'data': tableAndPlayer[that.players[player].tableNumber]
         };
-        sendMessage(that.players[player], message);
+        that.sendMessage(that.players[player], message);
     }
 };
 
@@ -465,7 +473,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     if (that.players[player]) {
         logger.info('server request: ' + JSON.stringify(message));
         if (that.players[player]) {
-            sendMessage(that.players[player], message);
+            that.sendMessage(that.players[player], message);
             var timestamp = new Date().getTime();
             logger.info('send player action,time is ' + timestamp);
             currentTable.timeout = setTimeout(function () {
@@ -505,25 +513,27 @@ SkyRTC.prototype.broadcastInGuests = function (message) {
     var tableNumber = message.data.tableNumber || message.data.table.tableNumber;
     for (var guest in that.guests) {
         if (that.guests[guest].tableNumber === tableNumber)
-            sendMessage(that.guests[guest], message);
+            that.sendMessage(that.guests[guest], message);
     }
 };
 
 SkyRTC.prototype.broadcastInPlayersForReload = function (message) {
     var tableNumber = message.data.tableNumber;
+    var that = this;
     for (var player in this.players) {
         if (this.players[player].tableNumber === tableNumber) {
-            sendMessage(this.players[player], message);
+            that.sendMessage(this.players[player], message);
         }
     }
 };
 
 SkyRTC.prototype.broadcastInPlayers = function (message) {
+    var that = this;
     if (message.eventName == "__game_start") {
         var tableNumber = message.data.tableNumber;
         for (var player in this.players) {
             if (this.players[player].tableNumber == tableNumber) {
-                sendMessage(this.players[player], message);
+                that.sendMessage(this.players[player], message);
             }
         }
     } else {
@@ -540,10 +550,10 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
             if (this.players[player].tableNumber === tableNumber) {
                 if (message.eventName !== '__game_over' && message.eventName !== '__round_end') {
                     playersData[player].cards = cards[player];
-                    sendMessage(this.players[player], message);
+                    that.sendMessage(this.players[player], message);
                     playersData[player].cards = [];
                 } else {
-                    sendMessage(this.players[player], message);
+                    that.sendMessage(this.players[player], message);
                 }
             }
         }
@@ -570,12 +580,14 @@ SkyRTC.prototype.init = function (socket) {
     );
 
     socket.on('error', function (err) {
-        logger.info("player:" + socket.id + " sokcet error, msg:", err);
-        var tableNumber = that.playerAndTable[socket.id];
-        if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
-            that.exitPlayers[socket.id] = socket.tableNumber;
+        logger.info("sokcet error, msg:", err);
+        if(socket) {
+            var tableNumber = that.playerAndTable[socket.id];
+            if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
+                that.exitPlayers[socket.id] = socket.tableNumber;
+            }
+            that.removeSocket(socket);
         }
-        that.removeSocket(socket);
     });
 
     socket.on('close', function () {
