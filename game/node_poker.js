@@ -2151,7 +2151,7 @@ Player.prototype.Bet = function (bet) {
 
                     this.talked = true;
                     // Attempt to progress the game
-                    this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips}
+                    this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
                     progress(this.table);

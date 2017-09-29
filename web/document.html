@@ -266,63 +266,73 @@
             "folded" : false,
             "allin" : false,
             "cards" : [XX, XX],
-            "isSurvive" : true
+            "isSurvive" : true,
+            "roundBet" : 0,
+		    "bet" : 10,
+		    "cards" : ["JC", "KS"]
         },
         "game" : {
             "smallBlind": {
-                "playerName": "bobi",
-                "amount": 10
+                "playerName" : "bobi",
+                "amount" : 10
             },
             "bigBlind": {
-                "playerName": "cicy",
-                "amount": 20
-            },
+                "playerName" : "cicy",
+                "amount" : 20
+            },<span class="new_content"><s>
             "gameBets" : [
                 {
                     "playerName" : "bobi",
-                    "roundBet": 50,
-                    "bet": 50
+                    "roundBet" : 50,
+                    "bet" : 50
                 },
                 {
                     "playerName" : "cicy",
-                    "roundBet": 100,
-                    "bet": 100
+                    "roundBet" : 100,
+                    "bet" : 100
                 },
                 {
                     "playerName" : "geoge",
-                    "roundBet": 200,
-                    "bet": 200
+                    "roundBet" : 200,
+                    "bet" : 200
                 },
                 ...
-            ],
+            ],</s> // 从1.0.4版开始bets信息归于player信息当中, 不再提供 gameBets字段</span>
             "board" : [XX, XX, XX],
             "minBet" : 10,
             "raiseCount" : 0,
-            "roundName" : "Deal", // 其它可选项为 : "Flop", "Turn", "River"
-            "otherPlayers" : [
+            "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
+            <span class="new_content">"players"</span> : [
                 {
-                    "playerName" : "cicy",
+                    "playerName" : "bobi",
                     "chips" : 20,
                     "folded" : true,
                     "allin" : false,
                     "isSurvive" : true,<span class="new_content">
-                    "reloadCount" : 2</span>
+                    "reloadCount" : 0,
+                    "roundBet" : 0,
+                    "bet" : 10,
+                    "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌</span>
                 },
                 {
-                    "playerName" : "geoge",
+                    "playerName" : "cicy",
                     "chips" : 0,
                     "folded" : true,
                     "allin" : true,
                     "isSurvive" : false,<span class="new_content">
-                    "reloadCount" : 2</span>
+                    "reloadCount" : 0,
+                    "roundBet" : 0,
+                    "bet" : 10</span>
                 },
                 {
-                    "playerName" : "alex",
+                    "playerName" : "geoge",
                     "chips" : 500,
                     "folded" : true,
                     "allin" : false,
                     "isSurvive" : true,<span class="new_content">
-                    "reloadCount" : 2</span>
+                    "reloadCount" : 0,
+                    "roundBet" : 0,
+                    "bet" : 10</span>
                 },
                 ...
             ]
@@ -372,53 +382,60 @@
             "bigBlind": {
                 "playerName": "cicy",
                 "amount": 20
-            },
+            },<span class="new_content"><s>
             "gameBets" : [
                 {
                     "playerName" : "bobi",
-                    "roundBet": 50,
-                    "bet": 50
+                    "roundBet" : 0,
+                    "bet" : 10
                 },
                 {
                     "playerName" : "cicy",
-                    "roundBet": 100,
-                    "bet": 100
+                    "roundBet" : 0,
+                    "bet" : 10
                 },
                 {
                     "playerName" : "geoge",
-                    "roundBet": 200,
-                    "bet": 200
+                    "roundBet" : 0,
+                    "bet" : 10
                 },
                 ...
-            ],
+            ],</s> // 从1.0.4版开始bets信息归于player信息当中, 不再提供 gameBets字段</span>
             "board" : [],
             "minBet" : 10,
             "raiseCount" : 0,
-            "roundName" : "Deal",
-            "otherPlayers" : [
+            "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
+            <span class="new_content">"players"</span> : [
                 {
-                    "playerName" : "cicy",
+                    "playerName" : "bobi",
                     "chips" : 20,
                     "folded" : true,
                     "allin" : false,
                     "isSurvive" : true,<span class="new_content">
-                    "reloadCount" : 2</span>
+                    "reloadCount" : 0,
+                    "roundBet" : 0,
+                    "bet" : 10,
+                    "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌</span>
                 },
                 {
-                    "playerName" : "geoge",
+                    "playerName" : "cicy",
                     "chips" : 0,
                     "folded" : true,
                     "allin" : true,
                     "isSurvive" : false,<span class="new_content">
-                    "reloadCount" : 2</span>
+                    "reloadCount" : 0,
+                    "roundBet" : 0,
+                    "bet" : 10</span>
                 },
                 {
-                    "playerName" : "alex",
+                    "playerName" : "geoge",
                     "chips" : 500,
                     "folded" : true,
                     "allin" : false,
                     "isSurvive" : true,<span class="new_content">
-                    "reloadCount" : 2</span>
+                    "reloadCount" : 0,
+                    "roundBet" : 0,
+                    "bet" : 10</span>
                 },
                 ...
             ]
