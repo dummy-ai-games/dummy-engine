@@ -2102,15 +2102,14 @@ Player.prototype.Raise = function () {
                     this.table.raiseCount++;
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', RAISE performed, table raise times = ' +
                         this.table.raiseCount);
-                    var playerCount = 0;
+
                     for (i = 0; i < this.table.players.length; i += 1) {
                         if (!this.table.players[i].allIn && !this.table.players[i].folded && this.table.players[i].isSurvive) {
                             this.table.players[i].talked = false;
-                            playerCount++;
                         }
                     }
-                    if (playerCount <= 1)
-                        this.talked = true;
+
+                    this.talked = true;
                     progress(this.table);
                 } else {
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips(chips: ' +
@@ -2147,7 +2146,16 @@ Player.prototype.Bet = function (bet) {
                     if (this.table.players[i].chips % 1 !== 0)
                         this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
 
+                    //update other player
+                    for (i = 0; i < this.table.players.length; i += 1) {
+                        if (!this.table.players[i].allIn && !this.table.players[i].folded && this.table.players[i].isSurvive) {
+                            this.table.players[i].talked = false;
+
+                        }
+                    }
+
                     this.talked = true;
+
                     // Attempt to progress the game
                     this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
