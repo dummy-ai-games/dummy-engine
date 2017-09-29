@@ -258,7 +258,7 @@ SkyRTC.prototype.sendMessage = function(socket, message) {
     var that = this;
     var errorFunc = function(error) {
            if (error) {
-                logger.error('server internal error occurred: ' + error);
+                logger.error('player:'+socket.id+' socket error, msg: ' + error);
                 if(socket) {
                     var tableNumber = that.playerAndTable[socket.id];
                     if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
