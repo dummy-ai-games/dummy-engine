@@ -18,7 +18,7 @@ var danger = 2;
 var rtc = SkyRTC();
 var playerName = '';
 
-var CALL_IN_TIME = 100;
+var CALL_IN_TIME = 0;
 
 $(document).ready(function () {
     playerName = getParameter('name');
