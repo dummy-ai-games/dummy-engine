@@ -2103,9 +2103,9 @@ Player.prototype.Raise = function () {
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', RAISE performed, table raise times = ' +
                         this.table.raiseCount);
 
-                    for (i = 0; i < this.table.players.length; i += 1) {
-                        if (!this.table.players[i].allIn && !this.table.players[i].folded && this.table.players[i].isSurvive) {
-                            this.table.players[i].talked = false;
+                    for (var j = 0; j < this.table.players.length; j += 1) {
+                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
+                            this.table.players[j].talked = false;
                         }
                     }
 
@@ -2147,9 +2147,9 @@ Player.prototype.Bet = function (bet) {
                         this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
 
                     //update other player
-                    for (i = 0; i < this.table.players.length; i += 1) {
-                        if (!this.table.players[i].allIn && !this.table.players[i].folded && this.table.players[i].isSurvive) {
-                            this.table.players[i].talked = false;
+                    for (var j = 0; j < this.table.players.length; j += 1) {
+                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
+                            this.table.players[j].talked = false;
 
                         }
                     }
