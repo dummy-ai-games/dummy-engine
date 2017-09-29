@@ -48,14 +48,14 @@ function SkyRTC() {
             return;
 
         var tableNumber = that.playerAndTable[socket.id];
-        if (tableNumber != undefined) {
+        if (tableNumber !== undefined) {
             if (that.players[socket.id]) {
                 logger.warn('player: ' + socket.id + ' already exist, reject');
                 return;
             }
             that.playerNumber++;
             var exitPlayerTableNum = that.exitPlayers[socket.id];
-            if (exitPlayerTableNum != undefined) {
+            if (exitPlayerTableNum !== undefined) {
                 socket.tableNumber = exitPlayerTableNum;
                 delete that.exitPlayers[socket.id];
             } else if (!(that.table[tableNumber] && that.table[tableNumber].isStart)) {
@@ -118,7 +118,7 @@ function SkyRTC() {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
                 var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
-                if (playerIndex != -1 && currentTable.checkPlayer(playerIndex)) {
+                if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex)) {
                     if (currentTable.timeout)
                         clearTimeout(currentTable.timeout);
                     try {

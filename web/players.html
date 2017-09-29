@@ -25,7 +25,7 @@
                         <ul class="nav masthead-nav">
                             <li><a href="./">主页</a></li>
                             <li><a href="document.html">文档<img src="./res/images/red-dot-md.png"></a></li>
-                            <li><a href="#" onclick="gotoTest();">测试</a></li>
+                            <li><a href="#" onclick="setGame();">测试</a></li>
                             <li class="active"><a href="#">玩家管理</a></li>
                         </ul>
                     </nav>
@@ -41,7 +41,7 @@
                     <input type="text" id="player_name" style="height:34px" placeholder="玩家名称">&nbsp;&nbsp;
                     <input type="text" id="display_name" style="height:34px" placeholder="游戏中的名称">
                     <span id="display_name_tip" class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="请参考文档.比赛规则-8"></span>&nbsp;&nbsp;&nbsp;
-                    <input type="number" id="table_number" style="height:34px; width: 64px;"  placeholder="游戏桌号">
+                    <input type="number" min="1" max="999" id="table_number" style="height:34px; width: 100px;"  placeholder="游戏桌号">
                     <button id="create_player_button" class="btn btn-success glyphicon glyphicon-plus" onclick="updatePlayer();" style="margin-bottom: 4px;"></button>
                     <button id="remove_player_button" class="btn btn-danger glyphicon glyphicon-remove" onclick="removePlayer();" style="margin-bottom: 4px; display: none;"></button>
                 </div>
@@ -76,13 +76,36 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
-                    <h4 data-i18n="page_code.d_hint_title" class="modal-title">提示</h4>
+                    <h4 class="modal-title">提示</h4>
                 </div>
                 <div class="modal-body">
                     <div id="text_hint"></div>
                 </div>
                 <div class="modal-footer">
-                    <button data-i18n="page_code.d_hint_ok" type="button" class="btn btn-danger" data-dismiss="modal">确定</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- game settings dialog -->
+    <div class="modal fade dialog" id="goto_game_dialog" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+                    <span class="modal-title">打开游戏</span>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="input-group">
+                            <span class="input-group-addon">游戏桌号</span>
+                            <input type="number" min="1" class="form-control" placeholder="游戏桌号" id="game_table_number" value="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="gotoGame();">确定</button>
                 </div>
             </div>
         </div>

@@ -131,7 +131,8 @@ function onPlayerSelected(data) {
 function onPlayerUnselected() {
     selectedPlayer = null;
     $('#player_name').val('');
-    $('#table_number').val('');
+    $('#table_number').val(currentTableNumber);
+    $('#display_name').val('');
 
     // hide update and remove button
     $('#create_player_button').show();
@@ -163,9 +164,13 @@ function dumpLog() {
 */
 
 // UI related functions
-function gotoTest() {
-    var tableNumber = window.prompt("table number ?", "");
-    if (tableNumber === null || tableNumber === "") {
+function setGame() {
+    $('#goto_game_dialog').modal();
+}
+
+function gotoGame() {
+    var tableNumber = $('#game_table_number').val();
+    if (null === tableNumber || isNaN(tableNumber)) {
         return;
     }
     window.location="./game.html?table="+tableNumber;
@@ -240,6 +245,8 @@ function updatePlayer() {
                 loadPlayersByTable();
             } else if(response.status.code === 1) {
                 popUpHintDialog('玩家已存在');
+                currentTableNumber = selectedPlayer.tableNumber;
+                tableNumberInput.val(currentTableNumber);
                 onPlayerUnselected();
                 loadTables();
                 loadPlayersByTable();
@@ -247,6 +254,8 @@ function updatePlayer() {
         },
         error: function () {
             popUpHintDialog('添加玩家失败');
+            currentTableNumber = selectedPlayer.tableNumber;
+            tableNumberInput.val(currentTableNumber);
             onPlayerUnselected();
             loadTables();
             loadPlayersByTable();
