@@ -1707,7 +1707,10 @@ function progress(table) {
             // Move all bets to the pot
             for (i = 0; i < table.game.bets.length; i += 1) {
                 table.game.pot += parseInt(table.game.bets[i], 10);
-                table.game.roundBets[i] += parseInt(table.game.bets[i], 10);
+                if (table.game.bets[i] % 1 != 0)
+                    table.game.roundBets[i] += parseFloat(table.game.bets[i].toFixed(2));
+                else
+                    table.game.roundBets[i] += parseInt(table.game.bets[i], 10);
             }
             if (table.game.roundName === 'River') {
                 table.game.roundName = 'Showdown';
@@ -2089,16 +2092,11 @@ Player.prototype.Raise = function () {
                 bet = 2 * maxBet;
                 if (this.chips + myBet > bet) {
                     this.chips = this.chips + myBet - bet;
-
                     if (this.chips % 1 !== 0)
                         this.chips = parseFloat(this.chips.toFixed(2));
 
-                    this.table.game.bets[i] = parseFloat(bet);
-
-                    if (this.table.game.bets[i] % 1 !== 0)
-                        this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
-
                     var addMoney = bet - myBet;
+                    this.table.game.bets[i] += bet;
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
                     this.table.raiseCount++;
@@ -2143,14 +2141,11 @@ Player.prototype.Bet = function (bet) {
                 var myBet = this.table.game.bets[i];
                 if (myBet + bet > maxBet && this.table.betCount < 4) {
                     this.table.betCount++;
-                    this.table.game.bets[i] += parseFloat(bet);
+                    this.table.game.bets[i] += bet;
                     this.table.players[i].chips -= bet;
 
                     if (this.table.players[i].chips % 1 !== 0)
                         this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
-
-                    if (this.table.game.bets[i] % 1 !== 0)
-                        this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
 
                     this.talked = true;
                     // Attempt to progress the game
@@ -2186,20 +2181,17 @@ Player.prototype.Call = function () {
         if (this === this.table.players[i]) {
             var myBet = 0;
             if (this.table.game.bets[i] >= 0) {
-                myBet = parseFloat(this.table.game.bets[i]);
+                myBet = this.table.game.bets[i];
             }
             if (this.chips + myBet > maxBet) {
                 this.chips = this.chips + myBet - maxBet;
-
                 if (this.chips % 1 !== 0)
                     this.chips = parseFloat(this.chips.toFixed(2));
-                this.table.game.bets[i] = maxBet;
 
-                if (this.table.game.bets[i] % 1 !== 0)
-                    this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
-
-                this.talked = true;
                 var addMoney = maxBet - myBet;
+                this.table.game.bets[i] += addMoney;
+                this.talked = true;
+
                 this.turnBet = {action: 'call', playerName: this.playerName, amount: addMoney, chips: this.chips};
                 this.table.eventEmitter.emit('showAction', this.turnBet);
                 logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CALL performed');
@@ -2221,18 +2213,12 @@ Player.prototype.AllIn = function () {
         if (this === this.table.players[i]) {
             if (this.table.players[i].chips !== 0) {
                 allInValue = this.table.players[i].chips;
-                this.table.game.bets[i] = parseFloat(this.table.game.bets[i]) + parseFloat(this.table.players[i].chips);
+                this.table.game.bets[i] += this.table.players[i].chips;
                 this.table.players[i].chips = 0;
                 this.allIn = true;
                 this.talked = true;
                 this.table.surviveCount--;
                 myBet = this.table.game.bets[i];
-
-                if (this.table.players[i].chips % 1 !== 0)
-                    this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
-
-                if (this.table.game.bets[i] % 1 !== 0)
-                    this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
             }
             break;
         }
