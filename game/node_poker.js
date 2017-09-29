@@ -2159,7 +2159,10 @@ Player.prototype.Bet = function (bet) {
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
                     progress(this.table);
                 } else {
-                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
+                    if(this.betCount >= 4)
+                        logGame(this.table.tableNumber, "betCount >=4 can't bet again, auto call");
+                    else
+                        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
                     this.Call();
                 }
                 break;
