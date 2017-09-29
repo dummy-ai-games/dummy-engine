@@ -2159,8 +2159,8 @@ Player.prototype.Bet = function (bet) {
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
                     progress(this.table);
                 } else {
-                    if(this.betCount >= 4)
-                        logGame(this.table.tableNumber, "betCount >=4 can't bet again, auto call");
+                    if(myBet + bet > maxBet)
+                        logGame(this.table.tableNumber, "betCount = 4 can't bet again, auto call");
                     else
                         logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
                     this.Call();
