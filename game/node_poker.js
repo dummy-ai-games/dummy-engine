@@ -2096,7 +2096,7 @@ Player.prototype.Raise = function () {
                         this.chips = parseFloat(this.chips.toFixed(2));
 
                     var addMoney = bet - myBet;
-                    this.table.game.bets[i] += bet;
+                    this.table.game.bets[i] += addMoney;
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
                     this.table.raiseCount++;
