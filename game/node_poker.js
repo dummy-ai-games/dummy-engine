@@ -2095,8 +2095,8 @@ Player.prototype.Raise = function () {
                     if (this.chips % 1 !== 0)
                         this.chips = parseFloat(this.chips.toFixed(2));
 
-                    var addMoney = bet - myBet;
-                    this.table.game.bets[i] += addMoney;
+                    var addMoney = parseFloat((bet - myBet).toFixed(2));
+                    this.table.game.bets[i] = bet;
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
                     this.table.raiseCount++;
@@ -2188,8 +2188,8 @@ Player.prototype.Call = function () {
                 if (this.chips % 1 !== 0)
                     this.chips = parseFloat(this.chips.toFixed(2));
 
-                var addMoney = maxBet - myBet;
-                this.table.game.bets[i] += addMoney;
+                var addMoney = parseFloat((maxBet - myBet).toFixed(2));
+                this.table.game.bets[i] = maxBet;
                 this.talked = true;
 
                 this.turnBet = {action: 'call', playerName: this.playerName, amount: addMoney, chips: this.chips};
