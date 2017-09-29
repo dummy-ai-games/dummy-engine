@@ -257,15 +257,16 @@ SkyRTC.prototype.getBasicData = function(tableNumber) {
 SkyRTC.prototype.sendMessage = function(socket, message) {
     var that = this;
     var errorFunc = function(error) {
-           if (error) {
-                logger.error('player:' + socket.id + ' socket error, msg: ' + error);
+           if (error) {                
                 if(socket) {
+                    logger.error('player:' + socket.id + ' socket error, msg: ' + error);
                     var tableNumber = that.playerAndTable[socket.id];
                     if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
                         that.exitPlayers[socket.id] = socket.tableNumber;
                     }
                     that.removeSocket(socket);
-                }
+                }else
+                    logger.error('socket error, msg: ' + error);
           }
     };
     
