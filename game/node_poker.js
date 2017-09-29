@@ -31,6 +31,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.gameLosers = [];
     this.currentPlayer = 0;
     this.raiseCount = 0;
+    this.betCount = 0;
     this.isBet = false;
     this.roundCount = 1;
     this.surviveCount = 0;
@@ -85,6 +86,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.isBet = true;
             getNextPlayer(that);
             that.raiseCount = 0;
+            that.betCount = 0;
             takeAction(that, '__bet');
         }
     });
@@ -2139,7 +2141,8 @@ Player.prototype.Bet = function (bet) {
         for (i = 0; i < this.table.players.length; i += 1) {
             if (this === this.table.players[i]) {
                 var myBet = this.table.game.bets[i];
-                if (myBet + bet > maxBet) {
+                if (myBet + bet > maxBet && this.betCount < 4) {
+                    this.betCount++;
                     this.table.game.bets[i] += parseFloat(bet);
                     this.table.players[i].chips -= bet;
 
@@ -2156,7 +2159,10 @@ Player.prototype.Bet = function (bet) {
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
                     progress(this.table);
                 } else {
-                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
+                    if(myBet + bet > maxBet)
+                        logGame(this.table.tableNumber, "betCount = 4 can't bet again, auto call");
+                    else
+                        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
                     this.Call();
                 }
                 break;

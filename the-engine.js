@@ -62,6 +62,9 @@ app.use(session({
     })
 }));
 
+app.use('/', express.static(__dirname + '/web/'));
+require('./routes');
+
 app.use(function (req, res, next) {
     if (req.session.user)
         res.locals.user = req.session.user;
@@ -72,5 +75,4 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.use('/', express.static(__dirname + '/web/'));
-require('./routes');
+
