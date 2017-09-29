@@ -616,7 +616,7 @@ SkyRTC.prototype.init = function(socket) {
     );
 
     socket.on('error', function (err) {
-        logger.error("sokcet error, msg:"+ err);
+        logger.error("socket error, msg:"+ err);
         if(socket) {
             var tableNumber = that.playerAndTable[socket.id];
             if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
