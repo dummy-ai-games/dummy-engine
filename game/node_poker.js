@@ -1950,7 +1950,7 @@ Table.prototype.NewRound = function () {
     } else {
         this.players[smallBlindIndex].chips -= this.smallBlind;
         if (this.players[smallBlindIndex].chips % 1 !== 0)
-            this.players[smallBlindIndex].chips = this.players[smallBlindIndex].chips.toFixed(2);
+            this.players[smallBlindIndex].chips = parseFloat(this.players[smallBlindIndex].chips.toFixed(2));
         this.game.bets[smallBlindIndex] = this.smallBlind;
     }
 
@@ -1963,7 +1963,7 @@ Table.prototype.NewRound = function () {
     } else {
         this.players[bigBlindIndex].chips -= this.bigBlind;
         if (this.players[bigBlindIndex].chips % 1 !== 0)
-            this.players[bigBlindIndex].chips = this.players[bigBlindIndex].chips.toFixed(2);
+            this.players[bigBlindIndex].chips = parseFloat(this.players[bigBlindIndex].chips.toFixed(2));
         this.game.bets[bigBlindIndex] = this.bigBlind;
     }
 
@@ -2007,7 +2007,7 @@ Table.prototype.findBigBlind = function (smallBindIndex) {
 };
 
 /*
-Table.prototype.start1stRound = function() {
+ Table.prototype.start1stRound = function() {
  // emit a fake gameOver to kick off the 1st round
  this.eventEmitter.emit('1stRound');
  };
@@ -2091,12 +2091,12 @@ Player.prototype.Raise = function () {
                     this.chips = this.chips + myBet - bet;
 
                     if (this.chips % 1 !== 0)
-                        this.chips = this.chips.toFixed(2);
+                        this.chips = parseFloat(this.chips.toFixed(2));
 
                     this.table.game.bets[i] = parseFloat(bet);
 
                     if (this.table.game.bets[i] % 1 !== 0)
-                        this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
+                        this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
 
                     var addMoney = bet - myBet;
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
@@ -2141,16 +2141,16 @@ Player.prototype.Bet = function (bet) {
         for (i = 0; i < this.table.players.length; i += 1) {
             if (this === this.table.players[i]) {
                 var myBet = this.table.game.bets[i];
-                if (myBet + bet > maxBet && this.betCount < 4) {
-                    this.betCount++;
+                if (myBet + bet > maxBet && this.table.betCount < 4) {
+                    this.table.betCount++;
                     this.table.game.bets[i] += parseFloat(bet);
                     this.table.players[i].chips -= bet;
 
                     if (this.table.players[i].chips % 1 !== 0)
-                        this.table.players[i].chips = this.table.players[i].chips.toFixed(2);
+                        this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
 
                     if (this.table.game.bets[i] % 1 !== 0)
-                        this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
+                        this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
 
                     this.talked = true;
                     // Attempt to progress the game
@@ -2159,8 +2159,8 @@ Player.prototype.Bet = function (bet) {
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
                     progress(this.table);
                 } else {
-                    if(myBet + bet > maxBet)
-                        logGame(this.table.tableNumber, "betCount = 4 can't bet again, auto call");
+                    if (myBet + bet > maxBet)
+                        logGame(this.table.tableNumber, "betCount =" + this.table.betCount + " can't bet again, auto call");
                     else
                         logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
                     this.Call();
@@ -2192,11 +2192,11 @@ Player.prototype.Call = function () {
                 this.chips = this.chips + myBet - maxBet;
 
                 if (this.chips % 1 !== 0)
-                    this.chips = this.chips.toFixed(2);
+                    this.chips = parseFloat(this.chips.toFixed(2));
                 this.table.game.bets[i] = maxBet;
 
                 if (this.table.game.bets[i] % 1 !== 0)
-                    this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
+                    this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
 
                 this.talked = true;
                 var addMoney = maxBet - myBet;
@@ -2229,10 +2229,10 @@ Player.prototype.AllIn = function () {
                 myBet = this.table.game.bets[i];
 
                 if (this.table.players[i].chips % 1 !== 0)
-                    this.table.players[i].chips = this.table.players[i].chips.toFixed(2);
+                    this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
 
                 if (this.table.game.bets[i] % 1 !== 0)
-                    this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
+                    this.table.game.bets[i] = parseFloat(this.table.game.bets[i].toFixed(2));
             }
             break;
         }
