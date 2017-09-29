@@ -11,7 +11,7 @@ var logger = require('../poem/logging/logger4js').helper;
 var dateUtils = require('../poem/utils/date_utils');
 var winston = require('winston');
 
-var logRoot = "./logs/";
+var logRoot = './logs/';
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloadCount, maxRoundCount) {
     this.smallBlind = smallBlind;
@@ -71,7 +71,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.eventEmitter.on('showAction', function (data) {
         var myData = getBasicData(that);
         myData.action = data;
-        logGame(that.tableNumber, JSON.stringify(myData));
+        logGame(that.tableNumber, 'show action : ' + JSON.stringify(myData));
         that.eventEmitter.emit('__show_action', myData);
     });
 
@@ -93,7 +93,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         var count = 0;
         var i;
         var data;
-        logger.info("received roundEnd");
         for (i = 0; i < that.players.length; i++) {
             if (that.players[i].chips <= 0 && that.players[i].reloadCount < that.maxReloadCount) {
                 that.players[i].reloadCount++;
@@ -104,17 +103,16 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }
         }
 
-        // debug
-        logger.info("********");
-        logger.info("count = " + count + ", players.length / 2 = " + that.players.length / 2);
-        logger.info("minPlayers = " + that.minPlayers);
-        logger.info("roundCount = " + that.roundCount + ", maxRoundCount = " + that.maxRoundCount);
-        logger.info("********");
+        logGame(that.tableNumber, 'round end');
+        logGame(that.tableNumber, '********');
+        logGame(that.tableNumber, 'alive player count = ' + count + ', players.length / 2 = ' + that.players.length / 2);
+        logGame(that.tableNumber, 'minPlayers = ' + that.minPlayers);
+        logGame(that.tableNumber, 'roundCount = ' + that.roundCount + ', maxRoundCount = ' + that.maxRoundCount);
+        logGame(that.tableNumber, '********');
 
         if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
             data = getBasicData(that);
             that.eventEmitter.emit('__round_end', data);
-            logGame(that.tableNumber, 'a new round started');
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++) {
                 var isSurvive = true;
@@ -125,19 +123,19 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
             var nextDealer = getNextDealer(that);
-            logGame(that.tableNumber, "current dealer is:" + that.dealer + " next is:" + nextDealer);
+            logGame(that.tableNumber, 'current dealer is : ' + that.dealer + ' next is:' + nextDealer);
             that.dealer = nextDealer;
             that.roundCount++;
             that.isReloadTime = true;
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
-            logger.info("start reload time");
+            logGame(that.tableNumber, 'start reload');
             setTimeout(function () {
                 that.isReloadTime = false;
                 that.isBet = false;
                 that.NewRound();
             }, 5 * 1000);
         } else {
-            logGame(that.tableNumber, 'game over, winners are: ');
+            logGame(that.tableNumber, 'game over, winners : ');
             that.isStart = false;
             for (i = 0; i < that.players.length; i++) {
                 var player = that.players[i];
@@ -493,7 +491,7 @@ function checkForBankrupt(table) {
     for (i = 0; i < table.players.length; i += 1) {
         if (table.players[i].chips === 0) {
             table.gameLosers.push(table.players[i]);
-            logger.info(table.tableNumber, 'player: ' + table.players[i].playerName + ' is going bankrupt');
+            logGame(table.tableNumber, 'player : ' + table.players[i].playerName + ' is going bankrupt');
             table.players.splice(i, 1);
         }
     }
@@ -1724,7 +1722,7 @@ function progress(table) {
                  */
                 table.eventEmitter.emit('roundEnd');
             } else if (table.game.roundName === 'Turn') {
-                logGame(table.tableNumber, 'effective turn');
+                logGame(table.tableNumber, 'effective turn -> river');
                 table.game.roundName = 'River';
                 table.game.deck.pop(); // Burn a card
                 table.game.board.push(table.game.deck.pop()); // Turn a card
@@ -1739,7 +1737,7 @@ function progress(table) {
                 }
                 table.eventEmitter.emit('deal');
             } else if (table.game.roundName === 'Flop') {
-                logGame(table.tableNumber, 'effective flop');
+                logGame(table.tableNumber, 'effective flop -> turn');
                 table.game.roundName = 'Turn';
                 table.game.deck.pop(); // Burn a card
                 table.game.board.push(table.game.deck.pop()); // Turn a card
@@ -1751,7 +1749,7 @@ function progress(table) {
                 }
                 table.eventEmitter.emit('deal');
             } else if (table.game.roundName === 'Deal') {
-                logGame(table.tableNumber, 'effective deal');
+                logGame(table.tableNumber, 'effective deal -> flop');
                 table.game.roundName = 'Flop';
                 table.game.deck.pop(); // Burn a card
                 for (i = 0; i < 3; i += 1) { // Turn three cards
@@ -1871,7 +1869,7 @@ Table.prototype.initNewRound = function () {
 
 Table.prototype.StartGame = function () {
     // If there is no current game and we have enough players, start a new game.
-    console.log("start game");
+    console.log('start game');
     if (!this.game) {
         this.playersToRemove = [];
         this.dealer = parseInt(Math.random() * (this.surviveCount));
@@ -1883,7 +1881,7 @@ Table.prototype.StartGame = function () {
 };
 
 Table.prototype.StopGame = function () {
-    console.log("stop game");
+    console.log('stop game');
     if (!this.game) {
         this.isStart = false;
     }
@@ -2022,6 +2020,9 @@ Player.prototype.Check = function () {
     var checkAllow, v, i;
 
     checkAllow = true;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to CHECK');
+
     for (v = 0; v < this.table.game.bets.length; v += 1) {
         if (this.table.game.bets[v] !== 0) {
             checkAllow = false;
@@ -2037,16 +2038,19 @@ Player.prototype.Check = function () {
         // Attempt to progress the game
         this.turnBet = {action: 'check', playerName: this.playerName, chips: this.chips};
         this.table.eventEmitter.emit('showAction', this.turnBet);
-        logGame(this.table.tableNumber, 'player: ' + this.playerName + ' CHECK');
+
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CHECK performed');
         progress(this.table);
     } else {
-        logGame(this.table.tableNumber, 'Check not allowed, replay please');
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CHECK is not allowed, default to CALL');
         this.Call();
     }
 };
 
 Player.prototype.Fold = function () {
     var i, bet;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to FOLD');
 
     // Move any current bet into the pot
     for (i = 0; i < this.table.players.length; i += 1) {
@@ -2058,7 +2062,7 @@ Player.prototype.Fold = function () {
     // Mark the player as folded
     this.folded = true;
     this.turnBet = {action: 'fold', playerName: this.playerName, chips: this.chips};
-    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' FOLD');
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ' FOLD performed');
     this.table.eventEmitter.emit('showAction', this.turnBet);
     this.table.surviveCount--;
     // Attempt to progress the game
@@ -2066,9 +2070,10 @@ Player.prototype.Fold = function () {
 };
 
 Player.prototype.Raise = function () {
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to RAISE');
 
     if (this.table.raiseCount >= 4) {
-        logGame(this.table.tableNumber, 'can not raise again --> Call !!!');
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', table raise times(' + this.table.raiseCount + ') exceeded, default to Call');
         this.Call();
     } else {
         var maxBet, i, bet;
@@ -2082,14 +2087,20 @@ Player.prototype.Raise = function () {
                 bet = 2 * maxBet;
                 if (this.chips + myBet > bet) {
                     this.chips = this.chips + myBet - bet;
-                    if (this.chips % 1 != 0)
+
+                    if (this.chips % 1 !== 0)
                         this.chips = this.chips.toFixed(2);
-                    this.table.game.bets[i] = bet;
+
+                    this.table.game.bets[i] = parseFloat(bet);
+
+                    if (this.table.game.bets[i] % 1 !== 0)
+                        this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
+
                     var addMoney = bet - myBet;
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
                     this.table.raiseCount++;
-                    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' RAISE, current raise count = ' +
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', RAISE performed, table raise times = ' +
                         this.table.raiseCount);
                     var playerCount = 0;
                     for (i = 0; i < this.table.players.length; i += 1) {
@@ -2102,8 +2113,8 @@ Player.prototype.Raise = function () {
                         this.talked = true;
                     progress(this.table);
                 } else {
-                    logGame(this.table.tableNumber, 'You do not have enough chips : (your chips: ' +
-                        this.chips + ', my bet: ' + myBet + ', bet: ' + bet + ') --> ALL IN !!!');
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips(chips: ' +
+                        this.chips + ', bet : ' + myBet + ', going to bet : ' + bet + ') default to ALLIN');
                     this.AllIn();
                 }
                 break;
@@ -2116,10 +2127,12 @@ Player.prototype.Bet = function (bet) {
     var maxBet = getMaxBet(this.table.game.bets);
     this.table.isBet = false;
     var i;
-    if (bet < this.table.bigBlind) {
-        logGame(this.table.tableNumber, 'player: ' +
-            this.playerName + ', bet < small blind, adjust to small blind: ' + this.table.smallBlind);
 
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to BET');
+
+    if (bet < this.table.bigBlind) {
+        logGame(this.table.tableNumber, 'player : ' +
+            this.playerName + ', bet(' + bet + ') < big blind(' + this.table.bigBlind + '), default to bet big blind : ' + this.table.bigBlind);
         bet = this.table.bigBlind;
     }
     if (this.chips > bet) {
@@ -2127,31 +2140,38 @@ Player.prototype.Bet = function (bet) {
             if (this === this.table.players[i]) {
                 var myBet = this.table.game.bets[i];
                 if (myBet + bet > maxBet) {
-                    this.table.game.bets[i] += bet;
+                    this.table.game.bets[i] += parseFloat(bet);
                     this.table.players[i].chips -= bet;
-                    if (this.table.players[i].chips % 1 != 0)
+
+                    if (this.table.players[i].chips % 1 !== 0)
                         this.table.players[i].chips = this.table.players[i].chips.toFixed(2);
+
+                    if (this.table.game.bets[i] % 1 !== 0)
+                        this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
+
                     this.talked = true;
                     // Attempt to progress the game
                     this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips}
                     this.table.eventEmitter.emit('showAction', this.turnBet);
-                    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' BET: ' + bet);
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
                     progress(this.table);
                 } else {
-                    logGame(this.table.tableNumber, 'bet value:' + bet + ' lower than min need bet:) -->Auto Call !!!');
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
                     this.Call();
                 }
                 break;
             }
         }
     } else {
-        logGame(this.table.tableNumber, 'You do not have enough chips (your chips: ' + this.chips + ') --> ALL IN !!!');
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
         this.AllIn();
     }
 };
 
 Player.prototype.Call = function () {
     var maxBet, i;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to CALL');
 
     maxBet = getMaxBet(this.table.game.bets);
 
@@ -2160,21 +2180,26 @@ Player.prototype.Call = function () {
         if (this === this.table.players[i]) {
             var myBet = 0;
             if (this.table.game.bets[i] >= 0) {
-                myBet = this.table.game.bets[i];
+                myBet = parseFloat(this.table.game.bets[i]);
             }
             if (this.chips + myBet > maxBet) {
                 this.chips = this.chips + myBet - maxBet;
-                if (this.chips % 1 != 0)
+
+                if (this.chips % 1 !== 0)
                     this.chips = this.chips.toFixed(2);
                 this.table.game.bets[i] = maxBet;
+
+                if (this.table.game.bets[i] % 1 !== 0)
+                    this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
+
                 this.talked = true;
                 var addMoney = maxBet - myBet;
                 this.turnBet = {action: 'call', playerName: this.playerName, amount: addMoney, chips: this.chips};
                 this.table.eventEmitter.emit('showAction', this.turnBet);
-                logGame(this.table.tableNumber, 'player: ' + this.playerName + ' CALL');
+                logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CALL performed');
                 progress(this.table);
             } else {
-                logGame(this.table.tableNumber, 'You do not have enough chips (your chips: ' + this.chips + ') --> ALL IN !!!');
+                logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
                 this.AllIn();
             }
         }
@@ -2182,31 +2207,36 @@ Player.prototype.Call = function () {
 };
 
 Player.prototype.AllIn = function () {
-    var i, allInValue = 0, mybet = 0;
+    var i, allInValue = 0, myBet = 0;
 
-    logGame(this.table.tableNumber, 'player: ' + this.playerName + ' ALLIN');
-
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to ALLIN');
 
     for (i = 0; i < this.table.players.length; i += 1) {
         if (this === this.table.players[i]) {
             if (this.table.players[i].chips !== 0) {
                 allInValue = this.table.players[i].chips;
-                this.table.game.bets[i] += this.table.players[i].chips;
+                this.table.game.bets[i] = parseFloat(this.table.game.bets[i]) + parseFloat(this.table.players[i].chips);
                 this.table.players[i].chips = 0;
                 this.allIn = true;
                 this.talked = true;
                 this.table.surviveCount--;
-                mybet = this.table.game.bets[i];
+                myBet = this.table.game.bets[i];
+
+                if (this.table.players[i].chips % 1 !== 0)
+                    this.table.players[i].chips = this.table.players[i].chips.toFixed(2);
+
+                if (this.table.game.bets[i] % 1 !== 0)
+                    this.table.game.bets[i] = this.table.game.bets[i].toFixed(2);
             }
             break;
         }
     }
 
-    // if player bet < mybet, the player need to call
+    // if player bet < myBet, the player need to call
     for (i = 0; i < this.table.players.length; i++) {
         var bet = this.table.game.bets[i];
         var player = this.table.players[i];
-        if (player.isSurvive && !player.folded && !player.allIn && bet < mybet) {
+        if (player.isSurvive && !player.folded && !player.allIn && bet < myBet) {
             player.talked = false;
         }
     }
@@ -2214,6 +2244,7 @@ Player.prototype.AllIn = function () {
     // Attempt to progress the game
     this.turnBet = {action: 'allin', playerName: this.playerName, amount: allInValue, chips: this.chips};
     this.table.eventEmitter.emit('showAction', this.turnBet);
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', ALLIN performed');
     progress(this.table);
 };
 
@@ -2229,26 +2260,8 @@ function rankHands(hands) {
     return hands;
 }
 
-var gameLogger = null;
 function logGame(tableNumber, msg) {
-    /*
-     var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd");
-     var logFileName = logRoot + "game/" + date + '_game_' + tableNumber + '.txt';
-
-     if (null !== gameLogger) {
-     gameLogger.close();
-     }
-     gameLogger = new (winston.Logger)({
-     transports: [
-     new (winston.transports.Console)(),
-     new (winston.transports.File)({filename: logFileName})
-     ]
-     });
-     var logDate = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
-     gameLogger.info(logDate + ": " + msg);
-     gameLogger.close();
-     */
-    logger.info(msg);
+    logger.info('>>> table ' + tableNumber + ' >>> ' + msg);
 }
 
 exports.Table = Table;
