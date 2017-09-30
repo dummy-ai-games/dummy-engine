@@ -14,24 +14,26 @@ var playerActions = {};
 var gameStatus = 0;
 var risk = 1;
 var danger = 2;
-
 var rtc = SkyRTC();
 var playerName = '';
-
+var server = '';
 var CALL_IN_TIME = 0;
+var serverAddress = '';
 
 $(document).ready(function () {
     playerName = getParameter('name');
-    console.log('player : ' + playerName);
+    server = getParameter('server');
+    serverAddress = 'ws://' + server;
+    writeToCommands('player : ' + playerName + ', server : ' + serverAddress);
     $('#player_name').html(playerName);
     initRTC();
 });
 
 function initRTC() {
-    rtc.connect('ws://localhost:3000', playerName);
+    rtc.connect(serverAddress, playerName);
 
     rtc.on('__action', function (data) {
-        console.log('action: ' + JSON.stringify(data));
+        writeToCommands('<<< action: ' + JSON.stringify(data, null, 4));
         self = data.self;
         roundBets = data.game.roundBets;
         bets = data.game.bets;
@@ -43,7 +45,7 @@ function initRTC() {
     });
 
     rtc.on('__bet', function (data) {
-        console.log('bet: ' + JSON.stringify(data));
+        writeToCommands('<<< bet: ' + JSON.stringify(data, null, 4));
         self = data.self;
         roundBets = data.game.roundBets;
         bets = data.game.bets;
@@ -55,13 +57,13 @@ function initRTC() {
     });
 
     rtc.on('__new_round', function (data) {
-        console.log('new round: ' + JSON.stringify(data));
+        writeToCommands('<<< new round: ' + JSON.stringify(data, null, 4));
         playerActions = {};
         gameStatus = 0;
     });
 
     rtc.on('__show_action', function (data) {
-        console.log('show action : ' + JSON.stringify(data));
+        writeToCommands('<<< show action: ' + JSON.stringify(data, null, 4));
         var playerAction = data.action;
 
 
@@ -83,16 +85,16 @@ function initRTC() {
     });
 
     rtc.on('__start_reload', function (data) {
-        console.log('start reload:' + JSON.stringify(data));
+        writeToCommands('<<< start reload: ' + JSON.stringify(data, null, 4));
         reload();
     });
 
     rtc.on('__round_end', function(data) {
-        console.log('round end:' + JSON.stringify(data));
+        writeToCommands('<<< round end: ' + JSON.stringify(data, null, 4));
     });
 
     rtc.on('__game_over', function(data) {
-        console.log('game over:' + JSON.stringify(data));
+        writeToCommands('<<< game over: ' + JSON.stringify(data, null, 4));
     });
 }
 
@@ -241,30 +243,37 @@ function takeAction(selfCard, cards, players) {
 }
 
 function reload() {
+    writeToCommands('>>> reload');
     rtc.Reload();
 }
 
 function bet() {
+    writeToCommands('>>> bet: 100');
     rtc.Bet(100);
 }
 
 function call() {
+    writeToCommands('>>> call');
     rtc.Call();
 }
 
 function check() {
+    writeToCommands('>>> check');
     rtc.check();
 }
 
 function raise() {
+    writeToCommands('>>> raise');
     rtc.Raise();
 }
 
 function allin() {
+    writeToCommands('>>> allin');
     rtc.AllIn();
 }
 
 function fold() {
+    writeToCommands('>>> fold');
     rtc.Fold();
 }
 
@@ -283,4 +292,10 @@ function getParameter(name) {
         p = p.substring(0, sharpPos);
     }
     return p;
+}
+
+function writeToCommands(text) {
+    document.getElementById("commands").value += text;
+    document.getElementById("commands").value += "\r\n";
+    console.log(text);
 }

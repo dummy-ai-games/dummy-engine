@@ -3,30 +3,13 @@
  * 2017-09-20
  */
 
-var hasUpdate =
-    [{
-        tab: 'game_instruction_new',
-        update: 1
-    }, {
-        tab: 'api_new',
-        update: 1
-    }, {
-        tab: 'example_new',
-        update: 1
-    }, {
-        tab: 'faq_new',
-        update: 1
-    }, {
-        tab: 'release_note_new',
-        update: 0
-    }];
-
 $(document).ready(function() {
-    initUpdates();
+    initUI();
 });
 
-function initUpdates() {
-    // TODO: remove the new dot after user has clicked the tab
+function initUI() {
+    $('#server_types').select2({
+    });
 }
 
 function setGame() {
@@ -43,4 +26,16 @@ function gotoGame() {
 
 function hideTip() {
     $('#tip').hide();
+}
+
+function createDummy() {
+    var playerName = $('#player_name').val();
+    if (null === playerName || "" === playerName) {
+        return;
+    }
+    var host = window.location.hostname;
+    var port = window.location.port;
+    var serverAddress = host + ':' + port;
+    window.open('./simulator.html?name='+playerName+'&server='+serverAddress, '_blank');
+    $('#player_name').val('');
 }

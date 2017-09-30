@@ -67,6 +67,19 @@ function rankHandInt(hand) {
     handRanks = [];
     handSuits = [];
 
+    /*
+     * hand.card[i] are the series of all 7 cards (2 private + 5 public)
+     * for example:
+     *
+     * hand.cards[0] = QH
+     * hand.cards[1] = 6C
+     * hand.cards[2] = 8C
+     * hand.cards[3] = 3S
+     * hand.cards[4] = 9D
+     * hand.cards[5] = TC
+     * hand.cards[6] = 2H
+     */
+
     for (i = 0; i < hand.cards.length; i += 1) {
         handRanks[i] = hand.cards[i].substr(0, 1);
         handSuits[i] = hand.cards[i].substr(1, 2);

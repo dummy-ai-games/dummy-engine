@@ -10,6 +10,7 @@
     <meta name="author" content="the-engine team">
     <title>Document</title>
     <link rel="stylesheet" href="./js/public/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./js/public/bower_components/select2/dist/css/select2.min.css">
     <link rel="stylesheet" href="style/document.css">
 </head>
 <body>
@@ -21,7 +22,7 @@
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="./index.html">主页</a></li>
-                            <li class="active"><a href="#">文档</a></li>
+                            <li class="active"><a href="#">文档<img src="./res/images/red-dot-md.png"></a></li>
                             <li><a href="#" onclick="setGame();">测试</a></li>
                             <li><a href="./players.html">玩家管理</a></li>
                         </ul>
@@ -37,7 +38,7 @@
                 <li class="active" style="cursor: pointer;"><a data-target="#competition_rules" data-toggle="tab">比赛规则</a></li>
                 <li style="cursor: pointer;"><a data-target="#game_rules" data-toggle="tab">游戏规则</a></li>
                 <li style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
-                <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">示例代码</a></li>
+                <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">开发参考</a></li>
                 <li style="cursor: pointer;"><a data-target="#faq" data-toggle="tab">FAQ</a></li>
                 <li style="cursor: pointer;"><a data-target="#release_note" data-toggle="tab">平台更新日志</a></li>
             </ul>
@@ -265,7 +266,9 @@
             "tableNumber": "1",
             "roundName": "Deal",
             "board": [],
-            "roundCount": 1,
+            "roundCount": 1,<span class="new_content">
+            "raiseCount" : 0,
+            "betCount" : 0,</span>
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -415,8 +418,9 @@
                 ...
             ],</s> // 从1.0.4版开始bets信息归于player信息当中, 不再提供 gameBets字段</span>
             "board" : [XX, XX, XX],
-            "minBet" : 10,
+            "minBet" : 10,<span class="new_content">
             "raiseCount" : 0,
+            "betCount" : 1,</span>
             "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
             <span class="new_content">"players"</span> : [
                 {
@@ -464,8 +468,9 @@
                         <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
                         <p>1.6. data.game.minBet 字段表示当前可以押注的最小值</p>
                         <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
-                        <p>1.8. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
-                        <p>1.9 data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
+                        <p>1.8. data.game.betCount 字段表示本回合中所有玩家总共下注 (bet) 的次数</p>
+                        <p>1.9. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
+                        <p>1.10.data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
                         <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise", <span class="new_content">"bet"</span> 中的一种, 决策的数据格式如下</p>
 <pre>
 {
@@ -518,8 +523,9 @@
                 ...
             ],</s> // 从1.0.4版开始bets信息归于player信息当中, 不再提供 gameBets字段</span>
             "board" : [],
-            "minBet" : 10,
+            "minBet" : 10,<span class="new_content">
             "raiseCount" : 0,
+            "betCount" : 1,</span>
             "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
             <span class="new_content">"players"</span> : [
                 {
@@ -594,7 +600,9 @@
             "tableNumber" : 1,
             "roundName" : "Turn",
             "board" : [XX, XX, XX, XX],
-            "roundCount": 1,
+            "roundCount": 1,<span class="new_content">
+            "raiseCount" : 0,
+            "betCount" : 1,</span>
             "smallBlind": {
                 "playerName": "geoge",
                 "amount": 10
@@ -696,7 +704,9 @@
                 "9S",
                 "5H"
             ],
-            "roundCount": 1,
+            "roundCount": 1,<span class="new_content">
+            "raiseCount" : 0,
+            "betCount" : 1,</span>
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -782,7 +792,9 @@
                 "9S",
                 "5H"
             ],
-            "roundCount": 16,
+            "roundCount": 16,<span class="new_content">
+            "raiseCount" : 0,
+            "betCount" : 1,</span>
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -868,12 +880,12 @@
                     <p><span>请开发者自行修改示例代码中的 Socket 地址和接入用户名信息以方便自助测试</span></p>
                     <div class="row">
                         <div class="col-md-4">
-                            <h2>Javascript V1.0.1 <img src="./res/images/red-dot-md.png"></h2>
+                            <h2>Javascript V1.0.1</h2>
                             <p>启动方式：双击用浏览器打开 player.html, 并附加URL参数name=your_name, <br>例如: file:///D:/player.html?name=bobi<br><br></p>
                             <p><a class="btn btn-large btn-default" href="./example/js-example.zip" role="button">js 示例下载 &raquo;</a></p>
                         </div>
                         <div class="col-md-4">
-                            <h2>Python V1.0.1 <img src="./res/images/red-dot-md.png"></h2>
+                            <h2>Python V1.0.1</h2>
                             <p>启动方式：请参考 <a href="https://pypi.python.org/pypi/websocket-client/0.7.0">https://pypi.python.org/pypi/websocket-client/0.7.0</a> 先安装 Python 的 websocket 插件, 自行修改代码中的 ws 和所有 playerName 变量值,然后运行 python player.py 接入游戏</p>
                             <p><a class="btn btn-default" href="./example/python-example.zip" role="button">python 示例下载 &raquo;</a></p>
                         </div>
@@ -882,6 +894,23 @@
                             <p>启动方式：请自行修改代码中的 URI 和 JoinData 以及 ActionData 中的 playerName 字段,编译生成 .jar 文件之后使用 java -jar player.jar 接入游戏 (example的IDE环境为 idea, 工程可编译生成 artifact : player.jar)</p>
                             <p><a class="btn btn-default" href="./example/java-example.zip" role="button">java 示例下载 &raquo;</a></p>
                         </div>
+                    </div>
+                    <hr>
+                    <div>
+                        <h2 class="new_content">牌面比较算法</h2>
+                        <p>算法输入为玩家手牌的数组, 输出为 rank 值, rank 值越大, 牌面组合越大, 目前只提供 js 版本, 其它版本请开发者自行修改完善</p>
+                        <p><a class="btn btn-default" href="./example/card_compare.txt" role="button">比牌算法下载 &raquo;</a></p>
+                    </div>
+                    <hr>
+                    <div>
+                        <h2 class="new_content">Dummy</h2>
+                        <p>Dummy是一个人工智障, 但是他可以在你三缺一的时候来凑数, 以及帮你捕获所有的交互指令</p>
+                        <div class="input-group">
+                            <span class="input-group-addon">玩家名称</span>
+                            <input type="text"class="form-control" placeholder="玩家名称(建议填写自己申请的玩家名, Dummy可以代打)" id="player_name">
+                        </div>
+                        <br>
+                        <p><a class="btn btn-default" role="button" onclick="createDummy();">启动一个Dummy &raquo;</a></p>
                     </div>
                 </div>
                 <div class="tab-pane" id="faq">
@@ -926,6 +955,20 @@
                     </p>
                     <p class="answer">
                         A: 请看 <a target="_blank" href="https://www.douban.com/group/topic/35806191/"> 这里 </a>
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: Royal Straight里按花色比较大小吗?
+                    </p>
+                    <p class="answer">
+                        A: 目前规定所有Royal Straight都是同样大小, 不分花色, 其它组合同理 </a>
+                    </p>
+                    <hr>
+                    <p class="question">
+                        Q: 如果比牌阶段多人牌面值相等, 筹码如果均分的话是否允许筹码出现浮点数?
+                    </p>
+                    <p class="answer">
+                        A: 允许, UI上会保留小数点后1位, 后台保留2位, 虽然在现实中会比较奇怪, 但是不影响本次虚拟比赛的排名 </a>
                     </p>
                     <hr>
                     <a style="text-decoration: none;"><h4><strong>开发篇</strong></h4></a>
@@ -1045,5 +1088,6 @@
 <script src="./js/public/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/js/modal.js"></script>
-<script src="js/document.js"></script>
+<script src="./js/public/bower_components/select2/dist/js/select2.min.js"></script>
+<script src="./js/document.js"></script>
 </html>

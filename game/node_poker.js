@@ -586,6 +586,7 @@ function rankHandInt(hand) {
     handSuits = [];
 
     for (i = 0; i < hand.cards.length; i += 1) {
+        logger.info("hand.cards[" + i + "] = " + hand.cards[i]);
         handRanks[i] = hand.cards[i].substr(0, 1);
         handSuits[i] = hand.cards[i].substr(1, 2);
     }
