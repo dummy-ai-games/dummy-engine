@@ -187,6 +187,8 @@ function getBasicData(table) {
     myTable['roundName'] = table.game.roundName;
     myTable['board'] = table.game.board;
     myTable['roundCount'] = table.roundCount;
+    myTable['raiseCount'] = table.raiseCount;
+    myTable['betCount'] = table.betCount;
     if (-1 !== sbPlayerIndex) {
         myTable['smallBlind'] = {
             playerName: table.players[sbPlayerIndex].playerName,
@@ -293,6 +295,8 @@ function takeAction(table, action) {
             'board': table.game.board,
             'minBet': table.bigBlind,
             'roundName': table.game.roundName,
+            'raiseCount': table.raiseCount,
+            'betCount': table.betCount,
             'players': players,
             'smallBlind': {
                 playerName: table.players[sbPlayerIndex].playerName,
