@@ -19,6 +19,8 @@ var playerName = '';
 var server = '';
 var CALL_IN_TIME = 0;
 var serverAddress = '';
+var maxCommands = 500;
+var commandCount = 0;
 
 $(document).ready(function () {
     playerName = getParameter('name');
@@ -295,7 +297,16 @@ function getParameter(name) {
 }
 
 function writeToCommands(text) {
+    if (commandCount > maxCommands) {
+        commandCount = 0;
+        clearCommands();
+    }
+    commandCount++;
     document.getElementById("commands").value += text;
     document.getElementById("commands").value += "\r\n";
     console.log(text);
+}
+
+function clearCommands() {
+    document.getElementById("commands").value = "";
 }
