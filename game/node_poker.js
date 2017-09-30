@@ -295,6 +295,7 @@ function takeAction(table, action) {
             'board': table.game.board,
             'minBet': table.bigBlind,
             'roundName': table.game.roundName,
+            'roundCount': table.roundCount,
             'raiseCount': table.raiseCount,
             'betCount': table.betCount,
             'players': players,
