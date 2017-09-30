@@ -29,27 +29,51 @@
                 </div>
             </div>
         </div>
-        <h2>文档 V1.0.4</h2>
-        <h4>2017-09-28</h4>
+        <h2>文档 V1.0.5</h2>
+        <h4>2017-09-30</h4>
         <hr>
         <div>
             <ul class="nav nav-tabs" id="main_tab">
-                <li class="active" style="cursor: pointer;"><a data-target="#game_instruction" data-toggle="tab">比赛规则</a></li>
+                <li class="active" style="cursor: pointer;"><a data-target="#competition_rules" data-toggle="tab">比赛规则</a></li>
+                <li style="cursor: pointer;"><a data-target="#game_rules" data-toggle="tab">游戏规则</a></li>
                 <li style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
                 <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">示例代码</a></li>
                 <li style="cursor: pointer;"><a data-target="#faq" data-toggle="tab">FAQ</a></li>
                 <li style="cursor: pointer;"><a data-target="#release_note" data-toggle="tab">平台更新日志</a></li>
             </ul>
             <br>
-            <div class="tab-content">
-                <div class="tab-pane active" id="game_instruction">
-                    <span class="tag label label-info" id="tip">
-                        <span>请玩家仔细阅读文档,文档在每个版本更新时会用<span class="new_content"> 橙色 </span>字体标识出修改部分,修改的部分保留1个版本 </span>
-                        ; <b><u>加黑的下划线内容</u></b> 表示待定参数,这些参数将在比赛前夕敲定下来
-                        <a><i class="remove glyphicon glyphicon-remove glyphicon-white" onclick="hideTip();"></i></a>
-                    </span>
-                    <!-- <span class="tag label label-success">如果遇到平台 BUG, 还请各位玩家积极向我们反馈,谢谢！</span> -->
-                    <br>
+            <span class="tag label label-info" id="tip">
+                <span>请玩家仔细阅读文档,文档在每个版本更新时会用<span class="new_content"> 橙色 </span>字体标识出修改部分,修改的部分保留1个版本 </span>
+                    ; <b><u>加黑的下划线内容</u></b> 表示待定参数,这些参数将在比赛前夕敲定下来
+                    <a><i class="remove glyphicon glyphicon-remove glyphicon-white" onclick="hideTip();"></i></a>
+            </span>
+            <div class="tab-content" style="margin-top: 40px; margin-bottom: 80px;">
+                <div class="tab-pane active" id="competition_rules">
+                    <a style="text-decoration: none;"><h4><strong>日程安排</strong></h4></a>
+                    <p>1.  每个Camp桌开发两个AI程序(可以采用相同AI或全面不同的AI)</p>
+                    <p>2.  组委会于九月中旬提供测试服务器供测试</p>
+                    <p>3.  10月18日 check 每个组的进展, 应该已经完成基本AI程序</p>
+                    <p>4.  10月23日 -- 10月27日 安排 drill, 虚拟排名(不影响正式比赛)</p>
+                    <p>5.  10月30日 14:10 宣布比赛最终规则, 各参赛队根据规则调整AI程序</p>
+                    <p>6.  10月30日 15:30 发放各组的比赛登录代码(玩家接入名)</p>
+                    <p>7.  10月30日 15:45 预赛正式开始, 期望 16:45 公示初赛结果, 不多于 <b><u>30</u></b> 队晋级(按照比赛结束时的筹码排名), 同时发放复赛登录代码</p>
+                    <p>8.  10月30日 17:00 复赛正式开始, 18:00 公示复赛结果, 不多于 <b><u>8</u></b> 队晋级</p>
+                    <p>9.  组委会为决赛队伍搭建8个比赛, 将晋级的选手都分别部署到服务器上, 每个决赛选手都可以调整自己的程序同时对抗测试另7个复赛晋级时的AI程序(不可获得他人的代码但是可以机器学习)</p>
+                    <p>10. 10月31日 上午决赛, 8个AI程序+2个VIP(真人)决出前两名</p>
+                    <hr>
+                    <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
+                    <p>1.  本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017  Task Force确定</p>
+                    <p>2.  比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
+                    <p>3.  预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>10圈</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>至多30名</u></b> 进入复赛</p>
+                    <p>4.  复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛</p>
+                    <p>5.  决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
+                    <p>6.  dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></p>
+                    <p>7.  每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</p>
+                    <p>8.  为了确保比赛时使用其它队玩家名作弊干扰比赛, 比赛前组委会会将一个随机生成的私有玩家名通过线下方式告知各组组长, 比赛时使用私有名接入游戏, 游戏面板中则显示昵称(游戏名)</p>
+                    <hr>
+                </div>
+
+                <div class="tab-pane" id="game_rules">
                     <a style="text-decoration: none;"><h4><strong>约定术语</strong></h4></a>
                     <p>约定游戏过程中会有如下概念:</p>
                     <ul>
@@ -60,43 +84,39 @@
                         <p>5. action: 一个action是指轮到某一个玩家 call/raise/check/fold/bet/allin 玩家通过 AI 客户端完成其中一种决策称之为一个action</p>
                     </ul>
                     <hr>
-
-                    <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
-                    <p>1. 本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017  Task Force确定</p>
-                    <p>2. 比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
-                    <p>3. 预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>10圈</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>至多30名</u></b> 进入复赛</p>
-                    <p>4. 复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛</p>
-                    <p>5. 决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
-                    <p>6. dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></p>
-                    <p>7. 每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</p>
-                    <p>8. 为了确保比赛时使用其它队玩家名作弊干扰比赛, 比赛前组委会会将一个随机生成的私有玩家名通过线下方式告知各组组长, 比赛时使用私有名接入游戏, 游戏面板中则显示昵称(游戏名)</p>
-                    <hr>
-                    <a name="server_access" style="text-decoration: none;"><h4><strong>服务器接入方式</strong></h4></a>
+                    <a style="text-decoration: none;"><h4><strong>游戏规则</strong></h4></a>
+                    <p>德克萨斯扑克全称Texas Hold’em poker, 中文简称德州扑克. 它是一种玩家对玩家的公共牌类游戏. 本次比赛中参赛人数为 3--10 人. </p>
+                    <p>德州扑克一共有52张牌, 没有王牌. 每个玩家分两张牌作为“底牌”, 五张由荷官陆续朝上发出的公共牌. 开始的时候, 每个玩家会有两张面朝下的底牌. 经过所有押注圈后, 若仍不能分出胜负, 游戏会进入“摊牌”阶段, 也就是让所剩的玩家亮出各自的底牌以较高下, 持大牌者获胜. </p>
+                    <p>玩家之间同时继续看牌或比牌需要下同样注额筹码, 筹码不足的玩家allin全下后可以看到底并参与比牌. </p>
+                    <br>
+                    <p><b>发牌一般分为5个步骤, 分别为：</b></p>
                     <ul>
-                        <p>本游戏引擎服务器端采用 Websocket 与 客户端相连接, 游戏为多人(上限为10人)对战模式, 至多允许10个客户端接入一个游戏桌 (game board)</p>
-                        <br>
-                        <img style="width: 75%; height: 75%" src="res/images/document/topologic.png">
-                        <br>
-                        <p>Websocket 接入URI: "ws://serverIP:PORT" </p>
-                        <p><b>内部测试接入 URI: "ws://10.64.8.16" </b></p>
+                        <li>Perflop — 先下大小盲注, 然后给每个玩家发2张底牌, 大盲注后面第一个玩家选择跟注、加注或者过牌放弃, 按照顺时针方向, 其他玩家依次表态, 大盲注玩家最后表态, 如果玩家有加注情况, 前面已经跟注的玩家需要再次表态甚至多次表态. </li>
+                        <li>Flop — 同时发3张公牌, 由小盲注开始(如果小盲注已过牌, 由后面最近的玩家开始, 以此类推), 按照顺时针方向依次表态, 玩家可以选择下注 (注意此时系统会给第1个玩家发__bet)、加注、或者过牌放弃. </li>
+                        <li>Turn — 发第4张牌, 由小盲注开始, 按照顺时针方向依次表态. </li>
+                        <li>River — 发第5张牌, 由小盲注开始, 按照顺时针方向依次表态, 玩家可以选择下注 (注意此时系统会给第1个玩家发__bet)、加注、或者过牌放弃. </li>
+                        <li>比牌 — 经过前面4轮发牌和下注, 剩余的玩家开始亮牌比大小, 成牌最大的玩家赢取池底. </li>
                     </ul>
-                    <hr>
-                    <a name="communication" style="text-decoration: none;"><h4><strong>通信机制</strong></h4></a>
+                    <br>
+                    <p><b>比牌方法：</b></p>
+                    <p>比牌先比牌型, 大的牌型大于小的牌型, 牌型一般分为10种, 从大到小为：</p>
                     <ul>
-                        <p>客户端在成功接入 Websocket 之后, 需要向服务器提交加入请求, 附带 playerName, playerName 在整个比赛中会唯一标识参赛玩家, 请妥善保存</p>
-                        <p>客户端接入服务器引擎并开始游戏之后, 服务器将向客户端发送两种不同类型的消息</p>
-                        <p>1. 通知客户端AI程序 "本次action应采取动作", 即服务器端告诉玩家 "本回合轮到你采取动作了", 此消息会在轮到某个客户端采取行动时发送, 为点对点消息, 此时客户端应通过 AI 决策程序计算出一种决策并发送给服务器</p>
-                        <p>2. 通知客户端AI程序当前牌桌上的状态, 此消息在任意一名玩家有所行动或者牌局发生任何变化时发送, 为广播消息, 客户端需要以此更新本地保存的牌局状态, 以助于在轮到己方行动时采取最优决策</p>
+                        <img src="./res/images/document/card_rules.jpg">
                     </ul>
+                    <br>
+                    <p><b>下注限制：</b></p>
+                    <p>每轮下注过程中, 最高下注额有一定限制. 本次比赛中规定每回合 Raise 最多只有 4 次, Bet 最多也是 4 次 (各 4 次) </p>
+                    <br>
+                    <p>更详细的规则请参考 <a href="https://baike.baidu.com/item/%E5%BE%B7%E5%85%8B%E8%90%A8%E6%96%AF%E6%89%91%E5%85%8B/83440?fr=aladdin">百度百科</a></p>
                 </div>
-
                 <div class="tab-pane" id="api_doc">
-                    <a style="text-decoration: none;"><h4><strong>开发规范</strong></h4></a>
-                    <div id="bs-example-navbar-collapse-2" class="navbar">
+                    <div id="bs-example-navbar-collapse-2" class="navbar" style="margin-top: -20px; margin-bottom: -20px;">
                         <ul class="nav navbar-nav" style="float: left;">
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="font-size: 16px;"><span class="glyphicon glyphicon-menu-hamburger"></span> <span>索引</span></a>
                                 <ul class="dropdown-menu">
+                                    <li><a href="#server_access">接入方式</a></li>
+                                    <li><a href="#game_basic">基本定义</a></li>
                                     <li><a href="#join_game">加入游戏</a></li>
                                     <li><a href="#new_round">新一轮开始</a></li>
                                     <li><a href="#reload">索取筹码</a></li>
@@ -105,11 +125,107 @@
                                     <li><a href="#round_end">每一轮结束</a></li>
                                     <li><a href="#game_over">游戏(一局)结束</a></li>
                                     <li><a href="#other_affairs">其它注意事项</a></li>
-                                    <li><a href="#appendixes">附表</a></li>
                                 </ul>
                             </li>
                         </ul>
                     </div>
+                    <hr>
+                    <a name="server_access" style="text-decoration: none;"><h4><strong>接入方式</strong></h4></a>
+                    <ul>
+                        <p>本游戏引擎服务器端采用 Websocket 与 客户端相连接, 游戏为多人(上限为10人)对战模式, 至多允许10个客户端接入一个游戏桌 (game board)</p>
+                        <br>
+                        <img style="width: 75%; height: 75%" src="res/images/document/topologic.png">
+                        <br>
+                        <p>Websocket 接入URI: "ws://serverIP:PORT" </p>
+                        <p><b>内部测试接入 URI: "ws://thegame.trendmicro.com.cn" </b></p>
+                        <p><b>外网测试接入 URI: "ws://116.62.203.120" </b></p>
+                    </ul>
+                    <ul>
+                        <p>客户端在成功接入 Websocket 之后, 需要向服务器提交加入请求, 附带 playerName, playerName 在整个比赛中会唯一标识参赛玩家, 请妥善保存</p>
+                        <p>客户端接入服务器引擎并开始游戏之后, 服务器将向客户端发送两种不同类型的消息</p>
+                        <p>1. 通知客户端AI程序 "本次action应采取动作", 即服务器端告诉玩家 "本回合轮到你采取动作了", 此消息会在轮到某个客户端采取行动时发送, 为点对点消息, 此时客户端应通过 AI 决策程序计算出一种决策并发送给服务器</p>
+                        <p>2. 通知客户端AI程序当前牌桌上的状态, 此消息在任意一名玩家有所行动或者牌局发生任何变化时发送, 为广播消息, 客户端需要以此更新本地保存的牌局状态, 以助于在轮到己方行动时采取最优决策</p>
+                    </ul>
+                    <hr>
+                    <a name="game_basic" style="text-display: none;"><h4><strong>基本定义</strong></h4></a>
+                    <ul>
+                        <p><b>行动说明和限制表</b></p>
+                        <table class="table table-striped table-bordered table-condensed">
+                            <tr>
+                                <td style="width: 20%; height: 25px;">
+                                    <b>取值</b>
+                                </td>
+                                <td style="width: 80%; height: 25px;">
+                                    <b>定义</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%; height: 25px;">
+                                    call
+                                </td>
+                                <td style="width: 80%; height: 25px;">
+                                    跟注, 与前一位玩家押下相等的筹码<br>
+                                    1. 如果玩家剩余的筹码不够, 系统将自动执行allin<br>
+                                    2. 如果轮到玩家决策bet, 而发现玩家决策出call, 那么自动 bet 小盲注<br>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%; height: 25px;">
+                                    raise
+                                </td>
+                                <td style="width: 80%; height: 25px;">
+                                    加注, 提高现有筹码为前一位玩家的2倍<br>
+                                    1. 如果超过加注次数(每回合上限为 <b>4</b> 次), 系统将自动执行 call<br>
+                                    2. 如果剩余筹码不够, 系统自动执行 allin<br>
+                                    3. 如果应该决策出 bet, 而发现玩家决策出 raise, 那么系统自动 bet 大盲注
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%; height: 25px;">
+                                    bet
+                                </td>
+                                <td style="width: 80%; height: 25px;">
+                                    自由下注, 以 amount 参数作为下注筹码金额<br>
+                                    1. 如果 amount 小于当前游戏规定的最小押注额, 系统将自动转换为最小押注额<br>
+                                    2. 如果玩家剩余筹码不够, 自动 allin<br>
+                                    3. amount 字段如果不是数字, 那么系统自动进行弃牌操作<br>
+                                    4. 金额必须是整数,如果不是整数,自动押注大盲注金额<br>
+                                    5. 轮到强制 bet 的时候 (收到 __bet 指令) 也可以决策为 check/raise/allin
+                                    6. 如果超过Bet次数(每回合上限为 <b>4</b> 次), 系统将自动执行 call<br>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%; height: 25px;">
+                                    check
+                                </td>
+                                <td style="width: 80%; height: 25px;">
+                                    过牌, 在不需要跟注的情况下, 把押注机会传递给下一位玩家<br>
+                                    1. 如果当前无法check的话 (牌桌上最大注额大于当前这名玩家的注额), 系统会自动执行call
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%; height: 25px;">
+                                    fold
+                                </td>
+                                <td style="width: 80%; height: 25px;">
+                                    弃牌, 放弃本轮比赛的所有手牌
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%; height: 25px;">
+                                    allin
+                                </td>
+                                <td style="width: 80%; height: 25px;">
+                                    全注, 将目前剩余的所有筹码(chips)作为注额
+                                </td>
+                            </tr>
+                        </table>
+                        <p><b>牌面值</b></p>
+                        <p>1. 牌面统一由2个字符组成</p>
+                        <p>2. 第1个字符为数字: 取值为: 2~9, T(10), J(J), Q(Q), K(K), A(Ace)</p>
+                        <p>3. 第2个字符为花色: 分别为 H(红心), S(黑桃), C(草花), D(方块)</p>
+                        <p>4. 例如: 3H -- 红心3; TS -- 黑桃10; QC -- 草花皇后; AD -- 方块Ace</p>
+                    </ul>
                     <hr>
                     <a name="join_game" style="text-decoration: none;"><h4><strong>加入游戏</strong></h4></a>
                     <ul>
@@ -747,95 +863,8 @@
                         <p>5. 每开始新的一圈时, 大小盲注会较之上一圈翻倍</p>
                         <p>6. 如果玩家在服务端发轮询动作之前离线, 系统会等待 <b><u>10秒</u></b>, <b><span style="color: #FF0000"> <b><u>10秒</u></b> 后仍然没有等到再次接入, 将视为自动弃牌</span></b></p>
                     </ul>
-                    <hr>
-                    <a name="appendixes" style="text-decoration: none;"><h4><strong>附表</strong></h4></a>
-                    <ul>
-                        <table class="table table-striped table-bordered table-condensed">
-                            <tr>
-                                <td colspan="2" style="width: 100%; height: 25px; background-color: #2F4FAF; color: #FFFFFF;">
-                                    <b>玩家采取的行动约定</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 20%; height: 25px;">
-                                    <b>取值</b>
-                                </td>
-                                <td style="width: 80%; height: 25px;">
-                                    <b>定义</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 20%; height: 25px;">
-                                    call
-                                </td>
-                                <td style="width: 80%; height: 25px;">
-                                    跟注, 与前一位玩家押下相等的筹码<br>
-                                    1. 如果玩家剩余的筹码不够, 系统将自动执行allin<br>
-                                    2. 如果轮到玩家决策bet, 而发现玩家决策出call, 那么自动 bet 小盲注<br>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 20%; height: 25px;">
-                                    raise
-                                </td>
-                                <td style="width: 80%; height: 25px;">
-                                    加注, 提高现有筹码为前一位玩家的2倍<br>
-                                    1. 如果超过加注次数(每回合上限为4次), 系统将自动执行 call<br>
-                                    2. 如果剩余筹码不够, 系统自动执行 allin<br>
-                                    3. 如果应该决策出 bet, 而发现玩家决策出 raise, 那么系统自动 bet 大盲注
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 20%; height: 25px;">
-                                    bet
-                                </td>
-                                <td style="width: 80%; height: 25px;">
-                                    自由下注, 以 amount 参数作为下注筹码金额<br>
-                                    1. 如果 amount 小于当前游戏规定的最小押注额, 系统将自动转换为最小押注额<br>
-                                    2. 如果玩家剩余筹码不够, 自动 allin<br>
-                                    3. 如果该 action 中不能 bet (即玩家收到服务器的决策请求为 __action), 而采取bet决策, 那么将实施 call<br>
-                                    4. amount 字段如果不是数字, 那么系统自动进行弃牌操作<br>
-                                    5. 金额必须是整数,如果不是整数,自动押注大盲注金额<br>
-                                    6. 轮到bet的时候也可以决策为 check/raise/allin
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 20%; height: 25px;">
-                                    check
-                                </td>
-                                <td style="width: 80%; height: 25px;">
-                                    过牌, 在不需要跟注的情况下, 把押注机会传递给下一位玩家<br>
-                                    1. 如果当前无法check的话, 系统会自动执行call
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 20%; height: 25px;">
-                                    fold
-                                </td>
-                                <td style="width: 80%; height: 25px;">
-                                    弃牌, 放弃本轮比赛的所有手牌
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="width: 20%; height: 25px;">
-                                    allin
-                                </td>
-                                <td style="width: 80%; height: 25px;">
-                                    全注, 将目前剩余的所有筹码(chips)作为注额
-                                </td>
-                            </tr>
-                        </table>
-                        <br>
-                        <p><b>牌面值</b></p>
-                        <p>1. 牌面统一由2个字符组成</p>
-                        <p>2. 第1个字符为数字: 取值为: 2~9, T(10), J(J), Q(Q), K(K), A(Ace)</p>
-                        <p>3. 第2个字符为花色: 分别为 H(红心), S(黑桃), C(草花), D(方块)</p>
-                        <p>4. 例如: 3H -- 红心3; TS -- 黑桃10; QC -- 草花皇后; AD -- 方块Ace</p>
-                    </ul>
                 </div>
                 <div class="tab-pane" id="example">
-                    <a style="text-decoration: none;"><h4><strong>示例代码</strong></h4></a>
-                    <hr>
                     <p><span>请开发者自行修改示例代码中的 Socket 地址和接入用户名信息以方便自助测试</span></p>
                     <div class="row">
                         <div class="col-md-4">
@@ -856,34 +885,87 @@
                     </div>
                 </div>
                 <div class="tab-pane" id="faq">
-                    <a style="text-decoration: none;"><h4><strong>FAQ</strong></h4></a>
-                    <hr>
+                    <a style="text-decoration: none;"><h4><strong>规则篇</strong></h4></a>
                     <p class="question">
-                        Q: 德州扑克的一般规则参照
+                        Q: 本次比赛是有上限还是无上限类型?
                     </p>
                     <p class="answer">
-                        A:
-                        <a href="https://www.pokerstars.com/zht/poker/games/texas-holdem/?no_redirect=1">参考1</a>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.intellipoker.tw/articles/?id=45">参考2</a>
+                        A: 有上限类型, 每回合中 Raise 和 Bet 各不能超过 4 次
                     </p>
-                    <hr>
+                    <br>
                     <p class="question">
                         Q: 为什么需要有reload操作, 而不是一开始就为每名玩家分配3000筹码?
                     </p>
                     <p class="answer">
                         A: 因为会影响到玩家决策allin
                     </p>
-                    <hr>
+                    <br>
                     <p class="question">
-                        Q:
+                        Q: 可不可以Re-raise?
                     </p>
                     <p class="answer">
-                        A:
+                        A: 本平台中的非第一次Raise, 即为Re-raise, 但由于是Limit方式, 所以在一回合中 Raise 的次数不能超过 4 次, 超过 4 次之后默认为 Call, 同理还有 Bet, 每回合 Bet 次数不能超过 4 次
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: 什么时候必须Bet (客户端接收到 __bet 消息)?
+                    </p>
+                    <p class="answer">
+                        A: Flop 以及后续阶段从小盲注位置开始的第一个玩家 (如果小盲注过牌或者ALLIN那么就依次顺延) 必须Bet (还可以是check/raise/allin)
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: 什么时候不允许Check?
+                    </p>
+                    <p class="answer">
+                        A: 如果当前牌桌上最大注额比即将行动的玩家的注额高, 这名玩家就不能为 Check, 否则系统自动判为 Call
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: 如果最后比牌阶段有多名玩家ALLIN, 如何结算筹码?
+                    </p>
+                    <p class="answer">
+                        A: 请看 <a target="_blank" href="https://www.douban.com/group/topic/35806191/"> 这里 </a>
+                    </p>
+                    <hr>
+                    <a style="text-decoration: none;"><h4><strong>开发篇</strong></h4></a>
+                    <p class="question">
+                        Q: 如何使用本平台自助接入和测试自己的AI程序?
+                    </p>
+                    <p class="answer">
+                        A:<br>
+                        1. 请先移步"玩家管理"页面, 找到一个没有人使用的桌号, 任意添加不少于 3 名玩家, 玩家用不同名称区分<br>
+                        2. 编写自己的AI程序, 注意Websocket接入地址正确<br>
+                        3. 点击"测试"输入创建玩家时录入的桌号, 可进入游戏界面
+                        4. 将AI程序中的玩家名逐个替换成不同玩家名, 逐个接入, 在游戏界面即可看见玩家进场
+                        5. 点击PLAY按钮, 开始比赛
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: 掉线了怎么办?
+                    </p>
+                    <p class="answer">
+                        A: 10s之内接入还有机会, 加入后可以通过侦听 __show_action 指令重新获得牌桌状态, 否则系统将用一直FOLD的算法接管这个掉线的玩家, 请认真coding & testing, 确保程序不会crash
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: 掉线了怎么办?
+                    </p>
+                    <p class="answer">
+                        A: 10s之内接入还有机会, 否则系统将用一直FOLD的算法接管这个掉线的玩家, 请认真coding & testing, 确保程序不会crash
                     </p>
                 </div>
                 <div class="tab-pane" id="release_note">
-                    <a style="text-decoration: none;"><h4><strong>平台更新日志</strong></h4></a>
-                    <hr>
+                    <div>
+                        <h4>V1.0.5 (2017-09-30)</h4>
+                        <br>
+                        修改了 __action 和 __bet 指令格式, 去掉了 gameBet 字段, 将玩家的下注信息统一放到了 players 信息列表中<br>
+                        修复了浮点数筹码引起的筹码错乱问题<br>
+                        修复了Web socket关闭引起的crash问题<br>
+                        UI微调<br>
+                        文档补充, 梳理了德州扑克基本规则以及FAQ
+                    </div>
+                    <br>
                     <div>
                         <h4>V1.0.4 (2017-09-28)</h4>
                         修改了bet(任意注)规则, 在一回合中可以随时下注, 详情请参考 __action 命令<br>
@@ -932,15 +1014,6 @@
                         THE-engine V1.0.0上线
                     </div>
                 </div>
-            </div>
-        </div>
-        <hr>
-        <div style="width: 100%; text-align: center;">
-            <div class="inner">
-                <p>开发者 (技术支持联系):
-                    <a href="mailto:bobi_zhou@trendmicro.com.cn; jieping_yang@trendmicro.com.cn" style="text-decoration: none;"> Bobi Zhou, JiePing Yang </a>
-                </p>
-                <a data-toggle="tooltip" data-placement="right" style="text-decoration: none;" href="#"> CDC Engineering Camp 2017  Task Force </a>
             </div>
         </div>
     </div>
