@@ -86,6 +86,10 @@ function initRTC() {
         }
     });
 
+    rtc.on('__deal', function(data) {
+        writeToCommands('<<< deal: ' + JSON.stringify(data, null, 4));
+    });
+
     rtc.on('__start_reload', function (data) {
         writeToCommands('<<< start reload: ' + JSON.stringify(data, null, 4));
         reload();

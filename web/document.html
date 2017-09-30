@@ -120,6 +120,7 @@
                                     <li><a href="#game_basic">基本定义</a></li>
                                     <li><a href="#join_game">加入游戏</a></li>
                                     <li><a href="#new_round">新一轮开始</a></li>
+                                    <li><a href="#deal">荷官发牌</a></li>
                                     <li><a href="#reload">索取筹码</a></li>
                                     <li><a href="#request_for_action">服务器请求决策</a></li>
                                     <li><a href="#update_status">服务器状态更新</a></li>
@@ -367,6 +368,72 @@
 <pre>
 {
     "eventName" : "__reload"
+}</pre>
+                    </ul>
+                    <hr>
+                    <a name="deal" style="text-decoration: none;"><h4><strong>荷官发牌</strong></h4></a>
+                    <ul>
+                        <p>在 Flop, Turn, River 发牌的时候服务器会广播这条命令, 格式如下:</p>
+<pre>
+{
+    "eventName" : "__deal",
+    "data" : {
+        "players": [
+            {
+                "playerName": "bobi",
+                "chips": 980,
+                "folded": false,
+                "allIn": false,
+                "isSurvive": true,
+                "reloadCount": 0,
+                "roundBet": 20,
+                "bet": 0,
+                "cards": []
+            },
+            {
+                "playerName": "cicy",
+                "chips": 980,
+                "folded": false,
+                "allIn": false,
+                "isSurvive": true,
+                "reloadCount": 0,
+                "roundBet": 20,
+                "bet": 0,
+                "cards": []
+            },
+            {
+                "playerName": "geoge",
+                "chips": 980,
+                "folded": false,
+                "allIn": false,
+                "isSurvive": true,
+                "reloadCount": 0,
+                "roundBet": 20,
+                "bet": 0,
+                "cards": []
+            },
+            ...
+        ],
+    "table": {
+        "tableNumber": "1",
+        "roundName": "Flop",
+        "board": [
+            "AC",
+            "8S",
+            "AH"
+        ],
+        "roundCount": 1,
+        "raiseCount": 0,
+        "betCount": 0,
+        "smallBlind": {
+            "playerName": "geoge",
+            "amount": 10
+        },
+        "bigBlind": {
+            "playerName": "tryest",
+            "amount": 20
+        }
+    }
 }</pre>
                     </ul>
                     <hr>
