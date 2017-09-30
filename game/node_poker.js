@@ -2152,7 +2152,7 @@ Player.prototype.Bet = function (bet) {
                     if (this.table.players[i].chips % 1 !== 0)
                         this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
 
-                    //update other player
+                    //update other player/
                     for (var j = 0; j < this.table.players.length; j += 1) {
                         if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
                             this.table.players[j].talked = false;
