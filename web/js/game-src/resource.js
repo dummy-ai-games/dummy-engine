@@ -3,7 +3,11 @@
  * 2017-08-21
  */
 
-var bg = "./res/images/game_bg.png";
+// board images
+var s_bg = "./res/images/game_board/bg.png";
+var s_dec_bottom = "./res/images/game_board/bg_chip.png";
+var s_bg_board = "./res/images/game_board/bg_table.png";
+var s_bg_mm = "./res/images/game_board/img_beauty.png";
 
 var s_p_2C = "./res/images/poker/2C.png";
 var s_p_2D = "./res/images/poker/2D.png";
@@ -59,22 +63,6 @@ var s_p_AH = "./res/images/poker/AH.png";
 var s_p_AS = "./res/images/poker/AS.png";
 var s_p_empty = "./res/images/poker/empty.png";
 var s_p_back = "./res/images/poker/back.png";
-var btn_play = "./res/images/play.png";
-var btn_play_clicked = "./res/images/play_clicked.png";
-var btn_stop =  "./res/images/stop.png";
-var btn_stop_clicked = "./res/images/stop_clicked.png";
-
-var s_a_avatar_0 = "./res/images/avatars/player_0.png";
-var s_a_avatar_1 = "./res/images/avatars/player_1.png";
-var s_a_avatar_2 = "./res/images/avatars/player_2.png";
-var s_a_avatar_3 = "./res/images/avatars/player_3.png";
-var s_a_avatar_4 = "./res/images/avatars/player_4.png";
-var s_a_avatar_5 = "./res/images/avatars/player_5.png";
-var s_a_avatar_6 = "./res/images/avatars/player_6.png";
-var s_a_avatar_7 = "./res/images/avatars/player_7.png";
-var s_a_avatar_8 = "./res/images/avatars/player_8.png";
-var s_a_avatar_9 = "./res/images/avatars/player_9.png";
-var s_a_avatar_none = "./res/images/avatars/empty_avatar.png";
 
 var pokerMap = new Map();
 pokerMap.set("2C", s_p_2C);
@@ -130,20 +118,11 @@ pokerMap.set("AD", s_p_AD);
 pokerMap.set("AH", s_p_AH);
 pokerMap.set("AS", s_p_AS);
 
-var avartarSamples = [s_a_avatar_0,
-    s_a_avatar_1,
-    s_a_avatar_2,
-    s_a_avatar_3,
-    s_a_avatar_4,
-    s_a_avatar_5,
-    s_a_avatar_6,
-    s_a_avatar_7,
-    s_a_avatar_8,
-    s_a_avatar_9];
-
-
 var resources = [
-    bg,
+    s_bg,
+    s_dec_bottom,
+    s_bg_board,
+    s_bg_mm,
     s_p_2C,
     s_p_2D,
     s_p_2H,
@@ -197,17 +176,4 @@ var resources = [
     s_p_AH,
     s_p_AS,
     s_p_empty,
-    s_p_back,
-    s_a_avatar_0,
-    s_a_avatar_1,
-    s_a_avatar_2,
-    s_a_avatar_3,
-    s_a_avatar_4,
-    s_a_avatar_5,
-    s_a_avatar_6,
-    s_a_avatar_7,
-    s_a_avatar_8,
-    s_a_avatar_9,
-    s_a_avatar_none,
-    btn_play,
-    btn_play_clicked];
+    s_p_back];

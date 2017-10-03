@@ -1,6 +1,6 @@
 /**
  * Created by the-engine-team
- * 2017-08-21
+ * 2017-10-03
  */
 
 // model related
@@ -20,62 +20,39 @@ var currentSmallBlind = 0;
 var currentBigBlind = 0;
 
 // visualization related
+var GameLayer = cc.Layer.extend({
 
-var GameLayer = cc.LayerColor.extend({
     defaultFont: '微软雅黑',
+
     // game model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
+    DEBUG: true,
 
-    defaultMoneyInit: 1000,
-    defaultBetInit: 0,
-    maxPlayers: 10,
-    publicCardMax: 5,
-    privateCardMax: 2,
-    currentPublicCard: 0,
-    currentPrivateCard: 0,
-    moneyInitiates: [],
-    betInitiates: [],
-    actionInitiates: [],
-
-    // canvas scale
-    scale: 1.0,
-    playerScale: 0.8,
-    privateCardScale: 1.0,
-    publicCardScale: 1.0,
-    avatarScale: 1.0,
-    controlMenuScale: 1.0,
-    cardWidth: 0.0,
-    cardHeight: 0.0,
-
-    // sub layers
-    playerLayers: [],
+    // scales
+    bgScale: 1.0,
+    decoScale: 1.0,
+    boardScale: 1.0,
+    mmScale: 1.0,
 
     // sprites
-    avatarSprites: [],
-    privateCardSprites: [],
-    publicCardSprites: [],
-
-    // buttons
-    startButton: null,
-    stopButton: null,
-
-    // menus
-    controlMenu: null,
-
-    // texts
-    roundText: null,
-    blindText: null,
-    nameTexts: [],
-    moneyTexts: [],
-    actionTexts: [],
-    betTexts: [],
-    accumulateTexts: [],
+    bgSprite: null,
+    decoBottom: null,
+    bgBoard: null,
+    bgMM: null,
 
     // menus
 
     // layers
+
+    // design specs
+    refWidth: 1024,
+    refHeight: 768,
+    boardMarginLeft: 28,
+    boardMarginRight: 28,
+    boardMarginBottom: 124,
+    mmMarginTop: 32,
 
     // constructor
     ctor: function () {
@@ -84,7 +61,7 @@ var GameLayer = cc.LayerColor.extend({
 
     // game initializer
     init: function () {
-        this._super(cc.color(51, 51, 51, 255));
+        this._super();
         // initiate sprite layout on gameCanvas
         var i;
         for (i = 0; i < this.maxPlayers; i++) {
@@ -93,235 +70,65 @@ var GameLayer = cc.LayerColor.extend({
             this.betInitiates[i] = "bet: " + this.defaultBetInit;
         }
 
-        this.validWidth = winWidth;
-        this.validHeight = winHeight;
+        this.validWidth = gameWidth;
+        this.validHeight = gameHeight;
         this.size = cc.size(this.validWidth, this.validHeight);
 
-        // show round N text at the center | top
-        this.roundText = new cc.LabelTTF("Round " + currentRound, this.defaultFont, 28,
-            cc.size(this.validWidth / 8 * this.playerScale, this.validHeight / 4 * this.playerScale));
-        this.roundText.setColor(cc.color(255, 255, 255, 255));
+        // add background
+        this.bgSprite = cc.Sprite.create(s_bg);
+        this.bgSprite.setAnchorPoint(0, 0);
 
-        this.roundText.setAnchorPoint(0, 0);
-        this.roundText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT);
-        this.roundText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-        this.roundText.setPosition(this.validWidth / 20  * this.playerScale, this.validHeight - this.roundText.height);
-        this.addChild(this.roundText, 6);
+        if (this.DEBUG) console.log("valid size = " + this.validHeight + ", " + this.validWidth + ", bg height = " +
+                    this.bgSprite.getContentSize().height + ", " + this.bgSprite.getContentSize().width);
 
-        // initialize N empty players
-        for (i = 0; i < this.maxPlayers; i++) {
+        this.bgScale = Math.max(this.validHeight / this.bgSprite.getContentSize().height,
+                                    this.validWidth / this.bgSprite.getContentSize().width);
 
-            this.nameTexts[i] = new cc.LabelTTF("Wait...", this.defaultFont, 18,
-                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
+        if (this.DEBUG) console.log("bg scale = " + this.bgScale);
 
-            this.avatarSprites[i] = new cc.Sprite.create(s_a_avatar_none);
+        this.bgSprite.setScale(this.bgScale);
+        this.bgSprite.setPosition(0, 0);
+        this.addChild(this.bgSprite, 0);
 
-            this.moneyTexts[i] = new cc.LabelTTF("0", this.defaultFont, 18,
-                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
+        // add bottom decoration
+        this.decoBottom = cc.Sprite.create(s_dec_bottom);
+        this.decoBottom.setAnchorPoint(0, 0);
 
-            this.actionTexts[i] = new cc.LabelTTF("-", this.defaultFont, 18,
-                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
+        if (this.DEBUG) console.log("bottom deco size = " + this.decoBottom.getContentSize().width + ", "
+                                    + this.decoBottom.getContentSize().height);
 
-            this.betTexts[i] = new cc.LabelTTF("bet:0", this.defaultFont, 16,
-                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
+        this.decoScale = this.validWidth / this.decoBottom.getContentSize().width;
 
-            this.accumulateTexts[i] = new cc.LabelTTF("acc:0", this.defaultFont, 16,
-                cc.size(this.validWidth / 16 * this.playerScale, this.validHeight / 5 * this.playerScale));
+        if (this.DEBUG) console.log("deco scale = " + this.decoScale);
 
-            this.nameTexts[i].setColor(cc.color(255, 255, 255, 255));
-            this.moneyTexts[i].setColor(cc.color(255, 0, 0, 255));
-            this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
-            this.betTexts[i].setColor(cc.color(0, 255, 0, 255));
-            this.accumulateTexts[i].setColor(cc.color(0, 255, 0, 255));
+        this.decoBottom.setScale(this.decoScale);
+        this.decoBottom.setPosition(0, 0);
+        this.addChild(this.decoBottom, 1);
 
-            this.nameTexts[i].setAnchorPoint(0, 0);
-            this.moneyTexts[i].setAnchorPoint(0, 0);
-            this.avatarSprites[i].setAnchorPoint(0, 0);
-            this.actionTexts[i].setAnchorPoint(0, 0);
-            this.betTexts[i].setAnchorPoint(0, 0);
-            this.accumulateTexts[i].setAnchorPoint(0, 0);
+        // add poker board
+        this.bgBoard = cc.Sprite.create(s_bg_board);
+        this.bgBoard.setAnchorPoint(0, 0);
 
-            this.nameTexts[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-            this.moneyTexts[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-            this.actionTexts[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-            this.betTexts[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-            this.accumulateTexts[i].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        var boardRealMarginLeft = this.boardMarginLeft * this.boardScale;
+        var boardRealMarginBottom = this.boardMarginBottom * this.boardScale;
 
-            this.nameTexts[i].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-            this.moneyTexts[i].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-            this.actionTexts[i].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-            this.betTexts[i].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-            this.accumulateTexts[i].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.boardScale = (this.validWidth - this.boardMarginLeft * 2) / (this.bgBoard.getContentSize().width);
 
-            this.nameTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
-            this.moneyTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
-            this.actionTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
-            this.betTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
-            this.accumulateTexts[i].boundingWidth = this.validWidth / 8 * this.playerScale;
+        if (this.DEBUG) console.log("board scale = " + this.boardScale);
+        this.bgBoard.setScale(this.boardScale);
 
-            this.avatarScale = this.validHeight / 10 / this.avatarSprites[i].getContentSize().height;
-            this.avatarSprites[i].setScale(this.avatarScale);
-            this.avatarSprites[i].setAnchorPoint(-0.5, -0.25);
+        this.bgBoard.setPosition(boardRealMarginLeft, boardRealMarginBottom);
+        this.addChild(this.bgBoard, 2);
 
-            if (i < 5) {
-                // put them in the left side
-                this.avatarSprites[i].setPosition(this.validWidth / 20 * 0,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-                this.nameTexts[i].setPosition(this.validWidth / 20 * 1,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-                this.moneyTexts[i].setPosition(this.validWidth / 20 * 2,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-                this.actionTexts[i].setPosition(this.validWidth / 20 * 3,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-                this.betTexts[i].setPosition(this.validWidth / 20 * 4,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-                this.accumulateTexts[i].setPosition(this.validWidth / 20 * 5,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height);
-            } else {
-                // put them in the right side
-                this.avatarSprites[i].setPosition(this.validWidth / 20 * 10,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
-                this.nameTexts[i].setPosition(this.validWidth / 20 * 11,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
-                this.moneyTexts[i].setPosition(this.validWidth / 20 * 12,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
-                this.actionTexts[i].setPosition(this.validWidth / 20 * 13,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
-                this.betTexts[i].setPosition(this.validWidth / 20 * 14,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
-                this.accumulateTexts[i].setPosition(this.validWidth / 20 * 15,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height);
-            }
+        // add dealer mm
+        this.bgMM = cc.Sprite.create(s_bg_mm);
+        this.bgMM.setAnchorPoint(0, 0);
+        this.mmScale = this.bgScale;
+        this.bgMM.setScale(this.mmScale);
+        this.bgMM.setPosition((this.validWidth - this.bgMM.getContentSize().width * this.mmScale) / 2,
+            this.validHeight - ((this.mmMarginTop + this.bgMM.getContentSize().height) * this.mmScale));
+        this.addChild(this.bgMM, 3);
 
-            // set invisible after initialized
-            this.avatarSprites[i].setVisible(false);
-            this.nameTexts[i].setVisible(false);
-            this.moneyTexts[i].setVisible(false);
-            this.actionTexts[i].setVisible(false);
-            this.betTexts[i].setVisible(false);
-            this.accumulateTexts[i].setVisible(false);
-
-            this.addChild(this.avatarSprites[i], 6);
-            this.addChild(this.nameTexts[i], 6);
-            this.addChild(this.moneyTexts[i], 6);
-            this.addChild(this.actionTexts[i], 6);
-            this.addChild(this.betTexts[i], 6);
-            this.addChild(this.accumulateTexts[i], 6);
-
-            // create private card sprite
-            this.privateCardSprites[i] = [];
-            this.privateCardSprites[i][0] = cc.Sprite.create(s_p_back);
-            this.privateCardSprites[i][1] = cc.Sprite.create(s_p_back);
-
-            this.privateCardSprites[i][0].setAnchorPoint(0, -0.25);
-            this.privateCardSprites[i][1].setAnchorPoint(0, -0.25);
-
-            if (i < 5) {
-                this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 20 * 7,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height));
-                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 20 * 7 - 20,
-                    this.validHeight - this.nameTexts[i].height * (i + 1) - this.roundText.height + 20));
-            } else {
-                this.privateCardSprites[i][0].setPosition(cc.p(this.validWidth / 20 * 17,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height));
-                this.privateCardSprites[i][1].setPosition(cc.p(this.validWidth / 20 * 17 - 20,
-                    this.validHeight - this.nameTexts[i].height * (i - 5 + 1) - this.roundText.height + 20));
-            }
-
-            // calculate card sprite scale for the screen
-            this.privateCardScale = this.validHeight / 10 / this.privateCardSprites[i][0].getContentSize().height;
-            this.privateCardSprites[i][0].setScale(this.privateCardScale);
-            this.privateCardSprites[i][1].setScale(this.privateCardScale);
-
-            this.privateCardSprites[i][0].setVisible(false);
-            this.privateCardSprites[i][1].setVisible(false);
-
-            this.addChild(this.privateCardSprites[i][0], 7);
-            this.addChild(this.privateCardSprites[i][1], 6);
-        }
-
-        this.publicCardSprites = [];
-        this.publicCardSprites[0] = cc.Sprite.create(s_p_empty);
-        this.publicCardSprites[1] = cc.Sprite.create(s_p_empty);
-        this.publicCardSprites[2] = cc.Sprite.create(s_p_empty);
-        this.publicCardSprites[3] = cc.Sprite.create(s_p_empty);
-        this.publicCardSprites[4] = cc.Sprite.create(s_p_empty);
-
-        this.publicCardSprites[0].setAnchorPoint(0, -0.5);
-        this.publicCardSprites[1].setAnchorPoint(0, -0.5);
-        this.publicCardSprites[2].setAnchorPoint(0, -0.5);
-        this.publicCardSprites[3].setAnchorPoint(0, -0.5);
-        this.publicCardSprites[4].setAnchorPoint(0, -0.5);
-
-        this.publicCardSprites[0].setPosition(cc.p(this.validWidth / 16 * 4, this.validHeight - this.roundText.height));
-        this.publicCardSprites[1].setPosition(cc.p(this.validWidth / 16 * 5, this.validHeight - this.roundText.height));
-        this.publicCardSprites[2].setPosition(cc.p(this.validWidth / 16 * 6, this.validHeight - this.roundText.height));
-        this.publicCardSprites[3].setPosition(cc.p(this.validWidth / 16 * 7, this.validHeight - this.roundText.height));
-        this.publicCardSprites[4].setPosition(cc.p(this.validWidth / 16 * 8, this.validHeight - this.roundText.height));
-
-        // calculate card sprite scale for the screen
-        this.publicCardScale = this.validHeight / 10 / this.publicCardSprites[0].getContentSize().height;
-        this.publicCardSprites[0].setScale(this.publicCardScale);
-        this.publicCardSprites[1].setScale(this.publicCardScale);
-        this.publicCardSprites[2].setScale(this.publicCardScale);
-        this.publicCardSprites[3].setScale(this.publicCardScale);
-        this.publicCardSprites[4].setScale(this.publicCardScale);
-
-        this.publicCardSprites[0].setVisible(false);
-        this.publicCardSprites[1].setVisible(false);
-        this.publicCardSprites[2].setVisible(false);
-        this.publicCardSprites[3].setVisible(false);
-        this.publicCardSprites[4].setVisible(false);
-
-        this.addChild(this.publicCardSprites[0], 6);
-        this.addChild(this.publicCardSprites[1], 6);
-        this.addChild(this.publicCardSprites[2], 6);
-        this.addChild(this.publicCardSprites[3], 6);
-        this.addChild(this.publicCardSprites[4], 6);
-
-        // add small/big blind text
-        this.blindText = new cc.LabelTTF("Small blind: " + currentSmallBlind + "/ Big blind: " + currentBigBlind, this.defaultFont, 20,
-            cc.size(this.validWidth / 4 * this.playerScale, this.validHeight / 4 * this.playerScale));
-        this.blindText.setColor(cc.color(255, 255, 0, 255));
-
-        this.blindText.setAnchorPoint(0, 0);
-        this.blindText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_LEFT);
-        this.blindText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-        this.blindText.setPosition(this.validWidth / 16 * 9, this.validHeight - this.roundText.height);
-        this.addChild(this.blindText, 6);
-
-        // add game start button
-        this.startButton = cc.MenuItemImage.create(
-            btn_play,
-            btn_play_clicked,
-            function () {
-                console.log("game start");
-                startGame();
-            },this);
-        this.stopButton = cc.MenuItemImage.create(
-            btn_stop,
-            btn_stop_clicked,
-            function () {
-                console.log("game stop");
-                stopGame();
-            },this);
-
-        this.controlMenuScale = this.validHeight / 16 / this.startButton.getContentSize().height;
-        this.startButton.setScale(this.controlMenuScale);
-        this.startButton.setAnchorPoint(0, 0.5);
-        this.stopButton.setScale(this.controlMenuScale);
-        this.stopButton.setAnchorPoint(0, 0.5);
-
-        this.startButton.setVisible(true);
-        this.stopButton.setVisible(false);
-
-        this.controlMenu = cc.Menu.create(this.startButton, this.stopButton);
-        this.controlMenu.setPosition(cc.p(this.validWidth / 20 * 3, this.validHeight - this.roundText.height / 2));
-        this.addChild(this.controlMenu);
-
-        // kick start the game
-        // test public card change display frame
-        publicCards = [];
         this.reset();
         this.scheduleUpdate();
     },
@@ -383,101 +190,15 @@ var GameLayer = cc.LayerColor.extend({
     },
 
     updateRound: function() {
-        if (gameStatus === STATUS_WAITING_FOR_PLAYERS) {
-            this.roundText.setString("Get Ready");
-            this.startButton.setVisible(true);
-            this.stopButton.setVisible(false);
-        } else if (gameStatus === STATUS_GAME_RUNNING) {
-            this.roundText.setString("Round " + currentRound);
-            this.startButton.setVisible(false);
-            this.stopButton.setVisible(true);
-        }
+
     },
 
     updatePlayers: function() {
-        var i;
-        // first, hide all players
-        for (i = 0; i < this.maxPlayers; i++) {
-            this.showPlayer(i, false);
-        }
 
-        for (i = 0; i < currentPlayers; i++) {
-            this.nameTexts[i].setString(players[i].displayName);
-            // update avatar
-            var avatar = avartarSamples[i];
-            var avatarFrame = cc.SpriteFrame.create(avatar, cc.rect(0, 0,
-                this.avatarSprites[i].width, this.avatarSprites[i].height));
-            this.avatarSprites[i].setSpriteFrame(avatarFrame);
-
-            if (undefined !== players[i].isSurvive) {
-                if (players[i].isSurvive === true) {
-                    this.nameTexts[i].setColor(cc.color(255, 255, 255, 255));
-                } else {
-                    this.nameTexts[i].setColor(cc.color(255, 0, 0, 255));
-                }
-            }
-
-            if (undefined !== players[i].isSmallBlind && true === players[i].isSmallBlind) {
-                this.nameTexts[i].setColor(cc.color(255, 255, 0, 255));
-            }
-            if (undefined !== players[i].isBigBlind && true === players[i].isBigBlind) {
-                this.nameTexts[i].setColor(cc.color(255, 128, 128, 255));
-            }
-
-            this.moneyTexts[i].setString(players[i].chips);
-            this.betTexts[i].setString("bet:" + players[i].bet);
-            this.accumulateTexts[i].setString("acc:" + players[i].accumulate);
-            this.actionTexts[i].setString(players[i].action);
-
-            if (players[i].inTurn === 1) {
-                this.actionTexts[i].setColor(cc.color(255, 128, 0, 255));
-                this.actionTexts[i].setFontSize(24);
-            } else {
-                this.actionTexts[i].setColor(cc.color(255, 255, 255, 255));
-                this.actionTexts[i].setFontSize(18);
-            }
-
-            // draw private cards
-            var privateCard0 = players[i].privateCards[0];
-            if (privateCard0) {
-                var cardName1 = pokerMap.get(privateCard0);
-                var frame1 = cc.SpriteFrame.create(cardName1, cc.rect(0, 0,
-                    this.privateCardSprites[i][0].width, this.privateCardSprites[i][0].height));
-                this.privateCardSprites[i][0].setSpriteFrame(frame1);
-            }
-            var privateCard1 = players[i].privateCards[1];
-            if (privateCard1) {
-                var cardName2 = pokerMap.get(privateCard1);
-                var frame2 = cc.SpriteFrame.create(cardName2, cc.rect(0, 0,
-                    this.privateCardSprites[i][1].width, this.privateCardSprites[i][1].height));
-                this.privateCardSprites[i][1].setSpriteFrame(frame2);
-            }
-            this.showPlayer(i, true);
-        }
     },
 
     updateTable: function(visible) {
-        var i;
-        // clear public cards
-        var frame;
-        for (i = 0; i < this.publicCardMax; i++) {
-            frame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
-                this.publicCardSprites[i].width, this.publicCardSprites[i].height));
-            this.publicCardSprites[i].setSpriteFrame(frame);
-        }
 
-        for (i = 0; i < this.publicCardMax; i++) {
-            if (publicCards[i]) {
-                var cardName = pokerMap.get(publicCards[i]);
-                frame = cc.SpriteFrame.create(cardName, cc.rect(0, 0,
-                        this.publicCardSprites[i].width, this.publicCardSprites[i].height));
-                this.publicCardSprites[i].setSpriteFrame(frame);
-            }
-            this.publicCardSprites[i].setVisible(visible);
-        }
-
-        // update small blind and big blind
-        this.blindText.setString("Small blind: " + currentSmallBlind + "/ Big blind: " + currentBigBlind);
     },
 
     updateBg: function() {
@@ -486,13 +207,5 @@ var GameLayer = cc.LayerColor.extend({
 
     // UI helpers
     showPlayer: function(i, show) {
-        this.avatarSprites[i].setVisible(show);
-        this.nameTexts[i].setVisible(show);
-        this.moneyTexts[i].setVisible(show);
-        this.betTexts[i].setVisible(show);
-        this.accumulateTexts[i].setVisible(show);
-        this.actionTexts[i].setVisible(show);
-        this.privateCardSprites[i][0].setVisible(show);
-        this.privateCardSprites[i][1].setVisible(show);
     }
 });

@@ -60,3 +60,6 @@ typings/
 
 # WebStorm project directory
 .idea/
+
+# Backup folder
+backup/

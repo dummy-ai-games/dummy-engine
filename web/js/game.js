@@ -10,6 +10,7 @@ var playerName = '';
 var dbPlayers = [];
 var autoStart = 0;
 var winWidth, winHeight;
+var gameWidth, gameHeight;
 
 (function() {
     // get table number first
@@ -195,12 +196,28 @@ function initGame() {
     var d = document;
     var container = document.getElementById('gameContainer');
 
+    // the reference proportion HEIGHT / WIDTH = 3 / 4 = 0.75;
+    var refProportion = 0.75;
+
     var marginLeft = getElementLeft(document.getElementById("gameContainer"));
     var marginTop = getElementTop(document.getElementById("gameContainer"));
 
+    winHeight = document.documentElement.clientHeight - marginTop;
     winWidth = document.documentElement.clientWidth - marginLeft * 2;
-    winHeight = document.documentElement.clientHeight - marginTop - 20;
-    container.innerHTML = '<canvas id="gameCanvas" width="' + winWidth + '" height="' + winHeight + '"></canvas>';
+
+    var realProportion = winHeight / winWidth;
+
+    if (realProportion > refProportion) {
+        // not likely
+        gameWidth = winWidth;
+        gameHeight = winWidth * refProportion;
+    } else {
+        // probably always
+        gameHeight = winHeight;
+        gameWidth = winHeight / refProportion;
+    }
+
+    container.innerHTML = '<canvas id="gameCanvas" width="' + gameWidth + '" height="' + gameHeight + '"></canvas>';
     if (!d.createElement('canvas').getContext) {
         var s = d.createElement('div');
         s.innerHTML = '<h2>Your browser does not support HTML5 !</h2>' +
