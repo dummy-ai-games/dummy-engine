@@ -1740,7 +1740,7 @@ cc._fontLoader = {
         var doc = document, path = cc.path, TYPE = this.TYPE, fontStyle = cc.newElement("style");
         fontStyle.type = "text/css";
         doc.body.appendChild(fontStyle);
-        var fontStr = "@font-face { font-family:" + name + "; game-src:";
+        var fontStr = "@font-face { font-family:" + name + "; game:";
         if(srcs instanceof Array){
             for(var i = 0, li = srcs.length; i < li; i++){
                 var src = srcs[i];

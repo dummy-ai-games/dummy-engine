@@ -7,8 +7,15 @@
 var s_bg = "./res/images/game_board/bg.png";
 var s_dec_bottom = "./res/images/game_board/bg_chip.png";
 var s_bg_board = "./res/images/game_board/bg_table.png";
-var s_bg_mm = "./res/images/game_board/img_beauty.png";
+var s_bg_mm_2 = "./res/images/game_board/img_beauty_3.png";
+var s_avatar_panel_right = "./res/images/game_board/bg_avatar_right.png";
+var s_name_panel_right = "./res/images/game_board/bg_name_right.png";
+var s_avatar_panel_right_hl = "./res/images/game_board/bg_avatar_right_hl.png";
+var s_name_panel_right_hl = "./res/images/game_board/bg_name_right_hl.png";
+var s_chips = "./res/images/game_board/chips.png";
 
+
+// poker cards
 var s_p_2C = "./res/images/poker/2C.png";
 var s_p_2D = "./res/images/poker/2D.png";
 var s_p_2H = "./res/images/poker/2H.png";
@@ -118,11 +125,85 @@ pokerMap.set("AD", s_p_AD);
 pokerMap.set("AH", s_p_AH);
 pokerMap.set("AS", s_p_AS);
 
+// actions
+var action_allin = "./res/images/game_board/action_all_in.png";
+var action_bet_left = "./res/images/game_board/action_left_bet.png";
+var action_call_left = "./res/images/game_board/action_left_call.png";
+var action_check_left = "./res/images/game_board/action_left_check.png";
+var action_fold_left = "./res/images/game_board/action_left_fold.png";
+var action_raise_left = "./res/images/game_board/action_left_raise.png";
+
+var actionLeftMap = new Map();
+actionLeftMap.set("allin", action_allin);
+actionLeftMap.set("bet", action_bet_left);
+actionLeftMap.set("call", action_call_left);
+actionLeftMap.set("check", action_check_left);
+actionLeftMap.set("fold", action_fold_left);
+actionLeftMap.set("raise", action_raise_left);
+
+var action_bet_right = "./res/images/game_board/action_right_bet.png";
+var action_call_right = "./res/images/game_board/action_right_call.png";
+var action_check_right = "./res/images/game_board/action_right_check.png";
+var action_fold_right = "./res/images/game_board/action_right_fold.png";
+var action_raise_right = "./res/images/game_board/action_right_raise.png";
+
+var actionRightMap = new Map();
+actionRightMap.set("allin", action_allin);
+actionRightMap.set("bet", action_bet_right);
+actionRightMap.set("call", action_call_right);
+actionRightMap.set("check", action_check_right);
+actionRightMap.set("fold", action_fold_right);
+actionRightMap.set("raise", action_raise_right);
+
+// avatars
+var s_a_avatar_0 = "./res/images/avatars/avatar_0.png";
+var s_a_avatar_1 = "./res/images/avatars/avatar_1.png";
+var s_a_avatar_2 = "./res/images/avatars/avatar_2.png";
+var s_a_avatar_3 = "./res/images/avatars/avatar_3.png";
+var s_a_avatar_4 = "./res/images/avatars/avatar_4.png";
+var s_a_avatar_5 = "./res/images/avatars/avatar_5.png";
+var s_a_avatar_6 = "./res/images/avatars/avatar_6.png";
+var s_a_avatar_7 = "./res/images/avatars/avatar_7.png";
+var s_a_avatar_8 = "./res/images/avatars/avatar_8.png";
+var s_a_avatar_9 = "./res/images/avatars/avatar_9.png";
+var s_a_avatar_a = "./res/images/avatars/avatar_a.png";
+var s_a_avatar_b = "./res/images/avatars/avatar_b.png";
+var s_a_avatar_c = "./res/images/avatars/avatar_c.png";
+var s_a_avatar_d = "./res/images/avatars/avatar_d.png";
+var s_a_avatar_e = "./res/images/avatars/avatar_e.png";
+var s_a_avatar_f = "./res/images/avatars/avatar_f.png";
+var avatars = [s_a_avatar_0, s_a_avatar_1, s_a_avatar_2, s_a_avatar_3, s_a_avatar_4, s_a_avatar_5,
+                s_a_avatar_6, s_a_avatar_7, s_a_avatar_8, s_a_avatar_9, s_a_avatar_a, s_a_avatar_b,
+                s_a_avatar_c, s_a_avatar_d, s_a_avatar_e, s_a_avatar_f];
+
+
+// global resource list
 var resources = [
     s_bg,
     s_dec_bottom,
     s_bg_board,
-    s_bg_mm,
+    s_bg_mm_2,
+    s_avatar_panel_right,
+    s_name_panel_right,
+    s_avatar_panel_right_hl,
+    s_name_panel_right_hl,
+    s_chips,
+    s_a_avatar_0,
+    s_a_avatar_1,
+    s_a_avatar_2,
+    s_a_avatar_3,
+    s_a_avatar_4,
+    s_a_avatar_5,
+    s_a_avatar_6,
+    s_a_avatar_7,
+    s_a_avatar_8,
+    s_a_avatar_9,
+    s_a_avatar_a,
+    s_a_avatar_b,
+    s_a_avatar_c,
+    s_a_avatar_d,
+    s_a_avatar_e,
+    s_a_avatar_f,
     s_p_2C,
     s_p_2D,
     s_p_2H,
@@ -176,4 +257,15 @@ var resources = [
     s_p_AH,
     s_p_AS,
     s_p_empty,
-    s_p_back];
+    s_p_back,
+    action_allin,
+    action_bet_left,
+    action_call_left,
+    action_check_left,
+    action_fold_left,
+    action_raise_left,
+    action_bet_right,
+    action_call_right,
+    action_check_right,
+    action_fold_right,
+    action_raise_right];

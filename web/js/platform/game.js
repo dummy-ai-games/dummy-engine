@@ -101,7 +101,7 @@ function initWebsock() {
     rtc.on('__game_over', function(data) {
         console.log('game over : ' + JSON.stringify(data));
         updateGame(data, true);
-        gameStatus = STATUS_GAME_FINISHED;
+        ccTheGame.gameStatus = STATUS_GAME_FINISHED;
 
         if (undefined !== autoStart && (autoStart === 1 || autoStart === '1')) {
             // auto start another game in 3s
@@ -114,13 +114,13 @@ function initWebsock() {
     rtc.on('__game_start', function(data) {
         // update in game engine
         console.log('game start : ' + JSON.stringify(data));
-        gameStatus = STATUS_GAME_RUNNING;
+        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
     });
 
     rtc.on('__game_stop', function(data) {
         // update in game engine
         console.log('game stop : ' + JSON.stringify(data));
-        gameStatus = STATUS_WAITING_FOR_PLAYERS;
+        ccTheGame.gameStatus = STATUS_WAITING_FOR_PLAYERS;
     });
 
     rtc.on('__deal', function(data) {
@@ -132,13 +132,13 @@ function initWebsock() {
         }
 
         // update in game engine
-        gameStatus = STATUS_GAME_RUNNING;
+        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
     });
 
     rtc.on('__new_round', function(data) {
         console.log('new round : ' + JSON.stringify(data));
-        gameStatus = STATUS_GAME_RUNNING;
+        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
 
         // update in game engine
         updateGame(data, true);
@@ -146,15 +146,14 @@ function initWebsock() {
 
     rtc.on('__round_end', function(data) {
         console.log('round end : ' + JSON.stringify(data));
-        gameStatus = STATUS_GAME_RUNNING;
+        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
     });
 
     rtc.on('__show_action', function(data) {
         console.log('show action : ' + JSON.stringify(data));
 
-        gameStatus = STATUS_GAME_RUNNING;
-        var tableNumber = data.table.tableNumber;
+        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
         var roundAction = data.action;
 
         var playerIndex = findPlayerIndexById(data.action.playerName);
