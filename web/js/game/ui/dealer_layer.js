@@ -3,7 +3,6 @@
  * 2017-10-05
  */
 
-// visualization related
 var DealerLayer = cc.LayerColor.extend({
 
     // constants
@@ -17,7 +16,7 @@ var DealerLayer = cc.LayerColor.extend({
     validHeight: 0,
 
     // scales
-    bgScale: 1.0,
+    gameScale: 1.0,
     controlMenuScale: 1.0,
 
     // sprites
@@ -26,7 +25,6 @@ var DealerLayer = cc.LayerColor.extend({
 
     // buttons
     startButton: null,
-    stopButton: null,
 
     // menus
     controlMenu: null,
@@ -36,22 +34,21 @@ var DealerLayer = cc.LayerColor.extend({
     // design specs
 
     // constructor
-    ctor: function (bgScale) {
+    ctor: function (gameScale) {
         this._super();
-        this.bgScale = bgScale;
+        this.gameScale = gameScale;
     },
 
     // game initializer
     init: function () {
-        this._super();
         this._super(cc.color(0, 0, 0, 225));
 
-        // initiate sprite layout on DealerLayer
+        // initiate layout on DealerLayer
         this.validWidth = gameWidth;
         this.validHeight = gameHeight;
         this.size = cc.size(this.validWidth, this.validHeight);
 
-        // add start button
+        // initiate start button
         this.startButton = cc.MenuItemImage.create(
             s_start_button,
             s_start_button_pressed,
@@ -59,12 +56,13 @@ var DealerLayer = cc.LayerColor.extend({
                 console.log("game start");
             },this);
 
-        this.controlMenuScale = this.bgScale;
+        this.controlMenuScale = this.gameScale;
         this.startButton.setAnchorPoint(0, 0);
         this.controlMenu = cc.Menu.create(this.startButton);
+
         this.controlMenu.setScale(this.controlMenuScale);
-        var menuPositionX = (this.validWidth - this.startButton.getContentSize().width * this.bgScale) / 2;
-        var menuPositionY = (this.validHeight - this.startButton.getContentSize().height * this.bgScale) / 2;
+        var menuPositionX = (this.validWidth - this.startButton.getContentSize().width) / 2 * this.gameScale;
+        var menuPositionY = (this.validHeight - this.startButton.getContentSize().height) / 2 * this.gameScale;
         this.controlMenu.setPosition(menuPositionX, menuPositionY);
         this.addChild(this.controlMenu, 1);
     },

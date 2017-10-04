@@ -5,6 +5,7 @@
 
 // board images
 var s_bg = "./res/images/game_board/bg.png";
+var s_winner_bg = "./res/images/game_board/winner_bg.png";
 var s_dec_bottom = "./res/images/game_board/bg_chip.png";
 var s_bg_board = "./res/images/game_board/bg_table.png";
 var s_bg_mm_2 = "./res/images/game_board/img_beauty_3.png";
@@ -193,6 +194,7 @@ var avatars = [s_a_avatar_0, s_a_avatar_1, s_a_avatar_2, s_a_avatar_3, s_a_avata
 // global resource list
 var resources = [
     s_bg,
+    s_winner_bg,
     s_dec_bottom,
     s_bg_board,
     s_bg_mm_2,

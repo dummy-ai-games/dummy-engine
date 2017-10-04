@@ -3,10 +3,6 @@
  * 2017-10-03
  */
 
-var PLAYER_AT_LEFT = 0;
-var PLAYER_AT_RIGHT = 1;
-
-// visualization related
 var PlayerLayer = cc.Layer.extend({
 
     // constants

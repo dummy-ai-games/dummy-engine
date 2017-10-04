@@ -3,35 +3,17 @@
  * 2017-10-03
  */
 
-// model related
-var STATUS_WAITING_FOR_PLAYERS = 0;
-var STATUS_GAME_RUNNING = 1;
-var STATUS_GAME_FINISHED = 2;
-
-var currentRound = 1;
-var players = [];
-var currentPlayers = 0;
-
-var publicCards = [];
-
-var currentSmallBlind = 0;
-var currentBigBlind = 0;
-
-// visualization related
 var GameLayer = cc.Layer.extend({
 
     // constants
     defaultFont: '微软雅黑',
     roundTextFont: 'IMPACT',
     roundTextSize: '50',
-    gameStatus: STATUS_WAITING_FOR_PLAYERS,
+    authorTextFont: this.defaultFont,
+    authorTextSize: '12',
     debug: true,
     maxPlayerCount: 10,
     maxPublicCardCount: 5,
-
-    // game model variables
-    currentPlayerCount: 0,
-    currentPublicCardCount: 0,
 
     // visualization variables
     size: null,
@@ -56,12 +38,14 @@ var GameLayer = cc.Layer.extend({
 
     // labels
     roundText: null,
+    authorText: null,
 
     // menus
 
     // layers
     playerLayers: [],
     dealerLayer: null,
+    winnerLayer: null,
 
     // design specs
     refWidth: 1024,
@@ -86,11 +70,14 @@ var GameLayer = cc.Layer.extend({
     ],
     cardVisualHeight: 100,
     cardVisualWidth: 72,
-    cardMarginBottom: 380,
+    cardMarginBottom: 280,
     cardMarginLeft: [320, 400, 480, 560, 640],
     roundTextWidth: 274,
     roundTextHeight: 64,
-    roundTextMarginBottom: 280,
+    roundTextMarginBottom: 460,
+    authorTextWidth: 320,
+    authorTextHeight: 32,
+    authorTextMarginBottom: 10,
     logoMarginTop: 18,
     logoMarginRight: 36,
 
@@ -193,6 +180,22 @@ var GameLayer = cc.Layer.extend({
                         this.roundTextMarginBottom * this.bgScale);
         this.addChild(this.roundText, 2);
 
+        // initialize author text
+        this.authorText = new cc.LabelTTF('开发者: Bobi.Zhou, JP.Yang, Teresa.Wu \r\n Engineering Camp 2017 Task Force',
+                this.authorTextFont, this.authorTextSize);
+        this.authorText.setColor(cc.color(255, 255, 255, 255));
+        this.authorText.setAnchorPoint(0, 0);
+        this.authorText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        this.authorText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.authorText.boundingWidth = this.authorTextWidth;
+        this.authorText.boundingHeight = this.authorTextHeight;
+        this.authorText.setScale(this.bgScale);
+        this.authorText
+            .setPosition((this.bgSprite.getContentSize().width - this.authorText.getContentSize().width) / 2
+                * this.bgScale,
+                this.authorTextMarginBottom * this.bgScale);
+        this.addChild(this.authorText, 2);
+
         // initialize TrendMicro logo
         this.tmLogo = cc.Sprite.create(s_tm_logo);
         this.tmLogo.setAnchorPoint(0, 0);
@@ -207,9 +210,15 @@ var GameLayer = cc.Layer.extend({
         this.dealerLayer = new DealerLayer(this.bgScale);
         this.dealerLayer.init();
         this.dealerLayer.setAnchorPoint(0, 0);
-        this.dealerLayer.setScale(this.bgScale);
         this.dealerLayer.setPosition(0, 0);
-        this.addChild(this.dealerLayer, 100);
+        // this.addChild(this.dealerLayer, 100);
+
+        // add winner layer on the top
+        this.winnerLayer = new WinnerLayer(this.bgScale);
+        this.winnerLayer.init();
+        this.winnerLayer.setAnchorPoint(0, 0);
+        this.winnerLayer.setPosition(0, 0);
+        this.addChild(this.winnerLayer, 100);
 
         this.reset();
         this.scheduleUpdate();
@@ -224,7 +233,7 @@ var GameLayer = cc.Layer.extend({
         // initiate players
         players = [];
         currentPlayers = 0;
-        this.gameStatus = STATUS_WAITING_FOR_PLAYERS;
+        gameStatus = STATUS_WAITING_FOR_PLAYERS;
     },
 
     removeAll: function() {
@@ -246,18 +255,24 @@ var GameLayer = cc.Layer.extend({
     },
 
     doUpdate: function() {
-        switch(this.gameStatus) {
+        switch(gameStatus) {
             case STATUS_WAITING_FOR_PLAYERS:
+                // this.dealerLayer.setVisible(true);
+                // this.winnerLayer.setVisible(false);
                 this.updateRound();
                 this.updatePlayers();
                 this.updateTable(false);
                 break;
             case STATUS_GAME_RUNNING:
+                // this.dealerLayer.setVisible(false);
+                // this.winnerLayer.setVisible(false);
                 this.updateRound();
                 this.updatePlayers();
                 this.updateTable(true);
                 break;
             case STATUS_GAME_FINISHED:
+                // this.dealerLayer.setVisible(false);
+                // this.winnerLayer.setVisible(true);
                 this.updateRound();
                 this.updatePlayers();
                 this.updateTable(true);

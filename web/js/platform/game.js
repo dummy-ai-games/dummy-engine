@@ -3,21 +3,45 @@
  * 2017-08-21
  */
 
-var ccTheGame;
-var rtc = SkyRTC();
+// data related
 var tableNumber = 0;
 var playerName = '';
 var dbPlayers = [];
 var autoStart = 0;
+
+// game board related
 var winWidth, winHeight;
 var gameWidth, gameHeight;
+
+// game model related
+var STATUS_WAITING_FOR_PLAYERS = 0;
+var STATUS_GAME_RUNNING = 1;
+var STATUS_GAME_FINISHED = 2;
+
+var gameStatus = STATUS_WAITING_FOR_PLAYERS;
+
+var currentRound = 1;
+
+var PLAYER_AT_LEFT = 0;
+var PLAYER_AT_RIGHT = 1;
+
+var players = [];
+var currentPlayers = 0;
+
+var publicCards = [];
+var currentPublicCards = 0;
+
+var currentSmallBlind = 0;
+var currentBigBlind = 0;
+
+// communication related
+var rtc = SkyRTC();
 
 (function() {
     // get table number first
     tableNumber = getParameter('table');
     playerName = getParameter('name');
     autoStart = getParameter('auto') || 0;
-    console.log("auto restart = " + autoStart);
     initGame();
 })();
 
@@ -101,7 +125,7 @@ function initWebsock() {
     rtc.on('__game_over', function(data) {
         console.log('game over : ' + JSON.stringify(data));
         updateGame(data, true);
-        ccTheGame.gameStatus = STATUS_GAME_FINISHED;
+        gameStatus = STATUS_GAME_FINISHED;
 
         if (undefined !== autoStart && (autoStart === 1 || autoStart === '1')) {
             // auto start another game in 3s
@@ -114,13 +138,13 @@ function initWebsock() {
     rtc.on('__game_start', function(data) {
         // update in game engine
         console.log('game start : ' + JSON.stringify(data));
-        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
+        gameStatus = STATUS_GAME_RUNNING;
     });
 
     rtc.on('__game_stop', function(data) {
         // update in game engine
         console.log('game stop : ' + JSON.stringify(data));
-        ccTheGame.gameStatus = STATUS_WAITING_FOR_PLAYERS;
+        gameStatus = STATUS_WAITING_FOR_PLAYERS;
     });
 
     rtc.on('__deal', function(data) {
@@ -132,13 +156,13 @@ function initWebsock() {
         }
 
         // update in game engine
-        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
+        gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
     });
 
     rtc.on('__new_round', function(data) {
         console.log('new round : ' + JSON.stringify(data));
-        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
+        gameStatus = STATUS_GAME_RUNNING;
 
         // update in game engine
         updateGame(data, true);
@@ -146,14 +170,14 @@ function initWebsock() {
 
     rtc.on('__round_end', function(data) {
         console.log('round end : ' + JSON.stringify(data));
-        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
+        gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
     });
 
     rtc.on('__show_action', function(data) {
         console.log('show action : ' + JSON.stringify(data));
 
-        ccTheGame.gameStatus = STATUS_GAME_RUNNING;
+        gameStatus = STATUS_GAME_RUNNING;
         var roundAction = data.action;
 
         var playerIndex = findPlayerIndexById(data.action.playerName);
@@ -244,9 +268,9 @@ function ccLoad() {
             var LSScene = cc.Scene.extend({
                 onEnter: function() {
                     this._super();
-                    ccTheGame = new GameLayer();
-                    ccTheGame.init();
-                    this.addChild(ccTheGame);
+                    var gameBoard = new GameLayer();
+                    gameBoard.init();
+                    this.addChild(gameBoard);
                     initPlayerInfo();
                 }
             });
