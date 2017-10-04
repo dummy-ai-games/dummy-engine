@@ -20,41 +20,105 @@ var currentBigBlind = 0;
 // visualization related
 var GameLayer = cc.Layer.extend({
 
+    // constants
     defaultFont: '微软雅黑',
+    roundTextFont: 'IMPACT',
+    roundTextSize: '50',
+    gameStatus: STATUS_WAITING_FOR_PLAYERS,
+    debug: true,
+    maxPlayerCount: 10,
+    maxPublicCardCount: 5,
 
     // game model variables
-    gameStatus: STATUS_WAITING_FOR_PLAYERS,
+    currentPlayerCount: 0,
+    currentPublicCardCount: 0,
 
-    // global visualization variables
+    // visualization variables
     size: null,
     validWidth: 0,
     validHeight: 0,
-    DEBUG: true,
 
     // scales
     bgScale: 1.0,
     decoScale: 1.0,
     boardScale: 1.0,
     mmScale: 1.0,
+    playerScale: 1.0,
+    cardScale: 1.0,
 
     // sprites
     bgSprite: null,
     decoBottom: null,
     bgBoard: null,
     bgMM: null,
+    publicCards: [],
+
+    // labels
+    roundText: null,
 
     // menus
 
     // layers
-    playerLayer: null,
+    playerLayers: [],
 
     // design specs
     refWidth: 1024,
     refHeight: 768,
     boardMarginLeft: 28,
     boardMarginRight: 28,
-    boardMarginBottom: 160,
-    mmMarginTop: 0,
+    boardMarginBottom: 180,
+    mmMarginTop: 20,
+    playerPosition: [
+        // players at right side
+        {
+            x: 640,
+            y: 560
+        },
+        {
+            x: 840,
+            y: 500
+        },
+        {
+            x: 870,
+            y: 340
+        },
+        {
+            x: 840,
+            y: 180
+        },
+        {
+            x: 600,
+            y: 120
+        },
+        // players at left side
+        {
+            x: 280,
+            y: 120
+        },
+        {
+            x: 40,
+            y: 180
+        },
+        {
+            x: 10,
+            y: 340
+        },
+        {
+            x: 40,
+            y: 500
+        },
+        {
+            x: 240,
+            y: 560
+        }
+    ],
+    cardVisualHeight: 100,
+    cardVisualWidth: 72,
+    cardMarginBottom: 380,
+    cardMarginLeft: [320, 400, 480, 560, 640],
+    roundTextWidth: 274,
+    roundTextHeight: 64,
+    roundTextMarginBottom: 280,
 
     // constructor
     ctor: function () {
@@ -65,12 +129,12 @@ var GameLayer = cc.Layer.extend({
     init: function () {
         this._super();
 
-        // initiate sprite layout on gameCanvasS
+        // initialize sprite layout on BoardLayer
         this.validWidth = gameWidth;
         this.validHeight = gameHeight;
         this.size = cc.size(this.validWidth, this.validHeight);
 
-        // add background
+        // initialize background
         this.bgSprite = cc.Sprite.create(s_bg);
         this.bgSprite.setAnchorPoint(0, 0);
         this.bgScale = Math.max(this.validHeight / this.bgSprite.getContentSize().height,
@@ -79,7 +143,7 @@ var GameLayer = cc.Layer.extend({
         this.bgSprite.setPosition(0, 0);
         this.addChild(this.bgSprite, 0);
 
-        // add bottom decoration
+        // initialize bottom decoration
         this.decoBottom = cc.Sprite.create(s_dec_bottom);
         this.decoBottom.setAnchorPoint(0, 0);
         this.decoScale = this.validWidth / this.decoBottom.getContentSize().width;
@@ -87,32 +151,71 @@ var GameLayer = cc.Layer.extend({
         this.decoBottom.setPosition(0, 0);
         this.addChild(this.decoBottom, 1);
 
-        // add dealer mm
+        // initialize dealer mm
         this.bgMM = cc.Sprite.create(s_bg_mm_2);
         this.bgMM.setAnchorPoint(0, 0);
-        this.mmScale = this.bgScale;
+        this.mmScale = this.bgScale * 0.75;
         this.bgMM.setScale(this.mmScale);
         this.bgMM.setPosition((this.validWidth - this.bgMM.getContentSize().width * this.mmScale) / 2,
-            this.validHeight - ((this.mmMarginTop + this.bgMM.getContentSize().height) * this.mmScale));
+            (this.bgSprite.getContentSize().height * this.bgScale - (this.mmMarginTop + this.bgMM.getContentSize().height) * this.mmScale));
         this.addChild(this.bgMM, 1);
 
-        // add poker board
+        // initialize poker board
         this.bgBoard = cc.Sprite.create(s_bg_board);
         this.bgBoard.setAnchorPoint(0, 0);
-        var boardRealMarginLeft = this.boardMarginLeft * this.boardScale;
-        var boardRealMarginBottom = this.boardMarginBottom * this.boardScale;
-        this.boardScale = (this.validWidth - this.boardMarginLeft * 2) / (this.bgBoard.getContentSize().width);
+        this.boardScale = this.bgScale;
+        var boardRealMarginLeft = (this.bgSprite.getContentSize().width - this.bgBoard.getContentSize().width) / 2
+                * this.bgScale;
+        var boardRealMarginBottom = (this.bgSprite.getContentSize().height - this.bgBoard.getContentSize().height) / 2
+            * this.bgScale;
         this.bgBoard.setScale(this.boardScale);
         this.bgBoard.setPosition(boardRealMarginLeft, boardRealMarginBottom);
         this.addChild(this.bgBoard, 2);
 
-        // add player layer
-        this.playerLayer = new PlayerLayer(PLAYER_AT_RIGHT);
-        this.playerLayer.init();
-        this.playerLayer.setAnchorPoint(0, 0);
-        // this.playerLayer.setScale(this.bgScale);
-        this.playerLayer.setPosition(100, 200);
-        this.addChild(this.playerLayer, 5);
+        // initialize players
+        var playerIndex;
+        this.playerScale = this.bgScale * 0.8;
+        for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+            if (playerIndex < 5) {
+                this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_RIGHT);
+            } else {
+                this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_LEFT);
+            }
+            this.playerLayers[playerIndex].init();
+            this.playerLayers[playerIndex].setAnchorPoint(0, 0);
+            this.playerLayers[playerIndex].setScale(this.playerScale);
+            this.playerLayers[playerIndex].setPosition(this.playerPosition[playerIndex].x * this.bgScale,
+                                                       this.playerPosition[playerIndex].y * this.bgScale);
+            this.addChild(this.playerLayers[playerIndex], 5);
+        }
+
+        // initialize public cards
+        var publicCardIndex;
+        for (publicCardIndex = 0; publicCardIndex < this.maxPublicCardCount; publicCardIndex++) {
+            this.publicCards[publicCardIndex] = cc.Sprite.create(s_p_2C);
+            this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
+            this.cardScale = Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
+                this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.bgScale;
+            this.publicCards[publicCardIndex].setScale(this.cardScale);
+            this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.bgScale,
+                    this.cardMarginBottom * this.bgScale);
+            this.addChild(this.publicCards[publicCardIndex], 2);
+        }
+
+        // initialize round text
+        this.roundText = new cc.LabelTTF('ROUND 1', this.roundTextFont, this.roundTextSize);
+        this.roundText.setColor(cc.color(255, 255, 255, 255));
+        this.roundText.setAnchorPoint(0, 0);
+        this.roundText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        this.roundText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.roundText.boundingWidth = this.roundTextWidth;
+        this.roundText.boundingHeight = this.roundTextHeight;
+        this.roundText.setScale(this.bgScale);
+        this.roundText
+            .setPosition((this.bgSprite.getContentSize().width - this.roundText.getContentSize().width) / 2
+                    * this.bgScale,
+                        this.roundTextMarginBottom * this.bgScale);
+        this.addChild(this.roundText, 2);
 
         this.reset();
         this.scheduleUpdate();
@@ -135,7 +238,7 @@ var GameLayer = cc.Layer.extend({
     },
 
     gameFinished: function() {
-        console.log("game finished");
+        console.log('game finished');
     },
 
     gameOver: function() {

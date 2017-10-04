@@ -8,10 +8,18 @@ var s_bg = "./res/images/game_board/bg.png";
 var s_dec_bottom = "./res/images/game_board/bg_chip.png";
 var s_bg_board = "./res/images/game_board/bg_table.png";
 var s_bg_mm_2 = "./res/images/game_board/img_beauty_3.png";
+
+// player images
 var s_avatar_panel_right = "./res/images/game_board/bg_avatar_right.png";
 var s_name_panel_right = "./res/images/game_board/bg_name_right.png";
 var s_avatar_panel_right_hl = "./res/images/game_board/bg_avatar_right_hl.png";
 var s_name_panel_right_hl = "./res/images/game_board/bg_name_right_hl.png";
+
+var s_avatar_panel_left = "./res/images/game_board/bg_avatar_left.png";
+var s_name_panel_left = "./res/images/game_board/bg_name_left.png";
+var s_avatar_panel_left_hl = "./res/images/game_board/bg_avatar_left_hl.png";
+var s_name_panel_left_hl = "./res/images/game_board/bg_name_left_hl.png";
+
 var s_chips = "./res/images/game_board/chips.png";
 
 
@@ -187,6 +195,10 @@ var resources = [
     s_name_panel_right,
     s_avatar_panel_right_hl,
     s_name_panel_right_hl,
+    s_avatar_panel_left,
+    s_name_panel_left,
+    s_avatar_panel_left_hl,
+    s_name_panel_left_hl,
     s_chips,
     s_a_avatar_0,
     s_a_avatar_1,
