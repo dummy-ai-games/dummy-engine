@@ -52,6 +52,7 @@ var GameLayer = cc.Layer.extend({
     bgBoard: null,
     bgMM: null,
     publicCards: [],
+    tmLogo: null,
 
     // labels
     roundText: null,
@@ -60,6 +61,7 @@ var GameLayer = cc.Layer.extend({
 
     // layers
     playerLayers: [],
+    dealerLayer: null,
 
     // design specs
     refWidth: 1024,
@@ -70,47 +72,17 @@ var GameLayer = cc.Layer.extend({
     mmMarginTop: 20,
     playerPosition: [
         // players at right side
-        {
-            x: 640,
-            y: 560
-        },
-        {
-            x: 840,
-            y: 500
-        },
-        {
-            x: 870,
-            y: 340
-        },
-        {
-            x: 840,
-            y: 180
-        },
-        {
-            x: 600,
-            y: 120
-        },
+        { x: 640, y: 560 },
+        { x: 840, y: 500 },
+        { x: 870, y: 340 },
+        { x: 840, y: 180 },
+        { x: 600, y: 120 },
         // players at left side
-        {
-            x: 280,
-            y: 120
-        },
-        {
-            x: 40,
-            y: 180
-        },
-        {
-            x: 10,
-            y: 340
-        },
-        {
-            x: 40,
-            y: 500
-        },
-        {
-            x: 240,
-            y: 560
-        }
+        { x: 280, y: 120 },
+        { x:  40, y: 180 },
+        { x:  10, y: 340 },
+        { x:  40, y: 500 },
+        { x: 240, y: 560 }
     ],
     cardVisualHeight: 100,
     cardVisualWidth: 72,
@@ -119,6 +91,8 @@ var GameLayer = cc.Layer.extend({
     roundTextWidth: 274,
     roundTextHeight: 64,
     roundTextMarginBottom: 280,
+    logoMarginTop: 18,
+    logoMarginRight: 36,
 
     // constructor
     ctor: function () {
@@ -157,7 +131,8 @@ var GameLayer = cc.Layer.extend({
         this.mmScale = this.bgScale * 0.75;
         this.bgMM.setScale(this.mmScale);
         this.bgMM.setPosition((this.validWidth - this.bgMM.getContentSize().width * this.mmScale) / 2,
-            (this.bgSprite.getContentSize().height * this.bgScale - (this.mmMarginTop + this.bgMM.getContentSize().height) * this.mmScale));
+            (this.bgSprite.getContentSize().height * this.bgScale -
+                (this.mmMarginTop + this.bgMM.getContentSize().height) * this.mmScale));
         this.addChild(this.bgMM, 1);
 
         // initialize poker board
@@ -192,10 +167,11 @@ var GameLayer = cc.Layer.extend({
         // initialize public cards
         var publicCardIndex;
         for (publicCardIndex = 0; publicCardIndex < this.maxPublicCardCount; publicCardIndex++) {
-            this.publicCards[publicCardIndex] = cc.Sprite.create(s_p_2C);
+            this.publicCards[publicCardIndex] = cc.Sprite.create(s_p_back);
             this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
-            this.cardScale = Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
-                this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.bgScale;
+            this.cardScale =
+                Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
+                    this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.bgScale;
             this.publicCards[publicCardIndex].setScale(this.cardScale);
             this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.bgScale,
                     this.cardMarginBottom * this.bgScale);
@@ -216,6 +192,24 @@ var GameLayer = cc.Layer.extend({
                     * this.bgScale,
                         this.roundTextMarginBottom * this.bgScale);
         this.addChild(this.roundText, 2);
+
+        // initialize TrendMicro logo
+        this.tmLogo = cc.Sprite.create(s_tm_logo);
+        this.tmLogo.setAnchorPoint(0, 0);
+        this.tmLogo.setScale(this.bgScale);
+        this.tmLogo.setPosition((this.bgSprite.getContentSize().width -
+            this.tmLogo.getContentSize().width - this.logoMarginRight) * this.bgScale,
+                (this.bgSprite.getContentSize().height -
+                this.tmLogo.getContentSize().height - this.logoMarginTop) * this.bgScale);
+        this.addChild(this.tmLogo, 2);
+
+        // add dealer layer on the top
+        this.dealerLayer = new DealerLayer(this.bgScale);
+        this.dealerLayer.init();
+        this.dealerLayer.setAnchorPoint(0, 0);
+        this.dealerLayer.setScale(this.bgScale);
+        this.dealerLayer.setPosition(0, 0);
+        this.addChild(this.dealerLayer, 100);
 
         this.reset();
         this.scheduleUpdate();

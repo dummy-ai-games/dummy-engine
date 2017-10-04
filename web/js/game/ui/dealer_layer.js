@@ -4,37 +4,47 @@
  */
 
 // visualization related
-var DealerLayer = cc.ColorLayer.extend({
+var DealerLayer = cc.LayerColor.extend({
 
     // constants
     defaultFont: '微软雅黑',
     nameSize: 24,
     debug: true,
 
+    // visualization variables
+    size: null,
+    validWidth: 0,
+    validHeight: 0,
+
     // scales
-    buttonScale: 1.0,
     bgScale: 1.0,
+    controlMenuScale: 1.0,
 
     // sprites
-    bgSprite: null,
 
     // labels
 
+    // buttons
+    startButton: null,
+    stopButton: null,
+
     // menus
+    controlMenu: null,
 
     // layers
 
     // design specs
 
     // constructor
-    ctor: function (playerType) {
+    ctor: function (bgScale) {
         this._super();
-        this.playerType = playerType;
+        this.bgScale = bgScale;
     },
 
     // game initializer
     init: function () {
         this._super();
+        this._super(cc.color(0, 0, 0, 225));
 
         // initiate sprite layout on DealerLayer
         this.validWidth = gameWidth;
@@ -42,7 +52,21 @@ var DealerLayer = cc.ColorLayer.extend({
         this.size = cc.size(this.validWidth, this.validHeight);
 
         // add start button
+        this.startButton = cc.MenuItemImage.create(
+            s_start_button,
+            s_start_button_pressed,
+            function () {
+                console.log("game start");
+            },this);
 
+        this.controlMenuScale = this.bgScale;
+        this.startButton.setAnchorPoint(0, 0);
+        this.controlMenu = cc.Menu.create(this.startButton);
+        this.controlMenu.setScale(this.controlMenuScale);
+        var menuPositionX = (this.validWidth - this.startButton.getContentSize().width * this.bgScale) / 2;
+        var menuPositionY = (this.validHeight - this.startButton.getContentSize().height * this.bgScale) / 2;
+        this.controlMenu.setPosition(menuPositionX, menuPositionY);
+        this.addChild(this.controlMenu, 1);
     },
 
     // game operations

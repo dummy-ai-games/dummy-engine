@@ -118,7 +118,8 @@ var PlayerLayer = cc.Layer.extend({
             this.nameLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.nameLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.nameLabel.boundingWidth = this.namePanel.getContentSize().width - this.avatarPanelLeftPadding;
-            this.nameLabel.boundingHeight = (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
+            this.nameLabel.boundingHeight =
+                (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
 
             this.nameLabel.setPosition(this.namePanel.getPositionX(),
                 this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 4);
@@ -132,7 +133,8 @@ var PlayerLayer = cc.Layer.extend({
             this.chipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.boundingWidth = this.namePanel.getContentSize().width - this.avatarPanelLeftPadding;
-            this.chipsLabel.boundingHeight = (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
+            this.chipsLabel.boundingHeight =
+                (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
 
             this.chipsLabel.setPosition(this.namePanel.getPositionX(),
                 (this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 2) / 4);
@@ -188,7 +190,7 @@ var PlayerLayer = cc.Layer.extend({
 
             // add private cards
             for (privateCardIndex = 1; privateCardIndex >= 0; privateCardIndex--) {
-                this.privateCards[privateCardIndex] = cc.Sprite.create(s_p_5D);
+                this.privateCards[privateCardIndex] = cc.Sprite.create(s_p_back);
                 this.privateCards[privateCardIndex].setAnchorPoint(0, 0);
                 this.cardsScale =
                     Math.max(this.cardVisualHeight / this.privateCards[privateCardIndex].getContentSize().height,
@@ -218,7 +220,8 @@ var PlayerLayer = cc.Layer.extend({
             this.nameLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.nameLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.nameLabel.boundingWidth = this.namePanel.getContentSize().width - this.avatarPanelLeftPadding;
-            this.nameLabel.boundingHeight = (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
+            this.nameLabel.boundingHeight =
+                (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
             this.nameLabel.setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding,
                 this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 4);
             this.addChild(this.nameLabel, 3);
@@ -231,7 +234,8 @@ var PlayerLayer = cc.Layer.extend({
             this.chipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.boundingWidth = this.namePanel.getContentSize().width - this.avatarPanelLeftPadding;
-            this.chipsLabel.boundingHeight = (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
+            this.chipsLabel.boundingHeight =
+                (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
 
             this.chipsLabel.setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding,
                 (this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 2) / 4);
@@ -306,15 +310,16 @@ var PlayerLayer = cc.Layer.extend({
 
             // add private cards
             for (privateCardIndex = 0; privateCardIndex < 2; privateCardIndex++) {
-                this.privateCards[privateCardIndex] = cc.Sprite.create(s_p_5D);
+                this.privateCards[privateCardIndex] = cc.Sprite.create(s_p_back);
                 this.privateCards[privateCardIndex].setAnchorPoint(0, 0);
                 this.cardsScale =
                     Math.max(this.cardVisualHeight / this.privateCards[privateCardIndex].getContentSize().height,
                         this.cardVisualWidth / this.privateCards[privateCardIndex].getContentSize().width);
                 this.privateCards[privateCardIndex].setScale(this.cardsScale);
                 this.privateCards[privateCardIndex]
-                    .setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding + privateCardIndex * this.cardMargin,
-                        this.namePanel.getPositionY() + this.privateCardsMarginBottom);
+                    .setPosition(this.namePanel.getPositionX() +
+                        this.avatarPanelLeftPadding + privateCardIndex * this.cardMargin,
+                            this.namePanel.getPositionY() + this.privateCardsMarginBottom);
                 this.addChild(this.privateCards[privateCardIndex], 0);
             }
         }
