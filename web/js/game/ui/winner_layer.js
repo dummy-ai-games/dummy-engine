@@ -8,8 +8,8 @@ var WinnerLayer = cc.LayerColor.extend({
     // constants
     titleFont: 'IMPACT',
     titleTextSize: 64,
-    winnerFont: '微软雅黑',
-    winnerTextSize: 24,
+    winnerFont: 'IMPACT',
+    winnerTextSize: 28,
     debug: true,
     maxWinners: 5,
 
@@ -88,20 +88,20 @@ var WinnerLayer = cc.LayerColor.extend({
 
         var winnerIndex;
         for (winnerIndex = 0; winnerIndex < this.maxWinners; winnerIndex++) {
-            this.winnerLabels[winnerIndex] = new cc.LabelTTF('Player ' + (winnerIndex + 1), this.winnerFont, this.winnerTextSize);
+            this.winnerLabels[winnerIndex] = new cc.LabelTTF('Player ' + (winnerIndex + 1),
+                this.winnerFont, this.winnerTextSize);
             this.winnerLabels[winnerIndex].setColor(cc.color(255, 255, 255, 255));
             this.winnerLabels[winnerIndex].setAnchorPoint(0, 0);
             this.winnerLabels[winnerIndex].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.winnerLabels[winnerIndex].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.winnerLabels[winnerIndex].boundingWidth = this.winnerTextWidth;
             this.winnerLabels[winnerIndex].boundingHeight = this.winnerTextHeight;
-            shadowColor = cc.color(255, 255, 0);
-            this.winnerLabels[winnerIndex].enableShadow(shadowColor, cc.size(0, -2), 0);
             this.winnerLabels[winnerIndex].setScale(this.gameScale);
             this.winnerLabels[winnerIndex]
                 .setPosition((this.bgSprite.getContentSize().width * this.bgScaleX -
                     this.winnerLabels[winnerIndex].getContentSize().width * this.gameScale) / 2,
-                    (this.winnerTextMarginBottom - this.winnerLabels[winnerIndex].getContentSize().height * winnerIndex) * this.gameScale);
+                    (this.winnerTextMarginBottom -
+                        this.winnerLabels[winnerIndex].getContentSize().height * winnerIndex) * this.gameScale);
             this.addChild(this.winnerLabels[winnerIndex], 2);
         }
     },
@@ -111,37 +111,14 @@ var WinnerLayer = cc.LayerColor.extend({
         this.doUpdate();
     },
 
-    // reset function
     reset: function() {
-        // initiate players
-        players = [];
-        currentPlayers = 0;
-        gameStatus = STATUS_WAITING_FOR_PLAYERS;
     },
 
     removeAll: function() {
         this.reset();
     },
 
-    gameFinished: function() {
-        console.log("game finished");
-    },
-
-    gameOver: function() {
-    },
-
-    // generic sprite animations
-    moveSprite: function (sprite, toPos, callback) {
-    },
-
-    cbSpriteMovingFinished: function(nodeExecutingAction, data) {
-    },
-
     doUpdate: function() {
 
-    },
-
-    // UI helpers
-    showPlayer: function(i, show) {
     }
 });

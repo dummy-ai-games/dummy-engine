@@ -43,18 +43,18 @@ var DealerLayer = cc.LayerColor.extend({
     init: function () {
         this._super(cc.color(0, 0, 0, 225));
 
-        // initiate layout on DealerLayer
+        // initialize layout on DealerLayer
         this.validWidth = gameWidth;
         this.validHeight = gameHeight;
         this.size = cc.size(this.validWidth, this.validHeight);
 
-        // initiate start button
+        // initialize start button
         this.startButton = cc.MenuItemImage.create(
             s_start_button,
             s_start_button_pressed,
             function () {
                 console.log("game start");
-            },this);
+            }, this);
 
         this.controlMenuScale = this.gameScale;
         this.startButton.setAnchorPoint(0, 0);
@@ -72,37 +72,14 @@ var DealerLayer = cc.LayerColor.extend({
         this.doUpdate();
     },
 
-    // reset function
     reset: function() {
-        // initiate players
-        players = [];
-        currentPlayers = 0;
-        gameStatus = STATUS_WAITING_FOR_PLAYERS;
     },
 
     removeAll: function() {
         this.reset();
     },
 
-    gameFinished: function() {
-        console.log("game finished");
-    },
-
-    gameOver: function() {
-    },
-
-    // generic sprite animations
-    moveSprite: function (sprite, toPos, callback) {
-    },
-
-    cbSpriteMovingFinished: function(nodeExecutingAction, data) {
-    },
-
     doUpdate: function() {
 
-    },
-
-    // UI helpers
-    showPlayer: function(i, show) {
     }
 });

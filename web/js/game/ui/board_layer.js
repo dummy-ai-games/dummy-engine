@@ -21,12 +21,14 @@ var GameLayer = cc.Layer.extend({
     validHeight: 0,
 
     // scales
+    gameScale: 1.0,
     bgScale: 1.0,
     decoScale: 1.0,
     boardScale: 1.0,
     mmScale: 1.0,
     playerScale: 1.0,
     cardScale: 1.0,
+    controlMenuScale: 1.0,
 
     // sprites
     bgSprite: null,
@@ -40,7 +42,12 @@ var GameLayer = cc.Layer.extend({
     roundText: null,
     authorText: null,
 
+    // buttons
+    startButton: null,
+    stopButton: null,
+
     // menus
+    controlMenu: null,
 
     // layers
     playerLayers: [],
@@ -80,6 +87,8 @@ var GameLayer = cc.Layer.extend({
     authorTextMarginBottom: 10,
     logoMarginTop: 18,
     logoMarginRight: 36,
+    controlMenuMarginLeft: 36,
+    controlMenuMarginBottom: 680,
 
     // constructor
     ctor: function () {
@@ -98,7 +107,7 @@ var GameLayer = cc.Layer.extend({
         // initialize background
         this.bgSprite = cc.Sprite.create(s_bg);
         this.bgSprite.setAnchorPoint(0, 0);
-        this.bgScale = Math.max(this.validHeight / this.bgSprite.getContentSize().height,
+        this.gameScale = this.bgScale = Math.max(this.validHeight / this.bgSprite.getContentSize().height,
                                     this.validWidth / this.bgSprite.getContentSize().width);
         this.bgSprite.setScale(this.bgScale);
         this.bgSprite.setPosition(0, 0);
@@ -115,28 +124,28 @@ var GameLayer = cc.Layer.extend({
         // initialize dealer mm
         this.bgMM = cc.Sprite.create(s_bg_mm_2);
         this.bgMM.setAnchorPoint(0, 0);
-        this.mmScale = this.bgScale * 0.75;
+        this.mmScale = this.gameScale * 0.75;
         this.bgMM.setScale(this.mmScale);
         this.bgMM.setPosition((this.validWidth - this.bgMM.getContentSize().width * this.mmScale) / 2,
-            (this.bgSprite.getContentSize().height * this.bgScale -
+            (this.bgSprite.getContentSize().height * this.gameScale -
                 (this.mmMarginTop + this.bgMM.getContentSize().height) * this.mmScale));
         this.addChild(this.bgMM, 1);
 
         // initialize poker board
         this.bgBoard = cc.Sprite.create(s_bg_board);
         this.bgBoard.setAnchorPoint(0, 0);
-        this.boardScale = this.bgScale;
+        this.boardScale = this.gameScale;
         var boardRealMarginLeft = (this.bgSprite.getContentSize().width - this.bgBoard.getContentSize().width) / 2
-                * this.bgScale;
+                * this.gameScale;
         var boardRealMarginBottom = (this.bgSprite.getContentSize().height - this.bgBoard.getContentSize().height) / 2
-            * this.bgScale;
+            * this.gameScale;
         this.bgBoard.setScale(this.boardScale);
         this.bgBoard.setPosition(boardRealMarginLeft, boardRealMarginBottom);
         this.addChild(this.bgBoard, 2);
 
         // initialize players
         var playerIndex;
-        this.playerScale = this.bgScale * 0.8;
+        this.playerScale = this.gameScale * 0.8;
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
             if (playerIndex < 5) {
                 this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_RIGHT);
@@ -146,8 +155,8 @@ var GameLayer = cc.Layer.extend({
             this.playerLayers[playerIndex].init();
             this.playerLayers[playerIndex].setAnchorPoint(0, 0);
             this.playerLayers[playerIndex].setScale(this.playerScale);
-            this.playerLayers[playerIndex].setPosition(this.playerPosition[playerIndex].x * this.bgScale,
-                                                       this.playerPosition[playerIndex].y * this.bgScale);
+            this.playerLayers[playerIndex].setPosition(this.playerPosition[playerIndex].x * this.gameScale,
+                                                       this.playerPosition[playerIndex].y * this.gameScale);
             this.addChild(this.playerLayers[playerIndex], 5);
         }
 
@@ -158,10 +167,10 @@ var GameLayer = cc.Layer.extend({
             this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
             this.cardScale =
                 Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
-                    this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.bgScale;
+                    this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.gameScale;
             this.publicCards[publicCardIndex].setScale(this.cardScale);
-            this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.bgScale,
-                    this.cardMarginBottom * this.bgScale);
+            this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.gameScale,
+                    this.cardMarginBottom * this.gameScale);
             this.addChild(this.publicCards[publicCardIndex], 2);
         }
 
@@ -173,11 +182,11 @@ var GameLayer = cc.Layer.extend({
         this.roundText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
         this.roundText.boundingWidth = this.roundTextWidth;
         this.roundText.boundingHeight = this.roundTextHeight;
-        this.roundText.setScale(this.bgScale);
+        this.roundText.setScale(this.gameScale);
         this.roundText
             .setPosition((this.bgSprite.getContentSize().width - this.roundText.getContentSize().width) / 2
-                    * this.bgScale,
-                        this.roundTextMarginBottom * this.bgScale);
+                    * this.gameScale,
+                        this.roundTextMarginBottom * this.gameScale);
         this.addChild(this.roundText, 2);
 
         // initialize author text
@@ -189,36 +198,39 @@ var GameLayer = cc.Layer.extend({
         this.authorText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
         this.authorText.boundingWidth = this.authorTextWidth;
         this.authorText.boundingHeight = this.authorTextHeight;
-        this.authorText.setScale(this.bgScale);
+        this.authorText.setScale(this.gameScale);
         this.authorText
             .setPosition((this.bgSprite.getContentSize().width - this.authorText.getContentSize().width) / 2
-                * this.bgScale,
-                this.authorTextMarginBottom * this.bgScale);
+                * this.gameScale,
+                this.authorTextMarginBottom * this.gameScale);
         this.addChild(this.authorText, 2);
 
         // initialize TrendMicro logo
         this.tmLogo = cc.Sprite.create(s_tm_logo);
         this.tmLogo.setAnchorPoint(0, 0);
-        this.tmLogo.setScale(this.bgScale);
+        this.tmLogo.setScale(this.gameScale);
         this.tmLogo.setPosition((this.bgSprite.getContentSize().width -
-            this.tmLogo.getContentSize().width - this.logoMarginRight) * this.bgScale,
+            this.tmLogo.getContentSize().width - this.logoMarginRight) * this.gameScale,
                 (this.bgSprite.getContentSize().height -
-                this.tmLogo.getContentSize().height - this.logoMarginTop) * this.bgScale);
+                this.tmLogo.getContentSize().height - this.logoMarginTop) * this.gameScale);
         this.addChild(this.tmLogo, 2);
 
+        // add stop button
+        this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button);
+
         // add dealer layer on the top
-        this.dealerLayer = new DealerLayer(this.bgScale);
+        this.dealerLayer = new DealerLayer(this.gameScale);
         this.dealerLayer.init();
         this.dealerLayer.setAnchorPoint(0, 0);
         this.dealerLayer.setPosition(0, 0);
         // this.addChild(this.dealerLayer, 100);
 
         // add winner layer on the top
-        this.winnerLayer = new WinnerLayer(this.bgScale);
+        this.winnerLayer = new WinnerLayer(this.gameScale);
         this.winnerLayer.init();
         this.winnerLayer.setAnchorPoint(0, 0);
         this.winnerLayer.setPosition(0, 0);
-        this.addChild(this.winnerLayer, 100);
+        // this.addChild(this.winnerLayer, 100);
 
         this.reset();
         this.scheduleUpdate();
@@ -230,7 +242,7 @@ var GameLayer = cc.Layer.extend({
     },
 
     reset: function() {
-        // initiate players
+        // initialize players
         players = [];
         currentPlayers = 0;
         gameStatus = STATUS_WAITING_FOR_PLAYERS;

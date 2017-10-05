@@ -326,37 +326,14 @@ var PlayerLayer = cc.Layer.extend({
         this.doUpdate();
     },
 
-    // reset function
     reset: function() {
-        // initiate players
-        players = [];
-        currentPlayers = 0;
-        gameStatus = STATUS_WAITING_FOR_PLAYERS;
     },
 
     removeAll: function() {
         this.reset();
     },
 
-    gameFinished: function() {
-        console.log('game finished');
-    },
-
-    gameOver: function() {
-    },
-
-    // generic sprite animations
-    moveSprite: function (sprite, toPos, callback) {
-    },
-
-    cbSpriteMovingFinished: function(nodeExecutingAction, data) {
-    },
-
     doUpdate: function() {
 
-    },
-
-    // UI helpers
-    showPlayer: function(i, show) {
     }
 });

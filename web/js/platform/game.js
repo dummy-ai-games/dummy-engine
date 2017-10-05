@@ -37,13 +37,13 @@ var currentBigBlind = 0;
 // communication related
 var rtc = SkyRTC();
 
-(function() {
+$(document).ready(function() {
     // get table number first
     tableNumber = getParameter('table');
     playerName = getParameter('name');
     autoStart = getParameter('auto') || 0;
     initGame();
-})();
+});
 
 // fetch player display name
 function initPlayerInfo() {
@@ -225,7 +225,7 @@ function initGame() {
     var marginLeft = getElementLeft(document.getElementById("gameContainer"));
     var marginTop = getElementTop(document.getElementById("gameContainer"));
 
-    winHeight = document.documentElement.clientHeight - marginTop;
+    winHeight = document.documentElement.clientHeight - marginTop - 8;
     winWidth = document.documentElement.clientWidth - marginLeft * 2;
 
     var realProportion = winHeight / winWidth;
