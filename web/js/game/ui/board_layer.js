@@ -3,7 +3,7 @@
  * 2017-10-03
  */
 
-var GameLayer = cc.Layer.extend({
+var BoardLayer = cc.Layer.extend({
 
     // constants
     defaultFont: '微软雅黑',
@@ -39,15 +39,14 @@ var GameLayer = cc.Layer.extend({
     tmLogo: null,
 
     // labels
-    roundText: null,
-    authorText: null,
+    roundLabel: null,
+    authorLabel: null,
 
     // buttons
     startButton: null,
     stopButton: null,
 
     // menus
-    controlMenu: null,
 
     // layers
     playerLayers: [],
@@ -65,13 +64,13 @@ var GameLayer = cc.Layer.extend({
         // players at right side
         { x: 640, y: 560 },
         { x: 840, y: 500 },
-        { x: 870, y: 340 },
+        { x: 860, y: 340 },
         { x: 840, y: 180 },
-        { x: 600, y: 120 },
+        { x: 600, y: 100 },
         // players at left side
-        { x: 280, y: 120 },
+        { x: 280, y: 100 },
         { x:  40, y: 180 },
-        { x:  10, y: 340 },
+        { x:   0, y: 340 },
         { x:  40, y: 500 },
         { x: 240, y: 560 }
     ],
@@ -83,11 +82,11 @@ var GameLayer = cc.Layer.extend({
     roundTextHeight: 64,
     roundTextMarginBottom: 460,
     authorTextWidth: 320,
-    authorTextHeight: 32,
-    authorTextMarginBottom: 10,
+    authorTextHeight: 48,
+    authorTextMarginBottom: 20,
     logoMarginTop: 18,
     logoMarginRight: 36,
-    controlMenuMarginLeft: 36,
+    controlMenuMarginLeft: 18,
     controlMenuMarginBottom: 680,
 
     // constructor
@@ -145,7 +144,7 @@ var GameLayer = cc.Layer.extend({
 
         // initialize players
         var playerIndex;
-        this.playerScale = this.gameScale * 0.8;
+        this.playerScale = this.gameScale * 0.9;
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
             if (playerIndex < 5) {
                 this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_RIGHT);
@@ -158,6 +157,7 @@ var GameLayer = cc.Layer.extend({
             this.playerLayers[playerIndex].setPosition(this.playerPosition[playerIndex].x * this.gameScale,
                                                        this.playerPosition[playerIndex].y * this.gameScale);
             this.addChild(this.playerLayers[playerIndex], 5);
+            this.playerLayers[playerIndex].setVisible(false);
         }
 
         // initialize public cards
@@ -172,38 +172,39 @@ var GameLayer = cc.Layer.extend({
             this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.gameScale,
                     this.cardMarginBottom * this.gameScale);
             this.addChild(this.publicCards[publicCardIndex], 2);
+            this.publicCards[publicCardIndex].setVisible(false);
         }
 
         // initialize round text
-        this.roundText = new cc.LabelTTF('ROUND 1', this.roundTextFont, this.roundTextSize);
-        this.roundText.setColor(cc.color(255, 255, 255, 255));
-        this.roundText.setAnchorPoint(0, 0);
-        this.roundText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-        this.roundText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-        this.roundText.boundingWidth = this.roundTextWidth;
-        this.roundText.boundingHeight = this.roundTextHeight;
-        this.roundText.setScale(this.gameScale);
-        this.roundText
-            .setPosition((this.bgSprite.getContentSize().width - this.roundText.getContentSize().width) / 2
+        this.roundLabel = new cc.LabelTTF('', this.roundTextFont, this.roundTextSize);
+        this.roundLabel.setColor(cc.color(255, 255, 255, 255));
+        this.roundLabel.setAnchorPoint(0, 0);
+        this.roundLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        this.roundLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.roundLabel.boundingWidth = this.roundTextWidth;
+        this.roundLabel.boundingHeight = this.roundTextHeight;
+        this.roundLabel.setScale(this.gameScale);
+        this.roundLabel
+            .setPosition((this.bgSprite.getContentSize().width - this.roundLabel.getContentSize().width) / 2
                     * this.gameScale,
                         this.roundTextMarginBottom * this.gameScale);
-        this.addChild(this.roundText, 2);
+        this.addChild(this.roundLabel, 2);
 
         // initialize author text
-        this.authorText = new cc.LabelTTF('开发者: Bobi.Zhou, JP.Yang, Teresa.Wu \r\n Engineering Camp 2017 Task Force',
+        this.authorLabel = new cc.LabelTTF('Developer: Bobi.Zhou, JP.Yang, Teresa.Wu\r\n CDC Mobile Club 2017\r\n Engineering Camp 2017 Task Force',
                 this.authorTextFont, this.authorTextSize);
-        this.authorText.setColor(cc.color(255, 255, 255, 255));
-        this.authorText.setAnchorPoint(0, 0);
-        this.authorText.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-        this.authorText.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-        this.authorText.boundingWidth = this.authorTextWidth;
-        this.authorText.boundingHeight = this.authorTextHeight;
-        this.authorText.setScale(this.gameScale);
-        this.authorText
-            .setPosition((this.bgSprite.getContentSize().width - this.authorText.getContentSize().width) / 2
+        this.authorLabel.setColor(cc.color(255, 255, 255, 255));
+        this.authorLabel.setAnchorPoint(0, 0);
+        this.authorLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        this.authorLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.authorLabel.boundingWidth = this.authorTextWidth;
+        this.authorLabel.boundingHeight = this.authorTextHeight;
+        this.authorLabel.setScale(this.gameScale);
+        this.authorLabel
+            .setPosition((this.bgSprite.getContentSize().width - this.authorLabel.getContentSize().width) / 2
                 * this.gameScale,
                 this.authorTextMarginBottom * this.gameScale);
-        this.addChild(this.authorText, 2);
+        this.addChild(this.authorLabel, 2);
 
         // initialize TrendMicro logo
         this.tmLogo = cc.Sprite.create(s_tm_logo);
@@ -215,22 +216,54 @@ var GameLayer = cc.Layer.extend({
                 this.tmLogo.getContentSize().height - this.logoMarginTop) * this.gameScale);
         this.addChild(this.tmLogo, 2);
 
-        // add stop button
-        this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button);
+        // add start and stop button
+        this.controlMenuScale = this.gameScale * 0.6;
+
+        this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
+        this.startButton.setAnchorPoint(0, 0);
+        this.startButton.setScale(this.controlMenuScale);
+        this.startButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
+                                     this.controlMenuMarginBottom * this.gameScale);
+        this.addChild(this.startButton, 2);
+        this.startButton.addTouchEventListener(function (sender, type) {
+            if (ccui.Widget.TOUCH_ENDED === type) {
+                console.log('start game');
+                if (gameStatus !== STATUS_GAME_RUNNING) {
+                    startGame();
+                }
+            }
+        }, this);
+
+        this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
+        this.stopButton.setAnchorPoint(0, 0);
+        this.stopButton.setScale(this.controlMenuScale);
+        this.stopButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
+            this.controlMenuMarginBottom * this.gameScale);
+        this.addChild(this.stopButton, 2);
+        this.stopButton.addTouchEventListener(function (sender, type) {
+            if (ccui.Widget.TOUCH_ENDED === type) {
+                console.log('start game');
+                if (gameStatus === STATUS_GAME_RUNNING) {
+                    stopGame();
+                }
+            }
+        }, this);
 
         // add dealer layer on the top
         this.dealerLayer = new DealerLayer(this.gameScale);
         this.dealerLayer.init();
         this.dealerLayer.setAnchorPoint(0, 0);
         this.dealerLayer.setPosition(0, 0);
-        // this.addChild(this.dealerLayer, 100);
+        this.dealerLayer.setVisible(false);
+        this.addChild(this.dealerLayer, 100);
 
         // add winner layer on the top
         this.winnerLayer = new WinnerLayer(this.gameScale);
         this.winnerLayer.init();
         this.winnerLayer.setAnchorPoint(0, 0);
         this.winnerLayer.setPosition(0, 0);
-        // this.addChild(this.winnerLayer, 100);
+        this.winnerLayer.setVisible(false);
+        this.addChild(this.winnerLayer, 100);
 
         this.reset();
         this.scheduleUpdate();
@@ -245,7 +278,7 @@ var GameLayer = cc.Layer.extend({
         // initialize players
         players = [];
         currentPlayers = 0;
-        gameStatus = STATUS_WAITING_FOR_PLAYERS;
+        gameStatus = STATUS_GAME_STANDBY;
     },
 
     removeAll: function() {
@@ -267,52 +300,113 @@ var GameLayer = cc.Layer.extend({
     },
 
     doUpdate: function() {
+        this.updateLayers();
+    },
+
+    updateLayers: function() {
         switch(gameStatus) {
-            case STATUS_WAITING_FOR_PLAYERS:
-                // this.dealerLayer.setVisible(true);
-                // this.winnerLayer.setVisible(false);
-                this.updateRound();
-                this.updatePlayers();
-                this.updateTable(false);
+            case STATUS_GAME_STANDBY:
+                this.showLayer(this.dealerLayer, true);
+                this.showLayer(this.winnerLayer, false);
+                this.updateBoardLayer();
+                this.updateDealerLayer();
                 break;
+
             case STATUS_GAME_RUNNING:
-                // this.dealerLayer.setVisible(false);
-                // this.winnerLayer.setVisible(false);
-                this.updateRound();
-                this.updatePlayers();
-                this.updateTable(true);
+                this.showLayer(this.dealerLayer, false);
+                this.showLayer(this.winnerLayer, false);
+                this.updateBoardLayer();
                 break;
+
             case STATUS_GAME_FINISHED:
-                // this.dealerLayer.setVisible(false);
-                // this.winnerLayer.setVisible(true);
-                this.updateRound();
-                this.updatePlayers();
-                this.updateTable(true);
+                this.showLayer(this.dealerLayer, false);
+                this.showLayer(this.winnerLayer, true);
+                this.updateWinnerLayer();
                 break;
 
             default:
-            {
                 break;
+        }
+    },
+
+    updateBoardLayer: function() {
+        this.updateBoard();
+        this.updatePlayers();
+    },
+
+    updateDealerLayer: function() {
+        this.dealerLayer.update();
+    },
+
+    updateWinnerLayer: function() {
+
+    },
+
+    // board layer updater
+    updatePlayers: function() {
+        var playerIndex;
+        // refresh all player layer
+        for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+            this.updatePlayer(this.playerLayers[playerIndex], null, false);
+        }
+        if (players) {
+            for (playerIndex = 0; playerIndex < players.length; playerIndex++) {
+                this.updatePlayer(this.playerLayers[playerIndex], players[playerIndex], true);
             }
         }
     },
 
-    updateRound: function() {
+    updateBoard: function() {
+        switch(gameStatus) {
+            case STATUS_GAME_STANDBY:
+                this.roundLabel.setString('GET READY');
+                break;
 
+            case STATUS_GAME_RUNNING:
+                this.roundLabel.setString('ROUND ' + currentRound);
+                // update public cards
+                var frame;
+                var publicCardIndex;
+                for (publicCardIndex = 0; publicCardIndex < this.publicCardMax; publicCardIndex++) {
+                    frame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
+                        this.publicCards[publicCardIndex].width,
+                            this.publicCards[publicCardIndex].height));
+                    this.publicCards[publicCardIndex].setSpriteFrame(frame);
+                }
+
+                // TODO: could not update public cards
+                for (publicCardIndex = 0; publicCardIndex < this.publicCardMax; publicCardIndex++) {
+                    if (publicCards[publicCardIndex]) {
+                        var cardName = pokerMap.get(publicCards[publicCardIndex]);
+                        frame = cc.SpriteFrame.create(cardName, cc.rect(0, 0,
+                            this.publicCards[publicCardIndex].width,
+                                this.publicCards[publicCardIndex].height));
+                        this.publicCards[publicCardIndex].setSpriteFrame(frame);
+                    }
+                    this.publicCards[publicCardIndex].setVisible(true);
+                }
+                break;
+
+            case STATUS_GAME_FINISHED:
+                this.roundLabel.setString('GAME OVER');
+                break;
+
+            default:
+                break;
+        }
     },
 
-    updatePlayers: function() {
-
+    // UI helpers
+    showLayer: function(layer, show) {
+        layer.setVisible(show);
+        layer.eventListener.swallowTouches = show;
     },
 
-    updateTable: function(visible) {
-
-    },
-
-    updateBg: function() {
-        // do not update background in this game
-    },
-
-    showPlayer: function(i, show) {
+    updatePlayer: function(playerLayer, player, show) {
+        playerLayer.setPlayer(player);
+        playerLayer.setVisible(show);
+        if (show) {
+            playerLayer.update();
+        }
     }
 });

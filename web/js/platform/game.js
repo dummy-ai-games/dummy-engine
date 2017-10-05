@@ -14,11 +14,11 @@ var winWidth, winHeight;
 var gameWidth, gameHeight;
 
 // game model related
-var STATUS_WAITING_FOR_PLAYERS = 0;
+var STATUS_GAME_STANDBY = 0;
 var STATUS_GAME_RUNNING = 1;
 var STATUS_GAME_FINISHED = 2;
 
-var gameStatus = STATUS_WAITING_FOR_PLAYERS;
+var gameStatus = STATUS_GAME_STANDBY;
 
 var currentRound = 1;
 
@@ -28,6 +28,7 @@ var PLAYER_AT_RIGHT = 1;
 var players = [];
 var currentPlayers = 0;
 
+var defaultInitChips = 1000;
 var publicCards = [];
 var currentPublicCards = 0;
 
@@ -74,7 +75,8 @@ function initPlayerInfo() {
 // game communication with back-end
 function initWebsock() {
     // initialize web communication
-    rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0], playerName,tableNumber);
+    rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0],
+            playerName,tableNumber);
 
     rtc.on('__new_peer', function(data) {
         if (data) {
@@ -85,16 +87,11 @@ function initWebsock() {
 
         if (undefined !== data && null !== data) {
             currentPlayers = data.length;
-            for (var i = 0; i < data.length; i++) {
+            // rebuild player list
+            players = [];
+            for (var i = 0; i < currentPlayers; i++) {
                 var playerDisplayName = findDBPlayerNameById(data[i]);
-                if (!players[i]) {
-                    players[i] =
-                        new Player(data[i], data[i], playerDisplayName, 1000);
-                } else {
-                    players[i].id = data[i];
-                    players[i].name = data[i];
-                    players[i].displayName = playerDisplayName;
-                }
+                players[i] = new Player(data[i], data[i], playerDisplayName, defaultInitChips, true, 0);
             }
         }
     });
@@ -108,16 +105,11 @@ function initWebsock() {
 
         if (undefined !== data && null !== data) {
             currentPlayers = data.length;
-            for (var i = 0; i < data.length; i++) {
+            // rebuild player list
+            players = [];
+            for (var i = 0; i < currentPlayers; i++) {
                 var playerDisplayName = findDBPlayerNameById(data[i]);
-                if (!players[i]) {
-                    players[i] =
-                        new Player(data[i], data[i], playerDisplayName, 1000);
-                } else {
-                    players[i].id = data[i];
-                    players[i].name = data[i];
-                    players[i].displayName = playerDisplayName;
-                }
+                players[i] = new Player(data[i], data[i], playerDisplayName, defaultInitChips, true, 0);
             }
         }
     });
@@ -144,7 +136,7 @@ function initWebsock() {
     rtc.on('__game_stop', function(data) {
         // update in game engine
         console.log('game stop : ' + JSON.stringify(data));
-        gameStatus = STATUS_WAITING_FOR_PLAYERS;
+        gameStatus = STATUS_GAME_STANDBY;
     });
 
     rtc.on('__deal', function(data) {
@@ -190,25 +182,20 @@ function initWebsock() {
                 players[playerIndex].setAction(roundAction.action);
                 if (roundAction.action === 'fold') {
                     players[playerIndex].setBet(0);
-                } else if (roundAction.amount) {
-                    players[playerIndex].setBet(roundAction.amount);
                 }
             }
         } else {
             // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setAction(roundAction.action);
-                if (roundAction.amount) {
-                    players[playerIndex].setBet(data.action.amount);
-                }
             }
         }
         // set in turn
         for (var i = 0; i < currentPlayers; i++) {
             if (playerIndex === i) {
-                players[i].setInTurn();
+                players[i].setInTurn(true);
             } else {
-                players[i].clearInTurn();
+                players[i].setInTurn(false);
             }
         }
         updateGame(data, false);
@@ -268,7 +255,7 @@ function ccLoad() {
             var LSScene = cc.Scene.extend({
                 onEnter: function() {
                     this._super();
-                    var gameBoard = new GameLayer();
+                    var gameBoard = new BoardLayer();
                     gameBoard.init();
                     this.addChild(gameBoard);
                     initPlayerInfo();
@@ -314,33 +301,30 @@ function updateGame(data, isNewRound) {
     if (data.players) {
         currentPlayers = data.players.length;
         for (i = 0; i < data.players.length; i++) {
-            players[i].id = data.players[i].playerName;
+            players[i].setId(data.players[i].playerName);
             players[i].setDisplayName(findDBPlayerNameById(data.players[i].playerName));
             if (data.players[i].cards && data.players[i].cards.length === 2) {
-                players[i].privateCards[0] = data.players[i].cards[0];
-                players[i].privateCards[1] = data.players[i].cards[1];
+                players[i].setPrivateCards(data.players[i].cards[0], data.players[i].cards[1]);
             }
-            players[i].setAccRoundBet(data.players[i].roundBet);
-            players[i].setAccBet(data.players[i].bet);
+            players[i].setRoundBet(data.players[i].roundBet);
+            players[i].setBet(data.players[i].bet);
 
-            // set player accumulate
-            var accumulate = players[i].accRoundBet + players[i].accBet;
-            players[i].setAccumulate(accumulate);
             // reset action when received __new_round
             if (isNewRound) {
-                players[i].setAction("-");
+                players[i].setAction("");
                 players[i].setBet(0);
-                players[i].setAccRoundBet(0);
-                players[i].setAccBet(0);
+                players[i].setRoundBet(0);
                 players[i].setAccumulate(0);
             }
 
             players[i].setChips(data.players[i].chips);
             players[i].setSurvive(data.players[i].isSurvive);
+            players[i].setFolded(data.players[i].folded);
+            players[i].setAllin(data.players[i].allIn);
 
             if (data.table) {
-                players[i].isSmallBlind = players[i].name === data.table.smallBlind.playerName;
-                players[i].isBigBlind = players[i].name === data.table.bigBlind.playerName;
+                players[i].setSmallBlind(players[i].name === data.table.smallBlind.playerName);
+                players[i].setBigBlind(players[i].name === data.table.bigBlind.playerName);
             }
 
             // get float 1

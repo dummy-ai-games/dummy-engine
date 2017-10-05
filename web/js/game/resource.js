@@ -26,8 +26,10 @@ var s_chips = "./res/images/game_board/chips.png";
 
 var s_start_button = "./res/images/game_board/start_button.png";
 var s_start_button_pressed = "./res/images/game_board/start_button_pressed.png";
+var s_start_button_disabled = "./res/images/game_board/start_button_disabled.png";
 var s_stop_button = "./res/images/game_board/stop_button.png";
 var s_stop_button_pressed = "./res/images/game_board/stop_button_pressed.png";
+var s_stop_button_disabled = "./res/images/game_board/stop_button_disabled.png";
 
 // poker cards
 var s_p_2C = "./res/images/poker/2C.png";
@@ -139,7 +141,8 @@ pokerMap.set("AD", s_p_AD);
 pokerMap.set("AH", s_p_AH);
 pokerMap.set("AS", s_p_AS);
 
-// actions
+// actions, NOTE: sizes of action images must be exactly the same
+var action_empty = "./res/images/game_board/action_empty.png";
 var action_allin = "./res/images/game_board/action_all_in.png";
 var action_bet_left = "./res/images/game_board/action_left_bet.png";
 var action_call_left = "./res/images/game_board/action_left_call.png";
@@ -210,8 +213,10 @@ var resources = [
     s_tm_logo,
     s_start_button,
     s_start_button_pressed,
+    s_start_button_disabled,
     s_stop_button,
     s_stop_button_pressed,
+    s_stop_button_disabled,
     s_a_avatar_0,
     s_a_avatar_1,
     s_a_avatar_2,
@@ -282,6 +287,7 @@ var resources = [
     s_p_AS,
     s_p_empty,
     s_p_back,
+    action_empty,
     action_allin,
     action_bet_left,
     action_call_left,

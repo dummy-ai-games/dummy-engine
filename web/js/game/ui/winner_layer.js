@@ -104,6 +104,24 @@ var WinnerLayer = cc.LayerColor.extend({
                         this.winnerLabels[winnerIndex].getContentSize().height * winnerIndex) * this.gameScale);
             this.addChild(this.winnerLabels[winnerIndex], 2);
         }
+
+        // event management
+        this.eventListener = cc.EventListener.create({
+            event: cc.EventListener.TOUCH_ONE_BY_ONE,
+            swallowTouches: true,
+            onTouchBegan: function (touch, event) {
+                return true;
+            },
+            //Trigger when moving touch
+            onTouchMoved: function (touch, event) {
+                return true;
+            },
+            //Process the touch end event
+            onTouchEnded: function (touch, event) {
+                return true;
+            }
+        });
+        cc.eventManager.addListener(this.eventListener, this);
     },
 
     // game operations
