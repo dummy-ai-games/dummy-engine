@@ -193,6 +193,8 @@ var BoardLayer = cc.Layer.extend({
         this.roundLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
         this.roundLabel.boundingWidth = this.roundTextWidth;
         this.roundLabel.boundingHeight = this.roundTextHeight;
+        var shadowColor = cc.color(128, 128, 128);
+        this.roundLabel.enableShadow(shadowColor, cc.size(0, -4), 0);
         this.roundLabel.setScale(this.gameScale);
         this.roundLabel
             .setPosition((this.bgSprite.getContentSize().width - this.roundLabel.getContentSize().width) / 2
@@ -286,10 +288,7 @@ var BoardLayer = cc.Layer.extend({
     },
 
     reset: function() {
-        // initialize players
-        players = [];
-        currentPlayers = 0;
-        gameStatus = STATUS_GAME_STANDBY;
+
     },
 
     removeAll: function() {
@@ -319,6 +318,7 @@ var BoardLayer = cc.Layer.extend({
                 this.showLayer(this.dealerLayer, false);
                 this.showLayer(this.winnerLayer, true);
                 this.updateWinnerLayer();
+                // this.updateBoardLayer();
                 break;
 
             default:
@@ -339,16 +339,17 @@ var BoardLayer = cc.Layer.extend({
 
     },
 
-    // board layer updater
+    // update sub layers
     updatePlayers: function() {
+        if (!players || players.length === 0) {
+            // no players at all
+            return;
+        }
         var playerIndex;
-        // update all player layer
-        if (players) {
-            for (playerIndex = 0; playerIndex < players.length; playerIndex++) {
+        for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+            if (players && players[playerIndex]) {
                 this.updatePlayer(this.playerLayers[playerIndex], players[playerIndex], true);
-            }
-        } else {
-            for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+            } else {
                 this.updatePlayer(this.playerLayers[playerIndex], null, false);
             }
         }
@@ -366,7 +367,8 @@ var BoardLayer = cc.Layer.extend({
                 this.updatePublicCardsModel();
                 var publicCardIndex;
                 for (publicCardIndex = 0; publicCardIndex < this.maxPublicCardCount; publicCardIndex++) {
-                    if (this.publicCardsModel[publicCardIndex] === null) {
+                    if (this.publicCardsModel[publicCardIndex] === null ||
+                        '' === this.publicCardsModel[publicCardIndex]) {
                         this.changeSpriteImage(this.publicCards[publicCardIndex], this.pokerBackFrame);
                     } else {
                         this.changeSpriteImage(this.publicCards[publicCardIndex],
@@ -397,9 +399,7 @@ var BoardLayer = cc.Layer.extend({
 
     updatePlayer: function(playerLayer, player, show) {
         if (playerLayer) {
-            if (!playerLayer.player) {
-                playerLayer.setPlayer(player);
-            }
+            playerLayer.setPlayer(player);
             playerLayer.setVisible(show);
             if (show) {
                 playerLayer.update();

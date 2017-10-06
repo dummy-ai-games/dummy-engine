@@ -459,30 +459,27 @@ var PlayerLayer = cc.Layer.extend({
         this.chipsLabel.setString('$'+ this.player.chips);
 
         // update accumulate
-        if (this.player.accumulate > 0) {
+        if (this.player.accumulate > 0 && this.player.isSurvive) {
             var accString = '$'+ this.player.accumulate;
             this.accChipsLabel.setString(accString);
-
-            // update chip sprites
-            if (0 === this.player.accumulate) {
-                this.currentChipLevel = 0;
-            } else {
-                this.currentChipLevel = Math.min(this.maxChipLevel,
-                    Math.ceil(this.player.accumulate / (100 * currentPlayers)));
-            }
-
-            if (this.player.playerName === 'bobi') {
-                cc.log('acc = ' + this.currentChipLevel);
-            }
-            for (var betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
-                if (betChipIndex < this.currentChipLevel) {
-                    this.betChips[betChipIndex].setVisible(true);
-                } else {
-                    this.betChips[betChipIndex].setVisible(false);
-                }
-            }
         } else {
             this.accChipsLabel.setString('');
+        }
+
+        // update chip sprites
+        if (this.player.isSurvive === false) {
+            this.currentChipLevel = 0;
+        } else {
+            this.currentChipLevel = Math.min(this.maxChipLevel,
+                Math.ceil(this.player.accumulate / currentBigBlind));
+        }
+
+        for (var betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
+            if (betChipIndex < this.currentChipLevel) {
+                this.betChips[betChipIndex].setVisible(true);
+            } else {
+                this.betChips[betChipIndex].setVisible(false);
+            }
         }
 
         if (this.player.isSmallBlind) {
