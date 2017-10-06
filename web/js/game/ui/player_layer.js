@@ -67,6 +67,18 @@ var PlayerLayer = cc.Layer.extend({
     cardVisualWidth: 72,
     cardMargin: 48,
 
+    // alternative frames
+    nameHighLightFrame: null,
+    avatarHighLightFrame: null,
+    nameNormalFrame: null,
+    avatarNormalFrame: null,
+    avatarFrames: [],
+    pokerFrames: null,
+    pokerBackFrame: null,
+    pokerEmptyFrame: null,
+    actionFrames: null,
+    actionEmptyFrame: null,
+
     // constructor
     ctor: function (playerType) {
         this._super();
@@ -356,6 +368,7 @@ var PlayerLayer = cc.Layer.extend({
                     this.namePanel.getPositionY() + this.privateCardsMarginBottom);
             this.addChild(this.privateCard1, 0);
         }
+        this.initializeAltFrames();
     },
 
     // game operations
@@ -399,17 +412,17 @@ var PlayerLayer = cc.Layer.extend({
 
         // update action
         if (this.player.action !== '') {
-            this.changeSpriteImage(this.actionPanel, this.actionMap.get(this.player.action));
+            this.changeSpriteImage(this.actionPanel, this.actionFrames.get(this.player.action));
         } else {
-            this.changeSpriteImage(this.actionPanel, action_empty);
+            this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
         }
 
         if (this.player.inTurn) {
-            this.changeSpriteImage(this.namePanel, this.nameHighLight);
-            this.changeSpriteImage(this.avatarPanel, this.avatarHighLight);
+            this.changeSpriteImage(this.namePanel, this.nameHighLightFrame);
+            this.changeSpriteImage(this.avatarPanel, this.avatarHighLightFrame);
         } else {
-            this.changeSpriteImage(this.namePanel, this.nameNormal);
-            this.changeSpriteImage(this.avatarPanel, this.avatarNormal);
+            this.changeSpriteImage(this.namePanel, this.nameNormalFrame);
+            this.changeSpriteImage(this.avatarPanel, this.avatarNormalFrame);
         }
 
         // update current bet
@@ -422,26 +435,26 @@ var PlayerLayer = cc.Layer.extend({
         // update private cards
         if (this.player.privateCards[0]) {
             if (this.player.folded) {
-                this.changeSpriteImage(this.privateCard0, s_p_back);
+                this.changeSpriteImage(this.privateCard0, this.pokerBackFrame);
             } else {
-                this.changeSpriteImage(this.privateCard0, pokerMap.get(this.player.privateCards[0]));
+                this.changeSpriteImage(this.privateCard0, this.pokerFrames.get(this.player.privateCards[0]));
             }
 
             this.privateCard0.setVisible(true);
         } else {
-            this.changeSpriteImage(this.privateCard0, s_p_empty);
+            this.changeSpriteImage(this.privateCard0, this.pokerEmptyFrame);
             this.privateCard0.setVisible(false);
         }
         if (this.player.privateCards[1]) {
             if (this.player.folded) {
-                this.changeSpriteImage(this.privateCard1, s_p_back);
+                this.changeSpriteImage(this.privateCard1, this.pokerBackFrame);
             } else {
-                this.changeSpriteImage(this.privateCard1, pokerMap.get(this.player.privateCards[1]));
+                this.changeSpriteImage(this.privateCard1, this.pokerFrames.get(this.player.privateCards[1]));
             }
 
             this.privateCard1.setVisible(true);
         } else {
-            this.changeSpriteImage(this.privateCard1, s_p_empty);
+            this.changeSpriteImage(this.privateCard1, this.pokerEmptyFrame);
             this.privateCard1.setVisible(false);
         }
     },
@@ -453,14 +466,57 @@ var PlayerLayer = cc.Layer.extend({
         if (this.player) {
             this.nameLabel.setString(this.player.displayName);
             var avatarIndex = this.player.avatarId || 0;
-            this.changeSpriteImage(this.avatar, avatars[avatarIndex]);
+            this.changeSpriteImage(this.avatar, this.avatarFrames[avatarIndex]);
         }
     },
 
     // UI helpers
-    changeSpriteImage: function(sprite, src) {
-        var frame = cc.SpriteFrame.create(src, cc.rect(0, 0,
-            sprite.getContentSize().width, sprite.getContentSize().height));
-        sprite.setSpriteFrame(frame);
+    initializeAltFrames: function() {
+        this.nameHighLightFrame = cc.SpriteFrame.create(this.nameHighLight, cc.rect(0, 0,
+            this.namePanel.getContentSize().width, this.namePanel.getContentSize().height));
+
+        this.avatarHighLightFrame = cc.SpriteFrame.create(this.avatarHighLight, cc.rect(0, 0,
+            this.avatarPanel.getContentSize().width, this.avatarPanel.getContentSize().height));
+
+        this.nameNormalFrame = cc.SpriteFrame.create(this.nameNormal, cc.rect(0, 0,
+            this.namePanel.getContentSize().width, this.namePanel.getContentSize().height));
+
+        this.avatarNormalFrame = cc.SpriteFrame.create(this.avatarNormal, cc.rect(0, 0,
+            this.avatarPanel.getContentSize().width, this.avatarPanel.getContentSize().height));
+
+        var index;
+        for (index = 0; index < avatars.length; index++) {
+            this.avatarFrames[index] = cc.SpriteFrame.create(avatars[index], cc.rect(0, 0,
+                this.avatar.getContentSize().width, this.avatar.getContentSize().height));
+        }
+
+        this.pokerBackFrame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
+            this.privateCard0.getContentSize().width, this.privateCard0.getContentSize().height));
+
+        this.pokerEmptyFrame = cc.SpriteFrame.create(s_p_empty, cc.rect(0, 0,
+            this.privateCard0.getContentSize().width, this.privateCard0.getContentSize().height));
+
+        var pokerKeys = pokerMap.keys();
+        this.pokerFrames = new Map();
+        for (index = 0; index < pokerKeys.length; index++) {
+            var pokerFrame = cc.SpriteFrame.create(pokerMap.get(pokerKeys[index]), cc.rect(0, 0,
+                this.privateCard0.getContentSize().width, this.privateCard0.getContentSize().height));
+            this.pokerFrames.set(pokerKeys[index], pokerFrame);
+        }
+
+        this.actionEmptyFrame = cc.SpriteFrame.create(action_empty, cc.rect(0, 0,
+            this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
+
+        var actionKeys = this.actionMap.keys();
+        this.actionFrames = new Map();
+        for (index = 0; index < actionKeys.length; index++) {
+            var actionFrame = cc.SpriteFrame.create(this.actionMap.get(actionKeys[index]), cc.rect(0, 0,
+                this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
+            this.actionFrames.set(actionKeys[index], actionFrame);
+        }
+    },
+
+    changeSpriteImage: function(sprite, srcFrame) {
+        sprite.setSpriteFrame(srcFrame);
     }
 });

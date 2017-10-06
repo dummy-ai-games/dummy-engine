@@ -403,10 +403,12 @@ var BoardLayer = cc.Layer.extend({
     },
 
     updatePlayer: function(playerLayer, player, show) {
-        playerLayer.setPlayer(player);
-        playerLayer.setVisible(show);
-        if (show) {
-            playerLayer.update();
+        if (playerLayer) {
+            playerLayer.setPlayer(player);
+            playerLayer.setVisible(show);
+            if (show) {
+                playerLayer.update();
+            }
         }
     }
 });
