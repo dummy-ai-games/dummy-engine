@@ -163,7 +163,7 @@ var PlayerLayer = cc.Layer.extend({
 
             // add chips label
             this.chipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
-            this.chipsLabel.setColor(cc.color(255, 255, 0, 255));
+            this.chipsLabel.setColor(cc.color(255, 255, 255, 255));
             this.chipsLabel.setAnchorPoint(0, 0);
             this.chipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
@@ -483,9 +483,9 @@ var PlayerLayer = cc.Layer.extend({
         }
 
         if (this.player.isSmallBlind) {
-            this.blindLabel.setString('Small Blind');
+            this.blindLabel.setString('SB : ' + currentSmallBlind);
         } else if (this.player.isBigBlind) {
-            this.blindLabel.setString('Big Blind');
+            this.blindLabel.setString('BB : ' + currentBigBlind);
         } else {
             this.blindLabel.setString('');
         }
