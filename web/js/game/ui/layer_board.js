@@ -342,13 +342,14 @@ var BoardLayer = cc.Layer.extend({
     // board layer updater
     updatePlayers: function() {
         var playerIndex;
-        // refresh all player layer
-        for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
-            this.updatePlayer(this.playerLayers[playerIndex], null, false);
-        }
+        // update all player layer
         if (players) {
             for (playerIndex = 0; playerIndex < players.length; playerIndex++) {
                 this.updatePlayer(this.playerLayers[playerIndex], players[playerIndex], true);
+            }
+        } else {
+            for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+                this.updatePlayer(this.playerLayers[playerIndex], null, false);
             }
         }
     },
@@ -396,7 +397,9 @@ var BoardLayer = cc.Layer.extend({
 
     updatePlayer: function(playerLayer, player, show) {
         if (playerLayer) {
-            playerLayer.setPlayer(player);
+            if (!playerLayer.player) {
+                playerLayer.setPlayer(player);
+            }
             playerLayer.setVisible(show);
             if (show) {
                 playerLayer.update();
@@ -422,6 +425,8 @@ var BoardLayer = cc.Layer.extend({
     },
 
     changeSpriteImage: function(sprite, srcFrame) {
-        sprite.setSpriteFrame(srcFrame);
+        if (sprite) {
+            sprite.setSpriteFrame(srcFrame);
+        }
     }
 });

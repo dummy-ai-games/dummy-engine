@@ -470,6 +470,10 @@ var PlayerLayer = cc.Layer.extend({
                 this.currentChipLevel = Math.min(this.maxChipLevel,
                     Math.ceil(this.player.accumulate / (100 * currentPlayers)));
             }
+
+            if (this.player.playerName === 'bobi') {
+                cc.log('acc = ' + this.currentChipLevel);
+            }
             for (var betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
                 if (betChipIndex < this.currentChipLevel) {
                     this.betChips[betChipIndex].setVisible(true);
@@ -522,7 +526,7 @@ var PlayerLayer = cc.Layer.extend({
         }
 
         // update private cards
-        if (this.player.privateCards[0]) {
+        if (this.player.privateCards[0] && this.player.isSurvive) {
             if (this.player.folded) {
                 this.changeSpriteImage(this.privateCard0, this.pokerBackFrame);
             } else {
@@ -534,7 +538,7 @@ var PlayerLayer = cc.Layer.extend({
             this.changeSpriteImage(this.privateCard0, this.pokerEmptyFrame);
             this.privateCard0.setVisible(false);
         }
-        if (this.player.privateCards[1]) {
+        if (this.player.privateCards[1] && this.player.isSurvive) {
             if (this.player.folded) {
                 this.changeSpriteImage(this.privateCard1, this.pokerBackFrame);
             } else {
