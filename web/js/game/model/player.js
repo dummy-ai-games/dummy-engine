@@ -22,6 +22,7 @@ var Player = function(_id, _playerName, _displayName, _chips, _isSurvive, _reloa
     this.avatarId = avatarId || 0;
     this.fold = false;
     this.allin = false;
+    this.takeAction = false;
 };
 
 Player.prototype.setId = function(_id) {
@@ -89,6 +90,10 @@ Player.prototype.setFolded = function(_folded) {
 
 Player.prototype.setAllin = function(_allin) {
     this.allin = _allin;
+};
+
+Player.prototype.setTakeAction = function(_takeActoin) {
+    this.takeAction = _takeActoin;
 };
 
 // avatar hash helper

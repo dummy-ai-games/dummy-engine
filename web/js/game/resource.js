@@ -16,14 +16,19 @@ var s_avatar_panel_right = "./res/images/game_board/bg_avatar_right.png";
 var s_name_panel_right = "./res/images/game_board/bg_name_right.png";
 var s_avatar_panel_right_hl = "./res/images/game_board/bg_avatar_right_hl.png";
 var s_name_panel_right_hl = "./res/images/game_board/bg_name_right_hl.png";
+var s_avatar_mask_right = "./res/images/game_board/bg_avatar_right_mask.png";
+var s_name_mask_right = "./res/images/game_board/bg_name_right_mask.png";
 
 var s_avatar_panel_left = "./res/images/game_board/bg_avatar_left.png";
 var s_name_panel_left = "./res/images/game_board/bg_name_left.png";
 var s_avatar_panel_left_hl = "./res/images/game_board/bg_avatar_left_hl.png";
 var s_name_panel_left_hl = "./res/images/game_board/bg_name_left_hl.png";
+var s_avatar_mask_left = "./res/images/game_board/bg_avatar_left_mask.png";
+var s_name_mask_left = "./res/images/game_board/bg_name_left_mask.png";
 
 var s_chips = "./res/images/game_board/chips.png";
 
+// dealer images
 var s_start_button = "./res/images/game_board/start_button.png";
 var s_start_button_pressed = "./res/images/game_board/start_button_pressed.png";
 var s_start_button_disabled = "./res/images/game_board/start_button_disabled.png";
@@ -149,6 +154,10 @@ var action_call_left = "./res/images/game_board/action_left_call.png";
 var action_check_left = "./res/images/game_board/action_left_check.png";
 var action_fold_left = "./res/images/game_board/action_left_fold.png";
 var action_raise_left = "./res/images/game_board/action_left_raise.png";
+var action_sb_left = "./res/images/game_board/action_left_sb.png";
+var action_bb_left = "./res/images/game_board/action_left_bb.png";
+var action_sb_right = "./res/images/game_board/action_right_sb.png";
+var action_bb_right = "./res/images/game_board/action_right_bb.png";
 
 var actionLeftMap = new Map();
 actionLeftMap.set("allin", action_allin);
@@ -205,10 +214,14 @@ var resources = [
     s_name_panel_right,
     s_avatar_panel_right_hl,
     s_name_panel_right_hl,
+    s_avatar_mask_right,
+    s_name_mask_right,
     s_avatar_panel_left,
     s_name_panel_left,
     s_avatar_panel_left_hl,
     s_name_panel_left_hl,
+    s_avatar_mask_left,
+    s_name_mask_left,
     s_chips,
     s_tm_logo,
     s_start_button,
@@ -298,4 +311,8 @@ var resources = [
     action_call_right,
     action_check_right,
     action_fold_right,
-    action_raise_right];
+    action_raise_right,
+    action_sb_left,
+    action_bb_left,
+    action_sb_right,
+    action_bb_right];

@@ -6,10 +6,12 @@
 var PlayerLayer = cc.Layer.extend({
 
     // constants
-    nameFont: '微软雅黑',
-    nameTextSize: 20,
-    chipsFont: 'Impact',
+    nameFont: 'Tw Cen MT',
+    nameTextSize: 24,
+    chipsFont: 'Tw Cen MT',
     chipsTextSize: 18,
+    blindFont: 'IMPACT',
+    blindTextSize: 18,
     debug: true,
     maxChipLevel: 10,
 
@@ -20,6 +22,8 @@ var PlayerLayer = cc.Layer.extend({
     playerType: PLAYER_AT_LEFT,
     player: null,
     actionMap: null,
+    actionSB: null,
+    actionBB: null,
     nameNormal: null,
     avatarNormal: null,
     nameHighLight: null,
@@ -35,8 +39,13 @@ var PlayerLayer = cc.Layer.extend({
     // sprites
     avatarPanel: null,
     namePanel: null,
+    avatarMask: null,
+    nameMask: null,
     avatar: null,
-    betChips: [],
+    betChips0: null,
+    betChips1: null,
+    betChips2: null,
+    betChips3: null,
     actionPanel: null,
     privateCard0: null,
     privateCard1: null,
@@ -45,7 +54,8 @@ var PlayerLayer = cc.Layer.extend({
     nameLabel: null,
     chipsLabel: null,
     betChipsLabel: null,
-    ccChipsLabel: null,
+    accChipsLabel: null,
+    blindLabel: null,
 
     // menus
 
@@ -61,13 +71,18 @@ var PlayerLayer = cc.Layer.extend({
     chipsHorizontalGap: 0,
     chipsVerticalGap: 20,
     actionPanelGap: 10,
+    accMargin: 18,
     betChipsLabelMarginLeft: 5,
     privateCardsMarginBottom: 36,
     cardVisualHeight: 100,
     cardVisualWidth: 72,
     cardMargin: 48,
+    accLabelMarginTop: 8,
+    betLabelMoveDistance: 10,
+    accWidth: 128,
+    accHeight: 32,
 
-    // alternative frames
+    // pre-loaded frames
     nameHighLightFrame: null,
     avatarHighLightFrame: null,
     nameNormalFrame: null,
@@ -78,6 +93,8 @@ var PlayerLayer = cc.Layer.extend({
     pokerEmptyFrame: null,
     actionFrames: null,
     actionEmptyFrame: null,
+    actionSBFrame: null,
+    actionBBFrame: null,
 
     // constructor
     ctor: function (playerType) {
@@ -112,11 +129,18 @@ var PlayerLayer = cc.Layer.extend({
             this.avatarScale = this.avatarWidth / this.avatar.getContentSize().width;
             avatarGap = (this.avatarPanelWidth - this.avatarWidth) / 2;
             this.avatar
-                .setPosition(this.avatarPanel.getPositionX() + this.avatarPanelLeftPadding + avatarGap,
+                .setPosition(this.avatarPanel.getPositionX() + this.avatarPanelLeftPadding + avatarGap - 3,
                     this.avatarPanelBottomPadding + avatarGap);
 
             this.avatar.setScale(this.avatarScale);
-            this.addChild(this.avatar, 2);
+            this.addChild(this.avatar, 3);
+
+            // add avatar mask
+            this.avatarMask = cc.Sprite.create(s_avatar_mask_right);
+            this.avatarMask.setAnchorPoint(0, 0);
+            this.avatarMask.setPosition(0, 0);
+            this.avatarMask.setVisible(false);
+            this.addChild(this.avatarMask, 4);
 
             // add name panel
             this.namePanel = cc.Sprite.create(s_name_panel_right);
@@ -127,46 +151,46 @@ var PlayerLayer = cc.Layer.extend({
             // add name label
             this.nameLabel = new cc.LabelTTF('', this.nameFont, this.nameTextSize);
             this.nameLabel.setColor(cc.color(0, 255, 255, 255));
-
             this.nameLabel.setAnchorPoint(0, 0);
             this.nameLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.nameLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.nameLabel.boundingWidth = this.namePanel.getContentSize().width - this.avatarPanelLeftPadding;
             this.nameLabel.boundingHeight =
                 (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
-
             this.nameLabel.setPosition(this.namePanel.getPositionX(),
                 this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 4);
             this.addChild(this.nameLabel, 3);
 
             // add chips label
             this.chipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
-            this.chipsLabel.setColor(cc.color(255, 255, 255, 255));
-
+            this.chipsLabel.setColor(cc.color(255, 255, 0, 255));
             this.chipsLabel.setAnchorPoint(0, 0);
             this.chipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.boundingWidth = this.namePanel.getContentSize().width - this.avatarPanelLeftPadding;
             this.chipsLabel.boundingHeight =
                 (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
-
             this.chipsLabel.setPosition(this.namePanel.getPositionX(),
                 (this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 2) / 4);
             this.addChild(this.chipsLabel, 3);
 
+            // add name mask
+            this.nameMask = cc.Sprite.create(s_name_mask_right);
+            this.nameMask.setAnchorPoint(0, 0);
+            this.nameMask.setPosition(this.avatarPanel.getContentSize().width + this.avatarNameGap, 0);
+            this.nameMask.setVisible(false);
+            this.addChild(this.nameMask, 4);
+
             // add bet chips sprite
+            this.betChips = [];
             for (betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
                 this.betChips[betChipIndex] = cc.Sprite.create(s_chips);
                 this.betChips[betChipIndex].setAnchorPoint(0, 0);
                 this.betChips[betChipIndex].setPosition(this.avatarPanel.getPositionX() -
                     (this.betChips[betChipIndex].getContentSize().width + this.chipsHorizontalGap),
                     this.chipsVerticalGap + (betChipIndex * 3));
+                this.betChips[betChipIndex].setVisible(false);
                 this.addChild(this.betChips[betChipIndex], 6 + betChipIndex);
-                if (betChipIndex < this.currentChipLevel) {
-                    this.betChips[betChipIndex].setVisible(true);
-                } else {
-                    this.betChips[betChipIndex].setVisible(false);
-                }
             }
 
             // add acc chips
@@ -175,15 +199,28 @@ var PlayerLayer = cc.Layer.extend({
             this.accChipsLabel.setAnchorPoint(0, 0);
             this.accChipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.accChipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-            this.accChipsLabel.setPosition(this.betChips[this.currentChipLevel].getPositionX() +
-                (this.betChips[this.currentChipLevel].getContentSize().width -
-                    this.accChipsLabel.getContentSize().width) / 2,
+            this.accChipsLabel.setPosition(this.betChips[0].getPositionX() +
+                (this.betChips[0].getContentSize().width -
+                    this.accChipsLabel.getContentSize().width) / 2 - this.accMargin,
                         this.betChips[0].getPositionY() -
-                        this.betChips[0].getContentSize().height / 2);
+                        this.betChips[0].getContentSize().height / 2 - this.accLabelMarginTop);
             this.addChild(this.accChipsLabel, 7);
+
+            // add blind label
+            this.blindLabel = new cc.LabelTTF('', this.blindFont, this.blindTextSize);
+            this.blindLabel.setColor(cc.color(255, 128, 0, 255));
+            this.blindLabel.setAnchorPoint(0, 0);
+            this.blindLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.blindLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.blindLabel.setPosition(this.namePanel.getPositionX(),
+                this.betChips[0].getPositionY() -
+                this.betChips[0].getContentSize().height / 2 - this.accLabelMarginTop);
+            this.addChild(this.blindLabel, 7);
 
             // add action panel
             this.actionMap = actionRightMap;
+            this.actionSB = action_sb_right;
+            this.actionBB = action_bb_right;
             this.nameNormal = s_name_panel_right;
             this.nameHighLight = s_name_panel_right_hl;
             this.avatarNormal = s_avatar_panel_right;
@@ -206,10 +243,9 @@ var PlayerLayer = cc.Layer.extend({
             this.betChipsLabel
                 .setPosition(this.actionPanel.getPositionX(),
                     this.actionPanel.getPositionY() + this.actionPanel.getContentSize().height);
-            this.addChild(this.betChipsLabel, 6 + this.currentChipLevel);
+            this.addChild(this.betChipsLabel, 20);
 
             // add private cards
-
             this.privateCard0 = cc.Sprite.create(s_p_back);
             this.privateCard0.setAnchorPoint(0, 0);
             this.cardsScale =
@@ -256,19 +292,24 @@ var PlayerLayer = cc.Layer.extend({
             this.addChild(this.nameLabel, 3);
 
             // add chips label
-            this.chipsLabel = new cc.LabelTTF('1000', this.chipsFont, this.chipsTextSize);
+            this.chipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
             this.chipsLabel.setColor(cc.color(255, 255, 255, 255));
-
             this.chipsLabel.setAnchorPoint(0, 0);
             this.chipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.boundingWidth = this.namePanel.getContentSize().width - this.avatarPanelLeftPadding;
             this.chipsLabel.boundingHeight =
                 (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
-
             this.chipsLabel.setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding,
                 (this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 2) / 4);
             this.addChild(this.chipsLabel, 3);
+
+            // add name mask
+            this.nameMask = cc.Sprite.create(s_name_mask_left);
+            this.nameMask.setAnchorPoint(0, 0);
+            this.nameMask.setPosition(0, 0);
+            this.nameMask.setVisible(false);
+            this.addChild(this.nameMask, 4);
 
             // add avatar panel
             this.avatarPanel = cc.Sprite.create(s_avatar_panel_left);
@@ -285,23 +326,26 @@ var PlayerLayer = cc.Layer.extend({
             this.avatar
                 .setPosition(this.avatarPanel.getPositionX() + avatarGap,
                     this.avatarPanelBottomPadding + avatarGap);
-
             this.avatar.setScale(this.avatarScale);
             this.addChild(this.avatar, 3);
 
+            // add avatar mask
+            this.avatarMask = cc.Sprite.create(s_avatar_mask_left);
+            this.avatarMask.setAnchorPoint(0, 0);
+            this.avatarMask.setPosition(this.namePanel.getContentSize().width + this.avatarNameGap, 0);
+            this.avatarMask.setVisible(false);
+            this.addChild(this.avatarMask, 4);
+
             // add bet chips sprite
+            this.betChips = [];
             for (betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
                 this.betChips[betChipIndex] = cc.Sprite.create(s_chips);
                 this.betChips[betChipIndex].setAnchorPoint(0, 0);
                 this.betChips[betChipIndex].setPosition(this.avatarPanel.getPositionX() +
                     this.avatarPanel.getContentSize().width + this.chipsHorizontalGap,
                     this.chipsVerticalGap + (betChipIndex * 3));
+                this.betChips[betChipIndex].setVisible(false);
                 this.addChild(this.betChips[betChipIndex], 4 + betChipIndex);
-                if (betChipIndex < this.currentChipLevel) {
-                    this.betChips[betChipIndex].setVisible(true);
-                } else {
-                    this.betChips[betChipIndex].setVisible(false);
-                }
             }
 
             // add acc chips
@@ -310,15 +354,28 @@ var PlayerLayer = cc.Layer.extend({
             this.accChipsLabel.setAnchorPoint(0, 0);
             this.accChipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.accChipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-            this.accChipsLabel.setPosition(this.betChips[this.currentChipLevel].getPositionX() +
-                (this.betChips[this.currentChipLevel].getContentSize().width -
-                    this.accChipsLabel.getContentSize().width) / 2,
+            this.accChipsLabel.setPosition(this.betChips[0].getPositionX() +
+                (this.betChips[0].getContentSize().width -
+                    this.accChipsLabel.getContentSize().width) / 2 - this.accMargin,
                 this.betChips[0].getPositionY() -
-                this.betChips[0].getContentSize().height / 2);
+                this.betChips[0].getContentSize().height / 2 - this.accLabelMarginTop);
             this.addChild(this.accChipsLabel, 7);
+
+            // add blind label
+            this.blindLabel = new cc.LabelTTF('', this.blindFont, this.blindTextSize);
+            this.blindLabel.setColor(cc.color(255, 128, 0, 255));
+            this.blindLabel.setAnchorPoint(0, 0);
+            this.blindLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.blindLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.blindLabel.setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding,
+                this.betChips[0].getPositionY() -
+                this.betChips[0].getContentSize().height / 2 - this.accLabelMarginTop);
+            this.addChild(this.blindLabel, 7);
 
             // add action panel
             this.actionMap = actionLeftMap;
+            this.actionSB = action_sb_left;
+            this.actionBB = action_bb_left;
             this.nameNormal = s_name_panel_left;
             this.nameHighLight = s_name_panel_left_hl;
             this.avatarNormal = s_avatar_panel_left;
@@ -341,7 +398,7 @@ var PlayerLayer = cc.Layer.extend({
             this.betChipsLabel
                 .setPosition(this.actionPanel.getPositionX(),
                     this.actionPanel.getPositionY() + this.actionPanel.getContentSize().height);
-            this.addChild(this.betChipsLabel, 6 + this.currentChipLevel);
+            this.addChild(this.betChipsLabel, 20);
 
             // add private cards
             this.privateCard0 = cc.Sprite.create(s_p_back);
@@ -368,6 +425,7 @@ var PlayerLayer = cc.Layer.extend({
                     this.namePanel.getPositionY() + this.privateCardsMarginBottom);
             this.addChild(this.privateCard1, 0);
         }
+
         this.initializeAltFrames();
     },
 
@@ -388,17 +446,30 @@ var PlayerLayer = cc.Layer.extend({
             return;
         }
 
+        // update player survival
+        if (!this.player.isSurvive) {
+            this.nameMask.setVisible(true);
+            this.avatarMask.setVisible(true);
+        } else {
+            this.nameMask.setVisible(false);
+            this.avatarMask.setVisible(false);
+        }
+
         // update chips
-        this.chipsLabel.setString(this.player.chips);
+        this.chipsLabel.setString('$'+ this.player.chips);
 
         // update accumulate
         if (this.player.accumulate > 0) {
-            var accString = '$ ' + this.player.accumulate;
+            var accString = '$'+ this.player.accumulate;
             this.accChipsLabel.setString(accString);
 
             // update chip sprites
-            this.currentChipLevel = Math.min(this.maxChipLevel, Math.ceil(this.player.accumulate / 1000));
-            // console.log('player ' + this.player.playerName + ' acc level = ' + this.currentChipLevel);
+            if (0 === this.player.accumulate) {
+                this.currentChipLevel = 0;
+            } else {
+                this.currentChipLevel = Math.min(this.maxChipLevel,
+                    Math.ceil(this.player.accumulate / (100 * currentPlayers)));
+            }
             for (var betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
                 if (betChipIndex < this.currentChipLevel) {
                     this.betChips[betChipIndex].setVisible(true);
@@ -410,11 +481,29 @@ var PlayerLayer = cc.Layer.extend({
             this.accChipsLabel.setString('');
         }
 
+        if (this.player.isSmallBlind) {
+            this.blindLabel.setString('Small Blind');
+        } else if (this.player.isBigBlind) {
+            this.blindLabel.setString('Big Blind');
+        } else {
+            this.blindLabel.setString('');
+        }
+
         // update action
         if (this.player.action !== '') {
             this.changeSpriteImage(this.actionPanel, this.actionFrames.get(this.player.action));
         } else {
-            this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
+            if (!this.player.takeAction) {
+                if (this.player.isSmallBlind) {
+                    this.changeSpriteImage(this.actionPanel, this.actionSBFrame);
+                } else if (this.player.isBigBlind) {
+                    this.changeSpriteImage(this.actionPanel, this.actionBBFrame);
+                } else {
+                    this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
+                }
+            } else {
+                this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
+            }
         }
 
         if (this.player.inTurn) {
@@ -505,6 +594,12 @@ var PlayerLayer = cc.Layer.extend({
         }
 
         this.actionEmptyFrame = cc.SpriteFrame.create(action_empty, cc.rect(0, 0,
+            this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
+
+        this.actionSBFrame = cc.SpriteFrame.create(this.actionSB, cc.rect(0, 0,
+            this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
+
+        this.actionBBFrame = cc.SpriteFrame.create(this.actionBB, cc.rect(0, 0,
             this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
 
         var actionKeys = this.actionMap.keys();

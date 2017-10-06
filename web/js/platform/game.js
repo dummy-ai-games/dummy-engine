@@ -30,7 +30,6 @@ var currentPlayers = 0;
 
 var defaultInitChips = 1000;
 var publicCards = [];
-var currentPublicCards = 0;
 
 var currentSmallBlind = 0;
 var currentBigBlind = 0;
@@ -179,6 +178,7 @@ function initWebsock() {
             roundAction.action === 'call') {
             // update in game engine
             if (playerIndex !== -1) {
+                players[playerIndex].setTakeAction(true);
                 players[playerIndex].setAction(roundAction.action);
                 if (roundAction.action === 'fold') {
                     players[playerIndex].setBet(0);
@@ -187,6 +187,7 @@ function initWebsock() {
         } else {
             // update in game engine
             if (playerIndex !== -1) {
+                players[playerIndex].setTakeAction(true);
                 players[playerIndex].setAction(roundAction.action);
             }
         }
@@ -286,7 +287,7 @@ function updateGame(data, isNewRound) {
 
     // update table
     if (data.table) {
-        publicCards = [];
+        publicCards = [null, null, null, null, null];
         for (i = 0; i < data.table.board.length; i++) {
             publicCards[i] = data.table.board[i];
         }
@@ -311,10 +312,12 @@ function updateGame(data, isNewRound) {
 
             // reset action when received __new_round
             if (isNewRound) {
-                players[i].setAction("");
+                players[i].setAction('');
                 players[i].setBet(0);
                 players[i].setRoundBet(0);
                 players[i].setAccumulate(0);
+                players[i].setTakeAction(false);
+                console.log('player ' + players[i].playerName + ', acc = ' + players[i].accumulate);
             }
 
             players[i].setChips(data.players[i].chips);
@@ -323,8 +326,8 @@ function updateGame(data, isNewRound) {
             players[i].setAllin(data.players[i].allIn);
 
             if (data.table) {
-                players[i].setSmallBlind(players[i].name === data.table.smallBlind.playerName);
-                players[i].setBigBlind(players[i].name === data.table.bigBlind.playerName);
+                players[i].setSmallBlind(players[i].playerName === data.table.smallBlind.playerName);
+                players[i].setBigBlind(players[i].playerName === data.table.bigBlind.playerName);
             }
 
             // get float 1

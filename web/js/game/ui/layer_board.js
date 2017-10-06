@@ -6,7 +6,7 @@
 var BoardLayer = cc.Layer.extend({
 
     // constants
-    defaultFont: '微软雅黑',
+    defaultFont: 'Tw Cen MT',
     roundTextFont: 'IMPACT',
     roundTextSize: '50',
     authorTextFont: this.defaultFont,
@@ -15,10 +15,11 @@ var BoardLayer = cc.Layer.extend({
     maxPlayerCount: 10,
     maxPublicCardCount: 5,
 
-    // visualization variables
+    // game model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
+    publicCardsModel: [],
 
     // scales
     gameScale: 1.0,
@@ -89,6 +90,11 @@ var BoardLayer = cc.Layer.extend({
     controlMenuMarginLeft: 18,
     controlMenuMarginBottom: 680,
 
+    // pre-loaded frames
+    pokerFrames: null,
+    pokerBackFrame: null,
+    pokerEmptyFrame: null,
+
     // constructor
     ctor: function () {
         this._super();
@@ -137,7 +143,7 @@ var BoardLayer = cc.Layer.extend({
         var boardRealMarginLeft = (this.bgSprite.getContentSize().width - this.bgBoard.getContentSize().width) / 2
                 * this.gameScale;
         var boardRealMarginBottom = (this.bgSprite.getContentSize().height - this.bgBoard.getContentSize().height) / 2
-            * this.gameScale;
+                * this.gameScale;
         this.bgBoard.setScale(this.boardScale);
         this.bgBoard.setPosition(boardRealMarginLeft, boardRealMarginBottom);
         this.addChild(this.bgBoard, 2);
@@ -162,6 +168,7 @@ var BoardLayer = cc.Layer.extend({
 
         // initialize public cards
         var publicCardIndex;
+        this.publicCards = [];
         for (publicCardIndex = 0; publicCardIndex < this.maxPublicCardCount; publicCardIndex++) {
             this.publicCards[publicCardIndex] = cc.Sprite.create(s_p_back);
             this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
@@ -174,6 +181,9 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.publicCards[publicCardIndex], 2);
             this.publicCards[publicCardIndex].setVisible(false);
         }
+
+        // initialize alt frames
+        this.initializeAltFrames();
 
         // initialize round text
         this.roundLabel = new cc.LabelTTF('', this.roundTextFont, this.roundTextSize);
@@ -191,7 +201,8 @@ var BoardLayer = cc.Layer.extend({
         this.addChild(this.roundLabel, 2);
 
         // initialize author text
-        this.authorLabel = new cc.LabelTTF('Developer: Bobi.Zhou, JP.Yang, Teresa.Wu\r\n CDC Mobile Club 2017\r\n Engineering Camp 2017 Task Force',
+        this.authorLabel = new cc.LabelTTF('Developer: Bobi.Zhou, JP.Yang, Teresa.Wu\r\n ' +
+                    'CDC Mobile Club 2017\r\n Engineering Camp 2017 Task Force',
                 this.authorTextFont, this.authorTextSize);
         this.authorLabel.setColor(cc.color(255, 255, 255, 255));
         this.authorLabel.setAnchorPoint(0, 0);
@@ -270,7 +281,7 @@ var BoardLayer = cc.Layer.extend({
     },
 
     // game operations
-    update: function (dt) {
+    update: function () {
         this.doUpdate();
     },
 
@@ -283,20 +294,6 @@ var BoardLayer = cc.Layer.extend({
 
     removeAll: function() {
         this.reset();
-    },
-
-    gameFinished: function() {
-        console.log('game finished');
-    },
-
-    gameOver: function() {
-    },
-
-    // generic sprite animations
-    moveSprite: function (sprite, toPos, callback) {
-    },
-
-    cbSpriteMovingFinished: function(nodeExecutingAction, data) {
     },
 
     doUpdate: function() {
@@ -365,23 +362,14 @@ var BoardLayer = cc.Layer.extend({
             case STATUS_GAME_RUNNING:
                 this.roundLabel.setString('ROUND ' + currentRound);
                 // update public cards
-                var frame;
+                this.updatePublicCardsModel();
                 var publicCardIndex;
-                for (publicCardIndex = 0; publicCardIndex < this.publicCardMax; publicCardIndex++) {
-                    frame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
-                        this.publicCards[publicCardIndex].width,
-                            this.publicCards[publicCardIndex].height));
-                    this.publicCards[publicCardIndex].setSpriteFrame(frame);
-                }
-
-                // TODO: could not update public cards
-                for (publicCardIndex = 0; publicCardIndex < this.publicCardMax; publicCardIndex++) {
-                    if (publicCards[publicCardIndex]) {
-                        var cardName = pokerMap.get(publicCards[publicCardIndex]);
-                        frame = cc.SpriteFrame.create(cardName, cc.rect(0, 0,
-                            this.publicCards[publicCardIndex].width,
-                                this.publicCards[publicCardIndex].height));
-                        this.publicCards[publicCardIndex].setSpriteFrame(frame);
+                for (publicCardIndex = 0; publicCardIndex < this.maxPublicCardCount; publicCardIndex++) {
+                    if (this.publicCardsModel[publicCardIndex] === null) {
+                        this.changeSpriteImage(this.publicCards[publicCardIndex], this.pokerBackFrame);
+                    } else {
+                        this.changeSpriteImage(this.publicCards[publicCardIndex],
+                            this.pokerFrames.get(this.publicCardsModel[publicCardIndex]));
                     }
                     this.publicCards[publicCardIndex].setVisible(true);
                 }
@@ -394,6 +382,10 @@ var BoardLayer = cc.Layer.extend({
             default:
                 break;
         }
+    },
+
+    updatePublicCardsModel: function() {
+        this.publicCardsModel = publicCards;
     },
 
     // UI helpers
@@ -410,5 +402,26 @@ var BoardLayer = cc.Layer.extend({
                 playerLayer.update();
             }
         }
+    },
+
+    initializeAltFrames: function() {
+        var index;
+        this.pokerBackFrame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
+            this.publicCards[0].getContentSize().width, this.publicCards[0].getContentSize().height));
+
+        this.pokerEmptyFrame = cc.SpriteFrame.create(s_p_empty, cc.rect(0, 0,
+            this.publicCards[0].getContentSize().width, this.publicCards[0].getContentSize().height));
+
+        var pokerKeys = pokerMap.keys();
+        this.pokerFrames = new Map();
+        for (index = 0; index < pokerKeys.length; index++) {
+            var pokerFrame = cc.SpriteFrame.create(pokerMap.get(pokerKeys[index]), cc.rect(0, 0,
+                this.publicCards[0].getContentSize().width, this.publicCards[0].getContentSize().height));
+            this.pokerFrames.set(pokerKeys[index], pokerFrame);
+        }
+    },
+
+    changeSpriteImage: function(sprite, srcFrame) {
+        sprite.setSpriteFrame(srcFrame);
     }
 });

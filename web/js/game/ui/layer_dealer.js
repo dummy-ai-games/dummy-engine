@@ -1,15 +1,15 @@
 /**
  * Created by the-engine-team
- * 2017-10-05
+ * 2017-10-04
  */
 
 var DealerLayer = cc.LayerColor.extend({
 
     // constants
-    defaultFont: '微软雅黑',
+    defaultFont: 'Tw Cen MT',
     titleFont: 'IMPACT',
     titleTextSize: 64,
-    boardFont: '微软雅黑',
+    boardFont: 'Tw Cen MT',
     boardTextSize: 32,
     nameFont: 'IMPACT',
     nameTextSize: 32,
