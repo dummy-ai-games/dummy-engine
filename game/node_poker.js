@@ -58,6 +58,9 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
     this.eventEmitter.on('newRound', function () {
         logGame(that.tableNumber, 'new round : ' + that.roundCount);
+        // reset raise count and bet count
+        that.raiseCount = 0;
+        that.betCount = 0;
         getNextPlayer(that);
         takeAction(that, '__turn');
         var tempData = [];

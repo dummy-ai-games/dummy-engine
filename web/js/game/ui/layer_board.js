@@ -8,9 +8,11 @@ var BoardLayer = cc.Layer.extend({
     // constants
     defaultFont: 'Tw Cen MT',
     roundTextFont: 'IMPACT',
-    roundTextSize: '50',
-    authorTextFont: this.defaultFont,
-    authorTextSize: '12',
+    roundTextSize: '42',
+    authorTextFont: 'Tw Cen MT',
+    authorTextSize: '14',
+    boardTextFont: 'Tw Cen MT',
+    boardTextSize: '18',
     debug: true,
     maxPlayerCount: 10,
     maxPublicCardCount: 5,
@@ -41,6 +43,7 @@ var BoardLayer = cc.Layer.extend({
 
     // labels
     roundLabel: null,
+    boardLabel: null,
     authorLabel: null,
 
     // buttons
@@ -63,28 +66,31 @@ var BoardLayer = cc.Layer.extend({
     mmMarginTop: 20,
     playerPosition: [
         // players at right side
-        { x: 640, y: 560 },
-        { x: 840, y: 500 },
-        { x: 860, y: 340 },
-        { x: 840, y: 180 },
-        { x: 600, y: 100 },
+        { x: 640, y: 560, chipsYFix: -40, chipsXFix: 0 },
+        { x: 840, y: 500, chipsYFix: 0, chipsXFix: 0 },
+        { x: 860, y: 340, chipsYFix: 0, chipsXFix: 0 },
+        { x: 840, y: 180, chipsYFix: 40, chipsXFix: -30 },
+        { x: 600, y: 80, chipsYFix: 150, chipsXFix: 120 },
         // players at left side
-        { x: 280, y: 100 },
-        { x:  40, y: 180 },
-        { x:   0, y: 340 },
-        { x:  40, y: 500 },
-        { x: 240, y: 560 }
+        { x: 280, y: 80, chipsYFix: 150, chipsXFix: -120 },
+        { x:  40, y: 180, chipsYFix: 40, chipsXFix: 30 },
+        { x:  10, y: 340, chipsYFix: 0, chipsXFix: 0 },
+        { x:  40, y: 500, chipsYFix: 0, chipsXFix: 0 },
+        { x: 240, y: 560, chipsYFix: -40, chipsXFix: 0 }
     ],
     cardVisualHeight: 100,
     cardVisualWidth: 72,
-    cardMarginBottom: 280,
+    cardMarginBottom: 320,
     cardMarginLeft: [320, 400, 480, 560, 640],
-    roundTextWidth: 274,
-    roundTextHeight: 64,
+    roundTextWidth: 640,
+    roundTextHeight: 50,
     roundTextMarginBottom: 460,
+    boardTextWidth: 200,
+    boardTextHeight: 48,
+    boardTextMarginBottom: 420,
     authorTextWidth: 320,
     authorTextHeight: 48,
-    authorTextMarginBottom: 20,
+    authorTextMarginBottom: 0,
     logoMarginTop: 18,
     logoMarginRight: 36,
     controlMenuMarginLeft: 18,
@@ -150,12 +156,16 @@ var BoardLayer = cc.Layer.extend({
 
         // initialize players
         var playerIndex;
-        this.playerScale = this.gameScale * 0.9;
+        this.playerScale = this.gameScale * 0.8;
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
             if (playerIndex < 5) {
-                this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_RIGHT);
+                this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_RIGHT,
+                    this.playerPosition[playerIndex].chipsYFix,
+                    this.playerPosition[playerIndex].chipsXFix);
             } else {
-                this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_LEFT);
+                this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_LEFT,
+                    this.playerPosition[playerIndex].chipsYFix,
+                    this.playerPosition[playerIndex].chipsXFix);
             }
             this.playerLayers[playerIndex].init();
             this.playerLayers[playerIndex].setAnchorPoint(0, 0);
@@ -173,7 +183,7 @@ var BoardLayer = cc.Layer.extend({
             this.publicCards[publicCardIndex] = cc.Sprite.create(s_p_back);
             this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
             this.cardScale =
-                Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
+                0.8 * Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
                     this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.gameScale;
             this.publicCards[publicCardIndex].setScale(this.cardScale);
             this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.gameScale,
@@ -186,6 +196,7 @@ var BoardLayer = cc.Layer.extend({
         this.initializeAltFrames();
 
         // initialize round text
+        var shadowColor;
         this.roundLabel = new cc.LabelTTF('', this.roundTextFont, this.roundTextSize);
         this.roundLabel.setColor(cc.color(255, 255, 255, 255));
         this.roundLabel.setAnchorPoint(0, 0);
@@ -193,7 +204,7 @@ var BoardLayer = cc.Layer.extend({
         this.roundLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
         this.roundLabel.boundingWidth = this.roundTextWidth;
         this.roundLabel.boundingHeight = this.roundTextHeight;
-        var shadowColor = cc.color(128, 128, 128);
+        shadowColor = cc.color(128, 128, 128);
         this.roundLabel.enableShadow(shadowColor, cc.size(0, -4), 0);
         this.roundLabel.setScale(this.gameScale);
         this.roundLabel
@@ -202,9 +213,23 @@ var BoardLayer = cc.Layer.extend({
                         this.roundTextMarginBottom * this.gameScale);
         this.addChild(this.roundLabel, 2);
 
+        // initialize board text
+        this.boardLabel = new cc.LabelTTF('', this.boardTextFont, this.boardTextSize);
+        this.boardLabel.setColor(cc.color(255, 255, 255, 255));
+        this.boardLabel.setAnchorPoint(0, 0);
+        this.boardLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        this.boardLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.boardLabel.boundingWidth = this.boardTextWidth;
+        this.boardLabel.boundingHeight = this.boardTextHeight;
+        this.boardLabel.setScale(this.gameScale);
+        this.boardLabel
+            .setPosition((this.bgSprite.getContentSize().width - this.boardLabel.getContentSize().width) / 2
+                * this.gameScale,
+                this.boardTextMarginBottom * this.gameScale);
+        this.addChild(this.boardLabel, 2);
+
         // initialize author text
-        this.authorLabel = new cc.LabelTTF('Developer: Bobi.Zhou, JP.Yang, Teresa.Wu\r\n ' +
-                    'CDC Mobile Club 2017\r\n Engineering Camp 2017 Task Force',
+        this.authorLabel = new cc.LabelTTF('By\r\nEngineering Camp 2017 Task Force & CDC Mobile Club',
                 this.authorTextFont, this.authorTextSize);
         this.authorLabel.setColor(cc.color(255, 255, 255, 255));
         this.authorLabel.setAnchorPoint(0, 0);
@@ -358,11 +383,14 @@ var BoardLayer = cc.Layer.extend({
     updateBoard: function() {
         switch(gameStatus) {
             case STATUS_GAME_STANDBY:
-                this.roundLabel.setString('GET READY');
+                this.roundLabel.setString('BOARD ' + tableNumber + ' - GET READY');
                 break;
 
             case STATUS_GAME_RUNNING:
-                this.roundLabel.setString('ROUND ' + currentRound);
+                // update round info
+                this.roundLabel.setString('BOARD ' + tableNumber + ' - ROUND ' + currentRound);
+                this.boardLabel.setString(currentRoundName + ' - raise : ' + currentRaiseCount +
+                    ' bet : ' + currentBetCount);
                 // update public cards
                 this.updatePublicCardsModel();
                 var publicCardIndex;
@@ -379,7 +407,7 @@ var BoardLayer = cc.Layer.extend({
                 break;
 
             case STATUS_GAME_FINISHED:
-                this.roundLabel.setString('GAME OVER');
+                this.roundLabel.setString('BOARD ' + tableNumber + ' - GAME OVER');
                 break;
 
             default:

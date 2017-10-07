@@ -135,6 +135,7 @@ var DealerLayer = cc.LayerColor.extend({
 
         // initialize name labels
         var playerIndex;
+        this.playerLabels = [];
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
             this.playerLabels[playerIndex] = new cc.LabelTTF('',
                 this.nameFont, this.nameTextSize);

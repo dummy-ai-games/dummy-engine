@@ -20,7 +20,10 @@ var STATUS_GAME_FINISHED = 2;
 
 var gameStatus = STATUS_GAME_STANDBY;
 
+var currentRoundName = '';
 var currentRound = 1;
+var currentRaiseCount = 0;
+var currentBetCount = 0;
 
 var PLAYER_AT_LEFT = 0;
 var PLAYER_AT_RIGHT = 1;
@@ -75,7 +78,7 @@ function initPlayerInfo() {
 function initWebsock() {
     // initialize web communication
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0],
-            playerName,tableNumber);
+            playerName, tableNumber);
 
     rtc.on('__new_peer', function(data) {
         if (data) {
@@ -283,6 +286,9 @@ function updateGame(data, isNewRound) {
     // update round
     if (data.table && data.table.roundCount) {
         currentRound = data.table.roundCount;
+        currentRaiseCount = data.table.raiseCount;
+        currentBetCount = data.table.betCount;
+        currentRoundName = data.table.roundName;
     }
 
     // update table
@@ -317,7 +323,6 @@ function updateGame(data, isNewRound) {
                 players[i].setRoundBet(0);
                 players[i].setAccumulate(0);
                 players[i].setTakeAction(false);
-                console.log('player ' + players[i].playerName + ', acc = ' + players[i].accumulate);
             }
 
             players[i].setChips(data.players[i].chips);

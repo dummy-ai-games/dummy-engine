@@ -81,6 +81,8 @@ var PlayerLayer = cc.Layer.extend({
     betLabelMoveDistance: 10,
     accWidth: 128,
     accHeight: 32,
+    chipsYFix: 0,
+    chipsXFix: 0,
 
     // pre-loaded frames
     nameHighLightFrame: null,
@@ -97,9 +99,11 @@ var PlayerLayer = cc.Layer.extend({
     actionBBFrame: null,
 
     // constructor
-    ctor: function (playerType) {
+    ctor: function (playerType, chipsYFix, chipsXFix) {
         this._super();
         this.playerType = playerType;
+        this.chipsYFix = chipsYFix;
+        this.chipsXFix = chipsXFix;
     },
 
     // game initializer
@@ -150,7 +154,7 @@ var PlayerLayer = cc.Layer.extend({
 
             // add name label
             this.nameLabel = new cc.LabelTTF('', this.nameFont, this.nameTextSize);
-            this.nameLabel.setColor(cc.color(0, 255, 255, 255));
+            this.nameLabel.setColor(cc.color(255, 255, 255, 255));
             this.nameLabel.setAnchorPoint(0, 0);
             this.nameLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.nameLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
@@ -163,7 +167,7 @@ var PlayerLayer = cc.Layer.extend({
 
             // add chips label
             this.chipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
-            this.chipsLabel.setColor(cc.color(255, 255, 255, 255));
+            this.chipsLabel.setColor(cc.color(255, 255, 0, 255));
             this.chipsLabel.setAnchorPoint(0, 0);
             this.chipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
@@ -187,8 +191,8 @@ var PlayerLayer = cc.Layer.extend({
                 this.betChips[betChipIndex] = cc.Sprite.create(s_chips);
                 this.betChips[betChipIndex].setAnchorPoint(0, 0);
                 this.betChips[betChipIndex].setPosition(this.avatarPanel.getPositionX() -
-                    (this.betChips[betChipIndex].getContentSize().width + this.chipsHorizontalGap),
-                    this.chipsVerticalGap + (betChipIndex * 3));
+                    (this.betChips[betChipIndex].getContentSize().width + this.chipsHorizontalGap) + this.chipsXFix,
+                    this.chipsVerticalGap + (betChipIndex * 3) + this.chipsYFix);
                 this.betChips[betChipIndex].setVisible(false);
                 this.addChild(this.betChips[betChipIndex], 6 + betChipIndex);
             }
@@ -213,8 +217,7 @@ var PlayerLayer = cc.Layer.extend({
             this.blindLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.blindLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.blindLabel.setPosition(this.namePanel.getPositionX(),
-                this.betChips[0].getPositionY() -
-                this.betChips[0].getContentSize().height / 2 - this.accLabelMarginTop);
+                this.namePanel.getPositionY() - this.accLabelMarginTop);
             this.addChild(this.blindLabel, 7);
 
             // add action panel
@@ -280,7 +283,7 @@ var PlayerLayer = cc.Layer.extend({
 
             // add name label
             this.nameLabel = new cc.LabelTTF('', this.nameFont, this.nameTextSize);
-            this.nameLabel.setColor(cc.color(0, 255, 255, 255));
+            this.nameLabel.setColor(cc.color(255, 255, 255, 255));
             this.nameLabel.setAnchorPoint(0, 0);
             this.nameLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.nameLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
@@ -293,7 +296,7 @@ var PlayerLayer = cc.Layer.extend({
 
             // add chips label
             this.chipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
-            this.chipsLabel.setColor(cc.color(255, 255, 255, 255));
+            this.chipsLabel.setColor(cc.color(255, 255, 0, 255));
             this.chipsLabel.setAnchorPoint(0, 0);
             this.chipsLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.chipsLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
@@ -342,8 +345,8 @@ var PlayerLayer = cc.Layer.extend({
                 this.betChips[betChipIndex] = cc.Sprite.create(s_chips);
                 this.betChips[betChipIndex].setAnchorPoint(0, 0);
                 this.betChips[betChipIndex].setPosition(this.avatarPanel.getPositionX() +
-                    this.avatarPanel.getContentSize().width + this.chipsHorizontalGap,
-                    this.chipsVerticalGap + (betChipIndex * 3));
+                    this.avatarPanel.getContentSize().width + this.chipsHorizontalGap + this.chipsXFix,
+                    this.chipsVerticalGap + (betChipIndex * 3) + this.chipsYFix);
                 this.betChips[betChipIndex].setVisible(false);
                 this.addChild(this.betChips[betChipIndex], 4 + betChipIndex);
             }
@@ -368,8 +371,7 @@ var PlayerLayer = cc.Layer.extend({
             this.blindLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.blindLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.blindLabel.setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding,
-                this.betChips[0].getPositionY() -
-                this.betChips[0].getContentSize().height / 2 - this.accLabelMarginTop);
+                this.namePanel.getPositionY() - this.accLabelMarginTop);
             this.addChild(this.blindLabel, 7);
 
             // add action panel
