@@ -156,7 +156,7 @@ var BoardLayer = cc.Layer.extend({
 
         // initialize players
         var playerIndex;
-        this.playerScale = this.gameScale * 0.8;
+        this.playerScale = this.gameScale * 0.85;
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
             if (playerIndex < 5) {
                 this.playerLayers[playerIndex] = new PlayerLayer(PLAYER_AT_RIGHT,
@@ -229,7 +229,7 @@ var BoardLayer = cc.Layer.extend({
         this.addChild(this.boardLabel, 2);
 
         // initialize author text
-        this.authorLabel = new cc.LabelTTF('By\r\nEngineering Camp 2017 Task Force & CDC Mobile Club',
+        this.authorLabel = new cc.LabelTTF('Engineering Camp 2017 Task Force & CDC Mobile Club',
                 this.authorTextFont, this.authorTextSize);
         this.authorLabel.setColor(cc.color(255, 255, 255, 255));
         this.authorLabel.setAnchorPoint(0, 0);
@@ -303,21 +303,12 @@ var BoardLayer = cc.Layer.extend({
         this.winnerLayer.setVisible(false);
         this.addChild(this.winnerLayer, 100);
 
-        this.reset();
         this.scheduleUpdate();
     },
 
     // game operations
     update: function () {
         this.doUpdate();
-    },
-
-    reset: function() {
-
-    },
-
-    removeAll: function() {
-        this.reset();
     },
 
     doUpdate: function() {
@@ -343,7 +334,6 @@ var BoardLayer = cc.Layer.extend({
                 this.showLayer(this.dealerLayer, false);
                 this.showLayer(this.winnerLayer, true);
                 this.updateWinnerLayer();
-                // this.updateBoardLayer();
                 break;
 
             default:

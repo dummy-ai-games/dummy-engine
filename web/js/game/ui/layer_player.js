@@ -12,8 +12,11 @@ var PlayerLayer = cc.Layer.extend({
     chipsTextSize: 18,
     blindFont: 'IMPACT',
     blindTextSize: 18,
+    reloadFont: 'Arial',
+    reloadTextSize: '24',
     debug: true,
     maxChipLevel: 10,
+    maxReloadCount: 2,
 
     // game model variables
     size: null,
@@ -49,6 +52,8 @@ var PlayerLayer = cc.Layer.extend({
     actionPanel: null,
     privateCard0: null,
     privateCard1: null,
+    privateCardMask0: null,
+    privateCardMask1: null,
 
     // labels
     nameLabel: null,
@@ -56,6 +61,7 @@ var PlayerLayer = cc.Layer.extend({
     betChipsLabel: null,
     accChipsLabel: null,
     blindLabel: null,
+    reloadLabel: null,
 
     // menus
 
@@ -124,7 +130,7 @@ var PlayerLayer = cc.Layer.extend({
             this.avatarPanel = cc.Sprite.create(s_avatar_panel_right);
             this.avatarPanel.setAnchorPoint(0, 0);
             this.avatarPanel.setPosition(0, 0);
-            this.addChild(this.avatarPanel, 2);
+            this.addChild(this.avatarPanel, 4);
 
             // add avatar
             avatarIndex = 0;
@@ -137,20 +143,20 @@ var PlayerLayer = cc.Layer.extend({
                     this.avatarPanelBottomPadding + avatarGap);
 
             this.avatar.setScale(this.avatarScale);
-            this.addChild(this.avatar, 3);
+            this.addChild(this.avatar, 5);
 
             // add avatar mask
             this.avatarMask = cc.Sprite.create(s_avatar_mask_right);
             this.avatarMask.setAnchorPoint(0, 0);
             this.avatarMask.setPosition(0, 0);
             this.avatarMask.setVisible(false);
-            this.addChild(this.avatarMask, 4);
+            this.addChild(this.avatarMask, 6);
 
             // add name panel
             this.namePanel = cc.Sprite.create(s_name_panel_right);
             this.namePanel.setAnchorPoint(0, 0);
             this.namePanel.setPosition(this.avatarPanel.getContentSize().width + this.avatarNameGap, 0);
-            this.addChild(this.namePanel, 2);
+            this.addChild(this.namePanel, 4);
 
             // add name label
             this.nameLabel = new cc.LabelTTF('', this.nameFont, this.nameTextSize);
@@ -163,7 +169,7 @@ var PlayerLayer = cc.Layer.extend({
                 (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
             this.nameLabel.setPosition(this.namePanel.getPositionX(),
                 this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 4);
-            this.addChild(this.nameLabel, 3);
+            this.addChild(this.nameLabel, 5);
 
             // add chips label
             this.chipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
@@ -176,14 +182,14 @@ var PlayerLayer = cc.Layer.extend({
                 (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
             this.chipsLabel.setPosition(this.namePanel.getPositionX(),
                 (this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 2) / 4);
-            this.addChild(this.chipsLabel, 3);
+            this.addChild(this.chipsLabel, 5);
 
             // add name mask
             this.nameMask = cc.Sprite.create(s_name_mask_right);
             this.nameMask.setAnchorPoint(0, 0);
             this.nameMask.setPosition(this.avatarPanel.getContentSize().width + this.avatarNameGap, 0);
             this.nameMask.setVisible(false);
-            this.addChild(this.nameMask, 4);
+            this.addChild(this.nameMask, 6);
 
             // add bet chips sprite
             this.betChips = [];
@@ -194,7 +200,7 @@ var PlayerLayer = cc.Layer.extend({
                     (this.betChips[betChipIndex].getContentSize().width + this.chipsHorizontalGap) + this.chipsXFix,
                     this.chipsVerticalGap + (betChipIndex * 3) + this.chipsYFix);
                 this.betChips[betChipIndex].setVisible(false);
-                this.addChild(this.betChips[betChipIndex], 6 + betChipIndex);
+                this.addChild(this.betChips[betChipIndex], 7 + betChipIndex);
             }
 
             // add acc chips
@@ -220,6 +226,16 @@ var PlayerLayer = cc.Layer.extend({
                 this.namePanel.getPositionY() - this.accLabelMarginTop);
             this.addChild(this.blindLabel, 7);
 
+            // add reload label
+            this.reloadLabel = new cc.LabelTTF('', this.reloadFont, this.reloadTextSize);
+            this.reloadLabel.setColor(cc.color(0, 255, 63, 255));
+            this.reloadLabel.setAnchorPoint(0, 0);
+            this.reloadLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.reloadLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.reloadLabel.setPosition(this.avatarPanel.getPositionX() + this.avatarPanelLeftPadding,
+                this.avatarPanel.getPositionY() - this.accLabelMarginTop);
+            this.addChild(this.reloadLabel, 7);
+
             // add action panel
             this.actionMap = actionRightMap;
             this.actionSB = action_sb_right;
@@ -234,7 +250,7 @@ var PlayerLayer = cc.Layer.extend({
             this.actionPanel.setPosition(this.avatarPanel.getPositionX() - this.actionPanel.getContentSize().width / 2,
                 this.avatarPanel.getPositionY() +
                     this.avatarPanel.getContentSize().height - this.avatarPanelBottomPadding - this.actionPanelGap);
-            this.addChild(this.actionPanel, 22);
+            this.addChild(this.actionPanel, 21);
 
             // add bet chips
             this.betChipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
@@ -250,28 +266,47 @@ var PlayerLayer = cc.Layer.extend({
 
             // add private cards
             this.privateCard0 = cc.Sprite.create(s_p_back);
+            this.privateCardMask0 = cc.Sprite.create(s_p_mask);
             this.privateCard0.setAnchorPoint(0, 0);
+            this.privateCardMask0.setAnchorPoint(0, 0);
             this.cardsScale =
                 Math.max(this.cardVisualHeight / this.privateCard0.getContentSize().height,
                     this.cardVisualWidth / this.privateCard0.getContentSize().width);
             this.privateCard0.setScale(this.cardsScale);
+            this.privateCardMask0.setScale(this.cardsScale);
             this.privateCard0.setPosition(this.namePanel.getPositionX() + this.namePanel.getContentSize().width -
                 this.cardMargin - (this.privateCard0.getContentSize().width * this.cardsScale) -
                 this.avatarPanelLeftPadding,
                 this.namePanel.getPositionY() + this.privateCardsMarginBottom);
+            this.privateCardMask0.setPosition(this.namePanel.getPositionX() + this.namePanel.getContentSize().width -
+                this.cardMargin - (this.privateCard0.getContentSize().width * this.cardsScale) -
+                this.avatarPanelLeftPadding,
+                this.namePanel.getPositionY() + this.privateCardsMarginBottom);
             this.addChild(this.privateCard0, 0);
+            this.privateCardMask0.setVisible(false);
+            this.addChild(this.privateCardMask0, 1);
 
             this.privateCard1 = cc.Sprite.create(s_p_back);
+            this.privateCardMask1 = cc.Sprite.create(s_p_mask);
             this.privateCard1.setAnchorPoint(0, 0);
+            this.privateCardMask1.setAnchorPoint(0, 0);
             this.cardsScale =
                 Math.max(this.cardVisualHeight / this.privateCard1.getContentSize().height,
                     this.cardVisualWidth / this.privateCard1.getContentSize().width);
             this.privateCard1.setScale(this.cardsScale);
+            this.privateCardMask1.setScale(this.cardsScale);
             this.privateCard1.setPosition(this.namePanel.getPositionX() + this.namePanel.getContentSize().width -
                     (this.privateCard1.getContentSize().width * this.cardsScale) -
                     this.avatarPanelLeftPadding,
                     this.namePanel.getPositionY() + this.privateCardsMarginBottom);
-            this.addChild(this.privateCard1, 1);
+            this.privateCardMask1.setPosition(this.namePanel.getPositionX() + this.namePanel.getContentSize().width -
+                (this.privateCard1.getContentSize().width * this.cardsScale) -
+                this.avatarPanelLeftPadding,
+                this.namePanel.getPositionY() + this.privateCardsMarginBottom);
+
+            this.addChild(this.privateCard1, 2);
+            this.privateCardMask1.setVisible(false);
+            this.addChild(this.privateCardMask1, 3);
 
         } else if (this.playerType === PLAYER_AT_LEFT) {
 
@@ -279,7 +314,7 @@ var PlayerLayer = cc.Layer.extend({
             this.namePanel = cc.Sprite.create(s_name_panel_left);
             this.namePanel.setAnchorPoint(0, 0);
             this.namePanel.setPosition(0, 0);
-            this.addChild(this.namePanel, 2);
+            this.addChild(this.namePanel, 4);
 
             // add name label
             this.nameLabel = new cc.LabelTTF('', this.nameFont, this.nameTextSize);
@@ -292,7 +327,7 @@ var PlayerLayer = cc.Layer.extend({
                 (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
             this.nameLabel.setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding,
                 this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 4);
-            this.addChild(this.nameLabel, 3);
+            this.addChild(this.nameLabel, 5);
 
             // add chips label
             this.chipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
@@ -305,20 +340,20 @@ var PlayerLayer = cc.Layer.extend({
                 (this.namePanel.getContentSize().height - this.avatarPanelBottomPadding) / 2;
             this.chipsLabel.setPosition(this.namePanel.getPositionX() + this.avatarPanelLeftPadding,
                 (this.nameLabel.getContentSize().height + this.avatarPanelBottomPadding / 2) / 4);
-            this.addChild(this.chipsLabel, 3);
+            this.addChild(this.chipsLabel, 5);
 
             // add name mask
             this.nameMask = cc.Sprite.create(s_name_mask_left);
             this.nameMask.setAnchorPoint(0, 0);
             this.nameMask.setPosition(0, 0);
             this.nameMask.setVisible(false);
-            this.addChild(this.nameMask, 4);
+            this.addChild(this.nameMask, 6);
 
             // add avatar panel
             this.avatarPanel = cc.Sprite.create(s_avatar_panel_left);
             this.avatarPanel.setAnchorPoint(0, 0);
             this.avatarPanel.setPosition(this.namePanel.getContentSize().width + this.avatarNameGap, 0);
-            this.addChild(this.avatarPanel, 2);
+            this.addChild(this.avatarPanel, 4);
 
             // add avatar
             avatarIndex = 0;
@@ -330,14 +365,14 @@ var PlayerLayer = cc.Layer.extend({
                 .setPosition(this.avatarPanel.getPositionX() + avatarGap,
                     this.avatarPanelBottomPadding + avatarGap);
             this.avatar.setScale(this.avatarScale);
-            this.addChild(this.avatar, 3);
+            this.addChild(this.avatar, 5);
 
             // add avatar mask
             this.avatarMask = cc.Sprite.create(s_avatar_mask_left);
             this.avatarMask.setAnchorPoint(0, 0);
             this.avatarMask.setPosition(this.namePanel.getContentSize().width + this.avatarNameGap, 0);
             this.avatarMask.setVisible(false);
-            this.addChild(this.avatarMask, 4);
+            this.addChild(this.avatarMask, 6);
 
             // add bet chips sprite
             this.betChips = [];
@@ -348,7 +383,7 @@ var PlayerLayer = cc.Layer.extend({
                     this.avatarPanel.getContentSize().width + this.chipsHorizontalGap + this.chipsXFix,
                     this.chipsVerticalGap + (betChipIndex * 3) + this.chipsYFix);
                 this.betChips[betChipIndex].setVisible(false);
-                this.addChild(this.betChips[betChipIndex], 4 + betChipIndex);
+                this.addChild(this.betChips[betChipIndex], 7 + betChipIndex);
             }
 
             // add acc chips
@@ -374,6 +409,16 @@ var PlayerLayer = cc.Layer.extend({
                 this.namePanel.getPositionY() - this.accLabelMarginTop);
             this.addChild(this.blindLabel, 7);
 
+            // add reload label
+            this.reloadLabel = new cc.LabelTTF('', this.reloadFont, this.reloadTextSize);
+            this.reloadLabel.setColor(cc.color(0, 255, 63, 255));
+            this.reloadLabel.setAnchorPoint(0, 0);
+            this.reloadLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.reloadLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.reloadLabel.setPosition(this.avatarPanel.getPositionX(),
+                this.avatarPanel.getPositionY() - this.accLabelMarginTop);
+            this.addChild(this.reloadLabel, 7);
+
             // add action panel
             this.actionMap = actionLeftMap;
             this.actionSB = action_sb_left;
@@ -388,7 +433,7 @@ var PlayerLayer = cc.Layer.extend({
             this.actionPanel.setPosition(this.avatarPanel.getPositionX() + this.avatarPanel.getContentSize().width / 2,
                 this.avatarPanel.getPositionY() +
                 this.avatarPanel.getContentSize().height - this.avatarPanelBottomPadding - this.actionPanelGap);
-            this.addChild(this.actionPanel, 22);
+            this.addChild(this.actionPanel, 21);
 
             // add bet chips
             this.betChipsLabel = new cc.LabelTTF('', this.chipsFont, this.chipsTextSize);
@@ -404,28 +449,46 @@ var PlayerLayer = cc.Layer.extend({
 
             // add private cards
             this.privateCard0 = cc.Sprite.create(s_p_back);
+            this.privateCardMask0 = cc.Sprite.create(s_p_mask);
             this.privateCard0.setAnchorPoint(0, 0);
+            this.privateCardMask0.setAnchorPoint(0, 0);
             this.cardsScale =
                 Math.max(this.cardVisualHeight / this.privateCard0.getContentSize().height,
                     this.cardVisualWidth / this.privateCard0.getContentSize().width);
             this.privateCard0.setScale(this.cardsScale);
+            this.privateCardMask0.setScale(this.cardsScale);
             this.privateCard0
                 .setPosition(this.namePanel.getPositionX() +
                     this.avatarPanelLeftPadding,
                     this.namePanel.getPositionY() + this.privateCardsMarginBottom);
+            this.privateCardMask0
+                .setPosition(this.namePanel.getPositionX() +
+                    this.avatarPanelLeftPadding,
+                    this.namePanel.getPositionY() + this.privateCardsMarginBottom);
             this.addChild(this.privateCard0, 0);
+            this.privateCardMask0.setVisible(false);
+            this.addChild(this.privateCardMask0, 1);
 
             this.privateCard1 = cc.Sprite.create(s_p_back);
+            this.privateCardMask1 = cc.Sprite.create(s_p_mask);
             this.privateCard1.setAnchorPoint(0, 0);
+            this.privateCardMask1.setAnchorPoint(0, 0);
             this.cardsScale =
                 Math.max(this.cardVisualHeight / this.privateCard1.getContentSize().height,
                     this.cardVisualWidth / this.privateCard1.getContentSize().width);
             this.privateCard1.setScale(this.cardsScale);
+            this.privateCardMask1.setScale(this.cardsScale);
             this.privateCard1
                 .setPosition(this.namePanel.getPositionX() +
                     this.avatarPanelLeftPadding + this.cardMargin,
                     this.namePanel.getPositionY() + this.privateCardsMarginBottom);
-            this.addChild(this.privateCard1, 0);
+            this.privateCardMask1
+                .setPosition(this.namePanel.getPositionX() +
+                    this.avatarPanelLeftPadding + this.cardMargin,
+                    this.namePanel.getPositionY() + this.privateCardsMarginBottom);
+            this.addChild(this.privateCard1, 2);
+            this.privateCardMask1.setVisible(false);
+            this.addChild(this.privateCardMask1, 3);
         }
 
         this.initializeAltFrames();
@@ -457,6 +520,13 @@ var PlayerLayer = cc.Layer.extend({
             this.avatarMask.setVisible(false);
         }
 
+        // update player lost
+        if (!this.player.isLost) {
+            this.nameLabel.setColor(cc.color(255, 255, 255, 255));
+        } else {
+            this.nameLabel.setColor(cc.color(127, 127, 127, 255));
+        }
+
         // update chips
         this.chipsLabel.setString('$'+ this.player.chips);
 
@@ -484,6 +554,7 @@ var PlayerLayer = cc.Layer.extend({
             }
         }
 
+        // update blind flag
         if (this.player.isSmallBlind) {
             this.blindLabel.setString('SB : ' + currentSmallBlind);
         } else if (this.player.isBigBlind) {
@@ -492,12 +563,23 @@ var PlayerLayer = cc.Layer.extend({
             this.blindLabel.setString('');
         }
 
+        // update reload count flag
+        var reloadIndex;
+        var reloadCountLeft = this.maxReloadCount - this.player.reloadCount;
+        var reloadString = '';
+        for (reloadIndex = 0; reloadIndex < reloadCountLeft; reloadIndex++) {
+            reloadString += '■';
+        }
+        this.reloadLabel.setString(reloadString);
+
         // update action
         if (this.player.action !== '') {
             this.changeSpriteImage(this.actionPanel, this.actionFrames.get(this.player.action));
         } else {
-            if (!this.player.takeAction) {
-                if (this.player.isSmallBlind) {
+            if (!this.player.takeAction && !this.player.folded) {
+                if (this.player.folded) {
+                    this.changeSpriteImage(this.actionPanel, this.actionFrames.get('FOLD'));
+                } else if (this.player.isSmallBlind) {
                     this.changeSpriteImage(this.actionPanel, this.actionSBFrame);
                 } else if (this.player.isBigBlind) {
                     this.changeSpriteImage(this.actionPanel, this.actionBBFrame);
@@ -526,24 +608,24 @@ var PlayerLayer = cc.Layer.extend({
 
         // update private cards
         if (this.player.privateCards[0] && this.player.isSurvive) {
+            this.changeSpriteImage(this.privateCard0, this.pokerFrames.get(this.player.privateCards[0]));
             if (this.player.folded) {
-                this.changeSpriteImage(this.privateCard0, this.pokerBackFrame);
+                this.privateCardMask0.setVisible(true);
             } else {
-                this.changeSpriteImage(this.privateCard0, this.pokerFrames.get(this.player.privateCards[0]));
+                this.privateCardMask0.setVisible(false);
             }
-
             this.privateCard0.setVisible(true);
         } else {
             this.changeSpriteImage(this.privateCard0, this.pokerEmptyFrame);
             this.privateCard0.setVisible(false);
         }
         if (this.player.privateCards[1] && this.player.isSurvive) {
+            this.changeSpriteImage(this.privateCard1, this.pokerFrames.get(this.player.privateCards[1]));
             if (this.player.folded) {
-                this.changeSpriteImage(this.privateCard1, this.pokerBackFrame);
+                this.privateCardMask1.setVisible(true);
             } else {
-                this.changeSpriteImage(this.privateCard1, this.pokerFrames.get(this.player.privateCards[1]));
+                this.privateCardMask1.setVisible(false);
             }
-
             this.privateCard1.setVisible(true);
         } else {
             this.changeSpriteImage(this.privateCard1, this.pokerEmptyFrame);

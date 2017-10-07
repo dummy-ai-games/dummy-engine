@@ -145,7 +145,7 @@ function initWebsock() {
         console.log('deal : ' + JSON.stringify(data));
         var board_card = data.table.board;
         var board = '';
-        for (var index in board_card) {
+        for (var index = 0; index < board_card.length; index++) {
             board += board_card[index] + ',';
         }
 
@@ -196,10 +196,12 @@ function initWebsock() {
         }
         // set in turn
         for (var i = 0; i < currentPlayers; i++) {
-            if (playerIndex === i) {
-                players[i].setInTurn(true);
-            } else {
-                players[i].setInTurn(false);
+            if (players[i]) {
+                if (playerIndex === i) {
+                    players[i].setInTurn(true);
+                } else {
+                    players[i].setInTurn(false);
+                }
             }
         }
         updateGame(data, false);
@@ -242,7 +244,7 @@ function initGame() {
         var p = d.getElementById(c.tag).parentNode;
         p.style.background = 'none';
         p.style.border = 'none';
-        p.insertBefore(s);
+        p.insertBefore(s, null);
 
         d.body.style.background = '#000000';
         return;
@@ -329,6 +331,7 @@ function updateGame(data, isNewRound) {
             players[i].setSurvive(data.players[i].isSurvive);
             players[i].setFolded(data.players[i].folded);
             players[i].setAllin(data.players[i].allIn);
+            players[i].setReloadCount(data.players[i].reloadCount);
 
             if (data.table) {
                 players[i].setSmallBlind(players[i].playerName === data.table.smallBlind.playerName);

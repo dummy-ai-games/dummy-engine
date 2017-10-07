@@ -62,7 +62,7 @@ var DealerLayer = cc.LayerColor.extend({
 
     // game initializer
     init: function () {
-        this._super(cc.color(0, 0, 0, 180));
+        this._super(cc.color(0, 0, 0, 239));
 
         // initialize layout on DealerLayer
         this.validWidth = gameWidth;
@@ -161,15 +161,15 @@ var DealerLayer = cc.LayerColor.extend({
         this.eventListener = cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
-            onTouchBegan: function (touch, event) {
+            onTouchBegan: function (/*touch, event*/) {
                 return true;
             },
 
-            onTouchMoved: function (touch, event) {
+            onTouchMoved: function (/*touch, event*/) {
                 return true;
             },
 
-            onTouchEnded: function (touch, event) {
+            onTouchEnded: function (/*touch, event*/) {
                 return true;
             }
         });

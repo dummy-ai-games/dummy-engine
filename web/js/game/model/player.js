@@ -8,6 +8,7 @@ var Player = function(_id, _playerName, _displayName, _chips, _isSurvive, _reloa
     this.playerName = _playerName;
     this.displayName = _displayName;
     this.isSurvive = _isSurvive;
+    this.isLost = false;
     this.chips = _chips;
     this.reloadCount = _reloadCount;
     this.bet = 0;
@@ -29,16 +30,16 @@ Player.prototype.setId = function(_id) {
     this.id = _id;
 };
 
-Player.prototype.setPlayerName = function(_playerName) {
-    this.setPlayerName = _playerName;
-};
-
 Player.prototype.setDisplayName = function(_displayName) {
     this.displayName = _displayName;
 };
 
 Player.prototype.setSurvive = function(_isSurvive) {
     this.isSurvive = _isSurvive;
+};
+
+Player.prototype.setIsLost = function(_isLost) {
+    this.isLost = _isLost;
 };
 
 Player.prototype.setChips = function(_chips) {
@@ -92,8 +93,8 @@ Player.prototype.setAllin = function(_allin) {
     this.allin = _allin;
 };
 
-Player.prototype.setTakeAction = function(_takeActoin) {
-    this.takeAction = _takeActoin;
+Player.prototype.setTakeAction = function(_takeAction) {
+    this.takeAction = _takeAction;
 };
 
 // avatar hash helper
@@ -101,7 +102,7 @@ function hashCode(str) {
     var hash = 0;
     var char;
     if (str.length === 0) return hash;
-    for (i = 0; i < str.length; i++) {
+    for (var i = 0; i < str.length; i++) {
         char = str.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
         hash = hash & hash;

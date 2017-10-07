@@ -109,15 +109,15 @@ var WinnerLayer = cc.LayerColor.extend({
         this.eventListener = cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
-            onTouchBegan: function (touch, event) {
+            onTouchBegan: function (/*touch, event*/) {
                 return true;
             },
             //Trigger when moving touch
-            onTouchMoved: function (touch, event) {
+            onTouchMoved: function (/*touch, event*/) {
                 return true;
             },
             //Process the touch end event
-            onTouchEnded: function (touch, event) {
+            onTouchEnded: function (/*touch, event*/) {
                 return true;
             }
         });
@@ -125,7 +125,7 @@ var WinnerLayer = cc.LayerColor.extend({
     },
 
     // game operations
-    update: function (dt) {
+    update: function () {
         this.doUpdate();
     },
 

@@ -226,28 +226,9 @@ SkyRTC.prototype.initPlayerData = function (player) {
 
 SkyRTC.prototype.getBasicData = function (tableNumber) {
     var that = this;
-    var players = [];
-    var table = {};
     var data = {};
     var desTable = that.table[tableNumber];
     if (desTable) {
-        /*
-         for (var i = 0; i < desTable.players.length; i++) {
-         var player = {};
-         player['playerName'] = desTable.players[i]['playerName'];
-         player['chips'] = desTable.players[i]['chips'];
-         player['folded'] = desTable.players[i]['folded'];
-         player['allIn'] = desTable.players[i]['allIn'];
-         player['cards'] = desTable.players[i]['cards'];
-         player['reloadCount'] = desTable.players[i]['reloadCount'];
-         players.push(player);
-         }
-         table['tableNumber'] = desTable.tableNumber;
-         table['roundName'] = desTable.roundName;
-         table['board'] = desTable.game.board;
-         data.players = players;
-         data.table = table;
-         */
         data = poker.getBasicData(desTable);
     }
 
@@ -371,7 +352,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
                 'tableNumber': tableNumber,
                 'error_code': 0
             }
-        }
+        };
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
     } else {
@@ -382,7 +363,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
                 'tableNumber': tableNumber,
                 'error_code': 1
             }
-        }
+        };
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
         that.table[tableNumber].StartGame();
@@ -517,18 +498,19 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                     logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
                     currentTable.players[currentTable.currentPlayer].Fold();
                 }
-            }, 60 * 1000); // for BETA test, set to 1min, for official game, set to 2s
+            }, 2 * 1000); // for BETA test, set to 1min, for official game, set to 2s
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
             if (currentTable.isStart) {
                 that.getPlayerAction(message, true);
+                logger.info("table " + tableNumber + " player " + player + " might be lost, auto FOLD");
             }
         }, 10 * 1000); // for BETA test, set to 10s
     } else {
         // bug fix - crash after players quit
         if (currentTable && currentTable.isStart) {
-            logger.info("table " + tableNumber + " player " + player + " response timeout, auto fold");
+            logger.info("table " + tableNumber + " player " + player + " quited, auto FOLD");
             currentTable.players[currentTable.currentPlayer].Fold();
         }
     }
