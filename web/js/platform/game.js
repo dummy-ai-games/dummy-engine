@@ -30,6 +30,7 @@ var PLAYER_AT_RIGHT = 1;
 
 var players = [];
 var currentPlayers = 0;
+var winners = [];
 
 var defaultInitChips = 1000;
 var publicCards = [];
@@ -97,7 +98,7 @@ function initWebsock() {
             }
         }
     });
-    
+
     rtc.on('__left', function(data) {
         if (undefined !== data && null !== data) {
             console.log('player left : ' + JSON.stringify(data));
@@ -106,18 +107,29 @@ function initWebsock() {
         }
 
         if (undefined !== data && null !== data) {
-            currentPlayers = data.length;
-            // rebuild player list
-            players = [];
-            for (var i = 0; i < currentPlayers; i++) {
-                var playerDisplayName = findDBPlayerNameById(data[i]);
-                players[i] = new Player(data[i], data[i], playerDisplayName, defaultInitChips, true, 0);
+            var index;
+            if (gameStatus === STATUS_GAME_STANDBY || gameStatus === STATUS_GAME_FINISHED) {
+                // rebuild player list
+                currentPlayers = data.length;
+                players = [];
+                for (index = 0; index < currentPlayers; index++) {
+                    var playerDisplayName = findDBPlayerNameById(data[index]);
+                    players[index] = new Player(data[index], data[index], playerDisplayName, defaultInitChips, true, 0);
+                }
+            } else {
+                // mark player as offline
+                for (index = 0; index < currentPlayers; index++) {
+                    players[index].setOnline(playerOnline(players[index].playerName, data));
+                }
             }
         }
     });
 
     rtc.on('__game_over', function(data) {
         console.log('game over : ' + JSON.stringify(data));
+        // set winners
+        winners = data.winners;
+
         updateGame(data, true);
         gameStatus = STATUS_GAME_FINISHED;
 
@@ -273,7 +285,7 @@ function ccLoad() {
     cc.game.run('gameCanvas');
 }
 
-// utilities
+// game helper
 function startGame() {
     rtc.startGame(tableNumber);
 }
@@ -301,7 +313,6 @@ function updateGame(data, isNewRound) {
         }
         currentSmallBlind = data.table.smallBlind.amount;
         currentBigBlind = data.table.bigBlind.amount;
-        console.log("current small blind = " + currentSmallBlind + ", current big blind = " + currentBigBlind);
     } else {
         console.log('data.table is null');
     }
@@ -312,34 +323,33 @@ function updateGame(data, isNewRound) {
         for (i = 0; i < data.players.length; i++) {
             players[i].setId(data.players[i].playerName);
             players[i].setDisplayName(findDBPlayerNameById(data.players[i].playerName));
-            if (data.players[i].cards && data.players[i].cards.length === 2) {
-                players[i].setPrivateCards(data.players[i].cards[0], data.players[i].cards[1]);
-            }
-            players[i].setRoundBet(data.players[i].roundBet);
-            players[i].setBet(data.players[i].bet);
-
-            // reset action when received __new_round
+            players[i].setOnline(true);
             if (isNewRound) {
                 players[i].setAction('');
+                players[i].setPrivateCards(null, null);
+                players[i].setAccumulate(0);
                 players[i].setBet(0);
                 players[i].setRoundBet(0);
-                players[i].setAccumulate(0);
                 players[i].setTakeAction(false);
+                players[i].setFolded(false);
+                players[i].setAllin(false);
+            } else {
+                if (data.players[i].cards && data.players[i].cards.length === 2) {
+                    players[i].setPrivateCards(data.players[i].cards[0], data.players[i].cards[1]);
+                }
+                players[i].setBet(data.players[i].bet);
+                players[i].setRoundBet(data.players[i].roundBet);
+                players[i].setChips(data.players[i].chips.toFixed(1));
+                players[i].setSurvive(data.players[i].isSurvive);
+                players[i].setFolded(data.players[i].folded);
+                players[i].setAllin(data.players[i].allIn);
+                players[i].setReloadCount(data.players[i].reloadCount);
             }
-
-            players[i].setChips(data.players[i].chips);
-            players[i].setSurvive(data.players[i].isSurvive);
-            players[i].setFolded(data.players[i].folded);
-            players[i].setAllin(data.players[i].allIn);
-            players[i].setReloadCount(data.players[i].reloadCount);
 
             if (data.table) {
                 players[i].setSmallBlind(players[i].playerName === data.table.smallBlind.playerName);
                 players[i].setBigBlind(players[i].playerName === data.table.bigBlind.playerName);
             }
-
-            // get float 1
-            players[i].setChips(players[i].chips.toFixed(1));
         }
     }
 }
@@ -351,6 +361,18 @@ function findPlayerIndexById(id) {
         }
     }
     return -1;
+}
+
+function playerOnline(id, playerList) {
+    if (playerList) {
+        for (var i = 0; i < playerList.length; i++) {
+            if (playerList[i].id === id) {
+                return true;
+            }
+        }
+        return false;
+    }
+    return true;
 }
 
 function findDBPlayerNameById(playerName) {

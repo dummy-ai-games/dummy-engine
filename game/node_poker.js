@@ -4,14 +4,12 @@
  */
 
 var events = require('events');
-var UUID = require('node-uuid');
 var playerDao = require('../models/player_dao.js');
 var winnerDao = require('../models/winner_dao.js');
 var logger = require('../poem/logging/logger4js').helper;
-var dateUtils = require('../poem/utils/date_utils');
-var winston = require('winston');
 
-var logRoot = './logs/';
+var Enums = require('../constants/enums.js');
+var enums = new Enums();
 
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloadCount, maxRoundCount) {
     this.smallBlind = smallBlind;
@@ -38,7 +36,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.isReloadTime = false;
     this.maxRoundCount = maxRoundCount;
     this.firstDealer = 0;
-    this.isStart = false;
+    this.status = enums.GAME_STATUS_STANDBY;
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
 
@@ -141,7 +139,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }, 5 * 1000);
         } else {
             logGame(that.tableNumber, 'game over, winners : ');
-            that.isStart = false;
+            that.status = enums.GAME_STATUS_FINISHED;
             for (i = 0; i < that.players.length; i++) {
                 var player = that.players[i];
                 player.chips += (that.maxReloadCount - player.reloadCount) * that.initChips;
@@ -187,6 +185,7 @@ function getBasicData(table) {
     var bbPlayerIndex = table.bigBlindIndex;
 
     myTable['tableNumber'] = table.tableNumber;
+    myTable['status'] = table.status;
     myTable['roundName'] = table.game.roundName;
     myTable['board'] = table.game.board;
     myTable['roundCount'] = table.roundCount;
@@ -1810,7 +1809,6 @@ function Game(smallBlind, bigBlind) {
 /*
  * Helper Methods Public
  */
-// NewRound helper
 Table.prototype.getHandForPlayerName = function (playerName) {
     for (var i in this.players) {
         if (this.players[i].playerName === playerName) {
@@ -1888,7 +1886,7 @@ Table.prototype.StartGame = function () {
         this.playersToRemove = [];
         this.dealer = parseInt(Math.random() * (this.surviveCount));
         this.firstDealer = this.dealer;
-        this.isStart = true;
+        this.status = enums.GAME_STATUS_RUNNING;
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
     }
@@ -1897,7 +1895,8 @@ Table.prototype.StartGame = function () {
 Table.prototype.StopGame = function () {
     console.log('stop game');
     if (!this.game) {
-        this.isStart = false;
+        // TODO: to implement a status for game PAUSED
+        this.status = enums.GAME_STATUS_STANDBY;
     }
 };
 

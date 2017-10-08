@@ -87,8 +87,9 @@ var WinnerLayer = cc.LayerColor.extend({
         this.addChild(this.congratulationLabel, 2);
 
         var winnerIndex;
-        for (winnerIndex = 0; winnerIndex < this.maxWinners; winnerIndex++) {
-            this.winnerLabels[winnerIndex] = new cc.LabelTTF('Player ' + (winnerIndex + 1),
+        var winnersCount = Math.min(this.maxWinners, winners.length);
+        for (winnerIndex = 0; winnerIndex < winnersCount; winnerIndex++) {
+            this.winnerLabels[winnerIndex] = new cc.LabelTTF(winners[winnerIndex].playerName,
                 this.winnerFont, this.winnerTextSize);
             this.winnerLabels[winnerIndex].setColor(cc.color(255, 255, 255, 255));
             this.winnerLabels[winnerIndex].setAnchorPoint(0, 0);

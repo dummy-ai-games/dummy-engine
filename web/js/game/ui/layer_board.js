@@ -443,7 +443,7 @@ var BoardLayer = cc.Layer.extend({
     },
 
     changeSpriteImage: function(sprite, srcFrame) {
-        if (sprite) {
+        if (sprite && srcFrame) {
             sprite.setSpriteFrame(srcFrame);
         }
     }

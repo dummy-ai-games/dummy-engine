@@ -8,7 +8,7 @@ var Player = function(_id, _playerName, _displayName, _chips, _isSurvive, _reloa
     this.playerName = _playerName;
     this.displayName = _displayName;
     this.isSurvive = _isSurvive;
-    this.isLost = false;
+    this.online = true;
     this.chips = _chips;
     this.reloadCount = _reloadCount;
     this.bet = 0;
@@ -38,8 +38,8 @@ Player.prototype.setSurvive = function(_isSurvive) {
     this.isSurvive = _isSurvive;
 };
 
-Player.prototype.setIsLost = function(_isLost) {
-    this.isLost = _isLost;
+Player.prototype.setOnline = function(_online) {
+    this.online = _online;
 };
 
 Player.prototype.setChips = function(_chips) {

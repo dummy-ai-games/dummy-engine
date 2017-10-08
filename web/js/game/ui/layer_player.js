@@ -520,8 +520,8 @@ var PlayerLayer = cc.Layer.extend({
             this.avatarMask.setVisible(false);
         }
 
-        // update player lost
-        if (!this.player.isLost) {
+        // update player offline
+        if (true === this.player.online) {
             this.nameLabel.setColor(cc.color(255, 255, 255, 255));
         } else {
             this.nameLabel.setColor(cc.color(127, 127, 127, 255));
@@ -609,16 +609,13 @@ var PlayerLayer = cc.Layer.extend({
         // update private cards
         if (this.player.privateCards[0] && this.player.isSurvive) {
             this.changeSpriteImage(this.privateCard0, this.pokerFrames.get(this.player.privateCards[0]));
-            if (this.player.folded) {
-                this.privateCardMask0.setVisible(true);
-            } else {
-                this.privateCardMask0.setVisible(false);
-            }
+
             this.privateCard0.setVisible(true);
         } else {
             this.changeSpriteImage(this.privateCard0, this.pokerEmptyFrame);
             this.privateCard0.setVisible(false);
         }
+
         if (this.player.privateCards[1] && this.player.isSurvive) {
             this.changeSpriteImage(this.privateCard1, this.pokerFrames.get(this.player.privateCards[1]));
             if (this.player.folded) {
@@ -630,6 +627,15 @@ var PlayerLayer = cc.Layer.extend({
         } else {
             this.changeSpriteImage(this.privateCard1, this.pokerEmptyFrame);
             this.privateCard1.setVisible(false);
+        }
+
+        // update fold mask
+        if (this.player.isSurvive && this.player.folded) {
+            this.privateCardMask0.setVisible(true);
+            this.privateCardMask1.setVisible(true);
+        } else {
+            this.privateCardMask0.setVisible(false);
+            this.privateCardMask1.setVisible(false);
         }
     },
 

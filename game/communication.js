@@ -58,7 +58,7 @@ function SkyRTC() {
             if (exitPlayerTableNum !== undefined) {
                 socket.tableNumber = exitPlayerTableNum;
                 delete that.exitPlayers[socket.id];
-            } else if (!(that.table[tableNumber] && that.table[tableNumber].isStart)) {
+            } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                 socket.tableNumber = that.playerAndTable[socket.id];
             }
 
@@ -494,7 +494,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             var timestamp = new Date().getTime();
             logger.info('send player action,time is ' + timestamp);
             currentTable.timeout = setTimeout(function () {
-                if (currentTable.isStart) {
+                if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                     logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
                     currentTable.players[currentTable.currentPlayer].Fold();
                 }
@@ -502,14 +502,14 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
-            if (currentTable.isStart) {
+            if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                 that.getPlayerAction(message, true);
                 logger.info("table " + tableNumber + " player " + player + " might be lost, auto FOLD");
             }
         }, 10 * 1000); // for BETA test, set to 10s
     } else {
         // bug fix - crash after players quit
-        if (currentTable && currentTable.isStart) {
+        if (currentTable && currentTable.status === enums.GAME_STATUS_RUNNING) {
             logger.info("table " + tableNumber + " player " + player + " quited, auto FOLD");
             currentTable.players[currentTable.currentPlayer].Fold();
         }
@@ -584,7 +584,7 @@ SkyRTC.prototype.exitHandle = function (socket) {
     var that = this;
     if (socket) {
         var tableNumber = that.playerAndTable[socket.id];
-        if (tableNumber && that.table[tableNumber] && that.table[tableNumber].isStart) {
+        if (tableNumber && that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.id] = socket.tableNumber;
         }
         that.removeSocket(socket);
