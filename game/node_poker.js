@@ -487,7 +487,7 @@ function checkForWinner(table) {
 
     roundEnd = true;
     for (l = 0; l < table.game.roundBets.length; l += 1) {
-        logGame(table.tableNumber, 'table.game.roundBets[' + i + '] = ' + table.game.roundBets[l] !== 0);
+        logGame(table.tableNumber, 'table.game.roundBets[' + i + '] = ' + table.game.roundBets[l]);
         if (table.game.roundBets[l] !== 0) {
             roundEnd = false;
         }
