@@ -128,6 +128,9 @@ function initWebsock() {
         console.log('game over : ' + JSON.stringify(data));
         // set winners
         winners = data.winners;
+        for (var index = 0; index < winners.length; index++) {
+            winners[index].displayName = findDBPlayerNameById(winners[index].playerName);
+        }
 
         updateGame(data, true);
         gameStatus = STATUS_GAME_FINISHED;
