@@ -435,6 +435,7 @@ function checkForAllInPlayer(table, winners) {
 }
 
 function checkForWinner(table) {
+    logGame(table.tableNumber, 'check for winner');
     var i, j, k, l, maxRank, winners, part, prize, allInPlayer, minBets, roundEnd;
     // Identify winner(s)
     winners = [];
@@ -486,6 +487,7 @@ function checkForWinner(table) {
 
     roundEnd = true;
     for (l = 0; l < table.game.roundBets.length; l += 1) {
+        logGame(table.tableNumber, 'table.game.roundBets[' + i + '] = ' + table.game.roundBets[l] !== 0);
         if (table.game.roundBets[l] !== 0) {
             roundEnd = false;
         }
