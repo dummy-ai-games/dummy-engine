@@ -62,7 +62,7 @@ var DealerLayer = cc.LayerColor.extend({
 
     // game initializer
     init: function () {
-        this._super(cc.color(0, 0, 0, 239));
+        this._super(cc.color(0, 0, 0, 254));
 
         // initialize layout on DealerLayer
         this.validWidth = gameWidth;

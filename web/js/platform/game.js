@@ -117,7 +117,6 @@ function initWebsock() {
                     players[index] = new Player(data[index], data[index], playerDisplayName, defaultInitChips, true, 0);
                 }
             } else {
-                // mark player as offline
                 for (index = 0; index < currentPlayers; index++) {
                     players[index].setOnline(playerOnline(players[index].playerName, data));
                 }
@@ -137,7 +136,7 @@ function initWebsock() {
             // auto start another game in 3s
             setTimeout(function() {
                 startGame();
-            }, 3000);
+            }, 10000);
         }
     });
 
@@ -320,10 +319,10 @@ function updateGame(data, isNewRound) {
     // update players
     if (data.players) {
         currentPlayers = data.players.length;
+        console.log('player list (' + currentPlayers + ') = ' + JSON.stringify(players));
         for (i = 0; i < data.players.length; i++) {
             players[i].setId(data.players[i].playerName);
             players[i].setDisplayName(findDBPlayerNameById(data.players[i].playerName));
-            players[i].setOnline(true);
             if (isNewRound) {
                 players[i].setAction('');
                 players[i].setPrivateCards(null, null);
@@ -363,10 +362,10 @@ function findPlayerIndexById(id) {
     return -1;
 }
 
-function playerOnline(id, playerList) {
+function playerOnline(playerName, playerList) {
     if (playerList) {
         for (var i = 0; i < playerList.length; i++) {
-            if (playerList[i].id === id) {
+            if (playerList[i] === playerName) {
                 return true;
             }
         }

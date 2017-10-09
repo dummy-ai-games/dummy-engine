@@ -333,6 +333,7 @@ var BoardLayer = cc.Layer.extend({
             case STATUS_GAME_FINISHED:
                 this.showLayer(this.dealerLayer, false);
                 this.showLayer(this.winnerLayer, true);
+                this.winnerLayer.setWinners(winners);
                 this.updateWinnerLayer();
                 break;
 
@@ -351,7 +352,7 @@ var BoardLayer = cc.Layer.extend({
     },
 
     updateWinnerLayer: function() {
-
+        this.winnerLayer.update();
     },
 
     // update sub layers

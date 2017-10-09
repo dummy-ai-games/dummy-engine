@@ -13,10 +13,11 @@ var WinnerLayer = cc.LayerColor.extend({
     debug: true,
     maxWinners: 5,
 
-    // visualization variables
+    // game model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
+    winners: [],
 
     // scales
     gameScale: 1.0,
@@ -43,6 +44,9 @@ var WinnerLayer = cc.LayerColor.extend({
     winnerTextWidth: 320,
     winnerTextHeight: 40,
     winnerTextMarginBottom: 440,
+
+    // event managers
+    eventListener: null,
 
     // constructor
     ctor: function (gameScale) {
@@ -87,9 +91,9 @@ var WinnerLayer = cc.LayerColor.extend({
         this.addChild(this.congratulationLabel, 2);
 
         var winnerIndex;
-        var winnersCount = Math.min(this.maxWinners, winners.length);
-        for (winnerIndex = 0; winnerIndex < winnersCount; winnerIndex++) {
-            this.winnerLabels[winnerIndex] = new cc.LabelTTF(winners[winnerIndex].playerName,
+        this.winnerLabels = [];
+        for (winnerIndex = 0; winnerIndex < this.maxWinners; winnerIndex++) {
+            this.winnerLabels[winnerIndex] = new cc.LabelTTF('',
                 this.winnerFont, this.winnerTextSize);
             this.winnerLabels[winnerIndex].setColor(cc.color(255, 255, 255, 255));
             this.winnerLabels[winnerIndex].setAnchorPoint(0, 0);
@@ -138,6 +142,22 @@ var WinnerLayer = cc.LayerColor.extend({
     },
 
     doUpdate: function() {
+        var winnerIndex;
+        if (this.winners) {
+            var winnersCount = Math.min(this.maxWinners, this.winners.length);
+            for (winnerIndex = 0; winnerIndex < this.maxWinners; winnerIndex++) {
+                if (winnerIndex < winnersCount) {
+                    this.winnerLabels[winnerIndex].setString(this.winners[winnerIndex].playerName);
+                    this.winnerLabels[winnerIndex].setVisible(true);
+                } else {
+                    this.winnerLabels[winnerIndex].setString('');
+                    this.winnerLabels[winnerIndex].setVisible(false);
+                }
+            }
+        }
+    },
 
+    setWinners: function(_winners) {
+        this.winners = _winners;
     }
 });
