@@ -147,7 +147,7 @@ var WinnerLayer = cc.LayerColor.extend({
             var winnersCount = Math.min(this.maxWinners, this.winners.length);
             for (winnerIndex = 0; winnerIndex < this.maxWinners; winnerIndex++) {
                 if (winnerIndex < winnersCount) {
-                    this.winnerLabels[winnerIndex].setString(this.winners[winnerIndex].playerName);
+                    this.winnerLabels[winnerIndex].setString(this.winners[winnerIndex].displayName);
                     this.winnerLabels[winnerIndex].setVisible(true);
                 } else {
                     this.winnerLabels[winnerIndex].setString('');
