@@ -39,6 +39,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.status = enums.GAME_STATUS_STANDBY;
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
+    this.isActionTime = false;
 
     // Validate acceptable value ranges.
     var err;
@@ -135,7 +136,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             logGame(that.tableNumber, 'current dealer is : ' + that.dealer + ' next is:' + nextDealer);
             that.dealer = nextDealer;
             that.roundCount++;
-            that.isReloadTime = true;
+            that.isReloadTime = true;            
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logGame(that.tableNumber, 'start reload');
             setTimeout(function () {
@@ -327,6 +328,7 @@ function takeAction(table, action) {
     };
 
     table.eventEmitter.emit(action, data);
+    table.isActionTime = true;
 }
 
 Table.prototype.checkPlayer = function (player) {
@@ -1729,6 +1731,7 @@ function progress(table) {
     var i, j, cards, hand;
     var maxBet;
     maxBet = getMaxBet(table.game.bets);
+    table.isActionTime = false;
     if (table.game) {
         if (checkForEndOfRound(table, maxBet) === true) {
             // Move all bets to the pot
