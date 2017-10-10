@@ -59,14 +59,20 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         // reset raise count and bet count
         that.raiseCount = 0;
         that.betCount = 0;
+        
+        logGame(that.tableNumber, 'start get first player');
         getNextPlayer(that);
+        
+        logGame(that.tableNumber, 'start get first player:' + that.currentPlayer + ' action ');
         takeAction(that, '__turn');
+        
         var tempData = [];
         for (var i = 0; i < that.players.length; i++) {
             tempData.push({playerName: that.players[i].playerName, chips: that.players[i].chips});
         }
         playerDao.updatePlayerChips(tempData, function () {
             // Do nothing
+            logGame(that.tableNumber, 'update player chip success ');
         });
     });
 
