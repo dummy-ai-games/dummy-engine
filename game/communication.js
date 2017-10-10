@@ -368,8 +368,6 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         that.broadcastInPlayers(message);
         that.table[tableNumber].StartGame();
     }
-
-
 };
 
 SkyRTC.prototype.stopGame = function (tableNumber) {

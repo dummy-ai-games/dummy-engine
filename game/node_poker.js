@@ -228,14 +228,22 @@ function getPlayerReloadData(table) {
 }
 
 function getNextPlayer(table) {
+    if (!table) {
+        logger.error('table is destroyed');
+    }
+
+    logGame(table.tableNumber, "get next player");
     var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ?
             (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
+        logGame(table.tableNumber, 'traverse : ' + table.players[table.currentPlayer].playerName);
+
     } while (!table.players[table.currentPlayer].isSurvive ||
-    table.players[table.currentPlayer].folded ||
-    table.players[table.currentPlayer].allIn ||
-    (table.players[table.currentPlayer].talked === true && table.game.bets[table.currentPlayer] === maxBet));
+                table.players[table.currentPlayer].folded ||
+                table.players[table.currentPlayer].allIn ||
+                (table.players[table.currentPlayer].talked === true &&
+                    table.game.bets[table.currentPlayer] === maxBet));
 }
 
 function getNextDealer(table) {
@@ -1861,6 +1869,7 @@ Table.prototype.getAllHands = function () {
     return allHands;
 };
 
+/*
 Table.prototype.initNewRound = function () {
     var i;
     this.dealer += 1;
@@ -1882,6 +1891,7 @@ Table.prototype.initNewRound = function () {
     fillDeck(this.game.deck);
     this.NewRound();
 };
+*/
 
 Table.prototype.StartGame = function () {
     // If there is no current game and we have enough players, start a new game.
