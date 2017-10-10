@@ -462,9 +462,9 @@ function checkForWinner(table) {
                 minBets = table.game.roundBets[winners[j]];
             }
         }
-        part = parseInt(minBets, 10);
+        part = parseFloat(minBet);
     } else {
-        part = parseInt(table.game.roundBets[winners[0]], 10);
+        part = parseFloat(table.game.roundBets[winners[0]]);
     }
     for (l = 0; l < table.game.roundBets.length; l += 1) {
         if (table.game.roundBets[l] > part) {
@@ -1716,11 +1716,11 @@ function progress(table) {
         if (checkForEndOfRound(table, maxBet) === true) {
             // Move all bets to the pot
             for (i = 0; i < table.game.bets.length; i += 1) {
-                table.game.pot += parseInt(table.game.bets[i], 10);
-                if (table.game.bets[i] % 1 != 0)
-                    table.game.roundBets[i] += parseFloat(table.game.bets[i].toFixed(2));
-                else
-                    table.game.roundBets[i] += parseInt(table.game.bets[i], 10);
+                table.game.pot += parseInt(table.game.bets[i], 10);      
+                logGame(table.tableNumber, 'bets[' + i + '] = ' + table.game.bets[i]);
+                table.game.roundBets[i] += parseFloat(table.game.bets[i]);
+                if (table.game.roundBets[i] % 1 != 0)              
+                   table.game.roundBets[i] = table.game.roundBets[i].toFixed(2);
             }
             if (table.game.roundName === 'River') {
                 table.game.roundName = 'Showdown';
