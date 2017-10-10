@@ -511,7 +511,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         currentTable.timeout = setTimeout(function () {
             if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                 that.getPlayerAction(message, true);
-                logger.info("table " + tableNumber + " player " + player + " might be lost, auto FOLD");
+                logger.info("table " + tableNumber + " player " + player + " might be lost, resend message");
             }
         }, 10 * 1000); // for BETA test, set to 10s
     } else {
