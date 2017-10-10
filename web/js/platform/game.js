@@ -345,7 +345,7 @@ function updateGame(data, isNewRound) {
                 }
                 players[i].setBet(data.players[i].bet);
                 players[i].setRoundBet(data.players[i].roundBet);
-                players[i].setChips(data.players[i].chips.toFixed(1));
+                players[i].setChips(data.players[i].chips);
                 players[i].setSurvive(data.players[i].isSurvive);
                 players[i].setFolded(data.players[i].folded);
                 players[i].setAllin(data.players[i].allIn);
