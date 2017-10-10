@@ -18,7 +18,11 @@ var STATUS_GAME_STANDBY = 0;
 var STATUS_GAME_RUNNING = 1;
 var STATUS_GAME_FINISHED = 2;
 
+var MODE_LIVE = 0;
+var MODE_PLAYER = 1;
+
 var gameStatus = STATUS_GAME_STANDBY;
+var playMode = MODE_LIVE;
 
 var currentRoundName = '';
 var currentRound = 1;

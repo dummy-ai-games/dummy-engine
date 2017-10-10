@@ -487,8 +487,18 @@ function checkForWinner(table) {
 
     roundEnd = true;
     for (l = 0; l < table.game.roundBets.length; l += 1) {
-        logGame(table.tableNumber, 'table.game.roundBets[' + i + '] = ' + table.game.roundBets[l] !== 0);
-        if (table.game.roundBets[l] !== 0) {
+        logGame(table.tableNumber, 'table.game.roundBets[' + i + '] = ' + table.game.roundBets[l]);
+        if (Math.abs(table.game.roundBets[l] - 0) < 1) {
+
+            // just for debug
+            if (table.game.roundBets[l] !== 0) {
+                logGame(table.tableNumber, 'roundBets[' + l + '] = ' + table.game.roundBets[l] + ' part = ' + part);
+                table.game.roundBets[l] = 0;
+                part = 0;
+            }
+            
+            roundEnd = true;
+        } else {
             roundEnd = false;
         }
     }
