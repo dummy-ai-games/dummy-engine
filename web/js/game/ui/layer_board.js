@@ -8,11 +8,13 @@ var BoardLayer = cc.Layer.extend({
     // constants
     defaultFont: 'Tw Cen MT',
     roundTextFont: 'IMPACT',
-    roundTextSize: '42',
+    roundTextSize: '36',
     authorTextFont: 'Tw Cen MT',
     authorTextSize: '14',
     boardTextFont: 'Tw Cen MT',
     boardTextSize: '18',
+    betTextFont: 'IMPACT',
+    betTextSize: '24',
     debug: true,
     maxPlayerCount: 10,
     maxPublicCardCount: 5,
@@ -32,6 +34,7 @@ var BoardLayer = cc.Layer.extend({
     playerScale: 1.0,
     cardScale: 1.0,
     controlMenuScale: 1.0,
+    operationButtonScale: 1.0,
 
     // sprites
     bgSprite: null,
@@ -44,11 +47,18 @@ var BoardLayer = cc.Layer.extend({
     // labels
     roundLabel: null,
     boardLabel: null,
+    betLabel: null,
     authorLabel: null,
 
     // buttons
     startButton: null,
     stopButton: null,
+    callButton: null,
+    checkButton: null,
+    raiseButton: null,
+    foldButton: null,
+    allinButton: null,
+    betButton: null,
 
     // menus
 
@@ -80,21 +90,25 @@ var BoardLayer = cc.Layer.extend({
     ],
     cardVisualHeight: 100,
     cardVisualWidth: 72,
-    cardMarginBottom: 320,
+    cardMarginBottom: 280,
     cardMarginLeft: [320, 400, 480, 560, 640],
     roundTextWidth: 640,
     roundTextHeight: 50,
     roundTextMarginBottom: 460,
     boardTextWidth: 200,
     boardTextHeight: 48,
-    boardTextMarginBottom: 420,
-    authorTextWidth: 320,
+    boardTextMarginBottom: 360,
+    betTextMarginBottom: 400,
+    authorTextWidth: 340,
     authorTextHeight: 48,
     authorTextMarginBottom: 0,
     logoMarginTop: 18,
     logoMarginRight: 36,
     controlMenuMarginLeft: 18,
     controlMenuMarginBottom: 680,
+    opButtonMarginLeft: 50,
+    opButtonGap: 20,
+    opButtonMarginBottom: 20,
 
     // pre-loaded frames
     pokerFrames: null,
@@ -110,6 +124,9 @@ var BoardLayer = cc.Layer.extend({
     init: function () {
         this._super();
 
+        // force set game mode to PLAYER MODE
+        playMode = MODE_LIVE;
+
         // initialize sprite layout on BoardLayer
         this.validWidth = gameWidth;
         this.validHeight = gameHeight;
@@ -124,13 +141,99 @@ var BoardLayer = cc.Layer.extend({
         this.bgSprite.setPosition(0, 0);
         this.addChild(this.bgSprite, 0);
 
-        // initialize bottom decoration
-        this.decoBottom = cc.Sprite.create(s_dec_bottom);
-        this.decoBottom.setAnchorPoint(0, 0);
-        this.decoScale = this.validWidth / this.decoBottom.getContentSize().width;
-        this.decoBottom.setScale(this.decoScale);
-        this.decoBottom.setPosition(0, 0);
-        this.addChild(this.decoBottom, 1);
+        if (MODE_LIVE === playMode) {
+            // initialize bottom decoration
+            this.decoBottom = cc.Sprite.create(s_dec_bottom);
+            this.decoBottom.setAnchorPoint(0, 0);
+            this.decoScale = this.validWidth / this.decoBottom.getContentSize().width;
+            this.decoBottom.setScale(this.decoScale);
+            this.decoBottom.setPosition(0, 0);
+            this.addChild(this.decoBottom, 1);
+        } else {
+            // initialize operation buttons
+
+            // call
+            this.callButton = ccui.Button.create(s_o_call_button, s_o_call_button_pressed, s_o_call_button);
+            this.callButton.setAnchorPoint(0, 0);
+            this.callButton.setScale(this.gameScale);
+            this.callButton.setPosition(this.opButtonMarginLeft, this.opButtonMarginBottom);
+            this.addChild(this.callButton, 2);
+            this.callButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('call pressed');
+                }
+            }, this);
+
+            // raise
+            this.raiseButton = ccui.Button.create(s_o_raise_button, s_o_raise_button_pressed, s_o_raise_button);
+            this.raiseButton.setAnchorPoint(0, 0);
+            this.raiseButton.setScale(this.gameScale);
+            this.raiseButton.setPosition(this.opButtonMarginLeft +
+                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap),
+                    this.opButtonMarginBottom);
+            this.addChild(this.raiseButton, 2);
+            this.raiseButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('raise pressed');
+                }
+            }, this);
+
+            // check
+            this.checkButton = ccui.Button.create(s_o_check_button, s_o_check_button_pressed, s_o_check_button);
+            this.checkButton.setAnchorPoint(0, 0);
+            this.checkButton.setScale(this.gameScale);
+            this.checkButton.setPosition(this.opButtonMarginLeft +
+                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 2,
+                this.opButtonMarginBottom);
+            this.addChild(this.checkButton, 2);
+            this.checkButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('check pressed');
+                }
+            }, this);
+
+            // fold
+            this.foldButton = ccui.Button.create(s_o_fold_button, s_o_fold_button_pressed, s_o_fold_button);
+            this.foldButton.setAnchorPoint(0, 0);
+            this.foldButton.setScale(this.gameScale);
+            this.foldButton.setPosition(this.opButtonMarginLeft +
+                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 3,
+                this.opButtonMarginBottom);
+            this.addChild(this.foldButton, 2);
+            this.foldButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('fold pressed');
+                }
+            }, this);
+
+            // all in
+            this.allinButton = ccui.Button.create(s_o_allin_button, s_o_allin_button_pressed, s_o_allin_button);
+            this.allinButton.setAnchorPoint(0, 0);
+            this.allinButton.setScale(this.gameScale);
+            this.allinButton.setPosition(this.opButtonMarginLeft +
+                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 4,
+                this.opButtonMarginBottom);
+            this.addChild(this.allinButton, 2);
+            this.allinButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('all in pressed');
+                }
+            }, this);
+
+            // bet button and input
+            this.betButton = ccui.Button.create(s_o_bet_button, s_o_bet_button, s_o_bet_button);
+            this.betButton.setAnchorPoint(0, 0);
+            this.betButton.setScale(this.gameScale);
+            this.betButton.setPosition(this.opButtonMarginLeft +
+                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 5,
+                this.opButtonMarginBottom);
+            this.addChild(this.betButton, 2);
+            this.betButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('bet pressed');
+                }
+            }, this);
+        }
 
         // initialize dealer mm
         this.bgMM = cc.Sprite.create(s_bg_mm_2);
@@ -228,21 +331,38 @@ var BoardLayer = cc.Layer.extend({
                 this.boardTextMarginBottom * this.gameScale);
         this.addChild(this.boardLabel, 2);
 
-        // initialize author text
-        this.authorLabel = new cc.LabelTTF('Engineering Camp 2017 Task Force & CDC Mobile Club',
-                this.authorTextFont, this.authorTextSize);
-        this.authorLabel.setColor(cc.color(255, 255, 255, 255));
-        this.authorLabel.setAnchorPoint(0, 0);
-        this.authorLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
-        this.authorLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-        this.authorLabel.boundingWidth = this.authorTextWidth;
-        this.authorLabel.boundingHeight = this.authorTextHeight;
-        this.authorLabel.setScale(this.gameScale);
-        this.authorLabel
-            .setPosition((this.bgSprite.getContentSize().width - this.authorLabel.getContentSize().width) / 2
+        // initialize bet text
+        this.betLabel = new cc.LabelTTF('', this.betTextFont, this.betTextSize);
+        this.betLabel.setColor(cc.color(255, 255, 255, 255));
+        this.betLabel.setAnchorPoint(0, 0);
+        this.betLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        this.betLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.betLabel.boundingWidth = this.boardTextWidth;
+        this.betLabel.boundingHeight = this.boardTextHeight;
+        this.betLabel.setScale(this.gameScale);
+        this.betLabel
+            .setPosition((this.bgSprite.getContentSize().width - this.betLabel.getContentSize().width) / 2
                 * this.gameScale,
-                this.authorTextMarginBottom * this.gameScale);
-        this.addChild(this.authorLabel, 2);
+                this.betTextMarginBottom * this.gameScale);
+        this.addChild(this.betLabel, 2);
+
+        // initialize author text
+        if (playMode == MODE_LIVE) {
+            this.authorLabel = new cc.LabelTTF('Engineering Camp 2017 Task Force & CDC Mobile Club',
+                this.authorTextFont, this.authorTextSize);
+            this.authorLabel.setColor(cc.color(255, 255, 255, 255));
+            this.authorLabel.setAnchorPoint(0, 0);
+            this.authorLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.authorLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.authorLabel.boundingWidth = this.authorTextWidth;
+            this.authorLabel.boundingHeight = this.authorTextHeight;
+            this.authorLabel.setScale(this.gameScale);
+            this.authorLabel
+                .setPosition((this.bgSprite.getContentSize().width - this.authorLabel.getContentSize().width) / 2
+                    * this.gameScale,
+                    this.authorTextMarginBottom * this.gameScale);
+            this.addChild(this.authorLabel, 2);
+        }
 
         // initialize TrendMicro logo
         this.tmLogo = cc.Sprite.create(s_tm_logo);
@@ -382,6 +502,14 @@ var BoardLayer = cc.Layer.extend({
                 this.roundLabel.setString('BOARD ' + tableNumber + ' - ROUND ' + currentRound);
                 this.boardLabel.setString(currentRoundName + ' - raise : ' + currentRaiseCount +
                     ' bet : ' + currentBetCount);
+
+                // update bet info
+                var betTotal = 0;
+                for (var i = 0; i < players.length; i++) {
+                    betTotal += players[i].accumulate;
+                }
+                this.betLabel.setString('TOTAL BET: $' + betTotal);
+
                 // update public cards
                 this.updatePublicCardsModel();
                 var publicCardIndex;

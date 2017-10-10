@@ -36,6 +36,19 @@ var s_stop_button = './res/images/game_board/stop_button.png';
 var s_stop_button_pressed = './res/images/game_board/stop_button_pressed.png';
 var s_stop_button_disabled = './res/images/game_board/stop_button_disabled.png';
 
+// operation buttons
+var s_o_call_button = './res/images/game_board/btn_call.png';
+var s_o_call_button_pressed = './res/images/game_board/btn_call_pressed.png';
+var s_o_raise_button = './res/images/game_board/btn_raise.png';
+var s_o_raise_button_pressed = './res/images/game_board/btn_raise_pressed.png';
+var s_o_check_button = './res/images/game_board/btn_check.png';
+var s_o_check_button_pressed = './res/images/game_board/btn_check_pressed.png';
+var s_o_fold_button = './res/images/game_board/btn_fold.png';
+var s_o_fold_button_pressed = './res/images/game_board/btn_fold_pressed.png';
+var s_o_allin_button = './res/images/game_board/btn_allin.png';
+var s_o_allin_button_pressed = './res/images/game_board/btn_allin_pressed.png';
+var s_o_bet_button = './res/images/game_board/btn_bet.png';
+
 // poker cards
 var s_p_2C = './res/images/poker/2C.png';
 var s_p_2D = './res/images/poker/2D.png';
@@ -231,6 +244,12 @@ var resources = [
     s_stop_button,
     s_stop_button_pressed,
     s_stop_button_disabled,
+    s_o_call_button,
+    s_o_call_button_pressed,
+    s_o_raise_button,
+    s_o_raise_button_pressed,
+    s_o_check_button,
+    s_o_check_button_pressed,
     s_a_avatar_0,
     s_a_avatar_1,
     s_a_avatar_2,
