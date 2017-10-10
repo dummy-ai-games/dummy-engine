@@ -585,6 +585,7 @@ SkyRTC.prototype.exitHandle = function (socket) {
         var tableNumber = that.playerAndTable[socket.id];
         if (tableNumber && that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.id] = socket.tableNumber;
+            logger.info('player : ' + socket.id + ' exit!!');
         }
         that.removeSocket(socket);
     }
@@ -615,7 +616,7 @@ SkyRTC.prototype.init = function (socket) {
     });
 
     socket.on('close', function () {
-        that.emit('remove_peer', socket.id);
+        //that.emit('remove_peer', socket.id);       
         that.exitHandle(socket);
     });
 
