@@ -329,11 +329,13 @@ SkyRTC.prototype.startGame = function (tableNumber) {
 
     logger.info("game start for table: " + tableNumber);
     if (that.table[tableNumber]) {
+        if (that.table[tableNumber].reloadTimeOut)
+            clearTimeout(that.table[tableNumber].reloadTimeOut);
+
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
 
-        if (that.table[tableNumber].reloadTimeOut)
-            clearTimeout(that.table[tableNumber].reloadTimeOut);
+        delete that.table[tableNumber];
 
         logger.info("remove table " + tableNumber + " timeout");
     }
