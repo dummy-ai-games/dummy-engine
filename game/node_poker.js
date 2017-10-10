@@ -1971,8 +1971,7 @@ Table.prototype.NewRound = function () {
         this.players[smallBlindIndex].talked = true;
         this.surviveCount--;
     } else {
-        this.players[smallBlindIndex].chips -= this.smallBlind;
-        this.players[smallBlindIndex].chips = parseInt(this.players[smallBlindIndex].chips);
+        this.players[smallBlindIndex].chips -= this.smallBlind;        
         this.game.bets[smallBlindIndex] = this.smallBlind;
     }
 
@@ -1984,8 +1983,8 @@ Table.prototype.NewRound = function () {
         this.surviveCount--;
     } else {
         this.players[bigBlindIndex].chips -= this.bigBlind;
-        if (this.players[bigBlindIndex].chips % 1 !== 0)
-            this.players[bigBlindIndex].chips = parseInt(this.players[bigBlindIndex].chips);
+        //if (this.players[bigBlindIndex].chips % 1 !== 0)
+           // this.players[bigBlindIndex].chips = parseInt(this.players[bigBlindIndex].chips);
         this.game.bets[bigBlindIndex] = this.bigBlind;
     }
 
