@@ -142,6 +142,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             setTimeout(function () {
                 that.isReloadTime = false;
                 that.isBet = false;
+                logGame(that.tableNumber,"reload time end, start new round");
                 that.NewRound();
             }, 5 * 1000);
         } else {

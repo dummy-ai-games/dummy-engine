@@ -118,6 +118,7 @@ function SkyRTC() {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
                 var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
+                logger.info("table " + currentTable.tableNumber + " isActionTime is " + currentTable.isActionTime);
                 if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
                     if (currentTable.timeout)
                         clearTimeout(currentTable.timeout);
