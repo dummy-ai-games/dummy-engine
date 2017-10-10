@@ -286,7 +286,7 @@ var BoardLayer = cc.Layer.extend({
             this.publicCards[publicCardIndex] = cc.Sprite.create(s_p_back);
             this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
             this.cardScale =
-                0.8 * Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
+                0.85 * Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
                     this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.gameScale;
             this.publicCards[publicCardIndex].setScale(this.cardScale);
             this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.gameScale,
