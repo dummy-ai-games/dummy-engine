@@ -1933,6 +1933,7 @@ Table.prototype.removePlayer = function (playerName) {
 
 Table.prototype.NewRound = function () {
     // Add players in waiting list
+    logGame(table.tableNumber, 'newRound function, start init data');
     var removeIndex = 0;
     var i;
     for (i in this.playersToAdd) {
