@@ -1728,9 +1728,9 @@ function progress(table) {
             for (i = 0; i < table.game.bets.length; i += 1) {
                 table.game.pot += parseInt(table.game.bets[i], 10);      
                 logGame(table.tableNumber, 'bets[' + i + '] = ' + table.game.bets[i]);
-                table.game.roundBets[i] += parseFloat(table.game.bets[i]);
+                table.game.roundBets[i] += table.game.bets[i];
                 if (table.game.roundBets[i] % 1 != 0)              
-                   table.game.roundBets[i] = table.game.roundBets[i].toFixed(2);
+                   table.game.roundBets[i] = parseFloat(table.game.roundBets[i].toFixed(2));
             }
             if (table.game.roundName === 'River') {
                 table.game.roundName = 'Showdown';
