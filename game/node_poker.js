@@ -462,7 +462,7 @@ function checkForWinner(table) {
                 minBets = table.game.roundBets[winners[j]];
             }
         }
-        part = parseInt(minBet);
+        part = parseInt(minBets);
     } else {
         part = parseInt(table.game.roundBets[winners[0]]);
     }
