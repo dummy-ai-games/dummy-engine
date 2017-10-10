@@ -40,6 +40,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
     this.isActionTime = false;
+    this.reloadTimeOut = null;
 
     // Validate acceptable value ranges.
     var err;
@@ -139,10 +140,10 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.isReloadTime = true;
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logGame(that.tableNumber, 'start reload');
-            setTimeout(function () {
+            that.reloadTimeOut = setTimeout(function () {
                 that.isReloadTime = false;
                 that.isBet = false;
-                logGame(that.tableNumber,"reload time end, start new round");
+                logGame(that.tableNumber, "reload time end, start new round");
                 that.NewRound();
             }, 5 * 1000);
         } else {
