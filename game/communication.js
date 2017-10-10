@@ -118,9 +118,10 @@ function SkyRTC() {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
                 var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
-                if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex)) {
+                if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
                     if (currentTable.timeout)
                         clearTimeout(currentTable.timeout);
+                    currentTable.isActionTime = false;//fix bug, should not accept action util server have request action
                     try {
                         switch (action) {
                             case 'bet':
