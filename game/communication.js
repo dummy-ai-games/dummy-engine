@@ -501,7 +501,9 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             currentTable.timeout = setTimeout(function () {
                 if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                     logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
+                    currentTable.isActionTime = false;
                     currentTable.players[currentTable.currentPlayer].Fold();
+
                 }
             }, 2 * 1000); // for BETA test, set to 1min, for official game, set to 2s
         }
@@ -516,6 +518,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         // bug fix - crash after players quit
         if (currentTable && currentTable.status === enums.GAME_STATUS_RUNNING) {
             logger.info("table " + tableNumber + " player " + player + " quited, auto FOLD");
+            currentTable.isActionTime = false;
             currentTable.players[currentTable.currentPlayer].Fold();
         }
     }
