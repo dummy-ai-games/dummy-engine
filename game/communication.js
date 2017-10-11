@@ -58,8 +58,10 @@ function SkyRTC() {
             if (exitPlayerTableNum !== undefined) {
                 socket.tableNumber = exitPlayerTableNum;
                 delete that.exitPlayers[socket.id];
+                logger.info("player rejoin, accept join");
             } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                 socket.tableNumber = that.playerAndTable[socket.id];
+                logger.info("game not start, accept join");
             }
 
             if (socket.tableNumber) {
