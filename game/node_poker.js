@@ -1739,7 +1739,7 @@ function progress(table) {
     var maxBet;
     maxBet = getMaxBet(table.game.bets);
     table.isActionTime = false;
-    if (table.game) {
+    if (table.game && table.status == enums.GAME_STATUS_RUNNING) {
         if (checkForEndOfRound(table, maxBet) === true) {
             // Move all bets to the pot
             for (i = 0; i < table.game.bets.length; i += 1) {

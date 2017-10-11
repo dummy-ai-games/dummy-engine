@@ -35,6 +35,7 @@ function SkyRTC() {
     this.exitPlayers = {};
     this.playerNumber = 0;
     this.playerAndTable = {};
+
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
@@ -119,7 +120,7 @@ function SkyRTC() {
             if (that.players[playerName]) {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
-                if(currentTable){
+                if (currentTable) {
                     var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
                     logger.info("table " + currentTable.tableNumber + " isActionTime is " + currentTable.isActionTime);
                     if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
@@ -382,6 +383,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
         that.table[tableNumber].StartGame();
+
     }
 };
 
@@ -396,8 +398,16 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
     }
 
     logger.info("game stop for table: " + tableNumber);
-    if (that.table[tableNumber] && that.table[tableNumber].timeout) {
-        clearTimeout(that.table[tableNumber].timeout);
+    if (that.table[tableNumber]) {
+        if (that.table[tableNumber].timeout)
+            clearTimeout(that.table[tableNumber].timeout);
+
+        if (that.table[tableNumber].reloadTimeOut)
+            clearTimeout(that.table[tableNumber].reloadTimeOut);
+
+        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+
+        delete that.table[tableNumber];
         logger.info("remove table " + tableNumber + " timeout");
     }
 
@@ -454,7 +464,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInPlayers(message);
         if (that.table[data.table.tableNumber].timeout)
             clearTimeout(data.table.tableNumber.timeout);
-         if (that.table[data.table.tableNumber].reloadTimeOut)
+        if (that.table[data.table.tableNumber].reloadTimeOut)
             clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
         delete that.table[data.table.tableNumber];
     });
