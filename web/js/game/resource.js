@@ -9,7 +9,7 @@ var s_winner_bg = './res/images/game_board/winner_bg.png';
 var s_dec_bottom = './res/images/game_board/bg_chip.png';
 var s_bg_board = './res/images/game_board/bg_table.png';
 var s_bg_mm_2 = './res/images/game_board/img_beauty_3.png';
-var s_tm_logo = './res/images/game_board/tm_logo.png';
+var s_tm_logo = './res/images/game_board/ec2017_logo.png';
 
 // player images
 var s_avatar_panel_right = './res/images/game_board/bg_avatar_right.png';
@@ -47,7 +47,7 @@ var s_o_fold_button = './res/images/game_board/btn_fold.png';
 var s_o_fold_button_pressed = './res/images/game_board/btn_fold_pressed.png';
 var s_o_allin_button = './res/images/game_board/btn_allin.png';
 var s_o_allin_button_pressed = './res/images/game_board/btn_allin_pressed.png';
-var s_o_bet_button = './res/images/game_board/btn_bet_pressed.png';
+var s_o_bet_button = './res/images/game_board/btn_bet.png';
 var s_o_bet_button_pressed = './res/images/game_board/btn_bet_pressed.png';
 var s_o_spinner = './res/images/game_board/bg_spinner.png';
 var s_o_arrow_up = './res/images/game_board/btn_up.png';
@@ -257,6 +257,9 @@ var resources = [
     s_o_check_button_pressed,
     s_o_bet_button,
     s_o_bet_button_pressed,
+    s_o_spinner,
+    s_o_arrow_up,
+    s_o_arrow_down,
     s_a_avatar_0,
     s_a_avatar_1,
     s_a_avatar_2,

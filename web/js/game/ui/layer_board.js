@@ -43,6 +43,7 @@ var BoardLayer = cc.Layer.extend({
     bgMM: null,
     publicCards: [],
     tmLogo: null,
+    bgBet: null,
 
     // labels
     roundLabel: null,
@@ -106,9 +107,10 @@ var BoardLayer = cc.Layer.extend({
     logoMarginRight: 36,
     controlMenuMarginLeft: 18,
     controlMenuMarginBottom: 680,
-    opButtonMarginLeft: 50,
+    opButtonMarginLeft: 20,
     opButtonGap: 20,
     opButtonMarginBottom: 20,
+    betButtonGap: 0,
 
     // pre-loaded frames
     pokerFrames: null,
@@ -151,12 +153,11 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.decoBottom, 1);
         } else {
             // initialize operation buttons
-
-            // call
+            // call button
             this.callButton = ccui.Button.create(s_o_call_button, s_o_call_button_pressed, s_o_call_button);
             this.callButton.setAnchorPoint(0, 0);
             this.callButton.setScale(this.gameScale);
-            this.callButton.setPosition(this.opButtonMarginLeft, this.opButtonMarginBottom);
+            this.callButton.setPosition(this.opButtonMarginLeft * this.gameScale, this.opButtonMarginBottom);
             this.addChild(this.callButton, 2);
             this.callButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -164,12 +165,12 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            // raise
+            // raise button
             this.raiseButton = ccui.Button.create(s_o_raise_button, s_o_raise_button_pressed, s_o_raise_button);
             this.raiseButton.setAnchorPoint(0, 0);
             this.raiseButton.setScale(this.gameScale);
-            this.raiseButton.setPosition(this.opButtonMarginLeft +
-                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap),
+            this.raiseButton.setPosition(this.opButtonMarginLeft * this.gameScale +
+                (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale,
                     this.opButtonMarginBottom);
             this.addChild(this.raiseButton, 2);
             this.raiseButton.addTouchEventListener(function (sender, type) {
@@ -178,13 +179,13 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            // check
+            // check button
             this.checkButton = ccui.Button.create(s_o_check_button, s_o_check_button_pressed, s_o_check_button);
             this.checkButton.setAnchorPoint(0, 0);
             this.checkButton.setScale(this.gameScale);
-            this.checkButton.setPosition(this.opButtonMarginLeft +
-                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 2,
-                this.opButtonMarginBottom);
+            this.checkButton.setPosition(this.opButtonMarginLeft * this.gameScale +
+                (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 2,
+                    this.opButtonMarginBottom);
             this.addChild(this.checkButton, 2);
             this.checkButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -192,13 +193,13 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            // fold
+            // fold button
             this.foldButton = ccui.Button.create(s_o_fold_button, s_o_fold_button_pressed, s_o_fold_button);
             this.foldButton.setAnchorPoint(0, 0);
             this.foldButton.setScale(this.gameScale);
-            this.foldButton.setPosition(this.opButtonMarginLeft +
-                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 3,
-                this.opButtonMarginBottom);
+            this.foldButton.setPosition(this.opButtonMarginLeft * this.gameScale +
+                (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 3,
+                    this.opButtonMarginBottom);
             this.addChild(this.foldButton, 2);
             this.foldButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -206,13 +207,13 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            // all in
+            // all in button
             this.allinButton = ccui.Button.create(s_o_allin_button, s_o_allin_button_pressed, s_o_allin_button);
             this.allinButton.setAnchorPoint(0, 0);
             this.allinButton.setScale(this.gameScale);
-            this.allinButton.setPosition(this.opButtonMarginLeft +
-                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 4,
-                this.opButtonMarginBottom);
+            this.allinButton.setPosition(this.opButtonMarginLeft * this.gameScale +
+                (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 4,
+                    this.opButtonMarginBottom);
             this.addChild(this.allinButton, 2);
             this.allinButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -220,13 +221,22 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            // bet button and input
-            this.betButton = ccui.Button.create(s_o_bet_button, s_o_bet_button, s_o_bet_button);
+            // bet input
+            this.bgBet = cc.Sprite.create(s_o_spinner);
+            this.bgBet.setAnchorPoint(0, 0);
+            this.bgBet.setScale(this.gameScale);
+            this.bgBet.setPosition(this.opButtonMarginLeft * this.gameScale +
+                (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 5,
+                    this.opButtonMarginBottom);
+            this.addChild(this.bgBet, 2);
+
+            // bet button
+            this.betButton = ccui.Button.create(s_o_bet_button, s_o_bet_button_pressed, s_o_bet_button);
             this.betButton.setAnchorPoint(0, 0);
             this.betButton.setScale(this.gameScale);
-            this.betButton.setPosition(this.opButtonMarginLeft +
-                (this.callButton.getContentSize().width * this.gameScale + this.opButtonGap) * 5,
-                this.opButtonMarginBottom);
+            this.betButton.setPosition(this.bgBet.getContentSize().width * this.gameScale + this.bgBet.getPositionX() +
+                this.betButtonGap * this.gameScale,
+                    this.opButtonMarginBottom);
             this.addChild(this.betButton, 2);
             this.betButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {

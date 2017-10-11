@@ -117,11 +117,11 @@ var WinnerLayer = cc.LayerColor.extend({
             onTouchBegan: function (/*touch, event*/) {
                 return true;
             },
-            //Trigger when moving touch
+            // trigger when moving touch
             onTouchMoved: function (/*touch, event*/) {
                 return true;
             },
-            //Process the touch end event
+            // process the touch end event
             onTouchEnded: function (/*touch, event*/) {
                 return true;
             }

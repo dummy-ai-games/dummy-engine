@@ -185,6 +185,5 @@ var SkyRTC = function() {
         }));
     };
 
-
     return new skyrtc();
 };
