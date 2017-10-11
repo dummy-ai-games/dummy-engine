@@ -125,7 +125,7 @@ var BoardLayer = cc.Layer.extend({
         this._super();
 
         // force set game mode to PLAYER MODE
-        playMode = MODE_LIVE;
+        playMode = MODE_PLAYER;
 
         // initialize sprite layout on BoardLayer
         this.validWidth = gameWidth;
@@ -347,7 +347,7 @@ var BoardLayer = cc.Layer.extend({
         this.addChild(this.betLabel, 2);
 
         // initialize author text
-        if (playMode == MODE_LIVE) {
+        if (playMode === MODE_LIVE) {
             this.authorLabel = new cc.LabelTTF('Engineering Camp 2017 Task Force & CDC Mobile Club',
                 this.authorTextFont, this.authorTextSize);
             this.authorLabel.setColor(cc.color(255, 255, 255, 255));
@@ -438,7 +438,7 @@ var BoardLayer = cc.Layer.extend({
     updateLayers: function() {
         switch(gameStatus) {
             case STATUS_GAME_STANDBY:
-                this.showLayer(this.dealerLayer, true);
+                this.showLayer(this.dealerLayer, false);
                 this.showLayer(this.winnerLayer, false);
                 this.updateBoardLayer();
                 this.updateDealerLayer();
