@@ -450,6 +450,8 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInPlayers(message);
         if (that.table[data.table.tableNumber].timeout)
             clearTimeout(data.table.tableNumber.timeout);
+         if (that.table[data.table.tableNumber].reloadTimeOut)
+            clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
         delete that.table[data.table.tableNumber];
     });
 
