@@ -141,6 +141,10 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logGame(that.tableNumber, 'start reload');
             that.reloadTimeOut = setTimeout(function () {
+                if (that.status !== enums.GAME_STATUS_RUNNING) {
+                    logGame(that.tableNumber, 'game is not started yet or is over, do nothing');
+                    return;
+                }
                 that.isReloadTime = false;
                 that.isBet = false;
                 logGame(that.tableNumber, "reload time end, start new round");
