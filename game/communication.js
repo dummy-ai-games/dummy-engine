@@ -35,6 +35,7 @@ function SkyRTC() {
     this.exitPlayers = {};
     this.playerNumber = 0;
     this.playerAndTable = {};
+
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
@@ -58,8 +59,10 @@ function SkyRTC() {
             if (exitPlayerTableNum !== undefined) {
                 socket.tableNumber = exitPlayerTableNum;
                 delete that.exitPlayers[socket.id];
+                logger.info("player rejoin, accept join");
             } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                 socket.tableNumber = that.playerAndTable[socket.id];
+                logger.info("game not start, accept join");
             }
 
             if (socket.tableNumber) {
@@ -117,7 +120,7 @@ function SkyRTC() {
             if (that.players[playerName]) {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
-                if(currentTable){
+                if (currentTable) {
                     var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
                     logger.info("table " + currentTable.tableNumber + " isActionTime is " + currentTable.isActionTime);
                     if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
@@ -337,6 +340,8 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
 
+        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+
         delete that.table[tableNumber];
 
         logger.info("remove table " + tableNumber + " timeout");
@@ -378,6 +383,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
         that.table[tableNumber].StartGame();
+
     }
 };
 
@@ -392,8 +398,16 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
     }
 
     logger.info("game stop for table: " + tableNumber);
-    if (that.table[tableNumber] && that.table[tableNumber].timeout) {
-        clearTimeout(that.table[tableNumber].timeout);
+    if (that.table[tableNumber]) {
+        if (that.table[tableNumber].timeout)
+            clearTimeout(that.table[tableNumber].timeout);
+
+        if (that.table[tableNumber].reloadTimeOut)
+            clearTimeout(that.table[tableNumber].reloadTimeOut);
+
+        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+
+        delete that.table[tableNumber];
         logger.info("remove table " + tableNumber + " timeout");
     }
 
@@ -450,7 +464,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInPlayers(message);
         if (that.table[data.table.tableNumber].timeout)
             clearTimeout(data.table.tableNumber.timeout);
-         if (that.table[data.table.tableNumber].reloadTimeOut)
+        if (that.table[data.table.tableNumber].reloadTimeOut)
             clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
         delete that.table[data.table.tableNumber];
     });
@@ -505,6 +519,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             var timestamp = new Date().getTime();
             logger.info('send player action,time is ' + timestamp);
             currentTable.timeout = setTimeout(function () {
+                currentTable.timeout = null;
                 if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                     logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
                     currentTable.isActionTime = false;
@@ -514,6 +529,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
+            currentTable.timeout = null;
             if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                 that.getPlayerAction(message, true);
                 logger.info("table " + tableNumber + " player " + player + " might be lost, resend message");

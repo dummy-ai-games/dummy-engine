@@ -141,6 +141,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logGame(that.tableNumber, 'start reload');
             that.reloadTimeOut = setTimeout(function () {
+                that.reloadTimeOut = null;
                 if (that.status !== enums.GAME_STATUS_RUNNING) {
                     logGame(that.tableNumber, 'game is not started yet or is over, do nothing');
                     return;
@@ -1738,7 +1739,7 @@ function progress(table) {
     var maxBet;
     maxBet = getMaxBet(table.game.bets);
     table.isActionTime = false;
-    if (table.game) {
+    if (table.game && table.status == enums.GAME_STATUS_RUNNING) {
         if (checkForEndOfRound(table, maxBet) === true) {
             // Move all bets to the pot
             for (i = 0; i < table.game.bets.length; i += 1) {
