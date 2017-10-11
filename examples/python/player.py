@@ -11,7 +11,7 @@ ws = ""
 
 def takeAction(action, data):
     if action == "__bet":
-        time.sleep(2)
+        #time.sleep(2)
         ws.send(json.dumps({
             "eventName": "__action",
             "data": {
@@ -21,7 +21,7 @@ def takeAction(action, data):
             }
         }))
     elif action == "__action":
-        time.sleep(2)
+        #time.sleep(2)
         ws.send(json.dumps({
             "eventName": "__action",
             "data": {
