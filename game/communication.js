@@ -505,6 +505,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             var timestamp = new Date().getTime();
             logger.info('send player action,time is ' + timestamp);
             currentTable.timeout = setTimeout(function () {
+                currentTable.timeout = null;
                 if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                     logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
                     currentTable.isActionTime = false;
@@ -514,6 +515,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
+            currentTable.timeout = null;
             if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                 that.getPlayerAction(message, true);
                 logger.info("table " + tableNumber + " player " + player + " might be lost, resend message");
