@@ -22,7 +22,7 @@
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="./index.html">主页</a></li>
-                            <li class="active"><a href="#">文档<img src="./res/images/red-dot-md.png"></a></li>
+                            <li class="active"><a href="#">文档</a></li>
                             <li><a href="#" onclick="setGame();">游戏</a></li>
                             <li><a href="./players.html">玩家管理</a></li>
                         </ul>
@@ -267,9 +267,9 @@
             "tableNumber": "1",
             "roundName": "Deal",
             "board": [],
-            "roundCount": 1,<span class="new_content">
+            "roundCount": 1,
             "raiseCount" : 0,
-            "betCount" : 0,</span>
+            "betCount" : 0,
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -285,30 +285,30 @@
                 "chips" : 20,
                 "folded" : true,
                 "allIn" : false,
-                "isSurvive" : true,<span class="new_content">
+                "isSurvive" : true,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40</span>
+                "bet" : 40
             },
             {
                 "playerName" : "cicy",
                 "chips" : 0,
                 "folded" : true,
                 "allIn" : true,
-                "isSurvive" : false,<span class="new_content">
+                "isSurvive" : false,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40</span>
+                "bet" : 40
             },
             {
                 "playerName" : "geoge",
                 "chips" : 500,
                 "folded" : true,
                 "allIn" : false,
-                "isSurvive" : true,<span class="new_content">
+                "isSurvive" : true,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40</span>
+                "bet" : 40
             },
             ...
         ]
@@ -465,61 +465,43 @@
             "bigBlind": {
                 "playerName" : "cicy",
                 "amount" : 20
-            },<span class="new_content"><s>
-            "gameBets" : [
-                {
-                    "playerName" : "bobi",
-                    "roundBet" : 50,
-                    "bet" : 50
-                },
-                {
-                    "playerName" : "cicy",
-                    "roundBet" : 100,
-                    "bet" : 100
-                },
-                {
-                    "playerName" : "geoge",
-                    "roundBet" : 200,
-                    "bet" : 200
-                },
-                ...
-            ],</s> // 从1.0.4版开始bets信息归于player信息当中, 不再提供 gameBets字段</span>
+            },
             "board" : [XX, XX, XX],
-            "minBet" : 10,<span class="new_content">
+            "minBet" : 10,
             "raiseCount" : 0,
-            "betCount" : 1,</span>
+            "betCount" : 1,
             "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
-            <span class="new_content">"players"</span> : [
+            "players" : [
                 {
                     "playerName" : "bobi",
                     "chips" : 20,
                     "folded" : true,
                     "allIn" : false,
-                    "isSurvive" : true,<span class="new_content">
+                    "isSurvive" : true,
                     "reloadCount" : 0,
                     "roundBet" : 0,
                     "bet" : 10,
-                    "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌</span>
+                    "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌
                 },
                 {
                     "playerName" : "cicy",
                     "chips" : 0,
                     "folded" : true,
                     "allIn" : true,
-                    "isSurvive" : false,<span class="new_content">
+                    "isSurvive" : false,
                     "reloadCount" : 0,
                     "roundBet" : 0,
-                    "bet" : 10</span>
+                    "bet" : 10
                 },
                 {
                     "playerName" : "geoge",
                     "chips" : 500,
                     "folded" : true,
                     "allIn" : false,
-                    "isSurvive" : true,<span class="new_content">
+                    "isSurvive" : true,
                     "reloadCount" : 0,
                     "roundBet" : 0,
-                    "bet" : 10</span>
+                    "bet" : 10
                 },
                 ...
             ]
@@ -527,7 +509,7 @@
     }
 }</pre>
                         <p>指令说明:</p>
-                        <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin", <span class="new_content">"bet"</span> 中的一种</p>
+                        <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin", "bet" 中的一种</p>
                         <p>1.1. data.self 字段表示当前己方(玩家自己)的状态, 除了 playerName, chips和几个状态之外, 通过这条信息玩家可以了解到自己的私有牌, 由于此消息是点对点发送, 因此玩家自己的私有牌不会泄露给其它玩家</p>
                         <p>1.2. data.game 表示当前牌局的状态, 其中 data.game.otherPlayers 字段中的牌桌上的所有玩家列表数据格式和内容含义均和 __new_round 指令中一致, 此处不再赘述</p>
                         <p>1.3. data.game.gameBets.roundBet 表示该玩家从本轮游戏开始之后所下的赌注(不包括本回合)</p>
@@ -538,13 +520,12 @@
                         <p>1.8. data.game.betCount 字段表示本回合中所有玩家总共下注 (bet) 的次数</p>
                         <p>1.9. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
                         <p>1.10.data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
-                        <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise", <span class="new_content">"bet"</span> 中的一种, 决策的数据格式如下</p>
+                        <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise", "bet" 中的一种, 决策的数据格式如下</p>
 <pre>
 {
     "eventName" : "__action",
     "data" : {
-        "action" : "call" // 还可以是 : "check", "fold", "allin", "raise", "bet" 中的其中一种, <span class="new_content">最新规则中允许是 "bet", bet 中的 amount 注额加上玩家当前已下注额之后不得小于当前最大注额</span>
-        <s>"playerName" : "bobi"</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数
+        "action" : "call" // 还可以是 : "check", "fold", "allin", "raise", "bet" 中的其中一种,最新规则中允许是 "bet", bet 中的 amount 注额加上玩家当前已下注额之后不得小于当前最大注额
     }
 }</pre>
                         <br>
@@ -570,61 +551,43 @@
             "bigBlind": {
                 "playerName": "cicy",
                 "amount": 20
-            },<span class="new_content"><s>
-            "gameBets" : [
-                {
-                    "playerName" : "bobi",
-                    "roundBet" : 0,
-                    "bet" : 10
-                },
-                {
-                    "playerName" : "cicy",
-                    "roundBet" : 0,
-                    "bet" : 10
-                },
-                {
-                    "playerName" : "geoge",
-                    "roundBet" : 0,
-                    "bet" : 10
-                },
-                ...
-            ],</s> // 从1.0.4版开始bets信息归于player信息当中, 不再提供 gameBets字段</span>
+            },
             "board" : [],
-            "minBet" : 10,<span class="new_content">
+            "minBet" : 10,
             "raiseCount" : 0,
-            "betCount" : 1,</span>
+            "betCount" : 1,
             "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
-            <span class="new_content">"players"</span> : [
+            "players" : [
                 {
                     "playerName" : "bobi",
                     "chips" : 20,
                     "folded" : true,
                     "allIn" : false,
-                    "isSurvive" : true,<span class="new_content">
+                    "isSurvive" : true,
                     "reloadCount" : 0,
                     "roundBet" : 0,
                     "bet" : 10,
-                    "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌</span>
+                    "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌
                 },
                 {
                     "playerName" : "cicy",
                     "chips" : 0,
                     "folded" : true,
                     "allIn" : true,
-                    "isSurvive" : false,<span class="new_content">
+                    "isSurvive" : false,
                     "reloadCount" : 0,
                     "roundBet" : 0,
-                    "bet" : 10</span>
+                    "bet" : 10
                 },
                 {
                     "playerName" : "geoge",
                     "chips" : 500,
                     "folded" : true,
                     "allIn" : false,
-                    "isSurvive" : true,<span class="new_content">
+                    "isSurvive" : true,
                     "reloadCount" : 0,
                     "roundBet" : 0,
-                    "bet" : 10</span>
+                    "bet" : 10
                 },
                 ...
             ]
@@ -641,7 +604,6 @@
     "eventName" : "__action",
     "data" : {
         "action" : "bet", // 这里建议是"bet", 也可以是 "check", "fold", "allin" 中的其中一种, 请参考附表中的说明
-        <s>"playerName" : "bobi",</s> // 服务器端将采用 socket ID 的方式判断玩家来源, 避免冒名作弊, 所以相对上一版, 这里不需要将 playerName 作为参数
         "amount" : 100 // amount 在这里是一个强制字段
     }
 }</pre>
@@ -667,9 +629,9 @@
             "tableNumber" : 1,
             "roundName" : "Turn",
             "board" : [XX, XX, XX, XX],
-            "roundCount": 1,<span class="new_content">
+            "roundCount": 1,
             "raiseCount" : 0,
-            "betCount" : 1,</span>
+            "betCount" : 1,
             "smallBlind": {
                 "playerName": "geoge",
                 "amount": 10
@@ -686,10 +648,10 @@
                 "folded" : true,
                 "allIn" : false,
                 "isSurvive" : true,
-                "cards" : [],<span class="new_content">
+                "cards" : [],
                 "reloadCount" : 2,
                 "roundBet" : 40,               
-                "bet" : 40</span>
+                "bet" : 40
             },
             {
                 "playerName" : "cicy",
@@ -697,10 +659,10 @@
                 "folded" : true,
                 "allIn" : true,
                 "isSurvive" : false,
-                "cards" : [],<span class="new_content">
+                "cards" : [],
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40</span>
+                "bet" : 40
             },
             {
                 "playerName" : "geoge",
@@ -708,10 +670,10 @@
                 "folded" : true,
                 "allIn" : false,
                 "isSurvive" : true,
-                "cards" : [],<span class="new_content">
+                "cards" : [],
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40</span>
+                "bet" : 40
             },
             ...
         ]
@@ -771,9 +733,9 @@
                 "9S",
                 "5H"
             ],
-            "roundCount": 1,<span class="new_content">
+            "roundCount": 1,
             "raiseCount" : 0,
-            "betCount" : 1,</span>
+            "betCount" : 1,
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -811,11 +773,9 @@
                 ],
                 "isSurvive": true,
                 "reloadCount": 2,
-                <span class="new_content">
                 "reloadCount" : 2,
                 "roundBet" : 40,
                 "bet" : 40
-                </span>
             },
             {
                 "playerName": "cicy",
@@ -827,10 +787,10 @@
                     "QH"
                 ],
                 "isSurvive": true,
-                "reloadCount": 2,<span class="new_content">
+                "reloadCount": 2,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40</span>
+                "bet" : 40
             },
             {
                 "playerName": "alex",
@@ -842,10 +802,10 @@
                     "8D"
                 ],
                 "isSurvive": true,
-                "reloadCount": 2,<span class="new_content">
+                "reloadCount": 2,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40</span>
+                "bet" : 40
             },
             ...
         ],
@@ -859,9 +819,9 @@
                 "9S",
                 "5H"
             ],
-            "roundCount": 16,<span class="new_content">
+            "roundCount": 16,
             "raiseCount" : 0,
-            "betCount" : 1,</span>
+            "betCount" : 1,
             "smallBlind": {
                 "playerName": "bobi",
                 "amount": 10
@@ -964,13 +924,13 @@
                     </div>
                     <hr>
                     <div>
-                        <h2 class="new_content">牌面比较算法</h2>
+                        <h2>牌面比较算法</h2>
                         <p>算法输入为玩家手牌的数组, 输出为 rank 值, rank 值越大, 牌面组合越大, 目前只提供 js 版本, 其它版本请开发者自行修改完善</p>
                         <p><a class="btn btn-default" href="./example/card_compare.txt" role="button">比牌算法下载 &raquo;</a></p>
                     </div>
                     <hr>
                     <div>
-                        <h2 class="new_content">Dummy</h2>
+                        <h2>Dummy</h2>
                         <p>Dummy是一个人工智障, 但是他可以在你三缺一的时候来凑数, 以及帮你捕获所有的交互指令</p>
                         <div class="input-group">
                             <span class="input-group-addon">玩家名称</span>
@@ -1060,6 +1020,11 @@
                     <br>
                 </div>
                 <div class="tab-pane" id="release_note">
+                    <div>
+                        <h4>V1.1.1 (2017-10-11)</h4>
+                        修复了服务器上的一些crash和通信时序错误<br>
+                    </div>
+                    <br>
                     <div>
                         <h4>V1.1.0 (2017-10-07)</h4>
                         全新UI<br>
