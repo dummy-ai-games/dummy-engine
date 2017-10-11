@@ -92,7 +92,7 @@ function SkyRTC() {
         var playerName = socket.id;
         var tableNum = that.players[playerName].tableNumber;
         var currentTable = that.table[tableNum];
-        if (currentTable.isReloadTime && that.players[playerName]) {
+        if (currentTable && currentTable.isReloadTime && that.players[playerName]) {
             var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
             if (playerIndex !== -1) {
                 var player = currentTable.players[playerIndex];
@@ -117,54 +117,56 @@ function SkyRTC() {
             if (that.players[playerName]) {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
-                var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
-                logger.info("table " + currentTable.tableNumber + " isActionTime is " + currentTable.isActionTime);
-                if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
-                    if (currentTable.timeout)
-                        clearTimeout(currentTable.timeout);
-                    currentTable.isActionTime = false;//fix bug, should not accept action util server have request action
-                    try {
-                        switch (action) {
-                            case 'bet':
-                                var amount;
-                                try {
-                                    amount = parseInt(data.amount);
-                                } catch (e) {
-                                    logger.error(e.message);
-                                    amount = currentTable.bigBlind;
-                                }
-                                currentTable.players[playerIndex].Bet(amount);
-                                break;
-                            case 'call':
-                                if (currentTable.isBet)
-                                    currentTable.players[playerIndex].Bet(currentTable.bigBlind);
-                                else
-                                    currentTable.players[playerIndex].Call();
-                                break;
-                            case 'check':
-                                currentTable.players[playerIndex].Check();
-                                break;
-                            case 'raise':
-                                if (currentTable.isBet)
-                                    currentTable.players[playerIndex].Bet(currentTable.bigBlind);
-                                else
-                                    currentTable.players[playerIndex].Raise();
-                                break;
-                            case 'allin':
-                                if (currentTable.isBet)
-                                    currentTable.isBet = false;
-                                currentTable.players[playerIndex].AllIn();
-                                break;
-                            case 'fold':
-                                currentTable.players[playerIndex].Fold();
-                                break;
-                            default:
-                                currentTable.players[playerIndex].Fold();
-                                break;
+                if(currentTable){
+                    var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
+                    logger.info("table " + currentTable.tableNumber + " isActionTime is " + currentTable.isActionTime);
+                    if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
+                        if (currentTable.timeout)
+                            clearTimeout(currentTable.timeout);
+                        currentTable.isActionTime = false;//fix bug, should not accept action util server have request action
+                        try {
+                            switch (action) {
+                                case 'bet':
+                                    var amount;
+                                    try {
+                                        amount = parseInt(data.amount);
+                                    } catch (e) {
+                                        logger.error(e.message);
+                                        amount = currentTable.bigBlind;
+                                    }
+                                    currentTable.players[playerIndex].Bet(amount);
+                                    break;
+                                case 'call':
+                                    if (currentTable.isBet)
+                                        currentTable.players[playerIndex].Bet(currentTable.bigBlind);
+                                    else
+                                        currentTable.players[playerIndex].Call();
+                                    break;
+                                case 'check':
+                                    currentTable.players[playerIndex].Check();
+                                    break;
+                                case 'raise':
+                                    if (currentTable.isBet)
+                                        currentTable.players[playerIndex].Bet(currentTable.bigBlind);
+                                    else
+                                        currentTable.players[playerIndex].Raise();
+                                    break;
+                                case 'allin':
+                                    if (currentTable.isBet)
+                                        currentTable.isBet = false;
+                                    currentTable.players[playerIndex].AllIn();
+                                    break;
+                                case 'fold':
+                                    currentTable.players[playerIndex].Fold();
+                                    break;
+                                default:
+                                    currentTable.players[playerIndex].Fold();
+                                    break;
+                            }
+                        } catch (e) {
+                            logger.error(e.message);
+                            currentTable.players[playerIndex].Fold();
                         }
-                    } catch (e) {
-                        logger.error(e.message);
-                        currentTable.players[playerIndex].Fold();
                     }
                 }
             }
