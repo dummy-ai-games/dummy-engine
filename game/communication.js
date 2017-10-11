@@ -450,6 +450,8 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInPlayers(message);
         if (that.table[data.table.tableNumber].timeout)
             clearTimeout(data.table.tableNumber.timeout);
+         if (that.table[data.table.tableNumber].reloadTimeOut)
+            clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
         delete that.table[data.table.tableNumber];
     });
 
@@ -507,7 +509,6 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                     logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
                     currentTable.isActionTime = false;
                     currentTable.players[currentTable.currentPlayer].Fold();
-
                 }
             }, 2 * 1000); // for BETA test, set to 1min, for official game, set to 2s
         }
