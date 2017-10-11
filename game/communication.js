@@ -339,6 +339,8 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
 
+        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+
         delete that.table[tableNumber];
 
         logger.info("remove table " + tableNumber + " timeout");
