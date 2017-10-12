@@ -411,6 +411,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
             'error_code': 1
         }
     };
+    
     that.broadcastInGuests(message);
     that.broadcastInPlayers(message);
     that.table[tableNumber].StartGame();
@@ -440,14 +441,7 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
         logger.info("remove table " + tableNumber + " timeout");
     }
 
-    // initialize game parameters
-    that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2, 100);
-    that.table[tableNumber].tableNumber = tableNumber;
-
-    for (var player in that.players) {
-        if (that.players[player].tableNumber === tableNumber)
-            that.table[tableNumber].AddPlayer(player);
-    }
+    // initialize game parameters   
     that.table[tableNumber].StopGame();
     message = {
         'eventName': '__game_stop',
