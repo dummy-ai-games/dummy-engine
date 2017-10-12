@@ -349,12 +349,7 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
 
     // initialize game parameters
     that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2, 100);
-    that.table[tableNumber].tableNumber = tableNumber;
-
-    for (var player in that.players) {
-        if (that.players[player].tableNumber === tableNumber)
-            that.table[tableNumber].AddPlayer(player);
-    }
+    that.table[tableNumber].tableNumber = tableNumber;    
     that.initTable(tableNumber);
     logger.info("init table done");
 
@@ -395,6 +390,10 @@ SkyRTC.prototype.sendCountDown = function(tableNumber) {
             that.sendCountDown(tableNumber);
         }, 1000);
     } else {
+        for (var player in that.players) {
+            if (that.players[player].tableNumber === tableNumber)
+                that.table[tableNumber].AddPlayer(player);
+        }
         that.startGame(tableNumber);
     }
 };
