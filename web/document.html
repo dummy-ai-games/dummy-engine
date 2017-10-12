@@ -30,8 +30,20 @@
                 </div>
             </div>
         </div>
-        <h2>文档 V1.0.5</h2>
-        <h4>2017-09-30</h4>
+        <h2>文档 V1.0.6</h2>
+        <h4>2017-10-12</h4>
+        <div class="alert alert-warning" role="alert" style="margin-top: 5px;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div>重要提醒: 初赛最终会以所有参赛玩家总排名的筹码总数的前30位作为晋级队伍, 而并非每一桌游戏的胜出者, 请各位玩家注意策略</div>
+        </div>
+        <div class="alert alert-danger" role="alert" style="margin-top: 5px;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div>重要提醒: 如果您是基于 Python Example V1.0.1以及以下版本进行开发，请自行去掉代码中的 sleep(2) 或者修改为 sleep(1), 因为目前服务器对指令的超时时限为2s; Python Example V1.0.2 上修复了这个问题, 带来不便请谅解!</div>
+        </div>
         <hr>
         <div>
             <ul class="nav nav-tabs" id="main_tab">
@@ -42,17 +54,7 @@
                 <li style="cursor: pointer;"><a data-target="#faq" data-toggle="tab">FAQ</a></li>
                 <li style="cursor: pointer;"><a data-target="#release_note" data-toggle="tab">更新日志</a></li>
             </ul>
-            <br>
-            <span class="tag label label-info" id="tip">
-                <span>请玩家仔细阅读文档,文档在每个版本更新时会用<span class="new_content"> 橙色 </span>字体标识出修改部分,修改的部分保留1个版本 </span>
-                    ; <b><u>加黑的下划线内容</u></b> 表示待定参数,这些参数将在比赛前夕敲定下来
-                    <a><i class="remove glyphicon glyphicon-remove glyphicon-white" onclick="hideTip();"></i></a>
-            </span>
-            <br>
-            <br>
-            <span class="tag label label-danger" id="tip2">
-                <span>重要提醒: 初赛最终会以所有参赛玩家总排名的筹码总数的前30位作为晋级队伍, 而并非每一桌游戏的胜出者, 请各位玩家注意策略</span>
-            </span>
+
             <div class="tab-content" style="margin-top: 40px; margin-bottom: 80px;">
                 <div class="tab-pane active" id="competition_rules">
                     <a style="text-decoration: none;"><h4><strong>日程安排</strong></h4></a>
@@ -76,6 +78,8 @@
                     <p>6.  dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></p>
                     <p>7.  每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</p>
                     <p>8.  为了确保比赛时使用其它队玩家名作弊干扰比赛, 比赛前组委会会将一个随机生成的私有玩家名通过线下方式告知各组组长, 比赛时使用私有名接入游戏, 游戏面板中则显示昵称(游戏名)</p>
+                    <p>9.  请玩家仔细阅读文档,文档在每个版本更新时会用<span class="new_content"> 橙色 </span>字体标识出修改部分,修改的部分保留1个版本 </span>
+                        ; <b><u>加黑的下划线内容</u></b> 表示待定参数,这些参数将在比赛前夕敲定下来</p>
                     <br>
                 </div>
 
@@ -197,7 +201,7 @@
                                     2. 如果玩家剩余筹码不够, 自动 allin<br>
                                     3. amount 字段如果不是数字, 那么系统自动进行弃牌操作<br>
                                     4. 金额必须是整数,如果不是整数,自动押注大盲注金额<br>
-                                    5. 轮到强制 bet 的时候 (收到 __bet 指令) 也可以决策为 check/raise/allin
+                                    5. 轮到强制 bet 的时候 (收到 __bet 指令) 也可以决策为 check/raise/allin<br>
                                     6. 如果超过Bet次数(每回合上限为 <b>4</b> 次), 系统将自动执行 call<br>
                                 </td>
                             </tr>
@@ -293,7 +297,8 @@
                 "isSurvive" : true,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40
+                "bet" : 40,
+                <span class="new_content">"cards": [] // 只有自己的手牌才可见 </span>
             },
             {
                 "playerName" : "cicy",
@@ -303,7 +308,8 @@
                 "isSurvive" : false,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40
+                "bet" : 40,
+                <span class="new_content">"cards": [] // 只有自己的手牌才可见 </span>
             },
             {
                 "playerName" : "geoge",
@@ -313,7 +319,8 @@
                 "isSurvive" : true,
                 "reloadCount" : 2,
                 "roundBet" : 40,
-                "bet" : 40
+                "bet" : 40,
+                <span class="new_content">"cards": [] // 只有自己的手牌才可见 </span>
             },
             ...
         ]
@@ -637,6 +644,7 @@
             "roundCount": 1,
             "raiseCount" : 0,
             "betCount" : 1,
+            <span class="new_content">"totalBet" : 2000,</span>
             "smallBlind": {
                 "playerName": "geoge",
                 "amount": 10
@@ -917,7 +925,7 @@
                             <p><a class="btn btn-large btn-default" href="./example/js-example.zip" role="button">js 示例下载 &raquo;</a></p>
                         </div>
                         <div class="col-md-4">
-                            <h2>Python V1.0.1</h2>
+                            <h2>Python V1.0.2</h2>
                             <p>启动方式：请参考 <a href="https://pypi.python.org/pypi/websocket-client/0.7.0">https://pypi.python.org/pypi/websocket-client/0.7.0</a> 先安装 Python 的 websocket 插件, 自行修改代码中的 ws 和所有 playerName 变量值,然后运行 python player.py 接入游戏</p>
                             <p><a class="btn btn-default" href="./example/python-example.zip" role="button">python 示例下载 &raquo;</a></p>
                         </div>
@@ -1026,6 +1034,13 @@
                 </div>
                 <div class="tab-pane" id="release_note">
                     <div>
+                        <h4>V1.1.2 (2017-10-12)</h4>
+                        进一步修复了服务器上的异常<br>
+                        __show_action中能看到当前奖池中的总筹码<br>
+                        UI微调<br>
+                    </div>
+                    <br>
+                    <div>
                         <h4>V1.1.1 (2017-10-11)</h4>
                         修复了服务器上的一些crash和通信时序错误<br>
                     </div>
@@ -1125,5 +1140,6 @@
 <script src="./js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/js/modal.js"></script>
 <script src="./js/public/bower_components/select2/dist/js/select2.min.js"></script>
+<script src="./js/public/bower_components/bootstrap/js/alert.js"></script>
 <script src="js/platform/document.js"></script>
 </html>

@@ -179,6 +179,7 @@ function getBasicData(table) {
     var players = [];
     var myTable = {};
     var data = {};
+    var totalBet = 0;
 
     for (var i = 0; i < table.players.length; i++) {
         var player = {};
@@ -190,10 +191,18 @@ function getBasicData(table) {
         player['isSurvive'] = table.players[i]['isSurvive'];
         player['reloadCount'] = table.players[i]['reloadCount'];
         // include bets info
+        if (!table.game.roundBets[i]) {
+            table.game.roundBets[i] = 0;
+        }
+        if (!table.game.bets[i]) {
+            table.game.bets[i] = 0;
+        }
+
         if (table.game) {
             player['roundBet'] = table.game.roundBets[i];
             player['bet'] = table.game.bets[i];
         }
+        totalBet += parseInt(player['roundBet']) + parseInt(player['bet']);
         players.push(player);
     }
     var sbPlayerIndex = table.smallBlindIndex;
@@ -206,6 +215,7 @@ function getBasicData(table) {
     myTable['roundCount'] = table.roundCount;
     myTable['raiseCount'] = table.raiseCount;
     myTable['betCount'] = table.betCount;
+    myTable['totalBet'] = totalBet;
     if (-1 !== sbPlayerIndex) {
         myTable['smallBlind'] = {
             playerName: table.players[sbPlayerIndex].playerName,
