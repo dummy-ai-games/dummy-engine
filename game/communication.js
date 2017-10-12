@@ -533,6 +533,9 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var currentTable;
     tableNumber = that.playerAndTable[player];
     currentTable = that.table[tableNumber];
+    if(!currentTable)
+        return;
+    
     if (that.players[player]) {
         logger.info('server request: ' + JSON.stringify(message));
         if (that.players[player]) {
