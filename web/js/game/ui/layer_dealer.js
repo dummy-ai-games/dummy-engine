@@ -48,7 +48,7 @@ var DealerLayer = cc.LayerColor.extend({
     titleTextWidth: 800,
     titleTextHeight: 144,
     boardTextWidth: 640,
-    boardTextHeight: 32,
+    boardTextHeight: 40,
     nameTextWidth: 160,
     nameTextHeight: 32,
 
@@ -63,7 +63,7 @@ var DealerLayer = cc.LayerColor.extend({
 
     // game initializer
     init: function () {
-        this._super(cc.color(0, 0, 0, 254));
+        this._super(cc.color(0, 0, 0, 239));
 
         // initialize layout on DealerLayer
         this.validWidth = gameWidth;
@@ -124,7 +124,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.addChild(this.titleLabel, 2);
 
         // initialize board number
-        this.boardLabel = new cc.LabelTTF('Board ' + tableNumber,
+        this.boardLabel = new cc.LabelTTF('BOARD ' + tableNumber + ' - GET READY',
             this.boardFont, this.boardTextSize);
         this.boardLabel.setColor(cc.color(255, 255, 255, 255));
         this.boardLabel.setAnchorPoint(0, 0);
@@ -134,7 +134,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.boardLabel.boundingHeight = this.boardTextHeight;
         this.boardLabel.setScale(this.gameScale);
         this.boardLabel.setPosition((this.validWidth - this.boardLabel.getContentSize().width * this.gameScale) / 2,
-                this.validHeight / 12 * 8);
+                this.validHeight / 12 * 7.2);
         this.addChild(this.boardLabel, 2);
 
         // initialize name labels
@@ -249,9 +249,14 @@ var DealerLayer = cc.LayerColor.extend({
 
     updateCountDown: function() {
         if (gameStatus === STATUS_GAME_PREPARING) {
-            this.boardLabel.setString('Game will start in ' + gameCountDown + ' seconds');
+            if (gameCountDown > 1) {
+                this.boardLabel.setString('Game will start in ' + gameCountDown + ' seconds');
+            } else {
+                this.boardLabel.setString('Game will start in ' + gameCountDown + ' second');
+            }
+
         } else {
-            this.boardLabel.setString('Board ' + tableNumber);
+            this.boardLabel.setString('BOARD ' + tableNumber + ' - GET READY');
         }
     },
 

@@ -19,8 +19,9 @@
             <nav>
                 <ul class="nav masthead-nav">
                     <li class="active"><a href="./index.html">主页</a></li>
-                    <li><a href="./document.html">文档<img src="./res/images/red-dot-md.png"></a></li>
-                    <li><a href="#" onclick="setGame();">游戏</a></li>
+                    <li><a href="./document.html">文档</a></li>
+                    <li><a href="#" onclick="setGame();">直播</a></li>
+                    <li><a href="#" onclick="setPlayer();">游戏<img src="./res/images/red-dot-md.png"></a></li>
                     <li><a href="./players.html">玩家管理</a></li>
                 </ul>
             </nav>
@@ -73,9 +74,39 @@
             </div>
         </div>
     </div>
+
+    <!-- player settings dialog -->
+    <div class="modal fade dialog" id="goto_play_dialog" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+                    <span class="modal-title">打开游戏</span>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="input-group">
+                            <span class="input-group-addon">游戏桌号</span>
+                            <input type="number" min="1" class="form-control" placeholder="游戏桌号" id="play_table_number" value="1">
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon">玩家名称</span>
+                            <input type="text" class="form-control" placeholder="玩家名称" id="play_player_name">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="gotoPlay();">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="./js/public/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/js/modal.js"></script>
+<script src="js/platform/basic.js"></script>
 <script src="js/platform/index.js"></script>
 </html>
