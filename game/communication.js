@@ -408,8 +408,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     };
     
     that.broadcastInGuests(message);
-    that.broadcastInPlayers(message);
-    that.table[tableNumber].status = enums.GAME_STATUS_RUNNING;
+    that.broadcastInPlayers(message);    
     for (var player in that.players) {
         if (that.players[player].tableNumber === tableNumber)
             that.table[tableNumber].AddPlayer(player);
@@ -618,7 +617,7 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
         }
         var tableNumber = message.data.table.tableNumber;
         for (var player in this.players) {
-            if (this.players[player].tableNumber === tableNumber) {
+            if (this.players[player].tableNumber === tableNumber && playersData[player]) {
                 if (message.eventName !== '__game_over' && message.eventName !== '__round_end') {
                     playersData[player].cards = cards[player];
                     that.sendMessage(this.players[player], message);
