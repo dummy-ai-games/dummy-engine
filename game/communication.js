@@ -554,7 +554,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                     currentTable.isActionTime = false;
                     currentTable.players[currentTable.currentPlayer].Fold();
                 }
-            }, 2 * 1000); // for BETA test, set to 1min, for official game, set to 2s
+            }, 5 * 1000); // for BETA test, set to 5 sec, for official game, set to 2 sec
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
