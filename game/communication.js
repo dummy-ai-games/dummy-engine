@@ -352,22 +352,7 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
     that.table[tableNumber].tableNumber = tableNumber;    
     that.initTable(tableNumber);
     logger.info("init table done");
-
-    if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
-        logger.info('table ' + tableNumber + ' start fail, it need at least ' + that.table[tableNumber].minPlayers + ' users to attend');
-        message = {
-            'eventName': '__game_start',
-            'data': {
-                'msg': 'table ' + tableNumber + ' need at least ' + that.table[tableNumber].minPlayers + ' users to attend',
-                'tableNumber': tableNumber,
-                'error_code': 0
-            }
-        };
-        that.broadcastInGuests(message);
-        that.broadcastInPlayers(message);
-    } else {
-        that.sendCountDown(tableNumber);
-    }
+    that.sendCountDown(tableNumber);
 };
 
 SkyRTC.prototype.sendCountDown = function(tableNumber) {
@@ -397,23 +382,38 @@ SkyRTC.prototype.sendCountDown = function(tableNumber) {
 SkyRTC.prototype.startGame = function (tableNumber) {
     var that = this;
     var message;
-    that.table[tableNumber].resetCountDown();
-    message = {
-        'eventName': '__game_start',
-        'data': {
-            'msg': 'table ' + tableNumber + ' started successfully',
-            'tableNumber': tableNumber,
-            'error_code': 1
-        }
-    };
-    
-    that.broadcastInGuests(message);
-    that.broadcastInPlayers(message);    
     for (var player in that.players) {
         if (that.players[player].tableNumber === tableNumber)
             that.table[tableNumber].AddPlayer(player);
     }
-    that.table[tableNumber].StartGame();
+
+    if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
+        logger.info('table ' + tableNumber + ' start fail, it need at least ' + that.table[tableNumber].minPlayers + ' users to attend');
+        message = {
+            'eventName': '__game_start',
+            'data': {
+                'msg': 'table ' + tableNumber + ' need at least ' + that.table[tableNumber].minPlayers + ' users to attend',
+                'tableNumber': tableNumber,
+                'error_code': 0
+            }
+        };
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+    } else {
+        message = {
+            'eventName': '__game_start',
+            'data': {
+                'msg': 'table ' + tableNumber + ' started successfully',
+                'tableNumber': tableNumber,
+                'error_code': 1
+            }
+        };
+
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+        that.table[tableNumber].StartGame();
+        that.table[tableNumber].resetCountDown();
+    }
 };
 
 SkyRTC.prototype.stopGame = function (tableNumber) {
