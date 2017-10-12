@@ -160,7 +160,7 @@
                     <hr>
                     <a name="game_basic" style="text-display: none;"><h4><strong>基本定义</strong></h4></a>
                     <ul>
-                        <p><b>行动说明和限制表</b></p>
+                        <p><b>行动说明和限制表 <span style="color: #FF0000">(很重要, 很重要, 很重要)</span></b></p>
                         <table class="table table-striped table-bordered table-condensed">
                             <tr>
                                 <td style="width: 20%; height: 25px;">
@@ -697,7 +697,8 @@
                         <p>2. data.action 表示当前导致牌局发生变化的任意一名玩家的行动, data.action.amount 表示当前这名玩家所追加的赌注的数值(不论是call, raise还是bet)</p>
                         <p>3. data.table 表示当前牌桌的状态, 包括公共牌的状态和已经发出的公共牌</p>
                         <p>4. data.players 表示当前所有玩家的状态, 请参考前序指令中的说明, 这里不再赘述</p>
-                        <p>5 data.table.smallBlind 和 data.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
+                        <p>5. data.table.smallBlind 和 data.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
+                        <p class="new_content">6. data.table.totalBet 表示当前牌桌底池的总筹码数额</p>
                         <p>以下是某次回合导致牌局发生变化之后服务器和客户端交互的消息示意图</p>
                         <img src="res/images/document/show_action_message.png" style="width: 75%; height: 75%;">
                     </ul>
