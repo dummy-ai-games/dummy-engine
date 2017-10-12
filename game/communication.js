@@ -389,11 +389,7 @@ SkyRTC.prototype.sendCountDown = function(tableNumber) {
         setTimeout(function () {
             that.sendCountDown(tableNumber);
         }, 1000);
-    } else {
-        for (var player in that.players) {
-            if (that.players[player].tableNumber === tableNumber)
-                that.table[tableNumber].AddPlayer(player);
-        }
+    } else {      
         that.startGame(tableNumber);
     }
 };
@@ -413,6 +409,10 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     
     that.broadcastInGuests(message);
     that.broadcastInPlayers(message);
+    for (var player in that.players) {
+        if (that.players[player].tableNumber === tableNumber)
+            that.table[tableNumber].AddPlayer(player);
+    }
     that.table[tableNumber].StartGame();
 };
 
