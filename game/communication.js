@@ -428,6 +428,7 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
     }
 
     logger.info("game stop for table: " + tableNumber);
+    that.table[tableNumber].StopGame();
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
@@ -441,8 +442,7 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
         logger.info("remove table " + tableNumber + " timeout");
     }
 
-    // initialize game parameters   
-    that.table[tableNumber].StopGame();
+   
     message = {
         'eventName': '__game_stop',
         'data': {'msg': 'table ' + tableNumber + ' stopped successfully', 'tableNumber': tableNumber}
