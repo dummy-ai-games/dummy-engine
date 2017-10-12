@@ -28,6 +28,7 @@ $(document).ready(function () {
     serverAddress = 'ws://' + server;
     writeToCommands('player : ' + playerName + ', server : ' + serverAddress);
     $('#player_name').html(playerName);
+    document.title = "THE Dummy " + playerName;
     initRTC();
 });
 

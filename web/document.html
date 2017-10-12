@@ -8,7 +8,7 @@
     <meta name="screen-orientation" content="portrait">
     <meta name="description" content="the-engine">
     <meta name="author" content="the-engine team">
-    <title>Document</title>
+    <title>THE Document</title>
     <link rel="stylesheet" href="./js/public/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./js/public/bower_components/select2/dist/css/select2.min.css">
     <link rel="stylesheet" href="style/document.css">
@@ -39,11 +39,11 @@
             </button>
             <div>重要提醒: 初赛最终会以所有参赛玩家总排名的筹码总数的前30位作为晋级队伍, 而并非每一桌游戏的胜出者, 请各位玩家注意策略</div>
         </div>
-        <div class="alert alert-danger" role="alert" style="margin-top: 5px;">
+        <div class="alert alert-success" role="alert" style="margin-top: 5px;">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
-            <div>重要提醒: 如果您是基于 Python Example V1.0.1以及以下版本进行开发，请自行去掉代码中的 sleep(2) 或者修改为 sleep(1), 因为目前服务器对指令的超时时限为2s; Python Example V1.0.2 上修复了这个问题, 带来不便请谅解!</div>
+            <div>提示: 您可以启动一个Dummy来测试您写的AI程序, Dummy非常弱小, 如果您连Dummy也无法打败, 就完蛋了... 在"开发参考"中可以启动Dummy</div>
         </div>
         <hr>
         <div>
@@ -949,10 +949,10 @@
                         <p>Dummy是一个人工智障, 但是他可以在你三缺一的时候来凑数, 以及帮你捕获所有的交互指令</p>
                         <div class="input-group">
                             <span class="input-group-addon">玩家名称</span>
-                            <input type="text"class="form-control" placeholder="玩家名称(建议填写自己申请的玩家名, Dummy可以代打)" id="player_name">
+                            <input type="text"class="form-control" placeholder="玩家名称(建议填写自己申请的玩家名, Dummy可以代打, 可同时添加多个名字, 用分号隔开)" id="player_name">
                         </div>
                         <br>
-                        <p><a class="btn btn-default" role="button" onclick="createDummy();">启动一个Dummy &raquo;</a></p>
+                        <p><a class="btn btn-default" role="button" onclick="createDummy();">启动Dummy &raquo;</a></p>
                     </div>
                 </div>
                 <div class="tab-pane" id="faq">

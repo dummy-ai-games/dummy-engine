@@ -76,7 +76,8 @@ var DealerLayer = cc.LayerColor.extend({
             this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
             this.startButton.setAnchorPoint(0, 0);
             this.startButton.setScale(this.buttonScale);
-            this.startButton.setPosition((this.validWidth - this.startButton.getContentSize().width * this.buttonScale) / 2,
+            this.startButton.setPosition((this.validWidth -
+                this.startButton.getContentSize().width * this.buttonScale) / 2,
                 this.validHeight / 12 * 2);
             this.addChild(this.startButton, 2);
             this.enableButton(this.startButton, false);
@@ -93,7 +94,8 @@ var DealerLayer = cc.LayerColor.extend({
             this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
             this.stopButton.setAnchorPoint(0, 0);
             this.stopButton.setScale(this.buttonScale);
-            this.stopButton.setPosition((this.validWidth - this.stopButton.getContentSize().width * this.buttonScale) / 2,
+            this.stopButton.setPosition((this.validWidth -
+                this.stopButton.getContentSize().width * this.buttonScale) / 2,
                 this.validHeight / 12 * 2);
             this.addChild(this.stopButton, 2);
             this.enableButton(this.stopButton, false);

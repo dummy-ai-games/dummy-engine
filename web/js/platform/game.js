@@ -55,8 +55,10 @@ $(document).ready(function() {
 
     if (playerName) {
         playMode = MODE_PLAYER;
+        document.title = "The Game";
     } else {
         playMode = MODE_LIVE;
+        document.title = "THE Live";
     }
     initGame();
 });

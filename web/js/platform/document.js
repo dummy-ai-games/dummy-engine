@@ -27,7 +27,8 @@ function createDummy() {
     var serverAddress = host + ':' + port;
 
     for (var i = 0; i < playerNames.length; i++) {
-        window.open('./simulator.html?name='+playerName+'&server='+serverAddress, '_blank');
+        var playerName = playerNames[i];
+        window.open('./dummy.html?name='+playerName+'&server='+serverAddress, '_blank');
     }
     $('#player_name').val('');
 }
