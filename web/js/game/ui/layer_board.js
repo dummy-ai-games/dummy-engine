@@ -46,6 +46,7 @@ var BoardLayer = cc.Layer.extend({
     publicCards: [],
     tmLogo: null,
     bgBet: null,
+    yourTurn: null,
 
     // labels
     roundLabel: null,
@@ -101,7 +102,7 @@ var BoardLayer = cc.Layer.extend({
     roundTextWidth: 640,
     roundTextHeight: 50,
     roundTextMarginBottom: 460,
-    boardTextWidth: 200,
+    boardTextWidth: 640,
     boardTextHeight: 48,
     boardTextMarginBottom: 360,
     betTextMarginBottom: 400,
@@ -118,6 +119,8 @@ var BoardLayer = cc.Layer.extend({
     betButtonGap: 0,
     betSpinnerGap: 4,
     betAmountGap: 10,
+    turnDestX: 80,
+    turnDestY: 700,
 
     // pre-loaded frames
     pokerFrames: null,
@@ -166,6 +169,7 @@ var BoardLayer = cc.Layer.extend({
             this.callButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('call pressed');
+                    this.playerAction(call);
                 }
             }, this);
 
@@ -180,6 +184,7 @@ var BoardLayer = cc.Layer.extend({
             this.raiseButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('raise pressed');
+                    this.playerAction(raise);
                 }
             }, this);
 
@@ -194,6 +199,7 @@ var BoardLayer = cc.Layer.extend({
             this.checkButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('check pressed');
+                    this.playerAction(check);
                 }
             }, this);
 
@@ -208,6 +214,7 @@ var BoardLayer = cc.Layer.extend({
             this.foldButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('fold pressed');
+                    this.playerAction(fold);
                 }
             }, this);
 
@@ -222,6 +229,7 @@ var BoardLayer = cc.Layer.extend({
             this.allinButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('all in pressed');
+                    this.playerAction(allin);
                 }
             }, this);
 
@@ -236,6 +244,7 @@ var BoardLayer = cc.Layer.extend({
             this.betButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('bet pressed');
+                    this.playerAction(bet, 100);
                 }
             }, this);
 
@@ -283,6 +292,14 @@ var BoardLayer = cc.Layer.extend({
                 .setPosition(this.bgBet.getPositionX() + this.bgBet.getContentSize().width * this.gameScale / 2,
                     this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.gameScale / 2);
             this.addChild(this.amountLabel, 3);
+
+            // initialize turn animation
+            this.yourTurn = cc.Sprite.create(s_your_turn);
+            this.yourTurn.setAnchorPoint(0.5, 0.5);
+            this.yourTurn.setScale(this.gameScale * 4);
+            this.yourTurn.setPosition(this.validWidth / 2, this.validHeight / 2);
+            this.yourTurn.setVisible(false);
+            this.addChild(this.yourTurn, 50);
         }
 
         // initialize dealer mm
@@ -576,6 +593,22 @@ var BoardLayer = cc.Layer.extend({
                     }
                     this.publicCards[publicCardIndex].setVisible(true);
                 }
+
+                // update your turn
+                if (playMode === MODE_PLAYER) {
+                    this.yourTurnDest = new cc.p(this.turnDestX * this.gameScale,
+                        this.turnDestY * this.gameScale);
+                    if (turnAnimationShowed === false && myTurn === true) {
+                        // play animation
+                        this.yourTurn.setVisible(true);
+                        this.yourTurnAnimation(this.yourTurn,
+                            this.gameScale * 4,
+                            this.gameScale * 0.3,
+                            this.yourTurnDest,
+                            new cc.CallFunc(this.cbYourTurnAnimationFinished, this));
+                        turnAnimationShowed = true;
+                    }
+                }
                 break;
 
             case STATUS_GAME_FINISHED:
@@ -605,6 +638,18 @@ var BoardLayer = cc.Layer.extend({
                 playerLayer.update();
             }
         }
+    },
+
+    yourTurnAnimation: function (sprite, fromScale, toScale, toPos, callback) {
+        sprite.setScale(fromScale);
+        var spriteScaleTo = new cc.ScaleTo(0.5, toScale, toScale);
+        var spriteMoveTo = new cc.MoveTo(0.5, toPos);
+        var scaleSequence = new cc.Sequence(spriteScaleTo, spriteMoveTo, callback);
+        sprite.runAction(scaleSequence);
+    },
+
+    cbYourTurnAnimationFinished: function(nodeExecutingAction, data) {
+        console.log('sprite animation finished');
     },
 
     initializeAltFrames: function() {

@@ -266,7 +266,7 @@ function call() {
 
 function check() {
     writeToCommands('>>> check');
-    rtc.check();
+    rtc.Check();
 }
 
 function raise() {

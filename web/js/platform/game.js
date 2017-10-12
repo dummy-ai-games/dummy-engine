@@ -31,6 +31,9 @@ var currentRound = 1;
 var currentRaiseCount = 0;
 var currentBetCount = 0;
 
+var myTurn = false;
+var turnAnimationShowed = false;
+
 var PLAYER_AT_LEFT = 0;
 var PLAYER_AT_RIGHT = 1;
 
@@ -200,6 +203,16 @@ function initWebsock() {
         console.log('round end : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
+    });
+
+    // this request could be received in player mode only
+    rtc.on('__action', function(data) {
+        console.log('server request action : ' + JSON.stringify(data));
+        // it's your turn !!
+        if (data.self.playerName === playerName) {
+            turnAnimationShowed = false;
+            myTurn = true;
+        }
     });
 
     rtc.on('__show_action', function(data) {
@@ -433,4 +446,41 @@ function getElementTop(element) {
         current = current.offsetParent;
     }
     return actualTop;
+}
+
+// Action helper
+
+function reload() {
+    console.log('>>> reload');
+    rtc.Reload();
+}
+
+function bet(amount) {
+    console.log('>>> bet: ' + amount);
+    rtc.Bet(amount);
+}
+
+function call() {
+    console.log('>>> call');
+    rtc.Call();
+}
+
+function check() {
+    console.log('>>> check');
+    rtc.Check();
+}
+
+function raise() {
+    console.log('>>> raise');
+    rtc.Raise();
+}
+
+function allin() {
+    console.log('>>> allin');
+    rtc.AllIn();
+}
+
+function fold() {
+    console.log('>>> fold');
+    rtc.Fold();
 }

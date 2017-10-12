@@ -10,6 +10,7 @@ var s_dec_bottom = './res/images/game_board/bg_chip.png';
 var s_bg_board = './res/images/game_board/bg_table.png';
 var s_bg_mm_2 = './res/images/game_board/img_beauty_3.png';
 var s_tm_logo = './res/images/game_board/ec2017_logo.png';
+var s_your_turn = './res/images/game_board/its_your_turn.png';
 
 // player images
 var s_avatar_panel_right = './res/images/game_board/bg_avatar_right.png';
@@ -243,6 +244,7 @@ var resources = [
     s_name_mask_left,
     s_chips,
     s_tm_logo,
+    s_your_turn,
     s_start_button,
     s_start_button_pressed,
     s_start_button_disabled,

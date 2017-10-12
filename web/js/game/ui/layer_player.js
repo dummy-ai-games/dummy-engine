@@ -612,8 +612,13 @@ var PlayerLayer = cc.Layer.extend({
 
             this.privateCard0.setVisible(true);
         } else {
-            this.changeSpriteImage(this.privateCard0, this.pokerEmptyFrame);
-            this.privateCard0.setVisible(false);
+            if (playMode === MODE_LIVE) {
+                this.changeSpriteImage(this.privateCard0, this.pokerEmptyFrame);
+                this.privateCard0.setVisible(false);
+            } else {
+                this.changeSpriteImage(this.privateCard0, this.pokerBackFrame);
+                this.privateCard0.setVisible(true);
+            }
         }
 
         if (this.player.privateCards[1] && this.player.isSurvive) {
@@ -625,8 +630,13 @@ var PlayerLayer = cc.Layer.extend({
             }
             this.privateCard1.setVisible(true);
         } else {
-            this.changeSpriteImage(this.privateCard1, this.pokerEmptyFrame);
-            this.privateCard1.setVisible(false);
+            if (playMode === MODE_LIVE) {
+                this.changeSpriteImage(this.privateCard1, this.pokerEmptyFrame);
+                this.privateCard1.setVisible(false);
+            } else {
+                this.changeSpriteImage(this.privateCard1, this.pokerBackFrame);
+                this.privateCard1.setVisible(true);
+            }
         }
 
         // update fold mask
