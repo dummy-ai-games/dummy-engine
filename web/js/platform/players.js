@@ -121,6 +121,7 @@ function loadPlayersByTable() {
 function onPlayerSelected(data) {
     selectedPlayer = data;
     $('#player_name').val(selectedPlayer.playerName);
+    $('#display_name').val(selectedPlayer.displayName);
     $('#table_number').val(selectedPlayer.tableNumber);
 
     // show update and remove button

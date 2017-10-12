@@ -15,6 +15,8 @@ var BoardLayer = cc.Layer.extend({
     boardTextSize: '18',
     betTextFont: 'IMPACT',
     betTextSize: '24',
+    amountTextFont: 'IMPACT',
+    amountTextSize: '32',
     debug: true,
     maxPlayerCount: 10,
     maxPublicCardCount: 5,
@@ -50,6 +52,7 @@ var BoardLayer = cc.Layer.extend({
     boardLabel: null,
     betLabel: null,
     authorLabel: null,
+    amountLabel: null,
 
     // buttons
     startButton: null,
@@ -60,6 +63,8 @@ var BoardLayer = cc.Layer.extend({
     foldButton: null,
     allinButton: null,
     betButton: null,
+    betSpinnerUp: null,
+    betSpinnerDown: null,
 
     // menus
 
@@ -109,8 +114,10 @@ var BoardLayer = cc.Layer.extend({
     controlMenuMarginBottom: 680,
     opButtonMarginLeft: 20,
     opButtonGap: 20,
-    opButtonMarginBottom: 20,
+    opButtonMarginBottom: 10,
     betButtonGap: 0,
+    betSpinnerGap: 4,
+    betAmountGap: 10,
 
     // pre-loaded frames
     pokerFrames: null,
@@ -125,9 +132,6 @@ var BoardLayer = cc.Layer.extend({
     // game initializer
     init: function () {
         this._super();
-
-        // force set game mode to PLAYER MODE
-        playMode = MODE_PLAYER;
 
         // initialize sprite layout on BoardLayer
         this.validWidth = gameWidth;
@@ -221,28 +225,64 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            // bet input
-            this.bgBet = cc.Sprite.create(s_o_spinner);
-            this.bgBet.setAnchorPoint(0, 0);
-            this.bgBet.setScale(this.gameScale);
-            this.bgBet.setPosition(this.opButtonMarginLeft * this.gameScale +
-                (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 5,
-                    this.opButtonMarginBottom);
-            this.addChild(this.bgBet, 2);
-
             // bet button
             this.betButton = ccui.Button.create(s_o_bet_button, s_o_bet_button_pressed, s_o_bet_button);
             this.betButton.setAnchorPoint(0, 0);
             this.betButton.setScale(this.gameScale);
-            this.betButton.setPosition(this.bgBet.getContentSize().width * this.gameScale + this.bgBet.getPositionX() +
-                this.betButtonGap * this.gameScale,
-                    this.opButtonMarginBottom);
+            this.betButton.setPosition(this.opButtonMarginLeft * this.gameScale +
+                (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 5,
+                this.opButtonMarginBottom);
             this.addChild(this.betButton, 2);
             this.betButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('bet pressed');
                 }
             }, this);
+
+            // bet input
+            this.bgBet = cc.Sprite.create(s_o_spinner);
+            this.bgBet.setAnchorPoint(0, 0);
+            this.bgBet.setScale(this.gameScale);
+            this.bgBet.setPosition(this.betButton.getPositionX() +
+                this.betButton.getContentSize().width * this.gameScale + this.betButtonGap,
+                    this.opButtonMarginBottom);
+            this.addChild(this.bgBet, 2);
+
+            // bet spinner
+            this.betSpinnerUp = ccui.Button.create(s_o_arrow_up, s_o_arrow_up, s_o_arrow_up);
+            this.betSpinnerUp.setAnchorPoint(0, 0.5);
+            this.betSpinnerUp.setScale(this.gameScale);
+            this.betSpinnerUp.setPosition(this.bgBet.getPositionX() + this.betSpinnerGap * this.gameScale,
+                this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.gameScale / 9 * 6);
+            this.addChild(this.betSpinnerUp, 3);
+            this.betSpinnerUp.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('up pressed');
+                }
+            }, this);
+
+            this.betSpinnerDown = ccui.Button.create(s_o_arrow_down, s_o_arrow_down, s_o_arrow_down);
+            this.betSpinnerDown.setAnchorPoint(0, 0.5);
+            this.betSpinnerDown.setScale(this.gameScale);
+            this.betSpinnerDown.setPosition(this.bgBet.getPositionX() + this.betSpinnerGap * this.gameScale,
+                this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.gameScale / 9 * 3);
+            this.addChild(this.betSpinnerDown, 3);
+            this.betSpinnerDown.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('down pressed');
+                }
+            }, this);
+
+            this.amountLabel = new cc.LabelTTF('20', this.amountTextFont, this.amountTextSize);
+            this.amountLabel.setColor(cc.color(255, 255, 255, 255));
+            this.amountLabel.setAnchorPoint(0.5, 0.5);
+            this.amountLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.amountLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.amountLabel.setScale(this.gameScale);
+            this.amountLabel
+                .setPosition(this.bgBet.getPositionX() + this.bgBet.getContentSize().width * this.gameScale / 2,
+                    this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.gameScale / 2);
+            this.addChild(this.amountLabel, 3);
         }
 
         // initialize dealer mm
@@ -387,35 +427,37 @@ var BoardLayer = cc.Layer.extend({
         // add start and stop button
         this.controlMenuScale = this.gameScale * 0.6;
 
-        this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
-        this.startButton.setAnchorPoint(0, 0);
-        this.startButton.setScale(this.controlMenuScale);
-        this.startButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
-                                     this.controlMenuMarginBottom * this.gameScale);
-        this.addChild(this.startButton, 2);
-        this.startButton.addTouchEventListener(function (sender, type) {
-            if (ccui.Widget.TOUCH_ENDED === type) {
-                console.log('start game');
-                if (gameStatus !== STATUS_GAME_RUNNING) {
-                    startGame();
+        if (playMode === MODE_LIVE) {
+            this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
+            this.startButton.setAnchorPoint(0, 0);
+            this.startButton.setScale(this.controlMenuScale);
+            this.startButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
+                this.controlMenuMarginBottom * this.gameScale);
+            this.addChild(this.startButton, 2);
+            this.startButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('start game');
+                    if (gameStatus !== STATUS_GAME_RUNNING) {
+                        startGame();
+                    }
                 }
-            }
-        }, this);
+            }, this);
 
-        this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
-        this.stopButton.setAnchorPoint(0, 0);
-        this.stopButton.setScale(this.controlMenuScale);
-        this.stopButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
-            this.controlMenuMarginBottom * this.gameScale);
-        this.addChild(this.stopButton, 2);
-        this.stopButton.addTouchEventListener(function (sender, type) {
-            if (ccui.Widget.TOUCH_ENDED === type) {
-                console.log('start game');
-                if (gameStatus === STATUS_GAME_RUNNING) {
-                    stopGame();
+            this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
+            this.stopButton.setAnchorPoint(0, 0);
+            this.stopButton.setScale(this.controlMenuScale);
+            this.stopButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
+                this.controlMenuMarginBottom * this.gameScale);
+            this.addChild(this.stopButton, 2);
+            this.stopButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    console.log('start game');
+                    if (gameStatus === STATUS_GAME_RUNNING) {
+                        stopGame();
+                    }
                 }
-            }
-        }, this);
+            }, this);
+        }
 
         // add dealer layer on the top
         this.dealerLayer = new DealerLayer(this.gameScale);
@@ -448,7 +490,8 @@ var BoardLayer = cc.Layer.extend({
     updateLayers: function() {
         switch(gameStatus) {
             case STATUS_GAME_STANDBY:
-                this.showLayer(this.dealerLayer, false);
+            case STATUS_GAME_PREPARING:
+                this.showLayer(this.dealerLayer, true);
                 this.showLayer(this.winnerLayer, false);
                 this.updateBoardLayer();
                 this.updateDealerLayer();

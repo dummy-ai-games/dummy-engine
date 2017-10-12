@@ -9,13 +9,14 @@ var DealerLayer = cc.LayerColor.extend({
     defaultFont: 'Tw Cen MT',
     titleFont: 'IMPACT',
     titleTextSize: 64,
-    boardFont: 'Tw Cen MT',
-    boardTextSize: 32,
+    boardFont: 'IMPACT',
+    boardTextSize: 36,
     nameFont: 'IMPACT',
     nameTextSize: 32,
     debug: true,
     maxPlayerCount: 10,
     minPlayerCount: 3,
+    countDownSec: 3,
 
     // visualization variables
     size: null,
@@ -46,7 +47,7 @@ var DealerLayer = cc.LayerColor.extend({
     // design specs
     titleTextWidth: 800,
     titleTextHeight: 144,
-    boardTextWidth: 240,
+    boardTextWidth: 640,
     boardTextHeight: 32,
     nameTextWidth: 160,
     nameTextHeight: 32,
@@ -70,31 +71,33 @@ var DealerLayer = cc.LayerColor.extend({
         this.size = cc.size(this.validWidth, this.validHeight);
 
         // initialize start and stop button
-        this.buttonScale = this.gameScale * 0.8;
-        this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
-        this.startButton.setAnchorPoint(0, 0);
-        this.startButton.setScale(this.buttonScale);
-        this.startButton.setPosition((this.validWidth - this.startButton.getContentSize().width * this.buttonScale) / 2,
+        if (MODE_LIVE === playMode) {
+            this.buttonScale = this.gameScale * 0.8;
+            this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
+            this.startButton.setAnchorPoint(0, 0);
+            this.startButton.setScale(this.buttonScale);
+            this.startButton.setPosition((this.validWidth - this.startButton.getContentSize().width * this.buttonScale) / 2,
                 this.validHeight / 12 * 2);
-        this.addChild(this.startButton, 2);
-        this.enableButton(this.startButton, false);
-        this.startButton.addTouchEventListener(function (sender, type) {
+            this.addChild(this.startButton, 2);
+            this.enableButton(this.startButton, false);
+            this.startButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     if (STATUS_GAME_RUNNING !== gameStatus) {
-                        console.log('start game');
+                        console.log('prepare start game');
+                        this.resetCountDown();
                         startGame();
                     }
                 }
             }, this);
 
-        this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
-        this.stopButton.setAnchorPoint(0, 0);
-        this.stopButton.setScale(this.buttonScale);
-        this.stopButton.setPosition((this.validWidth - this.stopButton.getContentSize().width * this.buttonScale) / 2,
+            this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
+            this.stopButton.setAnchorPoint(0, 0);
+            this.stopButton.setScale(this.buttonScale);
+            this.stopButton.setPosition((this.validWidth - this.stopButton.getContentSize().width * this.buttonScale) / 2,
                 this.validHeight / 12 * 2);
-        this.addChild(this.stopButton, 2);
-        this.enableButton(this.stopButton, false);
-        this.stopButton.addTouchEventListener(function (sender, type) {
+            this.addChild(this.stopButton, 2);
+            this.enableButton(this.stopButton, false);
+            this.stopButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     if (STATUS_GAME_RUNNING === gameStatus) {
                         console.log('stop game');
@@ -102,6 +105,7 @@ var DealerLayer = cc.LayerColor.extend({
                     }
                 }
             }, this);
+        }
 
         // initialize title
         this.titleLabel = new cc.LabelTTF('Texas Hold\'em AI Game',
@@ -189,7 +193,10 @@ var DealerLayer = cc.LayerColor.extend({
     },
 
     doUpdate: function() {
-        this.updateControl();
+        if (playMode === MODE_LIVE) {
+            this.updateControl();
+        }
+        this.updateCountDown();
         this.updatePlayers();
     },
 
@@ -224,6 +231,10 @@ var DealerLayer = cc.LayerColor.extend({
                 this.enableButton(this.startButton, false);
             }
             this.enableButton(this.stopButton, false);
+        } else if (gameStatus === STATUS_GAME_PREPARING) {
+            this.stopButton.setVisible(false);
+            this.startButton.setVisible(true);
+            this.enableButton(this.startButton, false);
         } else if (gameStatus === STATUS_GAME_RUNNING) {
             this.stopButton.setVisible(true);
             this.startButton.setVisible(false);
@@ -234,6 +245,18 @@ var DealerLayer = cc.LayerColor.extend({
             }
             this.enableButton(this.startButton, false);
         }
+    },
+
+    updateCountDown: function() {
+        if (gameStatus === STATUS_GAME_PREPARING) {
+            this.boardLabel.setString('Game will start in ' + gameCountDown + ' seconds');
+        } else {
+            this.boardLabel.setString('Board ' + tableNumber);
+        }
+    },
+
+    resetCountDown: function() {
+        gameCountDown = 3;
     },
 
     isPlayerIn: function(playerName) {

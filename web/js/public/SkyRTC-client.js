@@ -158,7 +158,7 @@ var SkyRTC = function() {
     skyrtc.prototype.startGame = function(tableNumber) {
         var that = this;
         that.socket.send(JSON.stringify({
-            "eventName": "__start_game",
+            "eventName": "__prepare_game",
             "data": {
                 "tableNumber": tableNumber
             }

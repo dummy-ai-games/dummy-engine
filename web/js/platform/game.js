@@ -15,13 +15,15 @@ var gameWidth, gameHeight;
 
 // game model related
 var STATUS_GAME_STANDBY = 0;
-var STATUS_GAME_RUNNING = 1;
-var STATUS_GAME_FINISHED = 2;
+var STATUS_GAME_PREPARING = 1;
+var STATUS_GAME_RUNNING = 2;
+var STATUS_GAME_FINISHED = 3;
 
 var MODE_LIVE = 0;
 var MODE_PLAYER = 1;
 
 var gameStatus = STATUS_GAME_STANDBY;
+var gameCountDown = 0;
 var playMode = MODE_LIVE;
 
 var currentRoundName = '';
@@ -50,6 +52,12 @@ $(document).ready(function() {
     tableNumber = getParameter('table');
     playerName = getParameter('name');
     autoStart = getParameter('auto') || 0;
+
+    if (playerName) {
+        playMode = MODE_PLAYER;
+    } else {
+        playMode = MODE_LIVE;
+    }
     initGame();
 });
 
@@ -143,8 +151,14 @@ function initWebsock() {
             // auto start another game in 3s
             setTimeout(function() {
                 startGame();
-            }, 10000);
+            }, 10 * 10000);
         }
+    });
+
+    rtc.on('__game_prepare', function(data) {
+        console.log('game preparing : ' + JSON.stringify(data));
+        gameStatus = STATUS_GAME_PREPARING;
+        gameCountDown = data.countDown;
     });
 
     rtc.on('__game_start', function(data) {
@@ -294,6 +308,7 @@ function ccLoad() {
 // game helper
 function startGame() {
     rtc.startGame(tableNumber);
+    gameStatus = STATUS_GAME_PREPARING;
 }
 
 function stopGame() {

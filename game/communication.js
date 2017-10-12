@@ -81,8 +81,12 @@ function SkyRTC() {
         }
     });
 
+    this.on('__prepare_game', function (data) {
+        this.prepareGame(data.tableNumber);
+    });
+
     this.on('__start_game', function (data) {
-        this.startGame(data.tableNumber);
+        // this.startGame(data.tableNumber);
     });
 
     this.on('__stop_game', function (data) {
@@ -322,7 +326,7 @@ SkyRTC.prototype.notifyLeft = function () {
     }
 };
 
-SkyRTC.prototype.startGame = function (tableNumber) {
+SkyRTC.prototype.prepareGame = function (tableNumber) {
     var that = this;
     var message;
     try {
@@ -332,18 +336,14 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         return;
     }
 
-    logger.info("game start for table: " + tableNumber);
+    logger.info("game preparing start for table: " + tableNumber);
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].reloadTimeOut)
             clearTimeout(that.table[tableNumber].reloadTimeOut);
-
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
-
-        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
-
+        that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
         delete that.table[tableNumber];
-
         logger.info("remove table " + tableNumber + " timeout");
     }
 
@@ -357,7 +357,6 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     }
     that.initTable(tableNumber);
     logger.info("init table done");
-    logger.info('broadcast __game_start');
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
         logger.info('table ' + tableNumber + ' start fail, it need at least ' + that.table[tableNumber].minPlayers + ' users to attend');
@@ -372,19 +371,49 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
     } else {
-        message = {
-            'eventName': '__game_start',
+        that.sendCountDown(tableNumber);
+    }
+};
+
+SkyRTC.prototype.sendCountDown = function(tableNumber) {
+    // start count down
+    var that = this;
+    if (that.table[tableNumber].countDown > 0) {
+        var message = {
+            'eventName': '__game_prepare',
             'data': {
-                'msg': 'table ' + tableNumber + ' started successfully',
                 'tableNumber': tableNumber,
-                'error_code': 1
+                'countDown': that.table[tableNumber].countDown
             }
         };
+        logger.info('send broadcast to guest and players with count down = ' + that.table[tableNumber].countDown);
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
-        that.table[tableNumber].StartGame();
-
+        that.table[tableNumber].countDown--;
+        // continue start countdown timer
+        setTimeout(function () {
+            that.sendCountDown(tableNumber);
+        }, 1000);
+    } else {
+        that.startGame(tableNumber);
     }
+};
+
+SkyRTC.prototype.startGame = function (tableNumber) {
+    var that = this;
+    var message;
+    that.table[tableNumber].resetCountDown();
+    message = {
+        'eventName': '__game_start',
+        'data': {
+            'msg': 'table ' + tableNumber + ' started successfully',
+            'tableNumber': tableNumber,
+            'error_code': 1
+        }
+    };
+    that.broadcastInGuests(message);
+    that.broadcastInPlayers(message);
+    that.table[tableNumber].StartGame();
 };
 
 SkyRTC.prototype.stopGame = function (tableNumber) {
@@ -578,7 +607,7 @@ SkyRTC.prototype.broadcastInPlayersForReload = function (message) {
 
 SkyRTC.prototype.broadcastInPlayers = function (message) {
     var that = this;
-    if (message.eventName == "__game_start") {
+    if (message.eventName === "__game_start" || message.eventName === "__game_prepare") {
         var tableNumber = message.data.tableNumber;
         for (var player in this.players) {
             if (this.players[player].tableNumber == tableNumber) {

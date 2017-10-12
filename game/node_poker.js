@@ -41,6 +41,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.bigBlindIndex = 0;
     this.isActionTime = false;
     this.reloadTimeOut = null;
+    this.countDown = 3;
 
     // Validate acceptable value ranges.
     var err;
@@ -337,6 +338,10 @@ function takeAction(table, action) {
     table.eventEmitter.emit(action, data);
     table.isActionTime = true;
 }
+
+Table.prototype.resetCountDown = function() {
+    this.countDown = 3;
+};
 
 Table.prototype.checkPlayer = function (player) {
     return player === this.currentPlayer;
