@@ -409,6 +409,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     
     that.broadcastInGuests(message);
     that.broadcastInPlayers(message);
+    that.table[tableNumber].status = enums.GAME_STATUS_RUNNING;
     for (var player in that.players) {
         if (that.players[player].tableNumber === tableNumber)
             that.table[tableNumber].AddPlayer(player);
