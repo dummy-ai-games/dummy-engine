@@ -338,10 +338,6 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
 
     logger.info("game preparing start for table: " + tableNumber);
     if (that.table[tableNumber]) {
-        if (that.table[tableNumber].reloadTimeOut)
-            clearTimeout(that.table[tableNumber].reloadTimeOut);
-        if (that.table[tableNumber].displayTimeout)
-            clearTimeout(that.table[tableNumber].displayTimeout);
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
         that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
@@ -433,9 +429,6 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
 
-        if (that.table[tableNumber].reloadTimeOut)
-            clearTimeout(that.table[tableNumber].reloadTimeOut);
-
         that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
 
         delete that.table[tableNumber];
@@ -486,11 +479,6 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         };
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
-
-        if (that.table[data.table.tableNumber].reloadTimeOut)
-            clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
-        if (that.table[data.table.tableNumber].displaysTimeout)
-            clearTimeout(that.table[data.table.tableNumber].displayTimeout);
         if (that.table[data.table.tableNumber].timeout)
             clearTimeout(data.table.tableNumber.timeout);
 

@@ -40,8 +40,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
     this.isActionTime = false;
-    this.reloadTimeOut = null;
-    this.displayTimeout = null;
     this.countDown = 3;
 
     // Validate acceptable value ranges.
@@ -142,8 +140,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.isReloadTime = true;
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logGame(that.tableNumber, 'start reload');
-            that.reloadTimeOut = setTimeout(function () {
-                that.reloadTimeOut = null;
+            that.timeout = setTimeout(function () {
+                that.timeout = null;
                 if (that.status !== enums.GAME_STATUS_RUNNING) {
                     logGame(that.tableNumber, 'game is not started yet or is over, do nothing');
                     return;
@@ -302,8 +300,8 @@ function sort(data) {
 }
 
 function takeAction(table, action) {
-    table.displayTimeout = setTimeout(function () {
-        table.displayTimeout = null;
+    table.timeout = setTimeout(function () {
+        table.timeout = null;
         if (table.status == enums.GAME_STATUS_RUNNING) {
             var players = [];
             var destPlayer = {};
@@ -352,7 +350,7 @@ function takeAction(table, action) {
             table.eventEmitter.emit(action, data);
             table.isActionTime = true;
         }
-    }, 100);
+    }, 1000);
 
 }
 
