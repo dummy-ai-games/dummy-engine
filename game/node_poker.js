@@ -41,7 +41,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.bigBlindIndex = 0;
     this.isActionTime = false;
     this.reloadTimeOut = null;
-    this.displayeTimeout = null;
+    this.displayTimeout = null;
     this.countDown = 3;
 
     // Validate acceptable value ranges.
@@ -302,8 +302,8 @@ function sort(data) {
 }
 
 function takeAction(table, action) {
-    table.displayeTimeout = setTimeout(function () {
-        table.displayeTimeout = null;
+    table.displayTimeout = setTimeout(function () {
+        table.displayTimeout = null;
         if (table.status == enums.GAME_STATUS_RUNNING) {
             var players = [];
             var destPlayer = {};

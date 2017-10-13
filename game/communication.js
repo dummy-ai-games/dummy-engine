@@ -340,8 +340,8 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].reloadTimeOut)
             clearTimeout(that.table[tableNumber].reloadTimeOut);
-        if (that.table[tableNumber].displayeTimeout)
-            clearTimeout(that.table[tableNumber].displayeTimeout);
+        if (that.table[tableNumber].displayTimeout)
+            clearTimeout(that.table[tableNumber].displayTimeout);
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
         that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
@@ -488,8 +488,8 @@ SkyRTC.prototype.initTable = function (tableNumber) {
 
         if (that.table[data.table.tableNumber].reloadTimeOut)
             clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
-        if (that.table[data.table.tableNumber].displayeTimeout)
-            clearTimeout(that.table[data.table.tableNumber].displayeTimeout);
+        if (that.table[data.table.tableNumber].displaysTimeout)
+            clearTimeout(that.table[data.table.tableNumber].displayTimeout);
         if (that.table[data.table.tableNumber].timeout)
             clearTimeout(data.table.tableNumber.timeout);
 
