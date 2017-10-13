@@ -130,8 +130,6 @@ function SkyRTC() {
                     if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
                         if (currentTable.timeout)
                             clearTimeout(currentTable.timeout);
-                        if (currentTable.displayTimeout)
-                            clearTimeout(currentTable.displayTimeout);
                         currentTable.isActionTime = false;//fix bug, should not accept action util server have request action
                         try {
                             switch (action) {
@@ -342,10 +340,10 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].reloadTimeOut)
             clearTimeout(that.table[tableNumber].reloadTimeOut);
+        if (that.table[tableNumber].displayeTimeout)
+            clearTimeout(that.table[tableNumber].displayeTimeout);
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
-        if (that.table[tableNumber].displayTimeout)
-            clearTimeout(that.table[tableNumber].displayTimeout);
         that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
         delete that.table[tableNumber];
         logger.info("remove table " + tableNumber + " timeout");
@@ -353,13 +351,13 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
 
     // initialize game parameters
     that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2, 100);
-    that.table[tableNumber].tableNumber = tableNumber;    
+    that.table[tableNumber].tableNumber = tableNumber;
     that.initTable(tableNumber);
     logger.info("init table done");
     that.sendCountDown(tableNumber);
 };
 
-SkyRTC.prototype.sendCountDown = function(tableNumber) {
+SkyRTC.prototype.sendCountDown = function (tableNumber) {
     // start count down
     var that = this;
     if (that.table[tableNumber].countDown > 0) {
@@ -378,7 +376,7 @@ SkyRTC.prototype.sendCountDown = function(tableNumber) {
         setTimeout(function () {
             that.sendCountDown(tableNumber);
         }, 1000);
-    } else {      
+    } else {
         that.startGame(tableNumber);
     }
 };
@@ -430,7 +428,7 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
         return;
     }
 
-    logger.info("game stop for table: " + tableNumber);    
+    logger.info("game stop for table: " + tableNumber);
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
@@ -438,16 +436,13 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
         if (that.table[tableNumber].reloadTimeOut)
             clearTimeout(that.table[tableNumber].reloadTimeOut);
 
-        if (that.table[tableNumber].displayTimeout)
-            clearTimeout(that.table[tableNumber].displayTimeout);
-
         that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
 
         delete that.table[tableNumber];
         logger.info("remove table " + tableNumber + " timeout");
     }
 
-   
+
     message = {
         'eventName': '__game_stop',
         'data': {'msg': 'table ' + tableNumber + ' stopped successfully', 'tableNumber': tableNumber}
@@ -490,12 +485,14 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         };
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
-        if (that.table[data.table.tableNumber].timeout)
-            clearTimeout(data.table.tableNumber.timeout);
+
         if (that.table[data.table.tableNumber].reloadTimeOut)
             clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
-        if (that.table[data.table.tableNumber].displayTimeout)
-            clearTimeout(that.table[data.table.tableNumber].displayTimeout);
+        if (that.table[data.table.tableNumber].displayeTimeout)
+            clearTimeout(that.table[data.table.tableNumber].displayeTimeout);
+        if (that.table[data.table.tableNumber].timeout)
+            clearTimeout(data.table.tableNumber.timeout);
+
         delete that.table[data.table.tableNumber];
     });
 
@@ -542,18 +539,23 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var currentTable;
     tableNumber = that.playerAndTable[player];
     currentTable = that.table[tableNumber];
-    if(!currentTable)
+    if (!currentTable)
         return;
 
-    // also send this message to all guests
-    that.broadcastInGuests(message);
-
     if (that.players[player]) {
-        if (that.players[player]) {
-            currentTable.displayTimeout = setTimeout(function () {
-                that.sendActionToPlayer(message, tableNumber, player, currentTable);
-            }, 2000);
-        }
+        logger.info('server request: ' + JSON.stringify(message));
+        that.sendMessage(that.players[player], message);
+        var timestamp = new Date().getTime();
+        logger.info('send player action,time is ' + timestamp);
+        currentTable.timeout = setTimeout(function () {
+            currentTable.timeout = null;
+            if (currentTable.status === enums.GAME_STATUS_RUNNING) {
+                logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
+                currentTable.isActionTime = false;
+                currentTable.players[currentTable.currentPlayer].Fold();
+            }
+        }, 5 * 1000); // for BETA test, set to 5 sec, for official game, set to 2 sec
+
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
             currentTable.timeout = null;
@@ -570,22 +572,6 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             currentTable.players[currentTable.currentPlayer].Fold();
         }
     }
-};
-
-SkyRTC.prototype.sendActionToPlayer = function (message, tableNumber, player, currentTable) {
-    var that = this;
-    logger.info('server request: ' + JSON.stringify(message));
-    that.sendMessage(that.players[player], message);
-    var timestamp = new Date().getTime();
-    logger.info('send player action,time is ' + timestamp);
-    currentTable.timeout = setTimeout(function () {
-        currentTable.timeout = null;
-        if (currentTable.status === enums.GAME_STATUS_RUNNING) {
-            logger.info("table " + tableNumber + " player " + player + " response timeout, auto FOLD");
-            currentTable.isActionTime = false;
-            currentTable.players[currentTable.currentPlayer].Fold();
-        }
-    }, 60 * 1000); // for BETA test, set to 1 min, for official game, set to 2 sec
 };
 
 SkyRTC.prototype.removeSocket = function (socket) {
