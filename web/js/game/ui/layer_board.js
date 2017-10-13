@@ -112,15 +112,15 @@ var BoardLayer = cc.Layer.extend({
     logoMarginTop: 18,
     logoMarginRight: 36,
     controlMenuMarginLeft: 18,
-    controlMenuMarginBottom: 680,
+    controlMenuMarginBottom: 660,
     opButtonMarginLeft: 20,
     opButtonGap: 20,
     opButtonMarginBottom: 10,
     betButtonGap: 0,
     betSpinnerGap: 4,
     betAmountGap: 10,
-    turnDestX: 80,
-    turnDestY: 700,
+    turnDestX: 120,
+    turnDestY: 720,
 
     // pre-loaded frames
     pokerFrames: null,
@@ -496,6 +496,12 @@ var BoardLayer = cc.Layer.extend({
     },
 
     // game operations
+    playerAction: function(callback, param) {
+        callback(param);
+        // hide your turn sign and continue game
+        this.yourTurn.setVisible(false);
+    },
+
     update: function () {
         this.doUpdate();
     },
@@ -603,7 +609,7 @@ var BoardLayer = cc.Layer.extend({
                         this.yourTurn.setVisible(true);
                         this.yourTurnAnimation(this.yourTurn,
                             this.gameScale * 4,
-                            this.gameScale * 0.3,
+                            this.gameScale * 0.8,
                             this.yourTurnDest,
                             new cc.CallFunc(this.cbYourTurnAnimationFinished, this));
                         turnAnimationShowed = true;

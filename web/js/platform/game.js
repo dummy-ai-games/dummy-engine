@@ -209,9 +209,39 @@ function initWebsock() {
     rtc.on('__action', function(data) {
         console.log('server request action : ' + JSON.stringify(data));
         // it's your turn !!
-        if (data.self.playerName === playerName) {
+        if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
+            console.log('!!! YOUR TURN !!!');
             turnAnimationShowed = false;
             myTurn = true;
+        }
+
+        for (var i = 0; i < currentPlayers; i++) {
+            if (players[i]) {
+                if (players[i].playerName === data.self.playerName) {
+                    players[i].setInTurn(true);
+                } else {
+                    players[i].setInTurn(false);
+                }
+            }
+        }
+    });
+
+    rtc.on('__bet', function(data) {
+        console.log('server request bet : ' + JSON.stringify(data));
+        // it's your turn !!
+        if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
+            console.log('!!! YOUR TURN !!!');
+            turnAnimationShowed = false;
+            myTurn = true;
+        }
+        for (var i = 0; i < currentPlayers; i++) {
+            if (players[i]) {
+                if (players[i].playerName === data.self.playerName) {
+                    players[i].setInTurn(true);
+                } else {
+                    players[i].setInTurn(false);
+                }
+            }
         }
     });
 
@@ -265,8 +295,8 @@ function initGame() {
     var marginLeft = getElementLeft(document.getElementById("gameContainer"));
     var marginTop = getElementTop(document.getElementById("gameContainer"));
 
-    winHeight = document.documentElement.clientHeight - marginTop - 8;
-    winWidth = document.documentElement.clientWidth - marginLeft * 2;
+    winHeight = document.documentElement.clientHeight;
+    winWidth = document.documentElement.clientWidth;
 
     var realProportion = winHeight / winWidth;
 

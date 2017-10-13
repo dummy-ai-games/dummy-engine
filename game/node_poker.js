@@ -151,7 +151,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 that.isBet = false;
                 logGame(that.tableNumber, "reload time end, start new round");
                 that.NewRound();
-            }, 5 * 1000);
+            }, 10 * 1000);
         } else {
             logGame(that.tableNumber, 'game over, winners : ');
             that.status = enums.GAME_STATUS_FINISHED;

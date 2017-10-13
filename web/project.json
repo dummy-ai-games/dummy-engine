@@ -1,6 +1,7 @@
 {
-    "debugMode"     : 1,
-    "frameRate"     : 10,
+    "showFPS"       : false,
+    "debugMode"     : 0,
+    "frameRate"     : 12,
     "id"            : "gameCanvas",
     "renderMode"    : 1,
     "jsList"        : [],

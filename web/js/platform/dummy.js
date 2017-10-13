@@ -17,7 +17,6 @@ var danger = 2;
 var rtc = SkyRTC();
 var playerName = '';
 var server = '';
-var CALL_IN_TIME = 0;
 var serverAddress = '';
 var maxCommands = 500;
 var commandCount = 0;
@@ -107,9 +106,7 @@ function initRTC() {
 
 function takeAction(selfCard, cards, players) {
     if (cards.length === 2) {
-        setTimeout(function () {
-            call();
-        }, CALL_IN_TIME);
+        call();
         return;
     }
     var handRanks = [];
@@ -181,72 +178,46 @@ function takeAction(selfCard, cards, players) {
 
     if (isTonghua || isShunzi) {
         if (handRanks.indexOf('T') > -1 && handRanks.indexOf('J') > -1 && handRanks.indexOf('Q') > -1 && handRanks.indexOf('K') > -1 && handRanks.indexOf('A') > -1)
-            setTimeout(function () {
-                allin();
-            }, CALL_IN_TIME);
+            allin();
         else if (isTonghua && isShunzi)
-            setTimeout(function () {
-                raise();
-            }, CALL_IN_TIME);
+            raise();
         else if (gameStatus !== danger)
-            setTimeout(function () {
-                raise();
-            }, CALL_IN_TIME);
+            raise();
         else
-            setTimeout(function () {
-                call();
-            }, CALL_IN_TIME);
+            call();
         return;
     }
 
     if (isSitiao) {
         if (gameStatus !== danger)
-            setTimeout(function () {
-                raise();
-            }, CALL_IN_TIME);
+            raise();
         else
-            setTimeout(function () {
-                call();
-            }, CALL_IN_TIME);
+            call();
         return;
     }
 
     if (isSantiao || pairNumber > 1) {
         if (isSantiao && (pairNumber > 1 || maxPairValue > '9') && gameStatus !== danger)
-            setTimeout(function () {
-                raise();
-            }, CALL_IN_TIME);
+            raise();
         else if (gameStatus === danger && !isSantiao && !(pairValue.indexOf(selfCard[0]) > -1 && pairValue.indexOf(selfCard[1]) > -1 && selfCard[0] !== selfCard[1]) && maxPairValue < 'I')
-            setTimeout(function () {
-                fold();
-            }, CALL_IN_TIME);
+            fold();
         else
-            setTimeout(function () {
-                call();
-            }, CALL_IN_TIME);
+            call();
         return;
     }
 
     if (pairNumber > 0 && (pairValue.toString().indexOf(selfCard[0]) > -1 || pairValue.toString().indexOf(selfCard[1]) > -1)) {
         if ((gameStatus === risk && maxPairValue < '6') || (gameStatus === danger && maxPairValue < 'I'))
-            setTimeout(function () {
-                fold();
-            }, CALL_IN_TIME);
+            fold();
         else
-            setTimeout(function () {
-                call();
-            }, CALL_IN_TIME);
+            call();
         return;
     }
 
     if (cards.length > 5)
-        setTimeout(function () {
-            fold();
-        }, CALL_IN_TIME);
+        fold();
     else
-        setTimeout(function () {
-            call();
-        }, CALL_IN_TIME);
+        call();
 }
 
 function reload() {
