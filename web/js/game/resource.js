@@ -178,6 +178,8 @@ var action_sb_left = './res/images/game_board/action_left_sb.png';
 var action_bb_left = './res/images/game_board/action_left_bb.png';
 var action_sb_right = './res/images/game_board/action_right_sb.png';
 var action_bb_right = './res/images/game_board/action_right_bb.png';
+var action_wait_left = './res/images/game_board/action_left_wait.png';
+var action_wait_right = './res/images/game_board/action_right_wait.png';
 
 var actionLeftMap = new Map();
 actionLeftMap.set('allin', action_allin);

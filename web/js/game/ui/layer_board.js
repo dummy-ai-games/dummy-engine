@@ -498,8 +498,6 @@ var BoardLayer = cc.Layer.extend({
     // game operations
     playerAction: function(callback, param) {
         callback(param);
-        // hide your turn sign and continue game
-        this.yourTurn.setVisible(false);
     },
 
     update: function () {
