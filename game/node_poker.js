@@ -352,7 +352,7 @@ function takeAction(table, action) {
             table.eventEmitter.emit(action, data);
             table.isActionTime = true;
         }
-    }, 2000);
+    }, 100);
 
 }
 

@@ -468,7 +468,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             'eventName': '__bet',
             'data': data
         };
-        that.getPlayerAction(message);
+
         var data = that.getBasicData(data.tableNumber);
         var message2 = {
             'eventName': '__deal',
@@ -476,6 +476,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         };
         that.broadcastInGuests(message2);
         that.broadcastInPlayers(message2);
+        that.getPlayerAction(message);
     });
 
     that.table[tableNumber].eventEmitter.on('__game_over', function (data) {
