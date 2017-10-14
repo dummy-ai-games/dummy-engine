@@ -54,7 +54,7 @@ var currentBigBlind = 0;
 // communication related
 var rtc = SkyRTC();
 
-$(document).ready(function() {
+$(document).ready(function () {
     // get table number first
     tableNumber = getParameter('table');
     playerName = getParameter('name');
@@ -80,16 +80,16 @@ function initPlayerInfo() {
             table_number: tableNumber
         },
         timeout: 20000,
-        success: function(response) {
-            if(response.status.code === 0) {
+        success: function (response) {
+            if (response.status.code === 0) {
                 console.log("get db players: " + JSON.stringify(response.entity));
                 dbPlayers = response.entity;
-            } else if(response.status.code === 1) {
+            } else if (response.status.code === 1) {
                 console.log('list player failed, use player name as display name');
             }
             initWebsock();
         },
-        error: function() {
+        error: function () {
             console.log('list player failed, use player name as display name');
             initWebsock();
         }
@@ -100,27 +100,29 @@ function initPlayerInfo() {
 function initWebsock() {
     // initialize web communication
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0],
-            playerName, tableNumber);
+        playerName, tableNumber);
 
-    rtc.on('__new_peer', function(data) {
-        if (data) {
-            console.log('player join : ' + JSON.stringify(data));
+    rtc.on('__new_peer', function (data) {
+        console.log("receive __new_peer" + JSON.stringify(data));
+        var joinPlayers = data.players;
+        if (joinPlayers) {
+            console.log('player join : ' + JSON.stringify(joinPlayers));
         } else {
             console.log('guest join');
         }
 
-        if (undefined !== data && null !== data) {
-            currentPlayers = data.length;
+        if (undefined !== joinPlayers && null !== joinPlayers) {
+            currentPlayers = joinPlayers.length;
             // rebuild player list
             players = [];
             for (var i = 0; i < currentPlayers; i++) {
-                var playerDisplayName = findDBPlayerNameById(data[i]);
-                players[i] = new Player(data[i], data[i], playerDisplayName, defaultInitChips, true, 0);
+                var playerDisplayName = findDBPlayerNameById(joinPlayers[i]);
+                players[i] = new Player(joinPlayers[i], joinPlayers[i], playerDisplayName, defaultInitChips, true, 0);
             }
         }
     });
 
-    rtc.on('__left', function(data) {
+    rtc.on('__left', function (data) {
         if (undefined !== data && null !== data) {
             console.log('player left : ' + JSON.stringify(data));
         } else {
@@ -145,7 +147,7 @@ function initWebsock() {
         }
     });
 
-    rtc.on('__game_over', function(data) {
+    rtc.on('__game_over', function (data) {
         console.log('game over : ' + JSON.stringify(data));
         // set winners
         winners = data.winners;
@@ -158,31 +160,31 @@ function initWebsock() {
 
         if (undefined !== autoStart && (autoStart === 1 || autoStart === '1')) {
             // auto start another game in 3s
-            setTimeout(function() {
+            setTimeout(function () {
                 startGame();
             }, 10 * 10000);
         }
     });
 
-    rtc.on('__game_prepare', function(data) {
+    rtc.on('__game_prepare', function (data) {
         console.log('game preparing : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_PREPARING;
         gameCountDown = data.countDown;
     });
 
-    rtc.on('__game_start', function(data) {
+    rtc.on('__game_start', function (data) {
         // update in game engine
         console.log('game start : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
     });
 
-    rtc.on('__game_stop', function(data) {
+    rtc.on('__game_stop', function (data) {
         // update in game engine
         console.log('game stop : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_STANDBY;
     });
 
-    rtc.on('__deal', function(data) {
+    rtc.on('__deal', function (data) {
         console.log('deal : ' + JSON.stringify(data));
         var board_card = data.table.board;
         var board = '';
@@ -200,7 +202,7 @@ function initWebsock() {
         updateGame(data, false);
     });
 
-    rtc.on('__new_round', function(data) {
+    rtc.on('__new_round', function (data) {
         console.log('new round : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
 
@@ -208,14 +210,14 @@ function initWebsock() {
         updateGame(data, true);
     });
 
-    rtc.on('__round_end', function(data) {
+    rtc.on('__round_end', function (data) {
         console.log('round end : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
     });
 
     // this request could be received in player mode only
-    rtc.on('__action', function(data) {
+    rtc.on('__action', function (data) {
         console.log('server request action : ' + JSON.stringify(data));
         // it's your turn !!
         if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
@@ -236,7 +238,7 @@ function initWebsock() {
         }
     });
 
-    rtc.on('__bet', function(data) {
+    rtc.on('__bet', function (data) {
         console.log('server request bet : ' + JSON.stringify(data));
         // it's your turn !!
         if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
@@ -256,7 +258,7 @@ function initWebsock() {
         }
     });
 
-    rtc.on('__show_action', function(data) {
+    rtc.on('__show_action', function (data) {
         console.log('show action : ' + JSON.stringify(data));
 
         gameStatus = STATUS_GAME_RUNNING;
@@ -337,17 +339,17 @@ function initGame() {
         d.body.style.background = '#000000';
         return;
     }
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', function () {
         ccLoad();
     });
 }
 
 function ccLoad() {
-    cc.game.onStart = function() {
+    cc.game.onStart = function () {
         //load resources
-        cc.LoaderScene.preload(resources, function() {
+        cc.LoaderScene.preload(resources, function () {
             var LSScene = cc.Scene.extend({
-                onEnter: function() {
+                onEnter: function () {
                     this._super();
                     var gameBoard = new BoardLayer();
                     gameBoard.init();
@@ -472,7 +474,7 @@ function findDBPlayerNameById(playerName) {
 function getElementLeft(element) {
     var actualLeft = element.offsetLeft;
     var current = element.offsetParent;
-    while (current !== null){
+    while (current !== null) {
         actualLeft += current.offsetLeft;
         current = current.offsetParent;
     }
@@ -482,7 +484,7 @@ function getElementLeft(element) {
 function getElementTop(element) {
     var actualTop = element.offsetTop;
     var current = element.offsetParent;
-    while (current !== null){
+    while (current !== null) {
         actualTop += current.offsetTop;
         current = current.offsetParent;
     }
