@@ -580,7 +580,7 @@ var PlayerLayer = cc.Layer.extend({
         if (!this.player.isSurvive) {
             this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
         } else if (this.player.folded) {
-            this.changeSpriteImage(this.actionPanel, this.actionFrames.get('FOLD'));
+            this.changeSpriteImage(this.actionPanel, this.actionFrames.get('fold'));
         } else if (this.player.isSmallBlind && this.player.takeAction === ACTION_STATUS_NONE) {
             this.changeSpriteImage(this.actionPanel, this.actionSBFrame);
         } else if (this.player.isBigBlind && this.player.takeAction === ACTION_STATUS_NONE) {
