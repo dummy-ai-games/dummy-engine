@@ -137,8 +137,9 @@ function SkyRTC() {
                                         amount = parseInt(data.amount);
                                     } catch (e) {
                                         logger.error(e.message);
-                                        amount = currentTable.bigBlind;
                                     }
+                                    if (!amount)
+                                        amount = currentTable.bigBlind;
                                     currentTable.players[playerIndex].Bet(amount);
                                     break;
                                 case 'call':
@@ -269,7 +270,7 @@ SkyRTC.prototype.notifyJoin = function () {
     var that = this;
     var tableAndPlayer = [];
     for (var playerName in that.players) {
-        if(that.players[playerName]) {
+        if (that.players[playerName]) {
             if (!tableAndPlayer[that.players[playerName].tableNumber]) {
                 tableAndPlayer[that.players[playerName].tableNumber] = [];
             }
@@ -290,7 +291,7 @@ SkyRTC.prototype.notifyJoin = function () {
         that.sendMessage(that.guests[guest], message);
     }
     for (var player in that.players) {
-        if(that.players[player]) {
+        if (that.players[player]) {
             tableNumber = that.players[player].tableNumber;
             message = {
                 'eventName': '__new_peer',
@@ -309,7 +310,7 @@ SkyRTC.prototype.notifyLeft = function () {
     var that = this;
     var tableAndPlayer = [];
     for (var playerName in that.players) {
-        if(that.players[playerName]) {
+        if (that.players[playerName]) {
             if (!tableAndPlayer[that.players[playerName].tableNumber]) {
                 tableAndPlayer[that.players[playerName].tableNumber] = [];
             }
@@ -329,7 +330,7 @@ SkyRTC.prototype.notifyLeft = function () {
         that.sendMessage(that.guests[guest], message);
     }
     for (var player in that.players) {
-        if(that.players[player]) {
+        if (that.players[player]) {
             if (undefined === tableAndPlayer[that.players[player].tableNumber]) {
                 tableAndPlayer[that.players[player].tableNumber] = [];
             }
