@@ -2184,7 +2184,7 @@ Player.prototype.Bet = function (bet) {
     this.table.isBet = false;
     var i;
 
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to BET');
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to BET:' + bet);
 
     if (bet < this.table.bigBlind) {
         logGame(this.table.tableNumber, 'player : ' +
