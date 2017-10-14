@@ -26,6 +26,7 @@ var BoardLayer = cc.Layer.extend({
     validWidth: 0,
     validHeight: 0,
     publicCardsModel: [],
+    currentBet: 0,
 
     // scales
     gameScale: 1.0,
@@ -118,7 +119,7 @@ var BoardLayer = cc.Layer.extend({
     opButtonGap: -16,
     opButtonMarginBottom: 10,
     betButtonGap: 0,
-    betSpinnerGap: 4,
+    betSpinnerGap: 6,
     betAmountGap: 10,
     turnDestX: 120,
     turnDestY: 720,
@@ -167,6 +168,7 @@ var BoardLayer = cc.Layer.extend({
             this.callButton.setAnchorPoint(0, 0);
             this.callButton.setScale(this.operationButtonScale);
             this.callButton.setPosition(this.opButtonMarginLeft * this.gameScale, this.opButtonMarginBottom);
+            this.enableButton(this.callButton, false);
             this.addChild(this.callButton, 2);
             this.callButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -182,6 +184,7 @@ var BoardLayer = cc.Layer.extend({
             this.raiseButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale,
                     this.opButtonMarginBottom);
+            this.enableButton(this.raiseButton, false);
             this.addChild(this.raiseButton, 2);
             this.raiseButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -197,6 +200,7 @@ var BoardLayer = cc.Layer.extend({
             this.checkButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 2,
                     this.opButtonMarginBottom);
+            this.enableButton(this.checkButton, false);
             this.addChild(this.checkButton, 2);
             this.checkButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -212,6 +216,7 @@ var BoardLayer = cc.Layer.extend({
             this.foldButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 3,
                     this.opButtonMarginBottom);
+            this.enableButton(this.foldButton, false);
             this.addChild(this.foldButton, 2);
             this.foldButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -227,6 +232,7 @@ var BoardLayer = cc.Layer.extend({
             this.allinButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 4,
                     this.opButtonMarginBottom);
+            this.enableButton(this.allinButton, false);
             this.addChild(this.allinButton, 2);
             this.allinButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -236,17 +242,19 @@ var BoardLayer = cc.Layer.extend({
             }, this);
 
             // bet button
+            this.currentBet = 0;
             this.betButton = ccui.Button.create(s_o_bet_button, s_o_bet_button_pressed, s_o_bet_button_disabled);
             this.betButton.setAnchorPoint(0, 0);
             this.betButton.setScale(this.operationButtonScale);
             this.betButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 5,
                 this.opButtonMarginBottom);
+            this.enableButton(this.betButton, false);
             this.addChild(this.betButton, 2);
             this.betButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('bet pressed');
-                    this.playerAction(bet, 100);
+                    this.playerAction(bet, this.currentBet);
                 }
             }, this);
 
@@ -255,7 +263,7 @@ var BoardLayer = cc.Layer.extend({
             this.bgBet.setAnchorPoint(0, 0);
             this.bgBet.setScale(this.operationButtonScale);
             this.bgBet.setPosition(this.betButton.getPositionX() +
-                this.betButton.getContentSize().width * this.gameScale + this.betButtonGap,
+                this.betButton.getContentSize().width * this.operationButtonScale + this.betButtonGap,
                     this.opButtonMarginBottom);
             this.addChild(this.bgBet, 2);
 
@@ -263,36 +271,41 @@ var BoardLayer = cc.Layer.extend({
             this.betSpinnerUp = ccui.Button.create(s_o_arrow_up, s_o_arrow_up_pressed, s_o_arrow_up_disabled);
             this.betSpinnerUp.setAnchorPoint(0, 0.5);
             this.betSpinnerUp.setScale(this.operationButtonScale);
-            this.betSpinnerUp.setPosition(this.bgBet.getPositionX() + this.betSpinnerGap * this.gameScale,
-                this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.gameScale / 9 * 6);
+            this.betSpinnerUp.setPosition(this.bgBet.getPositionX(),
+                this.bgBet.getPositionY() + (this.bgBet.getContentSize().height - this.betSpinnerGap)
+                    * this.operationButtonScale);
+            this.enableButton(this.betSpinnerUp, false);
             this.addChild(this.betSpinnerUp, 3);
             this.betSpinnerUp.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('up pressed');
+                    this.betPlus();
                 }
             }, this);
 
             this.betSpinnerDown = ccui.Button.create(s_o_arrow_down, s_o_arrow_down_pressed, s_o_arrow_down_disabled);
             this.betSpinnerDown.setAnchorPoint(0, 0.5);
             this.betSpinnerDown.setScale(this.operationButtonScale);
-            this.betSpinnerDown.setPosition(this.bgBet.getPositionX() + this.betSpinnerGap * this.gameScale,
-                this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.gameScale / 9 * 3);
+            this.betSpinnerDown.setPosition(this.bgBet.getPositionX(),
+                this.bgBet.getPositionY() + this.betSpinnerGap * this.operationButtonScale);
+            this.enableButton(this.betSpinnerDown, false);
             this.addChild(this.betSpinnerDown, 3);
             this.betSpinnerDown.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     console.log('down pressed');
+                    this.betMinus();
                 }
             }, this);
 
-            this.amountLabel = new cc.LabelTTF('20', this.amountTextFont, this.amountTextSize);
+            this.amountLabel = new cc.LabelTTF('$' + this.currentBet, this.amountTextFont, this.amountTextSize);
             this.amountLabel.setColor(cc.color(255, 255, 255, 255));
             this.amountLabel.setAnchorPoint(0.5, 0.5);
             this.amountLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.amountLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
             this.amountLabel.setScale(this.operationButtonScale);
             this.amountLabel
-                .setPosition(this.bgBet.getPositionX() + this.bgBet.getContentSize().width * this.gameScale / 2,
-                    this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.gameScale / 2);
+                .setPosition(this.bgBet.getPositionX() + this.bgBet.getContentSize().width * this.operationButtonScale / 2,
+                    this.bgBet.getPositionY() + this.bgBet.getContentSize().height * this.operationButtonScale / 2);
             this.addChild(this.amountLabel, 3);
 
             // initialize turn animation
@@ -503,6 +516,18 @@ var BoardLayer = cc.Layer.extend({
         callback(param);
     },
 
+    betPlus: function() {
+        this.currentBet *= 2;
+        this.amountLabel.setString('$' + this.currentBet);
+    },
+
+    betMinus: function() {
+        if (this.currentBet >= currentBigBlind) {
+            this.currentBet /= 2;
+            this.amountLabel.setString('$' + this.currentBet);
+        }
+    },
+
     update: function () {
         this.doUpdate();
     },
@@ -612,7 +637,9 @@ var BoardLayer = cc.Layer.extend({
                         this.turnDestY * this.gameScale);
                     if (turnAnimationShowed === false && yourTurn === true) {
                         // play animation
-                        this.yourTurn.setVisible(true);
+                        this.setYourTurn(true);
+                        this.currentBet = currentBigBlind;
+                        this.amountLabel.setString('$' + this.currentBet);
                         this.yourTurnAnimation(this.yourTurn,
                             this.gameScale * 4,
                             this.gameScale * 0.8,
@@ -622,7 +649,7 @@ var BoardLayer = cc.Layer.extend({
                     }
 
                     if (yourTurn === false) {
-                        this.yourTurn.setVisible(false);
+                        this.setYourTurn(false);
                     }
                 }
                 break;
@@ -668,6 +695,18 @@ var BoardLayer = cc.Layer.extend({
         console.log('sprite animation finished');
     },
 
+    setYourTurn: function(isYourTurn) {
+        this.yourTurn.setVisible(isYourTurn);
+        this.enableButton(this.callButton, isYourTurn);
+        this.enableButton(this.raiseButton, isYourTurn);
+        this.enableButton(this.checkButton, isYourTurn);
+        this.enableButton(this.foldButton, isYourTurn);
+        this.enableButton(this.allinButton, isYourTurn);
+        this.enableButton(this.betButton, isYourTurn);
+        this.enableButton(this.betSpinnerUp, isYourTurn);
+        this.enableButton(this.betSpinnerDown, isYourTurn);
+    },
+
     initializeAltFrames: function() {
         var index;
         this.pokerBackFrame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
@@ -688,6 +727,13 @@ var BoardLayer = cc.Layer.extend({
     changeSpriteImage: function(sprite, srcFrame) {
         if (sprite && srcFrame) {
             sprite.setSpriteFrame(srcFrame);
+        }
+    },
+
+    enableButton: function(button, enable) {
+        if (button && button.isEnabled() !== enable) {
+            button.setEnabled(enable);
+            button.setBright(enable);
         }
     },
 

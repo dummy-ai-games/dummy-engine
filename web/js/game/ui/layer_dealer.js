@@ -281,7 +281,7 @@ var DealerLayer = cc.LayerColor.extend({
 
     // UI helpers
     enableButton: function(button, enable) {
-        if (button.isEnabled() !== enable) {
+        if (button && button.isEnabled() !== enable) {
             button.setEnabled(enable);
             button.setBright(enable);
         }
