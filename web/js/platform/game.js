@@ -116,8 +116,8 @@ function initWebsock() {
             // rebuild player list
             players = [];
             for (var i = 0; i < currentPlayers; i++) {
-                var playerDisplayName = findDBPlayerNameById(joinPlayers[i]);
-                players[i] = new Player(joinPlayers[i], joinPlayers[i], playerDisplayName, defaultInitChips, true, 0);
+                var playerDisplayName = findDBPlayerNameByName(joinPlayers[i]);
+                players[i] = new Player(joinPlayers[i], playerDisplayName, defaultInitChips, true, 0);
             }
         }
     });
@@ -136,7 +136,7 @@ function initWebsock() {
                 currentPlayers = data.length;
                 players = [];
                 for (index = 0; index < currentPlayers; index++) {
-                    var playerDisplayName = findDBPlayerNameById(data[index]);
+                    var playerDisplayName = findDBPlayerNameByName(data[index]);
                     players[index] = new Player(data[index], data[index], playerDisplayName, defaultInitChips, true, 0);
                 }
             } else {
@@ -152,7 +152,7 @@ function initWebsock() {
         // set winners
         winners = data.winners;
         for (var index = 0; index < winners.length; index++) {
-            winners[index].displayName = findDBPlayerNameById(winners[index].playerName);
+            winners[index].displayName = findDBPlayerNameByName(winners[index].playerName);
         }
 
         updateGame(data, true);
@@ -219,17 +219,22 @@ function initWebsock() {
     // this request could be received in player mode only
     rtc.on('__action', function (data) {
         console.log('server request action : ' + JSON.stringify(data));
+        gameStatus = STATUS_GAME_RUNNING;
         // it's your turn !!
-        if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
-            console.log('!!! YOUR TURN !!!');
-            turnAnimationShowed = false;
-            yourTurn = true;
+        if (playMode === MODE_PLAYER) {
+            if (data.self.playerName === playerName) {
+                turnAnimationShowed = false;
+                yourTurn = true;
+            } else {
+                yourTurn = false;
+            }
         }
 
         for (var i = 0; i < currentPlayers; i++) {
             if (players[i]) {
                 if (players[i].playerName === data.self.playerName) {
                     players[i].setInTurn(true);
+                    console.log('set player ' + data.self.playerName + ' thinking');
                     players[i].setTakeAction(ACTION_STATUS_THINKING);
                 } else {
                     players[i].setInTurn(false);
@@ -240,16 +245,21 @@ function initWebsock() {
 
     rtc.on('__bet', function (data) {
         console.log('server request bet : ' + JSON.stringify(data));
+        gameStatus = STATUS_GAME_RUNNING;
         // it's your turn !!
-        if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
-            console.log('!!! YOUR TURN !!!');
-            turnAnimationShowed = false;
-            yourTurn = true;
+        if (playMode === MODE_PLAYER) {
+            if (data.self.playerName === playerName) {
+                turnAnimationShowed = false;
+                yourTurn = true;
+            } else {
+                yourTurn = false;
+            }
         }
         for (var i = 0; i < currentPlayers; i++) {
             if (players[i]) {
                 if (players[i].playerName === data.self.playerName) {
                     players[i].setInTurn(true);
+                    console.log('set player ' + data.self.playerName + ' thinking');
                     players[i].setTakeAction(ACTION_STATUS_THINKING);
                 } else {
                     players[i].setInTurn(false);
@@ -264,7 +274,10 @@ function initWebsock() {
         gameStatus = STATUS_GAME_RUNNING;
         var roundAction = data.action;
 
-        var playerIndex = findPlayerIndexById(data.action.playerName);
+        console.log('find player by name ' + data.action.playerName);
+        var playerIndex = findPlayerIndexByName(data.action.playerName);
+        console.log('players : ' + JSON.stringify(players) + ', index = ' + playerIndex);
+
         if (roundAction.action === 'check' ||
             roundAction.action === 'fold' ||
             roundAction.action === 'raise' ||
@@ -273,6 +286,8 @@ function initWebsock() {
             if (playerIndex !== -1) {
                 players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
                 players[playerIndex].setAction(roundAction.action);
+                console.log('set player ' + players[playerIndex].playerName + ' decided : ' +
+                    players[playerIndex].action);
                 if (roundAction.action === 'fold') {
                     players[playerIndex].setBet(0);
                 }
@@ -282,7 +297,13 @@ function initWebsock() {
             if (playerIndex !== -1) {
                 players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
                 players[playerIndex].setAction(roundAction.action);
+                console.log('set player ' + players[playerIndex].playerName + ' decided : ' +
+                    players[playerIndex].action);
             }
+        }
+        // remove your turn
+        if (yourTurn) {
+            yourTurn = false;
         }
         // set in turn
         for (var i = 0; i < currentPlayers; i++) {
@@ -401,41 +422,53 @@ function updateGame(data, isNewRound) {
         currentPlayers = data.players.length;
         console.log('player list (' + currentPlayers + ') = ' + JSON.stringify(players));
         for (i = 0; i < data.players.length; i++) {
-            players[i].setId(data.players[i].playerName);
-            players[i].setDisplayName(findDBPlayerNameById(data.players[i].playerName));
+            var targetPlayer = findTargetPlayer(data.players[i].playerName);
+            if (null === targetPlayer) {
+                continue;
+            }
+            targetPlayer.setDisplayName(findDBPlayerNameByName(data.players[i].playerName));
             if (isNewRound) {
-                players[i].setAction('');
-                players[i].setPrivateCards(null, null);
-                players[i].setAccumulate(0);
-                players[i].setBet(0);
-                players[i].setRoundBet(0);
-                players[i].setTakeAction(ACTION_STATUS_NONE);
-                players[i].setFolded(false);
-                players[i].setAllin(false);
+                targetPlayer.setAction('');
+                targetPlayer.setPrivateCards(null, null);
+                targetPlayer.setAccumulate(0);
+                targetPlayer.setBet(0);
+                targetPlayer.setRoundBet(0);
+                targetPlayer.setTakeAction(ACTION_STATUS_NONE);
+                targetPlayer.setFolded(false);
+                targetPlayer.setAllin(false);
             } else {
                 if (data.players[i].cards && data.players[i].cards.length === 2) {
-                    players[i].setPrivateCards(data.players[i].cards[0], data.players[i].cards[1]);
+                    targetPlayer.setPrivateCards(data.players[i].cards[0], data.players[i].cards[1]);
                 }
-                players[i].setBet(data.players[i].bet);
-                players[i].setRoundBet(data.players[i].roundBet);
-                players[i].setChips(data.players[i].chips);
-                players[i].setSurvive(data.players[i].isSurvive);
-                players[i].setFolded(data.players[i].folded);
-                players[i].setAllin(data.players[i].allIn);
-                players[i].setReloadCount(data.players[i].reloadCount);
+                targetPlayer.setBet(data.players[i].bet);
+                targetPlayer.setRoundBet(data.players[i].roundBet);
+                targetPlayer.setChips(data.players[i].chips);
+                targetPlayer.setSurvive(data.players[i].isSurvive);
+                targetPlayer.setFolded(data.players[i].folded);
+                targetPlayer.setAllin(data.players[i].allIn);
+                targetPlayer.setReloadCount(data.players[i].reloadCount);
             }
 
             if (data.table) {
-                players[i].setSmallBlind(players[i].playerName === data.table.smallBlind.playerName);
-                players[i].setBigBlind(players[i].playerName === data.table.bigBlind.playerName);
+                targetPlayer.setSmallBlind(targetPlayer.playerName === data.table.smallBlind.playerName);
+                targetPlayer.setBigBlind(targetPlayer.playerName === data.table.bigBlind.playerName);
             }
         }
     }
 }
 
-function findPlayerIndexById(id) {
+function findTargetPlayer(playerName) {
     for (var i = 0; i < players.length; i++) {
-        if (players[i].id === id) {
+        if (players[i].playerName === playerName) {
+            return players[i];
+        }
+    }
+    return null;
+}
+
+function findPlayerIndexByName(playerName) {
+    for (var i = 0; i < players.length; i++) {
+        if (players[i].playerName === playerName) {
             return i;
         }
     }
@@ -454,7 +487,7 @@ function playerOnline(playerName, playerList) {
     return true;
 }
 
-function findDBPlayerNameById(playerName) {
+function findDBPlayerNameByName(playerName) {
     if (dbPlayers) {
         for (var i = 0; i < dbPlayers.length; i++) {
             if (dbPlayers[i].playerName === playerName) {

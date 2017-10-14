@@ -40,19 +40,29 @@ var s_stop_button_disabled = './res/images/game_board/stop_button_disabled.png';
 // operation buttons
 var s_o_call_button = './res/images/game_board/btn_call.png';
 var s_o_call_button_pressed = './res/images/game_board/btn_call_pressed.png';
+var s_o_call_button_disabled = './res/images/game_board/btn_call_disabled.png';
 var s_o_raise_button = './res/images/game_board/btn_raise.png';
 var s_o_raise_button_pressed = './res/images/game_board/btn_raise_pressed.png';
+var s_o_raise_button_disabled = './res/images/game_board/btn_raise_disabled.png';
 var s_o_check_button = './res/images/game_board/btn_check.png';
 var s_o_check_button_pressed = './res/images/game_board/btn_check_pressed.png';
+var s_o_check_button_disabled = './res/images/game_board/btn_check_disabled.png';
 var s_o_fold_button = './res/images/game_board/btn_fold.png';
 var s_o_fold_button_pressed = './res/images/game_board/btn_fold_pressed.png';
+var s_o_fold_button_disabled = './res/images/game_board/btn_fold_disabled.png';
 var s_o_allin_button = './res/images/game_board/btn_allin.png';
 var s_o_allin_button_pressed = './res/images/game_board/btn_allin_pressed.png';
+var s_o_allin_button_disabled = './res/images/game_board/btn_allin_disabled.png';
 var s_o_bet_button = './res/images/game_board/btn_bet.png';
 var s_o_bet_button_pressed = './res/images/game_board/btn_bet_pressed.png';
+var s_o_bet_button_disabled = './res/images/game_board/btn_bet_disabled.png';
 var s_o_spinner = './res/images/game_board/bg_spinner.png';
 var s_o_arrow_up = './res/images/game_board/btn_up.png';
+var s_o_arrow_up_pressed = './res/images/game_board/btn_up_pressed.png';
+var s_o_arrow_up_disabled = './res/images/game_board/btn_up_disabled.png';
 var s_o_arrow_down = './res/images/game_board/btn_down.png';
+var s_o_arrow_down_pressed = './res/images/game_board/btn_down_pressed.png';
+var s_o_arrow_down_disabled = './res/images/game_board/btn_down_disabled.png';
 
 
 // poker cards
@@ -255,15 +265,29 @@ var resources = [
     s_stop_button_disabled,
     s_o_call_button,
     s_o_call_button_pressed,
+    s_o_call_button_disabled,
     s_o_raise_button,
     s_o_raise_button_pressed,
+    s_o_raise_button_disabled,
     s_o_check_button,
     s_o_check_button_pressed,
+    s_o_check_button_disabled,
+    s_o_fold_button,
+    s_o_fold_button_pressed,
+    s_o_fold_button_disabled,
+    s_o_allin_button,
+    s_o_allin_button_pressed,
+    s_o_allin_button_disabled,
     s_o_bet_button,
     s_o_bet_button_pressed,
+    s_o_bet_button_disabled,
     s_o_spinner,
     s_o_arrow_up,
+    s_o_arrow_up_pressed,
+    s_o_arrow_up_disabled,
     s_o_arrow_down,
+    s_o_arrow_down_pressed,
+    s_o_arrow_down_disabled,
     s_a_avatar_0,
     s_a_avatar_1,
     s_a_avatar_2,
