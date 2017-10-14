@@ -76,7 +76,7 @@ function SkyRTC() {
         } else {
             logger.info('guest join!!');
             that.guests[socket.id] = socket;
-            that.notifyJoin();
+            //that.notifyJoin();
             that.initGuestData(socket.id);
         }
     });
@@ -276,19 +276,29 @@ SkyRTC.prototype.notifyJoin = function () {
         }
         tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
     }
-    var message;
+    var message, tableNumber;
     for (var guest in that.guests) {
+        tableNumber = that.guests[guest].tableNumber;
         message = {
             'eventName': '__new_peer',
-            'data': tableAndPlayer[that.guests[guest].tableNumber]
+            'data': {"players": tableAndPlayer[tableNumber]}
         };
+        if (that.table[tableNumber])
+            message.data.tableStatus = that.table[tableNumber].status;
+        else
+            message.data.tableStatus = enums.GAME_STATUS_STANDBY;
         that.sendMessage(that.guests[guest], message);
     }
     for (var player in that.players) {
+        tableNumber = that.players[player].tableNumber;
         message = {
             'eventName': '__new_peer',
-            'data': tableAndPlayer[that.players[player].tableNumber]
+            'data': {"players": tableAndPlayer[tableNumber]}
         };
+        if (that.table[tableNumber])
+            message.data.tableStatus = that.table[tableNumber].status;
+        else
+            message.data.tableStatus = enums.GAME_STATUS_STANDBY;
         that.sendMessage(that.players[player], message);
     }
 };
@@ -457,22 +467,23 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__bet', function (data) {
+        var data2 = that.getBasicData(data.tableNumber);
+        that.addPlayerStatus(data2);
         var message = {
+            'eventName': '__deal',
+            'data': data2
+        };
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+        var message2 = {
             'eventName': '__bet',
             'data': data
         };
-
-        var data = that.getBasicData(data.tableNumber);
-        var message2 = {
-            'eventName': '__deal',
-            'data': data
-        };
-        that.broadcastInGuests(message2);
-        that.broadcastInPlayers(message2);
-        that.getPlayerAction(message);
+        that.getPlayerAction(message2);
     });
 
     that.table[tableNumber].eventEmitter.on('__game_over', function (data) {
+        that.addPlayerStatus(data);
         var message = {
             'eventName': '__game_over',
             'data': data
@@ -485,6 +496,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__new_round', function (data) {
+        that.addPlayerStatus(data);
         var message = {
             'eventName': '__new_round',
             'data': data
@@ -502,6 +514,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__round_end', function (data) {
+        that.addPlayerStatus(data);
         var message = {
             'eventName': '__round_end',
             'data': data
@@ -510,6 +523,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__show_action', function (data) {
+        that.addPlayerStatus(data);
         var message = {
             'eventName': '__show_action',
             'data': data
@@ -519,6 +533,17 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInPlayers(message);
     });
 };
+
+SkyRTC.prototype.addPlayerStatus = function (data) {
+    var that = this;
+    for (var i = 0; i < data.players.length; i++) {
+        var playerName = data.players[i].playerName;
+        if (that.players[playerName])
+            data.players[i].isOnline = true;
+        else
+            data.players[i].isOnline = false;
+    }
+}
 
 SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var that = this;
