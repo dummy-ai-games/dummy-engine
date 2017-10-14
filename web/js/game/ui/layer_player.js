@@ -581,9 +581,9 @@ var PlayerLayer = cc.Layer.extend({
             this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
         } else if (this.player.folded) {
             this.changeSpriteImage(this.actionPanel, this.actionFrames.get('fold'));
-        } else if (this.player.isSmallBlind && this.player.takeAction === ACTION_STATUS_NONE) {
+        } else if (this.player.isSmallBlind && currentRoundName === 'Deal' && !this.player.takeAction) {
             this.changeSpriteImage(this.actionPanel, this.actionSBFrame);
-        } else if (this.player.isBigBlind && this.player.takeAction === ACTION_STATUS_NONE) {
+        } else if (this.player.isBigBlind && currentRoundName === 'Deal' && !this.player.takeAction) {
             this.changeSpriteImage(this.actionPanel, this.actionBBFrame);
         } else if (this.player.takeAction === ACTION_STATUS_THINKING) {
             this.changeSpriteImage(this.actionPanel, this.actionWaitFrame);
