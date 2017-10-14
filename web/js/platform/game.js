@@ -19,6 +19,10 @@ var STATUS_GAME_PREPARING = 1;
 var STATUS_GAME_RUNNING = 2;
 var STATUS_GAME_FINISHED = 3;
 
+var ACTION_STATUS_NONE = 0;
+var ACTION_STATUS_THINKING = 1;
+var ACTION_STATUS_DECIDED = 2;
+
 var MODE_LIVE = 0;
 var MODE_PLAYER = 1;
 
@@ -31,7 +35,7 @@ var currentRound = 1;
 var currentRaiseCount = 0;
 var currentBetCount = 0;
 
-var myTurn = false;
+var yourTurn = false;
 var turnAnimationShowed = false;
 
 var PLAYER_AT_LEFT = 0;
@@ -186,6 +190,11 @@ function initWebsock() {
             board += board_card[index] + ',';
         }
 
+        // update player actions
+        for (var i = 0; i < currentPlayers; i++) {
+            players[i].setTakeAction(ACTION_STATUS_NONE);
+        }
+
         // update in game engine
         gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
@@ -212,13 +221,14 @@ function initWebsock() {
         if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
             console.log('!!! YOUR TURN !!!');
             turnAnimationShowed = false;
-            myTurn = true;
+            yourTurn = true;
         }
 
         for (var i = 0; i < currentPlayers; i++) {
             if (players[i]) {
                 if (players[i].playerName === data.self.playerName) {
                     players[i].setInTurn(true);
+                    players[i].setTakeAction(ACTION_STATUS_THINKING);
                 } else {
                     players[i].setInTurn(false);
                 }
@@ -232,12 +242,13 @@ function initWebsock() {
         if (playMode === MODE_PLAYER && data.self.playerName === playerName) {
             console.log('!!! YOUR TURN !!!');
             turnAnimationShowed = false;
-            myTurn = true;
+            yourTurn = true;
         }
         for (var i = 0; i < currentPlayers; i++) {
             if (players[i]) {
                 if (players[i].playerName === data.self.playerName) {
                     players[i].setInTurn(true);
+                    players[i].setTakeAction(ACTION_STATUS_THINKING);
                 } else {
                     players[i].setInTurn(false);
                 }
@@ -258,7 +269,7 @@ function initWebsock() {
             roundAction.action === 'call') {
             // update in game engine
             if (playerIndex !== -1) {
-                players[playerIndex].setTakeAction(true);
+                players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
                 players[playerIndex].setAction(roundAction.action);
                 if (roundAction.action === 'fold') {
                     players[playerIndex].setBet(0);
@@ -267,7 +278,7 @@ function initWebsock() {
         } else {
             // update in game engine
             if (playerIndex !== -1) {
-                players[playerIndex].setTakeAction(true);
+                players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
                 players[playerIndex].setAction(roundAction.action);
             }
         }
@@ -396,7 +407,7 @@ function updateGame(data, isNewRound) {
                 players[i].setAccumulate(0);
                 players[i].setBet(0);
                 players[i].setRoundBet(0);
-                players[i].setTakeAction(false);
+                players[i].setTakeAction(ACTION_STATUS_NONE);
                 players[i].setFolded(false);
                 players[i].setAllin(false);
             } else {

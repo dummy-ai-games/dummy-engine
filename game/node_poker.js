@@ -41,6 +41,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.bigBlindIndex = 0;
     this.isActionTime = false;
     this.reloadTimeOut = null;
+    this.displayTimeOut = null;
     this.countDown = 3;
 
     // Validate acceptable value ranges.

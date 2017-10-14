@@ -33,6 +33,7 @@ var BoardLayer = cc.Layer.extend({
     decoScale: 1.0,
     boardScale: 1.0,
     mmScale: 1.0,
+    logoScale: 1.0,
     playerScale: 1.0,
     cardScale: 1.0,
     controlMenuScale: 1.0,
@@ -109,7 +110,7 @@ var BoardLayer = cc.Layer.extend({
     authorTextWidth: 340,
     authorTextHeight: 48,
     authorTextMarginBottom: 0,
-    logoMarginTop: 18,
+    logoMarginTop: 12,
     logoMarginRight: 36,
     controlMenuMarginLeft: 18,
     controlMenuMarginBottom: 660,
@@ -434,7 +435,8 @@ var BoardLayer = cc.Layer.extend({
         // initialize TrendMicro logo
         this.tmLogo = cc.Sprite.create(s_tm_logo);
         this.tmLogo.setAnchorPoint(0, 0);
-        this.tmLogo.setScale(this.gameScale);
+        this.logoScale = this.gameScale * 0.8;
+        this.tmLogo.setScale(this.logoScale);
         this.tmLogo.setPosition((this.bgSprite.getContentSize().width -
             this.tmLogo.getContentSize().width - this.logoMarginRight) * this.gameScale,
                 (this.bgSprite.getContentSize().height -
@@ -602,7 +604,7 @@ var BoardLayer = cc.Layer.extend({
                 if (playMode === MODE_PLAYER) {
                     this.yourTurnDest = new cc.p(this.turnDestX * this.gameScale,
                         this.turnDestY * this.gameScale);
-                    if (turnAnimationShowed === false && myTurn === true) {
+                    if (turnAnimationShowed === false && yourTurn === true) {
                         // play animation
                         this.yourTurn.setVisible(true);
                         this.yourTurnAnimation(this.yourTurn,
@@ -611,6 +613,10 @@ var BoardLayer = cc.Layer.extend({
                             this.yourTurnDest,
                             new cc.CallFunc(this.cbYourTurnAnimationFinished, this));
                         turnAnimationShowed = true;
+                    }
+
+                    if (yourTurn === false) {
+                        this.yourTurn.setVisible(false);
                     }
                 }
                 break;

@@ -27,6 +27,7 @@ var PlayerLayer = cc.Layer.extend({
     actionMap: null,
     actionSB: null,
     actionBB: null,
+    actionWait: null,
     nameNormal: null,
     avatarNormal: null,
     nameHighLight: null,
@@ -79,7 +80,7 @@ var PlayerLayer = cc.Layer.extend({
     actionPanelGap: 10,
     accMargin: 18,
     betChipsLabelMarginLeft: 5,
-    privateCardsMarginBottom: 36,
+    privateCardsMarginBottom: 46,
     cardVisualHeight: 100,
     cardVisualWidth: 72,
     cardMargin: 48,
@@ -103,6 +104,7 @@ var PlayerLayer = cc.Layer.extend({
     actionEmptyFrame: null,
     actionSBFrame: null,
     actionBBFrame: null,
+    actionWaitFrame: null,
 
     // constructor
     ctor: function (playerType, chipsYFix, chipsXFix) {
@@ -240,6 +242,7 @@ var PlayerLayer = cc.Layer.extend({
             this.actionMap = actionRightMap;
             this.actionSB = action_sb_right;
             this.actionBB = action_bb_right;
+            this.actionWait = action_wait_right;
             this.nameNormal = s_name_panel_right;
             this.nameHighLight = s_name_panel_right_hl;
             this.avatarNormal = s_avatar_panel_right;
@@ -423,6 +426,7 @@ var PlayerLayer = cc.Layer.extend({
             this.actionMap = actionLeftMap;
             this.actionSB = action_sb_left;
             this.actionBB = action_bb_left;
+            this.actionWait = action_wait_left;
             this.nameNormal = s_name_panel_left;
             this.nameHighLight = s_name_panel_left_hl;
             this.avatarNormal = s_avatar_panel_left;
@@ -573,24 +577,28 @@ var PlayerLayer = cc.Layer.extend({
         this.reloadLabel.setString(reloadString);
 
         // update action
-        if (this.player.action !== '') {
-            this.changeSpriteImage(this.actionPanel, this.actionFrames.get(this.player.action));
-        } else {
-            if (!this.player.takeAction && !this.player.folded) {
-                if (this.player.folded) {
-                    this.changeSpriteImage(this.actionPanel, this.actionFrames.get('FOLD'));
-                } else if (this.player.isSmallBlind) {
-                    this.changeSpriteImage(this.actionPanel, this.actionSBFrame);
-                } else if (this.player.isBigBlind) {
-                    this.changeSpriteImage(this.actionPanel, this.actionBBFrame);
-                } else {
-                    this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
-                }
+        if (!this.player.isSurvive) {
+            this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
+        } else if (this.player.folded) {
+            this.changeSpriteImage(this.actionPanel, this.actionFrames.get('FOLD'));
+        } else if (this.player.isSmallBlind && this.player.takeAction === ACTION_STATUS_NONE) {
+            this.changeSpriteImage(this.actionPanel, this.actionSBFrame);
+        } else if (this.player.isBigBlind && this.player.takeAction === ACTION_STATUS_NONE) {
+            this.changeSpriteImage(this.actionPanel, this.actionBBFrame);
+        } else if (this.player.takeAction === ACTION_STATUS_THINKING) {
+            this.changeSpriteImage(this.actionPanel, this.actionWaitFrame);
+        } else if (this.player.takeAction === ACTION_STATUS_DECIDED) {
+            if (this.player.action !== '') {
+                this.changeSpriteImage(this.actionPanel, this.actionFrames.get(this.player.action));
             } else {
+                console.log('action error, player decided but no action is taken');
                 this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
             }
+        } else {
+            this.changeSpriteImage(this.actionPanel, this.actionEmptyFrame);
         }
 
+        // update in turn
         if (this.player.inTurn) {
             this.changeSpriteImage(this.namePanel, this.nameHighLightFrame);
             this.changeSpriteImage(this.avatarPanel, this.avatarHighLightFrame);
@@ -703,6 +711,9 @@ var PlayerLayer = cc.Layer.extend({
         this.actionBBFrame = cc.SpriteFrame.create(this.actionBB, cc.rect(0, 0,
             this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
 
+        this.actionWaitFrame = cc.SpriteFrame.create(this.actionWait, cc.rect(0, 0,
+            this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
+
         var actionKeys = this.actionMap.keys();
         this.actionFrames = new Map();
         for (index = 0; index < actionKeys.length; index++) {
@@ -713,6 +724,8 @@ var PlayerLayer = cc.Layer.extend({
     },
 
     changeSpriteImage: function(sprite, srcFrame) {
-        sprite.setSpriteFrame(srcFrame);
+        if (sprite && srcFrame) {
+            sprite.setSpriteFrame(srcFrame);
+        }
     }
 });

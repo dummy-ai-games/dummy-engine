@@ -130,8 +130,8 @@ function SkyRTC() {
                     if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
                         if (currentTable.timeout)
                             clearTimeout(currentTable.timeout);
-                        if (currentTable.displayTimeout)
-                            clearTimeout(currentTable.displayTimeout);
+                        if (currentTable.displayTimeOut)
+                            clearTimeout(currentTable.displayTimeOut);
                         currentTable.isActionTime = false;//fix bug, should not accept action util server have request action
                         try {
                             switch (action) {
@@ -344,8 +344,8 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
             clearTimeout(that.table[tableNumber].reloadTimeOut);
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
-        if (that.table[tableNumber].displayTimeout)
-            clearTimeout(that.table[tableNumber].displayTimeout);
+        if (that.table[tableNumber].displayTimeOut)
+            clearTimeout(that.table[tableNumber].displayTimeOut);
         that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
         delete that.table[tableNumber];
         logger.info("remove table " + tableNumber + " timeout");
@@ -438,8 +438,8 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
         if (that.table[tableNumber].reloadTimeOut)
             clearTimeout(that.table[tableNumber].reloadTimeOut);
 
-        if (that.table[tableNumber].displayTimeout)
-            clearTimeout(that.table[tableNumber].displayTimeout);
+        if (that.table[tableNumber].displayTimeOut)
+            clearTimeout(that.table[tableNumber].displayTimeOut);
 
         that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
 
@@ -494,8 +494,8 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             clearTimeout(data.table.tableNumber.timeout);
         if (that.table[data.table.tableNumber].reloadTimeOut)
             clearTimeout(that.table[data.table.tableNumber].reloadTimeOut);
-        if (that.table[data.table.tableNumber].displayTimeout)
-            clearTimeout(that.table[data.table.tableNumber].displayTimeout);
+        if (that.table[data.table.tableNumber].displayTimeOut)
+            clearTimeout(that.table[data.table.tableNumber].displayTimeOut);
         delete that.table[data.table.tableNumber];
     });
 
@@ -550,9 +550,9 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
 
     if (that.players[player]) {
         if (that.players[player]) {
-            currentTable.displayTimeout = setTimeout(function () {
+            currentTable.displayTimeOut = setTimeout(function () {
                 that.sendActionToPlayer(message, tableNumber, player, currentTable);
-            }, 2000);
+            }, 1000);
         }
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
