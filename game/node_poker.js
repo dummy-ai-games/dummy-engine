@@ -40,8 +40,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
     this.isActionTime = false;
-    this.reloadTimeOut = null;
-    this.displayTimeOut = null;
     this.countDown = 3;
 
     // Validate acceptable value ranges.
@@ -142,8 +140,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.isReloadTime = true;
             that.eventEmitter.emit('__start_reload', getPlayerReloadData(that));
             logGame(that.tableNumber, 'start reload');
-            that.reloadTimeOut = setTimeout(function () {
-                that.reloadTimeOut = null;
+            that.timeout = setTimeout(function () {
+                that.timeout = null;
                 if (that.status !== enums.GAME_STATUS_RUNNING) {
                     logGame(that.tableNumber, 'game is not started yet or is over, do nothing');
                     return;
@@ -302,55 +300,61 @@ function sort(data) {
 }
 
 function takeAction(table, action) {
-    var players = [];
-    var destPlayer = {};
-    for (var i = 0; i < table.players.length; i++) {
-        var player = {};
-        player['playerName'] = table.players[i]['playerName'];
-        player['chips'] = table.players[i]['chips'];
-        player['folded'] = table.players[i]['folded'];
-        player['allIn'] = table.players[i]['allIn'];
-        player['isSurvive'] = table.players[i]['isSurvive'];
-        player['reloadCount'] = table.players[i]['reloadCount'];
-        player['roundBet'] = table.game.roundBets[i];
-        player['bet'] = table.game.bets[i];
-        if (i === table.currentPlayer) {
-            player['cards'] = table.players[i]['cards'];
-            destPlayer = player;
-        }
-        players.push(player);
-    }
-
-    var sbPlayerIndex = table.smallBlindIndex;
-    var bbPlayerIndex = table.bigBlindIndex;
-
-    var data = {
-        'tableNumber': table.tableNumber,
-        'self': destPlayer,
-        'game': {
-            'board': table.game.board,
-            'minBet': table.bigBlind,
-            'roundName': table.game.roundName,
-            'roundCount': table.roundCount,
-            'raiseCount': table.raiseCount,
-            'betCount': table.betCount,
-            'players': players,
-            'smallBlind': {
-                playerName: table.players[sbPlayerIndex].playerName,
-                amount: table.smallBlind
-            },
-            'bigBlind': {
-                playerName: table.players[bbPlayerIndex].playerName,
-                amount: table.bigBlind
+    table.timeout = setTimeout(function () {
+        table.timeout = null;
+        if (table.status === enums.GAME_STATUS_RUNNING) {
+            var players = [];
+            var destPlayer = {};
+            for (var i = 0; i < table.players.length; i++) {
+                var player = {};
+                player['playerName'] = table.players[i]['playerName'];
+                player['chips'] = table.players[i]['chips'];
+                player['folded'] = table.players[i]['folded'];
+                player['allIn'] = table.players[i]['allIn'];
+                player['isSurvive'] = table.players[i]['isSurvive'];
+                player['reloadCount'] = table.players[i]['reloadCount'];
+                player['roundBet'] = table.game.roundBets[i];
+                player['bet'] = table.game.bets[i];
+                if (i === table.currentPlayer) {
+                    player['cards'] = table.players[i]['cards'];
+                    destPlayer = player;
+                }
+                players.push(player);
             }
-        }
-    };
 
-    table.eventEmitter.emit(action, data);
-    table.isActionTime = true;
+            var sbPlayerIndex = table.smallBlindIndex;
+            var bbPlayerIndex = table.bigBlindIndex;
+
+            var data = {
+                'tableNumber': table.tableNumber,
+                'self': destPlayer,
+                'game': {
+                    'board': table.game.board,
+                    'minBet': table.bigBlind,
+                    'roundName': table.game.roundName,
+                    'roundCount': table.roundCount,
+                    'raiseCount': table.raiseCount,
+                    'betCount': table.betCount,
+                    'players': players,
+                    'smallBlind': {
+                        playerName: table.players[sbPlayerIndex].playerName,
+                        amount: table.smallBlind
+                    },
+                    'bigBlind': {
+                        playerName: table.players[bbPlayerIndex].playerName,
+                        amount: table.bigBlind
+                    }
+                }
+            };
+
+            table.eventEmitter.emit(action, data);
+            table.isActionTime = true;
+        }
+    }, 1000);
+
 }
 
-Table.prototype.resetCountDown = function() {
+Table.prototype.resetCountDown = function () {
     this.countDown = 3;
 };
 

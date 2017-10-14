@@ -84,17 +84,17 @@ var BoardLayer = cc.Layer.extend({
     mmMarginTop: 20,
     playerPosition: [
         // players at right side
-        { x: 640, y: 560, chipsYFix: -40, chipsXFix: 0 },
+        { x: 640, y: 580, chipsYFix: -40, chipsXFix: 0 },
         { x: 840, y: 500, chipsYFix: 0, chipsXFix: 0 },
         { x: 860, y: 340, chipsYFix: 0, chipsXFix: 0 },
         { x: 840, y: 180, chipsYFix: 40, chipsXFix: -30 },
-        { x: 600, y: 80, chipsYFix: 150, chipsXFix: 120 },
+        { x: 600, y: 80, chipsYFix: 160, chipsXFix: 120 },
         // players at left side
-        { x: 280, y: 80, chipsYFix: 150, chipsXFix: -120 },
+        { x: 280, y: 80, chipsYFix: 160, chipsXFix: -120 },
         { x:  40, y: 180, chipsYFix: 40, chipsXFix: 30 },
         { x:  10, y: 340, chipsYFix: 0, chipsXFix: 0 },
         { x:  40, y: 500, chipsYFix: 0, chipsXFix: 0 },
-        { x: 240, y: 560, chipsYFix: -40, chipsXFix: 0 }
+        { x: 230, y: 580, chipsYFix: -40, chipsXFix: 0 }
     ],
     cardVisualHeight: 100,
     cardVisualWidth: 72,
