@@ -282,7 +282,9 @@ SkyRTC.prototype.notifyJoin = function () {
         tableNumber = that.guests[guest].tableNumber;
         message = {
             'eventName': '__new_peer',
-            'data': {"players": tableAndPlayer[tableNumber]}
+            'data': {
+                "players": tableAndPlayer[tableNumber]
+            }
         };
         if (that.table[tableNumber])
             message.data.tableStatus = that.table[tableNumber].status;
@@ -295,7 +297,9 @@ SkyRTC.prototype.notifyJoin = function () {
             tableNumber = that.players[player].tableNumber;
             message = {
                 'eventName': '__new_peer',
-                'data': {"players": tableAndPlayer[tableNumber]}
+                'data': {
+                    "players": tableAndPlayer[tableNumber]
+                }
             };
             if (that.table[tableNumber])
                 message.data.tableStatus = that.table[tableNumber].status;
@@ -325,7 +329,9 @@ SkyRTC.prototype.notifyLeft = function () {
         }
         message = {
             'eventName': '__left',
-            'data': tableAndPlayer[that.guests[guest].tableNumber]
+            'data': {
+                "players": tableAndPlayer[tableNumber]
+            }
         };
         that.sendMessage(that.guests[guest], message);
     }
@@ -336,7 +342,9 @@ SkyRTC.prototype.notifyLeft = function () {
             }
             message = {
                 'eventName': '__left',
-                'data': tableAndPlayer[that.players[player].tableNumber]
+                'data': {
+                    "players": tableAndPlayer[tableNumber]
+                }
             };
             that.sendMessage(that.players[player], message);
         }
@@ -550,7 +558,7 @@ SkyRTC.prototype.addPlayerStatus = function (data) {
         else
             data.players[i].isOnline = false;
     }
-}
+};
 
 SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var that = this;
