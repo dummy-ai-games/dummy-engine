@@ -277,6 +277,17 @@ SkyRTC.prototype.notifyJoin = function () {
         tableNumber = that.guests[guest].tableNumber;
         message = {
             'eventName': '__new_peer',
+            'data' : tableAndPlayer[tableNumber]
+        };
+        if (that.table[tableNumber])
+            message.data.tableStatus = that.table[tableNumber].status;
+        else
+            message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+        that.sendMessage(that.guests[guest], message);
+
+        // for backward compatibility, send another command to Live and Player UI
+        message = {
+            'eventName': '__new_peer_2',
             'data': {
                 'tableNumber' : tableNumber,
                 'players': tableAndPlayer[tableNumber]
@@ -293,6 +304,17 @@ SkyRTC.prototype.notifyJoin = function () {
             tableNumber = that.players[player].tableNumber;
             message = {
                 'eventName': '__new_peer',
+                'data' : tableAndPlayer[tableNumber]
+            };
+            if (that.table[tableNumber])
+                message.data.tableStatus = that.table[tableNumber].status;
+            else
+                message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+            that.sendMessage(that.players[player], message);
+
+            // for backward compatibility, send another command to Live and Player UI
+            message = {
+                'eventName': '__new_peer_2',
                 'data': {
                     'tableNumber' : tableNumber,
                     'players': tableAndPlayer[tableNumber]
@@ -303,6 +325,7 @@ SkyRTC.prototype.notifyJoin = function () {
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
             that.sendMessage(that.players[player], message);
+
         }
     }
 };
@@ -547,6 +570,8 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             'data': data
         };
         that.broadcastInPlayers(message);
+        // updated by strawmanbobi : also broadcast in guest
+        that.broadcastInGuests(message);
     });
 
     that.table[tableNumber].eventEmitter.on('__show_action', function (data) {

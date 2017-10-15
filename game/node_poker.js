@@ -1781,6 +1781,8 @@ function progress(table) {
                 /*
                  checkForBankrupt(table);
                  */
+
+                // TODO: could add winning information to __round_end message
                 table.eventEmitter.emit('roundEnd');
             } else if (table.game.roundName === 'Turn') {
                 logGame(table.tableNumber, 'effective turn -> river');

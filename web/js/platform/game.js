@@ -38,6 +38,8 @@ var currentBetCount = 0;
 var yourTurn = false;
 var turnAnimationShowed = false;
 
+var reloadTime = false;
+
 var PLAYER_AT_LEFT = 0;
 var PLAYER_AT_RIGHT = 1;
 
@@ -108,6 +110,10 @@ function initWebsock() {
         playerName, tableNumber);
 
     rtc.on('__new_peer', function (data) {
+        console.log('old player join : ' + JSON.stringify(data));
+    });
+
+    rtc.on('__new_peer_2', function (data) {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
 
@@ -224,8 +230,8 @@ function initWebsock() {
 
     rtc.on('__new_round', function (data) {
         console.log('new round : ' + JSON.stringify(data));
+        reloadTime = false;
         gameStatus = STATUS_GAME_RUNNING;
-
         // update in game engine
         updateGame(data, true);
     });
@@ -233,6 +239,7 @@ function initWebsock() {
     rtc.on('__round_end', function (data) {
         console.log('round end : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
+        reloadTime = true;
         updateGame(data, false);
     });
 

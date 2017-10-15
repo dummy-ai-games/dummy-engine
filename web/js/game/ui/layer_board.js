@@ -75,6 +75,7 @@ var BoardLayer = cc.Layer.extend({
     playerLayers: [],
     dealerLayer: null,
     winnerLayer: null,
+    scoreLayer: null,
 
     // design specs
     refWidth: 1024,
@@ -500,6 +501,14 @@ var BoardLayer = cc.Layer.extend({
         this.dealerLayer.setVisible(false);
         this.addChild(this.dealerLayer, 100);
 
+        // add score layer on the top
+        this.scoreLayer = new ScoreLayer(this.gameScale);
+        this.scoreLayer.init();
+        this.scoreLayer.setAnchorPoint(0, 0);
+        this.scoreLayer.setPosition(0, 0);
+        this.scoreLayer.setVisible(false);
+        this.addChild(this.scoreLayer, 100);
+
         // add winner layer on the top
         this.winnerLayer = new WinnerLayer(this.gameScale);
         this.winnerLayer.init();
@@ -542,19 +551,24 @@ var BoardLayer = cc.Layer.extend({
             case STATUS_GAME_PREPARING:
                 this.showLayer(this.dealerLayer, true);
                 this.showLayer(this.winnerLayer, false);
+                this.showLayer(this.scoreLayer, false);
                 this.updateBoardLayer();
                 this.updateDealerLayer();
+
                 break;
 
             case STATUS_GAME_RUNNING:
                 this.showLayer(this.dealerLayer, false);
                 this.showLayer(this.winnerLayer, false);
+                this.showLayer(this.scoreLayer, reloadTime);
                 this.updateBoardLayer();
+                this.updateScoreLayer();
                 break;
 
             case STATUS_GAME_FINISHED:
                 this.showLayer(this.dealerLayer, false);
                 this.showLayer(this.winnerLayer, true);
+                this.showLayer(this.scoreLayer, false);
                 this.winnerLayer.setWinners(winners);
                 this.updateWinnerLayer();
                 break;
@@ -567,6 +581,11 @@ var BoardLayer = cc.Layer.extend({
     updateBoardLayer: function() {
         this.updateBoard();
         this.updatePlayers();
+    },
+
+    updateScoreLayer: function() {
+        this.scoreLayer.setPlayers(players);
+        this.scoreLayer.update();
     },
 
     updateDealerLayer: function() {
