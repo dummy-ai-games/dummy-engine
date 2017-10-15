@@ -54,6 +54,11 @@ var currentBigBlind = 0;
 // communication related
 var rtc = SkyRTC();
 
+window.onbeforeunload = function ()
+{
+    return 'Are you sure to leave?';
+};
+
 $(document).ready(function () {
     // get table number first
     tableNumber = getParameter('table');
@@ -62,10 +67,10 @@ $(document).ready(function () {
 
     if (playerName) {
         playMode = MODE_PLAYER;
-        document.title = "The Game";
+        document.title = 'The Game';
     } else {
         playMode = MODE_LIVE;
-        document.title = "THE Live";
+        document.title = 'THE Live';
     }
     initGame();
 });
@@ -82,7 +87,7 @@ function initPlayerInfo() {
         timeout: 20000,
         success: function (response) {
             if (response.status.code === 0) {
-                console.log("get db players: " + JSON.stringify(response.entity));
+                console.log('get db players: ' + JSON.stringify(response.entity));
                 dbPlayers = response.entity;
             } else if (response.status.code === 1) {
                 console.log('list player failed, use player name as display name');
@@ -103,45 +108,60 @@ function initWebsock() {
         playerName, tableNumber);
 
     rtc.on('__new_peer', function (data) {
-        console.log("receive __new_peer" + JSON.stringify(data));
-        var joinPlayers = data.players;
-        if (joinPlayers) {
-            console.log('player join : ' + JSON.stringify(joinPlayers));
+        var inPlayers = data.players;
+        var tableStatus = data.tableStatus;
+
+        if (inPlayers) {
+            console.log('player join : ' + JSON.stringify(data));
         } else {
             console.log('guest join');
         }
 
-        if (undefined !== joinPlayers && null !== joinPlayers) {
-            currentPlayers = joinPlayers.length;
+        if (gameStatus === STATUS_GAME_RUNNING) {
+            // do not handle this command while game is running, to prevent player status reset
+            return;
+        }
+
+        if (undefined !== inPlayers && null !== inPlayers) {
+            currentPlayers = inPlayers.length;
             // rebuild player list
             players = [];
             for (var i = 0; i < currentPlayers; i++) {
-                var playerDisplayName = findDBPlayerNameByName(joinPlayers[i]);
-                players[i] = new Player(joinPlayers[i], playerDisplayName, defaultInitChips, true, 0);
+                var playerDisplayName = findDBPlayerNameByName(inPlayers[i]);
+                players[i] = new Player(inPlayers[i], playerDisplayName, defaultInitChips, true, 0);
             }
         }
+
+        // sync game status here
+        console.log('game status = ' + tableStatus);
+        gameStatus = tableStatus;
     });
 
     rtc.on('__left', function (data) {
-        if (undefined !== data && null !== data) {
+        var inPlayers = data.players;
+        var tableStatus = data.tableStatus;
+
+        if (undefined !== inPlayers && null !== inPlayers) {
             console.log('player left : ' + JSON.stringify(data));
         } else {
             console.log('guest left');
         }
+        gameStatus = tableStatus;
+        if (gameStatus === STATUS_GAME_RUNNING) {
+            // do not handle this command while game is running, to prevent player status reset
+            return;
+        }
 
-        if (undefined !== data && null !== data) {
+        if (undefined !== inPlayers && null !== inPlayers) {
             var index;
             if (gameStatus === STATUS_GAME_STANDBY || gameStatus === STATUS_GAME_FINISHED) {
                 // rebuild player list
-                currentPlayers = data.length;
+                currentPlayers = inPlayers.length;
                 players = [];
                 for (index = 0; index < currentPlayers; index++) {
-                    var playerDisplayName = findDBPlayerNameByName(data[index]);
-                    players[index] = new Player(data[index], data[index], playerDisplayName, defaultInitChips, true, 0);
-                }
-            } else {
-                for (index = 0; index < currentPlayers; index++) {
-                    players[index].setOnline(playerOnline(players[index].playerName, data));
+                    var playerDisplayName = findDBPlayerNameByName(inPlayers[index]);
+                    players[index] = new Player(inPlayers[index],
+                        inPlayers[index], playerDisplayName, defaultInitChips, true, 0);
                 }
             }
         }
@@ -326,8 +346,8 @@ function initGame() {
     // the reference proportion HEIGHT / WIDTH = 3 / 4 = 0.75;
     var refProportion = 0.75;
 
-    var marginLeft = getElementLeft(document.getElementById("gameContainer"));
-    var marginTop = getElementTop(document.getElementById("gameContainer"));
+    var marginLeft = getElementLeft(document.getElementById('gameContainer'));
+    var marginTop = getElementTop(document.getElementById('gameContainer'));
 
     winHeight = document.documentElement.clientHeight;
     winWidth = document.documentElement.clientWidth;
@@ -427,6 +447,7 @@ function updateGame(data, isNewRound) {
                 continue;
             }
             targetPlayer.setDisplayName(findDBPlayerNameByName(data.players[i].playerName));
+            targetPlayer.setOnline(data.players[i].isOnline);
             if (isNewRound) {
                 targetPlayer.setAction('');
                 targetPlayer.setPrivateCards(null, null);

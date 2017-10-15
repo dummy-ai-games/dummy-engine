@@ -484,7 +484,7 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.stopButton, 2);
             this.stopButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
-                    console.log('start game');
+                    console.log('stop game');
                     if (gameStatus === STATUS_GAME_RUNNING) {
                         stopGame();
                     }

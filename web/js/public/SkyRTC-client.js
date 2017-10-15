@@ -90,7 +90,7 @@ var SkyRTC = function() {
             that.emit("remove_peer", data.socketId);
         });
     };
-    skyrtc.prototype.Bet = function(playerName, amount) {
+    skyrtc.prototype.Bet = function(amount) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -111,7 +111,7 @@ var SkyRTC = function() {
             }
         }));
     };
-    skyrtc.prototype.Check = function(playerName) {
+    skyrtc.prototype.Check = function() {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -122,7 +122,7 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.Raise = function(playerName) {
+    skyrtc.prototype.Raise = function() {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -133,7 +133,7 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.AllIn = function(playerName) {
+    skyrtc.prototype.AllIn = function() {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -144,7 +144,7 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.Fold = function(playerName) {
+    skyrtc.prototype.Fold = function() {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",

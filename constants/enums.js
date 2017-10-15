@@ -10,8 +10,9 @@ function Enums() {
     this.APP_USERDEBUG_MODE = "userdebug";
 
     this.GAME_STATUS_STANDBY = 0;
-    this.GAME_STATUS_RUNNING = 1;
-    this.GAME_STATUS_FINISHED = 2;
+    this.GAME_STATUS_PREPARING = 1;
+    this.GAME_STATUS_RUNNING = 2;
+    this.GAME_STATUS_FINISHED = 3;
 }
 
 module.exports = Enums;
