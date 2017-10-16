@@ -39,10 +39,10 @@ var ScoreLayer = cc.LayerColor.extend({
     // design specs
     titleTextWidth: 640,
     titleTextHeight: 64,
-    titleTextMarginBottom: 680,
+    titleTextMarginBottom: 640,
     scoreTextWidth: 320,
     scoreTextHeight: 80,
-    scoreTextMarginBottom: 560,
+    scoreTextMarginBottom: 500,
 
     // event managers
     eventListener: null,
@@ -120,7 +120,7 @@ var ScoreLayer = cc.LayerColor.extend({
             this.reloadButton.setScale(this.gameScale);
             this.reloadButton.setPosition((this.validWidth -
                 this.reloadButton.getContentSize().width * this.gameScale) / 2,
-                this.validHeight / 12 * 2);
+                this.validHeight / 12);
             this.addChild(this.reloadButton, 2);
             this.reloadButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
@@ -170,10 +170,14 @@ var ScoreLayer = cc.LayerColor.extend({
         // update score label
         var playerIndex;
         if (this.players) {
-            for (playerIndex = 0; playerIndex < this.players.length; playerIndex++) {
-                if (this.scoreLabels && this.scoreLabels[playerIndex]) {
+            for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+                if (this.scoreLabels && this.scoreLabels[playerIndex] && playerIndex < this.players.length) {
                     this.scoreLabels[playerIndex].setString(this.players[playerIndex].displayName + ' : ' +
                         this.players[playerIndex].chips);
+                    this.scoreLabels[playerIndex].setVisible(true);
+                } else {
+                    this.scoreLabels[playerIndex].setString('');
+                    this.scoreLabels[playerIndex].setVisible(false);
                 }
             }
         }
