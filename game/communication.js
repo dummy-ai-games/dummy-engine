@@ -275,7 +275,11 @@ SkyRTC.prototype.notifyJoin = function () {
     // TODO: to make clear how the Live and Player UI would be affected by aliens join and left
     for (var guest in that.guests) {
         tableNumber = that.guests[guest].tableNumber;       
-
+        message = {
+             'eventName': '__new_peer',
+             'data' : tableAndPlayer[tableNumber]
+        };       
+        that.sendMessage(that.guests[guest], message);
         // for backward compatibility, send another command to Live and Player UI
         message = {
             'eventName': '__new_peer_2',
@@ -293,7 +297,11 @@ SkyRTC.prototype.notifyJoin = function () {
     for (var player in that.players) {
         if (that.players[player]) {
             tableNumber = that.players[player].tableNumber;           
-
+            message = {
+             'eventName': '__new_peer',
+             'data' : tableAndPlayer[tableNumber]
+            };       
+            that.sendMessage(that.players[player], message);
             // for backward compatibility, send another command to Live and Player UI
             message = {
                 'eventName': '__new_peer_2',
