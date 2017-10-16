@@ -127,6 +127,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 var player = data.players[i];
                 player.hand = that.players[i].hand;
                 player.winMoney = that.players[i].winMoney;
+                delete player.folded;
             }
             that.eventEmitter.emit('__round_end', data);
             that.surviveCount = count;
