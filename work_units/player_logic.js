@@ -13,6 +13,7 @@ var Table = require('../models/table_dao.js');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 
+var MD5Dao = require('../poem/crypto/md5');
 
 exports.listTablesWorkUnit = function(callback) {
     Table.listTables(function(getTablesErr, tables) {
@@ -28,12 +29,12 @@ exports.getPlayersWorkUnit = function(tableNumber, callback) {
     Player.getPlayers(conditions, function(getPlayersErr, players) {
         if (errorCode.SUCCESS.code === getPlayersErr.code && null !== players && players.length > 0) {
             for (var i = 0; i < players.length; i++) {
-                logger.info("player[" + i + "].displayName = " + players[i].displayName);
                 if (undefined === players[i].displayName ||
                     null === players[i].displayName ||
                     "" === players[i].displayName) {
                     players[i].displayName = players[i].playerName;
                 }
+                players[i].playerName = MD5Dao.MD5(players[i].playerName);
             }
         }
         logger.info("get players : " + JSON.stringify(players));

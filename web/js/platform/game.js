@@ -110,7 +110,7 @@ function initWebsock() {
         playerName, tableNumber);
 
     rtc.on('__new_peer', function (data) {
-        console.log('old player join : ' + JSON.stringify(data));
+        console.log('deprecated player join : ' + JSON.stringify(data));
     });
 
     rtc.on('__new_peer_2', function (data) {
@@ -140,6 +140,7 @@ function initWebsock() {
 
         // sync game status here
         console.log('game status = ' + tableStatus);
+        console.log('local players = ' + JSON.stringify(players));
         gameStatus = tableStatus;
     });
 
@@ -166,8 +167,7 @@ function initWebsock() {
                 players = [];
                 for (index = 0; index < currentPlayers; index++) {
                     var playerDisplayName = findDBPlayerNameByName(inPlayers[index]);
-                    players[index] = new Player(inPlayers[index],
-                        inPlayers[index], playerDisplayName, defaultInitChips, true, 0);
+                    players[index] = new Player(inPlayers[index], playerDisplayName, defaultInitChips, true, 0);
                 }
             }
         }
