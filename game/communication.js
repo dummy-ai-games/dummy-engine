@@ -262,7 +262,8 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
 
 SkyRTC.prototype.notifyJoin = function () {
     var that = this;
-    var tableAndPlayer = [];
+    var tableAndPlayer = {};
+    var tableAndData = {};
 
     logger.info('notify join');
     for (var playerName in that.players) {
@@ -271,6 +272,11 @@ SkyRTC.prototype.notifyJoin = function () {
                 tableAndPlayer[that.players[playerName].tableNumber] = [];
             }
             tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
+        }
+    }
+    for(var tableNumber in tableAndPlayer){
+        if(that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING){
+            tableAndData[tableNumber] = poker.getBasicData(that.table[tableNumber]);
         }
     }
     var message, tableNumber;
@@ -288,7 +294,8 @@ SkyRTC.prototype.notifyJoin = function () {
             'eventName': '__new_peer_2',
             'data': {
                 'tableNumber' : tableNumber,
-                'players': tableAndPlayer[tableNumber]
+                'players': tableAndPlayer[tableNumber],
+                'basicData': tableAndData[tableNumber]
             }
         };
         if (that.table[tableNumber])
@@ -310,13 +317,16 @@ SkyRTC.prototype.notifyJoin = function () {
                 'eventName': '__new_peer_2',
                 'data': {
                     'tableNumber' : tableNumber,
-                    'players': tableAndPlayer[tableNumber]
+                    'players': tableAndPlayer[tableNumber],
+                    'basicData': tableAndData[tableNumber]
                 }
             };
             if (that.table[tableNumber])
                 message.data.tableStatus = that.table[tableNumber].status;
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+
+
             that.sendMessage(that.players[player], message);
 
         }
