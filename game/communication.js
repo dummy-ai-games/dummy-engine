@@ -48,7 +48,7 @@ function SkyRTC() {
             return;
 
         var tableNumber = that.playerAndTable[socket.id];
-        if (tableNumber) {
+        if (tableNumber !== undefined) {
             if (that.players[socket.id]) {
                 logger.warn('player: ' + socket.id + ' already exist, reject');
                 return;
