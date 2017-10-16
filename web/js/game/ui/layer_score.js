@@ -70,7 +70,7 @@ var ScoreLayer = cc.LayerColor.extend({
         this.addChild(this.bgSprite, 0);
 
         // initialize title
-        this.titleLabel= new cc.LabelTTF('Round Finished', this.titleFont, this.titleTextSize);
+        this.titleLabel= new cc.LabelTTF('', this.titleFont, this.titleTextSize);
         this.titleLabel.setColor(cc.color(255, 255, 255, 255));
         this.titleLabel.setAnchorPoint(0, 0);
         this.titleLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
@@ -105,24 +105,28 @@ var ScoreLayer = cc.LayerColor.extend({
                 this.scoreLabels[playerIndex]
                     .setPosition(this.bgSprite.getContentSize().width / 5 * 3 * this.gameScale,
                         (this.scoreTextMarginBottom -
-                            this.scoreLabels[playerIndex].getContentSize().height * (playerIndex - 5)) * this.gameScale);
+                            this.scoreLabels[playerIndex].getContentSize().height * (playerIndex - 5)) *
+                                this.gameScale);
             }
 
             this.addChild(this.scoreLabels[playerIndex], 2);
         }
 
-        if (playMode == MODE_PLAYER) {
-            this.reloadButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
+        if (playMode === MODE_PLAYER) {
+            this.reloadButton = ccui.Button.create(s_o_reload_button,
+                                                   s_o_reload_button_pressed,
+                                                   s_o_reload_button_disabled);
             this.reloadButton.setAnchorPoint(0, 0);
-            this.reloadButton.setScale(this.gameScale * 0.8);
+            this.reloadButton.setScale(this.gameScale);
             this.reloadButton.setPosition((this.validWidth -
-                this.reloadButton.getContentSize().width * this.gameScale * 0.8) / 2,
+                this.reloadButton.getContentSize().width * this.gameScale) / 2,
                 this.validHeight / 12 * 2);
             this.addChild(this.reloadButton, 2);
             this.reloadButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
-                    if (STATUS_GAME_RUNNING !== gameStatus) {
+                    if (STATUS_GAME_RUNNING === gameStatus) {
                         console.log('reload');
+                        reload();
                     }
                 }
             }, this);
@@ -160,6 +164,10 @@ var ScoreLayer = cc.LayerColor.extend({
     },
 
     doUpdate: function() {
+        // update round label
+        this.titleLabel.setString('Round ' + currentRound + ' Finished');
+
+        // update score label
         var playerIndex;
         if (this.players) {
             for (playerIndex = 0; playerIndex < this.players.length; playerIndex++) {

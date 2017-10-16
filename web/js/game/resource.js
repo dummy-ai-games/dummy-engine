@@ -56,6 +56,9 @@ var s_o_allin_button_disabled = './res/images/game_board/btn_allin_disabled.png'
 var s_o_bet_button = './res/images/game_board/btn_bet.png';
 var s_o_bet_button_pressed = './res/images/game_board/btn_bet_pressed.png';
 var s_o_bet_button_disabled = './res/images/game_board/btn_bet_disabled.png';
+var s_o_reload_button = './res/images/game_board/btn_reload.png';
+var s_o_reload_button_pressed = './res/images/game_board/btn_reload_pressed.png';
+var s_o_reload_button_disabled = './res/images/game_board/btn_reload_disabled.png';
 var s_o_spinner = './res/images/game_board/bg_spinner.png';
 var s_o_arrow_up = './res/images/game_board/btn_up.png';
 var s_o_arrow_up_pressed = './res/images/game_board/btn_up_pressed.png';
@@ -281,6 +284,9 @@ var resources = [
     s_o_bet_button,
     s_o_bet_button_pressed,
     s_o_bet_button_disabled,
+    s_o_reload_button,
+    s_o_reload_button_pressed,
+    s_o_reload_button_disabled,
     s_o_spinner,
     s_o_arrow_up,
     s_o_arrow_up_pressed,
