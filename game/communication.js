@@ -605,7 +605,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var player = message.data.self.playerName;
     var tableNumber;
     var currentTable;
-    tableNumber = that.playerAndTable[player];
+    tableNumber = message.data.tableNumber;
     currentTable = that.table[tableNumber];
     if (!currentTable)
         return;
