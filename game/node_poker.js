@@ -123,6 +123,11 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
         if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
             data = getBasicData(that);
+            for(var i = 0;i<data.players.length;i++){
+                var player = data.players[i];
+                player.hand = that.players[i].hand;
+                player.winMoney = that.players[i].winMoney;
+            }
             that.eventEmitter.emit('__round_end', data);
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++) {
@@ -317,6 +322,7 @@ function takeAction(table, action) {
                 player['bet'] = table.game.bets[i];
                 if (i === table.currentPlayer) {
                     player['cards'] = table.players[i]['cards'];
+                    player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
                     destPlayer = player;
                 }
                 players.push(player);
@@ -330,7 +336,6 @@ function takeAction(table, action) {
                 'self': destPlayer,
                 'game': {
                     'board': table.game.board,
-                    'minBet': table.bigBlind,
                     'roundName': table.game.roundName,
                     'roundCount': table.roundCount,
                     'raiseCount': table.raiseCount,
@@ -524,6 +529,7 @@ function checkForWinner(table) {
         var winnerPrize = parseInt(prize / winners.length);
         var winningPlayer = table.players[winners[i]];
         winningPlayer.chips += winnerPrize;
+        winningPlayer.winMoney += winnerPrize;
         if (table.game.roundBets[winners[i]] === 0) {
             winningPlayer.folded = true;
         }
@@ -1993,6 +1999,7 @@ Table.prototype.NewRound = function () {
             this.players[i].cards.push(this.game.deck.pop());
             this.players[i].cards.push(this.game.deck.pop());
         }
+        this.players[i].winMoney = 0;
         this.game.bets[i] = 0;
         this.game.roundBets[i] = 0;
     }
