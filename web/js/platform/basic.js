@@ -27,14 +27,35 @@ function setPlayer() {
 }
 
 function gotoPlay() {
-    var tableNumber = $('#play_table_number').val();
     var playerName = $('#play_player_name').val();
-    if (null === tableNumber || isNaN(tableNumber)) {
-        return;
-    }
+    var tableNumber;
     if (null === playerName) {
         return;
     }
+    // fetch table number by player name
+    $.ajax({
+        url: '/player/get_table_by_player',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            playerName: playerName
+        },
+        timeout: 20000,
+        success: function (response) {
+            if (response.status.code === 0) {
+                tableNumber = response.entity;
+                joinGame(tableNumber, playerName);
+            } else if (response.status.code === 1) {
+                console.log('player does not exist ?');
+            }
+        },
+        error: function () {
+            console.log('player does not exist ?');
+        }
+    });
+}
+
+function joinGame(tableNumber, playerName) {
     window.open('./game.html?table='+tableNumber+'&name='+playerName, '_blank');
     $('#play_player_name').val('');
     localStorage.setItem('game_table', tableNumber);

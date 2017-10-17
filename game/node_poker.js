@@ -352,7 +352,6 @@ function takeAction(table, action) {
                     }
                 }
             };
-
             table.eventEmitter.emit(action, data);
             table.isActionTime = true;
         }

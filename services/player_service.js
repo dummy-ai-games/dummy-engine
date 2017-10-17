@@ -7,6 +7,7 @@ var constants = require('../poem/configuration/constants');
 var logger = require('../poem/logging/logger4js').helper;
 
 var ServiceResponse = require('../responses/service_response.js');
+var IntegerResponse = require('../responses/integer_response.js');
 var PlayersResponse = require('../responses/players_response.js');
 var TablesResponse = require('../responses/tables_response.js');
 var TablesNPlayersRespons = require('../responses/tablesnplayers_response.js');
@@ -94,6 +95,23 @@ exports.deletePlayer = function (req, res) {
     playerLogic.deletePlayerWorkUnit(player, function (createPlayersErr) {
         serviceResponse.status = createPlayersErr;
         res.send(serviceResponse);
+        res.end();
+    });
+};
+
+/**
+ * function :   Get table by player
+ * parameter :  Player name
+ * return :     Table number
+ */
+exports.getTableByPlayer = function (req, res) {
+    var playerName = req.body.playerName;
+    var integerResponse = new IntegerResponse();
+
+    playerLogic.getTableNumberByPlayer(playerName, function(getTableNumberErr, tableNumber) {
+        integerResponse.status = getTableNumberErr;
+        integerResponse.entity = tableNumber;
+        res.send(integerResponse);
         res.end();
     });
 };

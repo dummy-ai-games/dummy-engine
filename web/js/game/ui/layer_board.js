@@ -83,7 +83,7 @@ var BoardLayer = cc.Layer.extend({
     boardMarginLeft: 28,
     boardMarginRight: 28,
     boardMarginBottom: 180,
-    mmMarginTop: 20,
+    mmMarginTop: 40,
     playerPosition: [
         // players at right side
         { x: 640, y: 580, chipsYFix: -40, chipsXFix: 0 },
@@ -145,7 +145,7 @@ var BoardLayer = cc.Layer.extend({
         this.size = cc.size(this.validWidth, this.validHeight);
 
         // initialize background
-        this.bgSprite = cc.Sprite.create(s_bg);
+        this.bgSprite = new cc.Sprite(s_bg);
         this.bgSprite.setAnchorPoint(0, 0);
         this.gameScale = this.bgScale = Math.max(this.validHeight / this.bgSprite.getContentSize().height,
                                     this.validWidth / this.bgSprite.getContentSize().width);
@@ -155,7 +155,7 @@ var BoardLayer = cc.Layer.extend({
 
         if (MODE_LIVE === playMode) {
             // initialize bottom decoration
-            this.decoBottom = cc.Sprite.create(s_dec_bottom);
+            this.decoBottom = new cc.Sprite(s_dec_bottom);
             this.decoBottom.setAnchorPoint(0, 0);
             this.decoScale = this.validWidth / this.decoBottom.getContentSize().width;
             this.decoBottom.setScale(this.decoScale);
@@ -165,7 +165,7 @@ var BoardLayer = cc.Layer.extend({
             // initialize operation buttons
             this.operationButtonScale = this.gameScale * 0.8;
             // call button
-            this.callButton = ccui.Button.create(s_o_call_button, s_o_call_button_pressed, s_o_call_button_disabled);
+            this.callButton = new ccui.Button(s_o_call_button, s_o_call_button_pressed, s_o_call_button_disabled);
             this.callButton.setAnchorPoint(0, 0);
             this.callButton.setScale(this.operationButtonScale);
             this.callButton.setPosition(this.opButtonMarginLeft * this.gameScale, this.opButtonMarginBottom);
@@ -179,7 +179,7 @@ var BoardLayer = cc.Layer.extend({
             }, this);
 
             // raise button
-            this.raiseButton = ccui.Button.create(s_o_raise_button, s_o_raise_button_pressed, s_o_raise_button_disabled);
+            this.raiseButton = new ccui.Button(s_o_raise_button, s_o_raise_button_pressed, s_o_raise_button_disabled);
             this.raiseButton.setAnchorPoint(0, 0);
             this.raiseButton.setScale(this.operationButtonScale);
             this.raiseButton.setPosition(this.opButtonMarginLeft * this.gameScale +
@@ -195,7 +195,7 @@ var BoardLayer = cc.Layer.extend({
             }, this);
 
             // check button
-            this.checkButton = ccui.Button.create(s_o_check_button, s_o_check_button_pressed, s_o_check_button_disabled);
+            this.checkButton = new ccui.Button(s_o_check_button, s_o_check_button_pressed, s_o_check_button_disabled);
             this.checkButton.setAnchorPoint(0, 0);
             this.checkButton.setScale(this.operationButtonScale);
             this.checkButton.setPosition(this.opButtonMarginLeft * this.gameScale +
@@ -211,7 +211,7 @@ var BoardLayer = cc.Layer.extend({
             }, this);
 
             // fold button
-            this.foldButton = ccui.Button.create(s_o_fold_button, s_o_fold_button_pressed, s_o_fold_button_disabled);
+            this.foldButton = new ccui.Button(s_o_fold_button, s_o_fold_button_pressed, s_o_fold_button_disabled);
             this.foldButton.setAnchorPoint(0, 0);
             this.foldButton.setScale(this.operationButtonScale);
             this.foldButton.setPosition(this.opButtonMarginLeft * this.gameScale +
@@ -227,7 +227,7 @@ var BoardLayer = cc.Layer.extend({
             }, this);
 
             // all in button
-            this.allinButton = ccui.Button.create(s_o_allin_button, s_o_allin_button_pressed, s_o_allin_button_disabled);
+            this.allinButton = new ccui.Button(s_o_allin_button, s_o_allin_button_pressed, s_o_allin_button_disabled);
             this.allinButton.setAnchorPoint(0, 0);
             this.allinButton.setScale(this.operationButtonScale);
             this.allinButton.setPosition(this.opButtonMarginLeft * this.gameScale +
@@ -244,7 +244,7 @@ var BoardLayer = cc.Layer.extend({
 
             // bet button
             this.currentBet = 0;
-            this.betButton = ccui.Button.create(s_o_bet_button, s_o_bet_button_pressed, s_o_bet_button_disabled);
+            this.betButton = new ccui.Button(s_o_bet_button, s_o_bet_button_pressed, s_o_bet_button_disabled);
             this.betButton.setAnchorPoint(0, 0);
             this.betButton.setScale(this.operationButtonScale);
             this.betButton.setPosition(this.opButtonMarginLeft * this.gameScale +
@@ -260,7 +260,7 @@ var BoardLayer = cc.Layer.extend({
             }, this);
 
             // bet input
-            this.bgBet = cc.Sprite.create(s_o_spinner);
+            this.bgBet = new cc.Sprite(s_o_spinner);
             this.bgBet.setAnchorPoint(0, 0);
             this.bgBet.setScale(this.operationButtonScale);
             this.bgBet.setPosition(this.betButton.getPositionX() +
@@ -269,7 +269,7 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.bgBet, 2);
 
             // bet spinner
-            this.betSpinnerUp = ccui.Button.create(s_o_arrow_up, s_o_arrow_up_pressed, s_o_arrow_up_disabled);
+            this.betSpinnerUp = new ccui.Button(s_o_arrow_up, s_o_arrow_up_pressed, s_o_arrow_up_disabled);
             this.betSpinnerUp.setAnchorPoint(0, 0.5);
             this.betSpinnerUp.setScale(this.operationButtonScale);
             this.betSpinnerUp.setPosition(this.bgBet.getPositionX(),
@@ -284,7 +284,7 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            this.betSpinnerDown = ccui.Button.create(s_o_arrow_down, s_o_arrow_down_pressed, s_o_arrow_down_disabled);
+            this.betSpinnerDown = new ccui.Button(s_o_arrow_down, s_o_arrow_down_pressed, s_o_arrow_down_disabled);
             this.betSpinnerDown.setAnchorPoint(0, 0.5);
             this.betSpinnerDown.setScale(this.operationButtonScale);
             this.betSpinnerDown.setPosition(this.bgBet.getPositionX(),
@@ -310,7 +310,7 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.amountLabel, 3);
 
             // initialize turn animation
-            this.yourTurn = cc.Sprite.create(s_your_turn);
+            this.yourTurn = new cc.Sprite(s_your_turn);
             this.yourTurn.setAnchorPoint(0.5, 0.5);
             this.yourTurn.setScale(this.gameScale * 4);
             this.yourTurn.setPosition(this.validWidth / 2, this.validHeight / 2);
@@ -319,9 +319,9 @@ var BoardLayer = cc.Layer.extend({
         }
 
         // initialize dealer mm
-        this.bgMM = cc.Sprite.create(s_bg_mm_2);
+        this.bgMM = new cc.Sprite(s_bg_mm_2);
         this.bgMM.setAnchorPoint(0, 0);
-        this.mmScale = this.gameScale * 0.75;
+        this.mmScale = this.gameScale * 0.7;
         this.bgMM.setScale(this.mmScale);
         this.bgMM.setPosition((this.validWidth - this.bgMM.getContentSize().width * this.mmScale) / 2,
             (this.bgSprite.getContentSize().height * this.gameScale -
@@ -329,7 +329,7 @@ var BoardLayer = cc.Layer.extend({
         this.addChild(this.bgMM, 1);
 
         // initialize poker board
-        this.bgBoard = cc.Sprite.create(s_bg_board);
+        this.bgBoard = new cc.Sprite(s_bg_board);
         this.bgBoard.setAnchorPoint(0, 0);
         this.boardScale = this.gameScale;
         var boardRealMarginLeft = (this.bgSprite.getContentSize().width - this.bgBoard.getContentSize().width) / 2
@@ -366,7 +366,7 @@ var BoardLayer = cc.Layer.extend({
         var publicCardIndex;
         this.publicCards = [];
         for (publicCardIndex = 0; publicCardIndex < this.maxPublicCardCount; publicCardIndex++) {
-            this.publicCards[publicCardIndex] = cc.Sprite.create(s_p_back);
+            this.publicCards[publicCardIndex] = new cc.Sprite(s_p_back);
             this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
             this.cardScale =
                 0.85 * Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
@@ -448,7 +448,7 @@ var BoardLayer = cc.Layer.extend({
         }
 
         // initialize TrendMicro logo
-        this.tmLogo = cc.Sprite.create(s_tm_logo);
+        this.tmLogo = new cc.Sprite(s_tm_logo);
         this.tmLogo.setAnchorPoint(0, 0);
         this.logoScale = this.gameScale * 0.8;
         this.tmLogo.setScale(this.logoScale);
@@ -462,7 +462,7 @@ var BoardLayer = cc.Layer.extend({
         this.controlMenuScale = this.gameScale * 0.6;
 
         if (playMode === MODE_LIVE) {
-            this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
+            this.startButton = new ccui.Button(s_start_button, s_start_button_pressed, s_start_button_disabled);
             this.startButton.setAnchorPoint(0, 0);
             this.startButton.setScale(this.controlMenuScale);
             this.startButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
@@ -477,7 +477,7 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
+            this.stopButton = new ccui.Button(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
             this.stopButton.setAnchorPoint(0, 0);
             this.stopButton.setScale(this.controlMenuScale);
             this.stopButton.setPosition(this.controlMenuMarginLeft * this.gameScale,
@@ -554,7 +554,6 @@ var BoardLayer = cc.Layer.extend({
                 this.showLayer(this.scoreLayer, false);
                 this.updateBoardLayer();
                 this.updateDealerLayer();
-
                 break;
 
             case STATUS_GAME_RUNNING:
@@ -728,16 +727,16 @@ var BoardLayer = cc.Layer.extend({
 
     initializeAltFrames: function() {
         var index;
-        this.pokerBackFrame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
+        this.pokerBackFrame = new cc.SpriteFrame(s_p_back, cc.rect(0, 0,
             this.publicCards[0].getContentSize().width, this.publicCards[0].getContentSize().height));
 
-        this.pokerEmptyFrame = cc.SpriteFrame.create(s_p_empty, cc.rect(0, 0,
+        this.pokerEmptyFrame = new cc.SpriteFrame(s_p_empty, cc.rect(0, 0,
             this.publicCards[0].getContentSize().width, this.publicCards[0].getContentSize().height));
 
         var pokerKeys = pokerMap.keys();
         this.pokerFrames = new Map();
         for (index = 0; index < pokerKeys.length; index++) {
-            var pokerFrame = cc.SpriteFrame.create(pokerMap.get(pokerKeys[index]), cc.rect(0, 0,
+            var pokerFrame = new cc.SpriteFrame(pokerMap.get(pokerKeys[index]), cc.rect(0, 0,
                 this.publicCards[0].getContentSize().width, this.publicCards[0].getContentSize().height));
             this.pokerFrames.set(pokerKeys[index], pokerFrame);
         }

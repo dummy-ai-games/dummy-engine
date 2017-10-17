@@ -73,7 +73,7 @@ var DealerLayer = cc.LayerColor.extend({
         // initialize start and stop button
         if (MODE_LIVE === playMode) {
             this.buttonScale = this.gameScale * 0.8;
-            this.startButton = ccui.Button.create(s_start_button, s_start_button_pressed, s_start_button_disabled);
+            this.startButton = new ccui.Button(s_start_button, s_start_button_pressed, s_start_button_disabled);
             this.startButton.setAnchorPoint(0, 0);
             this.startButton.setScale(this.buttonScale);
             this.startButton.setPosition((this.validWidth -
@@ -91,7 +91,7 @@ var DealerLayer = cc.LayerColor.extend({
                 }
             }, this);
 
-            this.stopButton = ccui.Button.create(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
+            this.stopButton = new ccui.Button(s_stop_button, s_stop_button_pressed, s_stop_button_disabled);
             this.stopButton.setAnchorPoint(0, 0);
             this.stopButton.setScale(this.buttonScale);
             this.stopButton.setPosition((this.validWidth -
@@ -164,7 +164,7 @@ var DealerLayer = cc.LayerColor.extend({
         }
 
         // event management
-        this.eventListener = cc.EventListener.create({
+        this.eventListener = new cc.EventListener({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
             onTouchBegan: function (/*touch, event*/) {

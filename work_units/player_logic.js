@@ -96,3 +96,19 @@ exports.deletePlayerWorkUnit = function(player, callback) {
         callback(deletePlayerErr);
     });
 };
+
+exports.getTableNumberByPlayer = function(playerName, callback) {
+    var conditions = {
+        playerName: playerName
+    };
+
+    Player.getPlayers(conditions, function(getPlayersErr, players) {
+        if (getPlayersErr.code === errorCode.SUCCESS.code &&
+            null !== players && players.length > 0) {
+            var tableNumber = players[0].tableNumber;
+            callback(getPlayersErr, tableNumber);
+        } else {
+            callback(errorCode.FAILED, null);
+        }
+    });
+};

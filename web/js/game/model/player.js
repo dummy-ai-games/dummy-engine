@@ -24,6 +24,10 @@ var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCoun
     this.fold = false;
     this.allin = false;
     this.takeAction = false;
+
+    // optional fields for round clear
+    this.hand = null;
+    this.prize = 0;
 };
 
 Player.prototype.setId = function(_id) {
@@ -95,6 +99,14 @@ Player.prototype.setAllin = function(_allin) {
 
 Player.prototype.setTakeAction = function(_takeAction) {
     this.takeAction = _takeAction;
+};
+
+Player.prototype.setHand = function(_hand) {
+    this.hand = _hand;
+};
+
+Player.prototype.setPrize = function(_prize) {
+    this.prize = _prize;
 };
 
 // avatar hash helper

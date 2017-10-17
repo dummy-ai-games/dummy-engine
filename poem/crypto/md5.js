@@ -94,7 +94,7 @@ function MD5(sMessage, fullSize) {
     var x = Array();
     var k, AA, BB, CC, DD, a, b, c, d
     var S11 = 7, S12 = 12, S13 = 17, S14 = 22;
-    var S21 = 5, S22 = 9 , S23 = 14, S24 = 20;
+    var S21 = 5, S22 = 9, S23 = 14, S24 = 20;
     var S31 = 4, S32 = 11, S33 = 16, S34 = 23;
     var S41 = 6, S42 = 10, S43 = 15, S44 = 21;
 // Steps 1 and 2. Append padding bits and length and convert to words
@@ -180,12 +180,7 @@ function MD5(sMessage, fullSize) {
         d = AddUnsigned(d, DD);
     }
 // Step 5. Output the 128 bit digest
-    var temp;
-    if (undefined != fullSize && null != fullSize) {
-        temp = WordToHex(a) + WordToHex(b) + WordToHex(c) + WordToHex(d);
-    } else {
-        temp = WordToHex(a) + WordToHex(b) + WordToHex(c);
-    }
+    var temp = WordToHex(a) + WordToHex(b) + WordToHex(c) + WordToHex(d);
     return temp.toLowerCase();
 }
 

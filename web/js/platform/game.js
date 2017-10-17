@@ -5,6 +5,7 @@
 
 // data related
 var tableNumber = 0;
+var playerNamePlain = '';
 var playerName = '';
 var dbPlayers = [];
 var autoStart = 0;
@@ -64,11 +65,12 @@ window.onbeforeunload = function ()
 $(document).ready(function () {
     // get table number first
     tableNumber = getParameter('table');
-    playerName = getParameter('name');
+    playerNamePlain = getParameter('name');
     autoStart = getParameter('auto') || 0;
 
-    if (playerName) {
+    if (playerNamePlain) {
         playMode = MODE_PLAYER;
+        playerName = MD5(playerNamePlain);
         document.title = 'The Game';
     } else {
         playMode = MODE_LIVE;
@@ -107,7 +109,7 @@ function initPlayerInfo() {
 function initWebsock() {
     // initialize web communication
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0],
-        playerName, tableNumber);
+        playerNamePlain, tableNumber);
 
     rtc.on('__new_peer', function (data) {
         console.log('deprecated player join : ' + JSON.stringify(data));
@@ -240,17 +242,20 @@ function initWebsock() {
         console.log('round end : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
         reloadTime = true;
-        updateGame(data, false);
+        updateGame(data, false, true);
     });
 
     // this request could be received in player mode only
     rtc.on('__action', function (data) {
         console.log('server request action : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
+        console.log('play mode = ' + playMode);
         // it's your turn !!
         if (playMode === MODE_PLAYER) {
-            if (data.self.playerName === playerName) {
+            console.log('self.name = ' + data.self.playerName + ', player name = ' + playerName);
+            if (data.self.playerName.toLowerCase() === playerName.toLowerCase()) {
                 turnAnimationShowed = false;
+                console.log('!!! your turn !!!');
                 yourTurn = true;
             } else {
                 yourTurn = false;
@@ -421,7 +426,7 @@ function stopGame() {
     rtc.stopGame(tableNumber);
 }
 
-function updateGame(data, isNewRound) {
+function updateGame(data, isNewRound, roundClear) {
     var i;
 
     // update round
@@ -447,7 +452,6 @@ function updateGame(data, isNewRound) {
     // update players
     if (data.players) {
         currentPlayers = data.players.length;
-        console.log('player list (' + currentPlayers + ') = ' + JSON.stringify(players));
         for (i = 0; i < data.players.length; i++) {
             var targetPlayer = findTargetPlayer(data.players[i].playerName);
             if (null === targetPlayer) {
@@ -475,6 +479,18 @@ function updateGame(data, isNewRound) {
                 targetPlayer.setFolded(data.players[i].folded);
                 targetPlayer.setAllin(data.players[i].allIn);
                 targetPlayer.setReloadCount(data.players[i].reloadCount);
+            }
+
+            if (roundClear) {
+                if (undefined !== data.players[i].hand && null !== data.players[i].hand) {
+                    targetPlayer.setHand(data.players[i].hand);
+                }
+                if (undefined !== data.players[i].winMoney && null !== data.players[i].winMoney) {
+                    targetPlayer.setPrize(data.players[i].winMoney);
+                }
+            } else {
+                targetPlayer.setHand(null);
+                targetPlayer.setPrize(null);
             }
 
             if (data.table) {
