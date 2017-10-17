@@ -1,20 +1,19 @@
+/**
+ * Created by the-engine team
+ * 2017-07-22
+ */
+
 var SkyRTC = function() {
 
-    /**********************************************************/
-    /*                                                        */
-    /*                       事件处理器                       */
-    /*                                                        */
-    /**********************************************************/
     function EventEmitter() {
         this.events = {};
     }
 
-    //绑定事件函数
     EventEmitter.prototype.on = function(eventName, callback) {
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(callback);
     };
-    //触发事件函数
+
     EventEmitter.prototype.emit = function(eventName, _) {
         var events = this.events[eventName],
             args = Array.prototype.slice.call(arguments, 1),
@@ -28,26 +27,13 @@ var SkyRTC = function() {
         }
     };
 
-
-    /**********************************************************/
-    /*                                                        */
-    /*                   流及信道建立部分                     */
-    /*                                                        */
-    /**********************************************************/
-
-
-    /*******************基础部分*********************/
     function skyrtc() {
-        //本地WebSocket连接
         this.socket = null;
     }
 
-    //继承自事件处理器，提供绑定事件和触发事件的功能
     skyrtc.prototype = new EventEmitter();
 
-
-    /*************************服务器连接部分***************************/
-    skyrtc.prototype.connect = function(server, playerName,table) {
+    skyrtc.prototype.connect = function(server, playerName, tableNumber, isHuman) {
         var socket,
             that = this;
 
@@ -57,7 +43,8 @@ var SkyRTC = function() {
                 "eventName": "__join",
                 "data": {
                     "playerName": playerName,
-                    "table":table
+                    "tableNumber": tableNumber,
+                    "isHuman": isHuman
                 }
             }));
             that.emit("socket_opened", socket);
@@ -155,12 +142,22 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.startGame = function(tableNumber) {
+    skyrtc.prototype.startGame = function(tableNumber,
+                                          commandInterval, roundInterval,
+                                          defaultSb, defaultChips, reloadChance,
+                                          commandTimeout, lostTimeout) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__prepare_game",
             "data": {
-                "tableNumber": tableNumber
+                "tableNumber": tableNumber,
+                "commandInterval": commandInterval,
+                "roundInterval": roundInterval,
+                "defaultSb": defaultSb,
+                "defaultChips": defaultChips,
+                "reloadChance": reloadChance,
+                "commandTimeout": commandTimeout,
+                "lostTimeout": lostTimeout
             }
         }));
     };

@@ -9,10 +9,19 @@ var playerNamePlain = '';
 var playerName = '';
 var dbPlayers = [];
 var autoStart = 0;
+var gameBgm = 0;
+var commandInterval = 1;
+var roundInterval = 10;
+var commandTimeout = 2;
+var lostTimeout = 10;
+var defaultSb = 10;
+var defaultChips = 1000;
+var reloadChance = 2;
 
 // game board related
 var winWidth, winHeight;
 var gameWidth, gameHeight;
+var audio1, audio2;
 
 // game model related
 var STATUS_GAME_STANDBY = 0;
@@ -38,6 +47,8 @@ var currentBetCount = 0;
 
 var yourTurn = false;
 var turnAnimationShowed = false;
+var playerMinBet = 0;
+var playerMaxBet = 0;
 
 var reloadTime = false;
 
@@ -67,6 +78,14 @@ $(document).ready(function () {
     tableNumber = getParameter('table');
     playerNamePlain = getParameter('name');
     autoStart = getParameter('auto') || 0;
+    gameBgm = getParameter('bgm') || 0;
+    commandInterval = getParameter('commandInterval') || 0.5;
+    roundInterval = getParameter('roundInterval') || 10;
+    defaultSb = getParameter('defaultSb') || 10;
+    defaultChips = getParameter('defaultChips') || 1000;
+    reloadChance = getParameter('reloadChance') || 2;
+    commandTimeout = getParameter('commandTimeout') || 2;
+    lostTimeout = getParameter('lostTimeout') || 10;
 
     if (playerNamePlain) {
         playMode = MODE_PLAYER;
@@ -109,7 +128,7 @@ function initPlayerInfo() {
 function initWebsock() {
     // initialize web communication
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0],
-        playerNamePlain, tableNumber);
+        playerNamePlain, tableNumber, true);
 
     rtc.on('__new_peer', function (data) {
         console.log('deprecated player join : ' + JSON.stringify(data));
@@ -190,7 +209,9 @@ function initWebsock() {
             // auto start another game in 3s
             setTimeout(function () {
                 startGame();
-            }, 10 * 10000);
+            }, 20 * 1000);
+        } else {
+            stopAudios();
         }
     });
 
@@ -204,12 +225,18 @@ function initWebsock() {
         // update in game engine
         console.log('game start : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
+        if (1 === parseInt(gameBgm)) {
+            stopAudios();
+            console.log('start play audio');
+            audio1.play();
+        }
     });
 
     rtc.on('__game_stop', function (data) {
         // update in game engine
         console.log('game stop : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_STANDBY;
+        stopAudios();
     });
 
     rtc.on('__deal', function (data) {
@@ -249,14 +276,14 @@ function initWebsock() {
     rtc.on('__action', function (data) {
         console.log('server request action : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
-        console.log('play mode = ' + playMode);
-        // it's your turn !!
         if (playMode === MODE_PLAYER) {
             console.log('self.name = ' + data.self.playerName + ', player name = ' + playerName);
             if (data.self.playerName.toLowerCase() === playerName.toLowerCase()) {
                 turnAnimationShowed = false;
-                console.log('!!! your turn !!!');
                 yourTurn = true;
+                playerMinBet = data.self.minBet;
+                playerMaxBet = data.self.chips;
+                console.log('your turn, binBet = ' + playerMinBet + ', maxBet = ' + playerMaxBet);
             } else {
                 yourTurn = false;
             }
@@ -280,9 +307,12 @@ function initWebsock() {
         gameStatus = STATUS_GAME_RUNNING;
         // it's your turn !!
         if (playMode === MODE_PLAYER) {
-            if (data.self.playerName === playerName) {
+            if (data.self.playerName.toLowerCase() === playerName.toLowerCase()) {
                 turnAnimationShowed = false;
                 yourTurn = true;
+                playerMinBet = data.self.minBet;
+                playerMaxBet = data.self.chips;
+                console.log('your turn, binBet = ' + playerMinBet + ', maxBet = ' + playerMaxBet);
             } else {
                 yourTurn = false;
             }
@@ -414,11 +444,35 @@ function ccLoad() {
         }, this);
     };
     cc.game.run('gameCanvas');
+
+    // init bgm
+    audio1 = new Audio('../res/audio/bgm.ogg');
+    audio2 = new Audio('../res/audio/bgm.ogg');
+    audio1.addEventListener('timeupdate', function() {
+        if (this.currentTime > 151.7) {
+            audio2.play();
+        }
+    }, false);
+    audio1.addEventListener('ended', function() {
+        this.pause();
+        this.currentTime = 0;
+    }, false);
+
+    audio2.addEventListener('timeupdate', function() {
+        if (this.currentTime > 151.7) {
+            audio1.play();
+        }
+    }, false);
+    audio2.addEventListener('ended', function() {
+        this.pause();
+        this.currentTime = 0;
+    }, false);
 }
 
 // game helper
 function startGame() {
-    rtc.startGame(tableNumber);
+    rtc.startGame(tableNumber, commandInterval, roundInterval,
+        defaultSb, defaultChips, reloadChance, commandTimeout, lostTimeout);
     gameStatus = STATUS_GAME_PREPARING;
 }
 
@@ -568,8 +622,14 @@ function getElementTop(element) {
     return actualTop;
 }
 
-// Action helper
+function stopAudios() {
+    audio1.pause();
+    audio2.pause();
+    audio1.currentTime = 0;
+    audio2.currentTime = 0;
+}
 
+// Action helper
 function reload() {
     console.log('>>> reload');
     rtc.Reload();

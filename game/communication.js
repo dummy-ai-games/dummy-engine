@@ -40,15 +40,20 @@ function SkyRTC() {
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
-        var table = data.table;
+        var table = data.tableNumber;
+        var isHuman = data.isHuman || false;
+
+
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
         if (that.playerAndTable[playerName]) {
             socket.id = playerName;
             socket.MD5Id = MD5Dao.MD5(playerName);
+            socket.isHuman = isHuman;
         } else if (table) {
             socket.tableNumber = table;
-        } else
+        } else {
             return;
+        }
 
         var tableNumber = that.playerAndTable[socket.id];
         if (tableNumber !== undefined) {
@@ -84,7 +89,9 @@ function SkyRTC() {
     });
 
     this.on('__prepare_game', function (data) {
-        this.prepareGame(data.tableNumber);
+        this.prepareGame(data.tableNumber, data.defaultChips, data.defaultSb,
+                            data.commandInterval, data.roundInterval, data.reloadChance,
+                            data.commandTimeout, data.lostTimeout);
     });
 
     this.on('__start_game', function (data) {
@@ -389,7 +396,8 @@ SkyRTC.prototype.notifyLeft = function () {
     }
 };
 
-SkyRTC.prototype.prepareGame = function (tableNumber) {
+SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
+                                         commandInterval, roundInterval, reloadChance, commandTimeout, lostTimeout) {
     var that = this;
     var message;
     try {
@@ -409,7 +417,45 @@ SkyRTC.prototype.prepareGame = function (tableNumber) {
     }
 
     // initialize game parameters
-    that.table[tableNumber] = new poker.Table(10, 20, 3, 10, 1000, 2, 100);
+    var sb = 10;
+    var bb = 20;
+    var initChips = 1000;
+    var rc = 2;
+    var ci = 1;
+    var ri = 10;
+    var ct = 2;
+    var lt = 10;
+
+    if (undefined !== defaultSb && null !== defaultSb && defaultSb >= 10) {
+        sb = parseInt(defaultSb);
+        bb = parseInt(sb * 2);
+    }
+
+    if (undefined !== defaultChips && null !== defaultChips && defaultChips >= 1000) {
+        initChips = parseInt(defaultChips);
+    }
+
+    if (undefined !== reloadChance && null !== reloadChance && reloadChance >= 0) {
+        rc = parseInt(reloadChance);
+    }
+
+    if (undefined !== commandInterval && null !== commandInterval && commandInterval >= 0) {
+        ci = parseInt(commandInterval);
+    }
+
+    if (undefined !== roundInterval && null !== roundInterval && roundInterval >= 0) {
+        ri = parseInt(roundInterval);
+    }
+
+    if (undefined !== commandTimeout && null !== commandTimeout && commandTimeout >= 0) {
+        ct = parseFloat(commandTimeout);
+    }
+
+    if (undefined !== lostTimeout && null !== lostTimeout && lostTimeout >= 0) {
+        lt = parseInt(lostTimeout);
+    }
+
+    that.table[tableNumber] = new poker.Table(sb, bb, 3, 10, initChips, rc, 100, ci, ri, ct, lt);
     that.table[tableNumber].tableNumber = tableNumber;
     that.initTable(tableNumber);
     logger.info('init table done');
@@ -574,7 +620,6 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             'data': data
         };
         that.broadcastInPlayers(message);
-        // updated by strawmanbobi : also broadcast in guest
         that.broadcastInGuests(message);
     });
 
@@ -606,6 +651,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     var player = message.data.self.playerName;
     var tableNumber;
     var currentTable;
+    var commandTimeout = 0;
     tableNumber = message.data.tableNumber;
     currentTable = that.table[tableNumber];
     if (!currentTable)
@@ -618,7 +664,12 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         logger.info('server request: ' + JSON.stringify(message));
         that.sendMessage(that.players[player], message);
         var timestamp = new Date().getTime();
-        logger.info('send player action,time is ' + timestamp);
+        if (that.players[player].isHuman) {
+            commandTimeout = 60;
+        } else {
+            commandTimeout = currentTable.commandTimeout;
+        }
+        logger.info('send player action, time is ' + timestamp);
         currentTable.timeout = setTimeout(function () {
             currentTable.timeout = null;
             if (currentTable.status === enums.GAME_STATUS_RUNNING) {
@@ -626,7 +677,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                 currentTable.isActionTime = false;
                 currentTable.players[currentTable.currentPlayer].Fold();
             }
-        }, 60 * 1000); // for BETA test, set to 1 min, for official game, set to 2 sec
+        }, commandTimeout * 1000); // for BETA test, set to 1 min, for official game, set to 2 sec
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
             currentTable.timeout = null;
@@ -634,7 +685,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                 that.getPlayerAction(message, true);
                 logger.info('table ' + tableNumber + ' player ' + player + ' might be lost, resend message');
             }
-        }, 10 * 1000); // for BETA test, set to 10s
+        }, currentTable.lostTimeout * 1000); // for BETA test, set to 10s
     } else {
         // bug fix - crash after players quit
         if (currentTable && currentTable.status === enums.GAME_STATUS_RUNNING) {

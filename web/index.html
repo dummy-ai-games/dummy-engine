@@ -66,6 +66,75 @@
                             <span class="input-group-addon">游戏桌号</span>
                             <input type="number" min="1" class="form-control" placeholder="游戏桌号" id="game_table_number" value="1">
                         </div>
+                        <hr>
+                        <p><strong>参数设置</strong></p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">指令间隔</span>
+                                    <input type="number" min="0" max="2" step="0.2" class="form-control" placeholder="指令间隔" id="game_command_interval" value="1" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">回合间隔</span>
+                                    <input type="number" min="5" max="30" step="5" class="form-control" placeholder="回合间隔" id="game_round_interval" value="10" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">指令超时</span>
+                                    <input type="number" min="1" max="10" step="1" class="form-control" placeholder="指令超时" id="game_command_timeout" value="2" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">掉线超时</span>
+                                    <input type="number" min="10" max="15" step="1" class="form-control" placeholder="回合间隔" id="game_lost_timeout" value="10" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">默认小盲</span>
+                                    <input type="number" min="10" max="100" step="10" class="form-control" placeholder="默认小盲" id="game_default_sb" value="10" onkeydown="return false">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">默认筹码</span>
+                                    <input type="number" min="1000" max="2000" step="100" class="form-control" placeholder="默认筹码" id="game_default_chips" value="1000" onkeydown="return false">
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">重载次数</span>
+                                    <input type="number" min="0" max="5" step="1" class="form-control" placeholder="重载次数" id="game_reload_chance" value="2" onkeydown="return false">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group" style="padding-top: 6px;">
+                                    <input type="checkbox" id="game_bgm" checked/> 背景音效
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group" style="padding-top: 6px;">
+                                    <input type="checkbox" id="auto_restart"/> 自动重启
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

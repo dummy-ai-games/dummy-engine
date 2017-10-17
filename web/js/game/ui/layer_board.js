@@ -526,12 +526,14 @@ var BoardLayer = cc.Layer.extend({
     },
 
     betPlus: function() {
-        this.currentBet *= 2;
-        this.amountLabel.setString('$' + this.currentBet);
+        if (this.currentBet * 2 <= playerMaxBet) {
+            this.currentBet *= 2;
+            this.amountLabel.setString('$' + this.currentBet);
+        }
     },
 
     betMinus: function() {
-        if (this.currentBet >= currentBigBlind) {
+        if (this.currentBet / 2 >= playerMinBet) {
             this.currentBet /= 2;
             this.amountLabel.setString('$' + this.currentBet);
         }
@@ -657,7 +659,7 @@ var BoardLayer = cc.Layer.extend({
                         // play animation
                         this.setYourTurn(true);
                         this.currentBet = currentBigBlind;
-                        this.amountLabel.setString('$' + this.currentBet);
+                        this.amountLabel.setString('$' + playerMinBet);
                         this.yourTurnAnimation(this.yourTurn,
                             this.gameScale * 4,
                             this.gameScale * 0.8,
@@ -668,6 +670,7 @@ var BoardLayer = cc.Layer.extend({
 
                     if (yourTurn === false) {
                         this.setYourTurn(false);
+                        this.amountLabel.setString('--');
                     }
                 }
                 break;

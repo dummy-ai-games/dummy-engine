@@ -29,6 +29,12 @@ var s_name_mask_left = './res/images/game_board/bg_name_left_mask.png';
 
 var s_chips = './res/images/game_board/chips.png';
 
+// medals
+var s_m_1st = './res/images/game_board/first.png';
+var s_m_2nd = './res/images/game_board/second.png';
+var s_m_3rd = './res/images/game_board/third.png';
+var medalArray = [s_m_1st, s_m_2nd, s_m_3rd];
+
 // dealer images
 var s_start_button = './res/images/game_board/start_button.png';
 var s_start_button_pressed = './res/images/game_board/start_button_pressed.png';
@@ -258,6 +264,9 @@ var resources = [
     s_avatar_mask_left,
     s_name_mask_left,
     s_chips,
+    s_m_1st,
+    s_m_2nd,
+    s_m_3rd,
     s_tm_logo,
     s_your_turn,
     s_start_button,

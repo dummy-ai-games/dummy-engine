@@ -7,7 +7,7 @@ var ScoreLayer = cc.LayerColor.extend({
 
     // constants
     titleFont: 'IMPACT',
-    titleTextSize: 32,
+    titleTextSize: 36,
     playerFont: 'Tw Cen MT',
     playerTextSize: 20,
     cardsInfoFont: 'Tw Cen MT',
@@ -20,6 +20,7 @@ var ScoreLayer = cc.LayerColor.extend({
     validHeight: 0,
     maxPlayerCount: 10,
     maxCardsCount: 7,
+    maxMedalCount: 3,
     players: [],
 
     // pre-loaded frames
@@ -30,9 +31,11 @@ var ScoreLayer = cc.LayerColor.extend({
     // scales
     gameScale: 1.0,
     cardScale: 1.0,
+    medalScale: 1.0,
 
     // sprites
-    playerHands: null,
+    playerHands: [],
+    medals: [],
 
     // labels
     titleLabel: null,
@@ -61,6 +64,7 @@ var ScoreLayer = cc.LayerColor.extend({
     cardWidthSpec: 57,
     cardHeightSpec: 80,
     reloadButtonMarginBottom: 10,
+    medalMarginRight: 10,
 
     // event managers
     eventListener: null,
@@ -82,7 +86,7 @@ var ScoreLayer = cc.LayerColor.extend({
 
         // initialize title
         this.titleLabel= new cc.LabelTTF('Round 1 Clear', this.titleFont, this.titleTextSize);
-        this.titleLabel.setColor(cc.color(255, 255, 255, 255));
+        this.titleLabel.setColor(cc.color(255, 255, 0, 255));
         this.titleLabel.setAnchorPoint(0, 0);
         this.titleLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
         this.titleLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
@@ -95,6 +99,7 @@ var ScoreLayer = cc.LayerColor.extend({
                     this.titleTextMarginBottom * this.gameScale);
         this.addChild(this.titleLabel, 2);
 
+        // initialize player score labels
         var playerIndex;
         this.scoreLabels = [];
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
@@ -122,6 +127,23 @@ var ScoreLayer = cc.LayerColor.extend({
                                 this.gameScale);
             }
             this.addChild(this.scoreLabels[playerIndex], 2);
+        }
+
+        // initialize medals
+        var medalIndex;
+        this.medals = [];
+        for (medalIndex = 0; medalIndex < this.maxMedalCount; medalIndex++) {
+            this.medals[medalIndex] = new cc.Sprite(medalArray[medalIndex]);
+            this.medals[medalIndex].setAnchorPoint(0, 0);
+            this.medalScale = this.gameScale * 0.6;
+            this.medals[medalIndex].setScale(this.medalScale);
+            this.medals[medalIndex].setPosition(this.scoreLabels[0].getPositionX() -
+                this.medals[medalIndex].getContentSize().width * this.medalScale -
+                this.medalMarginRight * this.gameScale,
+                    this.scoreLabels[medalIndex].getPositionY() -
+                    this.medals[medalIndex].getContentSize().height * this.medalScale);
+
+            this.addChild(this.medals[medalIndex], 2);
         }
 
         // initialize player hands

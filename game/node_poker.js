@@ -11,16 +11,17 @@ var logger = require('../poem/logging/logger4js').helper;
 var Enums = require('../constants/enums.js');
 var enums = new Enums();
 
-function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloadCount, maxRoundCount) {
-    this.smallBlind = smallBlind;
-    this.bigBlind = bigBlind;
-    this.minPlayers = minPlayers;
-    this.maxPlayers = maxPlayers;
+function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloadCount, maxRoundCount,
+               commandInterval, roundInterval, commandTimeout, lostTimeout) {
+    this.smallBlind = smallBlind || 10;
+    this.bigBlind = bigBlind || this.smallBlind * 2;
+    this.minPlayers = minPlayers || 3;
+    this.maxPlayers = maxPlayers || 10;
     this.players = [];
     this.timeout = null;
     this.dealer = 0; // Track the dealer position between games
-    this.initChips = initChips;
-    this.maxReloadCount = maxReloadCount;
+    this.initChips = initChips || 1000;
+    this.maxReloadCount = maxReloadCount || 2;
     this.playersToRemove = [];
     this.playersToAdd = [];
     this.eventEmitter = new events.EventEmitter();
@@ -34,13 +35,17 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.roundCount = 1;
     this.surviveCount = 0;
     this.isReloadTime = false;
-    this.maxRoundCount = maxRoundCount;
+    this.maxRoundCount = maxRoundCount || 100;
     this.firstDealer = 0;
     this.status = enums.GAME_STATUS_STANDBY;
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
     this.isActionTime = false;
     this.countDown = 3;
+    this.commandInterval = commandInterval || 1;
+    this.roundInterval = roundInterval || 10;
+    this.commandTimeout = commandTimeout || 2;
+    this.lostTimeout = lostTimeout || 10;
 
     // Validate acceptable value ranges.
     var err;
@@ -116,14 +121,15 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
         logGame(that.tableNumber, 'round end');
         logGame(that.tableNumber, '********');
-        logGame(that.tableNumber, 'alive player count = ' + count + ', players.length / 2 = ' + that.players.length / 2);
+        logGame(that.tableNumber, 'alive player count = ' + count + ', players.length / 2 = ' +
+            that.players.length / 2);
         logGame(that.tableNumber, 'minPlayers = ' + that.minPlayers);
         logGame(that.tableNumber, 'roundCount = ' + that.roundCount + ', maxRoundCount = ' + that.maxRoundCount);
         logGame(that.tableNumber, '********');
 
         if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
             data = getBasicData(that);
-            for(var i = 0;i<data.players.length;i++){
+            for(var i = 0;i<data.players.length;i++) {
                 var player = data.players[i];
                 player.hand = that.players[i].hand;
                 player.winMoney = that.players[i].winMoney;
@@ -156,7 +162,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 that.isBet = false;
                 logGame(that.tableNumber, "reload time end, start new round");
                 that.NewRound();
-            }, 10 * 1000);
+            }, that.roundInterval * 1000);
         } else {
             logGame(that.tableNumber, 'game over, winners : ');
             that.status = enums.GAME_STATUS_FINISHED;
@@ -355,8 +361,7 @@ function takeAction(table, action) {
             table.eventEmitter.emit(action, data);
             table.isActionTime = true;
         }
-    }, 1000);
-
+    }, table.commandInterval * 1000);
 }
 
 Table.prototype.resetCountDown = function () {
@@ -2089,11 +2094,9 @@ Player.prototype.GetChips = function (cash) {
 // Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
 Player.prototype.Check = function () {
     var checkAllow, v, i;
-
     checkAllow = true;
 
     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to CHECK');
-
     for (v = 0; v < this.table.game.bets.length; v += 1) {
         if (this.table.game.bets[v] !== 0) {
             checkAllow = false;
