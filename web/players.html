@@ -25,9 +25,9 @@
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="./">主页</a></li>
-                            <li><a href="document.html">文档</a></li>
+                            <li><a href="document.html">文档<img src="./res/images/red-dot-md.png"></a></li>
                             <li><a href="#" onclick="setGame();">直播</a></li>
-                            <li><a href="#" onclick="setPlayer();">游戏<img src="./res/images/red-dot-md.png"></a></li>
+                            <li><a href="#" onclick="setPlayer();">游戏</a></li>
                             <li class="active"><a href="#">玩家管理</a></li>
                         </ul>
                     </nav>
@@ -100,14 +100,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">指令间隔</span>
+                                    <span class="input-group-addon">指令间隔&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="为了让您看清楚 Live 上玩家的出牌顺序, 服务器上可以在连续两条 action 请求之间加上一定时间间隔"></span></span>
                                     <input type="number" min="0" max="2" step="0.2" class="form-control" placeholder="指令间隔" id="game_command_interval" value="1" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">回合间隔</span>
+                                    <span class="input-group-addon">回合间隔&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="在每回合清算的时候将展示玩家手牌, 得分和牌面组合, 以及让客户端请求reload 的这个时间间隔"></span></span>
                                     <input type="number" min="5" max="30" step="5" class="form-control" placeholder="回合间隔" id="game_round_interval" value="10" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
@@ -117,14 +117,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">指令超时</span>
+                                    <span class="input-group-addon">指令超时&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="服务器等待客户端决策指令的超时时间, 正式比赛为 2 秒"></span></span>
                                     <input type="number" min="1" max="10" step="1" class="form-control" placeholder="指令超时" id="game_command_timeout" value="2" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">掉线超时</span>
+                                    <span class="input-group-addon">掉线超时&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="客户端因为各种原因掉线之后服务器的等待时间, 正式比赛为 10 秒"></span></span>
                                     <input type="number" min="10" max="15" step="1" class="form-control" placeholder="回合间隔" id="game_lost_timeout" value="10" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
@@ -134,13 +134,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">默认小盲</span>
+                                    <span class="input-group-addon">默认小盲&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="默认初始小盲注, 正式比赛为 10"></span></span>
                                     <input type="number" min="10" max="100" step="10" class="form-control" placeholder="默认小盲" id="game_default_sb" value="10" onkeydown="return false">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">默认筹码</span>
+                                    <span class="input-group-addon">默认筹码&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="默认玩家初始以及每次reload可获得的筹码, 正式比赛为 1000"></span></span>
                                     <input type="number" min="1000" max="2000" step="100" class="form-control" placeholder="默认筹码" id="game_default_chips" value="1000" onkeydown="return false">
                                 </div>
                             </div>
@@ -149,18 +149,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">重载次数</span>
+                                    <span class="input-group-addon">重载次数&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="玩家可申请的reload的机会, 正式比赛为 2 次"></span></span>
                                     <input type="number" min="0" max="5" step="1" class="form-control" placeholder="重载次数" id="game_reload_chance" value="2" onkeydown="return false">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group" style="padding-top: 6px;">
-                                    <input type="checkbox" id="game_bgm" checked/> 背景音效
+                                    <input type="checkbox" id="game_bgm" checked/> 背景音效&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="无限洗脑循环"></span>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group" style="padding-top: 6px;">
-                                    <input type="checkbox" id="auto_restart"/> 自动重启
+                                    <input type="checkbox" id="auto_restart"/> 自动重启&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="自动重新开始下一局比赛"></span>
                                 </div>
                             </div>
                         </div>

@@ -16,19 +16,19 @@ var risk = 1;
 var danger = 2;
 
 var rtc = SkyRTC();
+var plainPlayerName = '';
 var playerName = '';
 
-
-
 $(document).ready(function () {
-    playerName = getParameter('name');
+    plainPlayerName = getParameter('name');
+    playerName = MD5(plainPlayerName);
     console.log('player : ' + playerName);
     $('#player_name').html(playerName);
     initRTC();
 });
 
 function initRTC() {
-    rtc.connect('ws://localhost:3000', playerName);
+    rtc.connect('ws://localhost:3000', plainPlayerName);
     rtc.on('__action', function (data) {
         console.log(data);
 

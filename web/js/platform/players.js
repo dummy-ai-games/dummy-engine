@@ -86,7 +86,7 @@ function loadPlayersByTable() {
             field: '',
             checkbox: true
         }, {
-            field: 'playerName',
+            field: 'plainName',
             title: '玩家名',
             align: 'left',
             valign: 'middle',
@@ -97,6 +97,13 @@ function loadPlayersByTable() {
             align: 'left',
             valign: 'middle',
             visible: false,
+            sortable: true
+        }, {
+            field: 'playerName',
+            title: 'Token',
+            align: 'left',
+            valign: 'middle',
+            visible: true,
             sortable: true
         }, {
             field: 'displayName',
@@ -120,7 +127,7 @@ function loadPlayersByTable() {
 
 function onPlayerSelected(data) {
     selectedPlayer = data;
-    $('#player_name').val(selectedPlayer.playerName);
+    $('#player_name').val(selectedPlayer.plainName);
     $('#display_name').val(selectedPlayer.displayName);
     $('#table_number').val(selectedPlayer.tableNumber);
 

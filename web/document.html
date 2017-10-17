@@ -25,26 +25,26 @@
                             <li><a href="./index.html">主页</a></li>
                             <li class="active"><a href="#">文档</a></li>
                             <li><a href="#" onclick="setGame();">直播</a></li>
-                            <li><a href="#" onclick="setPlayer();">游戏<img src="./res/images/red-dot-md.png"></a></li>
+                            <li><a href="#" onclick="setPlayer();">游戏</a></li>
                             <li><a href="./players.html">玩家管理</a></li>
                         </ul>
                     </nav>
                 </div>
             </div>
         </div>
-        <h2>文档 V1.0.6</h2>
-        <h4>2017-10-12</h4>
+        <h2>文档 V1.0.7</h2>
+        <h4>2017-10-18</h4>
         <div class="alert alert-warning" role="alert" style="margin-top: 5px;">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
             <div>重要提醒: 初赛最终会以所有参赛玩家总排名的筹码总数的前30位作为晋级队伍, 而并非每一桌游戏的胜出者, 请各位玩家注意策略</div>
         </div>
-        <div class="alert alert-success" role="alert" style="margin-top: 5px;">
+        <div class="alert alert-danger" role="alert" style="margin-top: 5px;">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
-            <div>提示: 您可以启动一个Dummy来测试您写的AI程序, Dummy非常弱小, 如果您连Dummy也无法打败, 就完蛋了... 在"开发参考"中可以启动Dummy</div>
+            <div>非常重要的提醒: 从平台 1.2.1 版本开始, 客户端登录时采用的 playerName 在服务器上将被哈希生成一个 token, 后续的所有交互指令中各位参赛玩家的标识符均为这个 token, 所以请客户端开发者在本地保留一份 playerName 的 Hash 值, 以便作为判断依据, 详情可以参考最新的 "__join" 指令说明, 以及 "实用工具" 中的 "MD5 Hash"</div>
         </div>
         <hr>
         <div>
@@ -52,7 +52,7 @@
                 <li class="active" style="cursor: pointer;"><a data-target="#competition_rules" data-toggle="tab">比赛规则</a></li>
                 <li style="cursor: pointer;"><a data-target="#game_rules" data-toggle="tab">游戏规则</a></li>
                 <li style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
-                <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">开发参考</a></li>
+                <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">实用工具</a></li>
                 <li style="cursor: pointer;"><a data-target="#faq" data-toggle="tab">FAQ</a></li>
                 <li style="cursor: pointer;"><a data-target="#release_note" data-toggle="tab">更新日志</a></li>
             </ul>
@@ -243,7 +243,7 @@
                     <a name="join_game" style="text-decoration: none;"><h4><strong>加入游戏</strong></h4></a>
                     <ul>
                         <p>加入游戏命令在游戏开始之前, 玩家进入游戏桌时由客户端向服务器发送, 命令格式 (JSON) 如下:</p>
-                        <pre class="pre_code">
+                        <pre class="pre_code new_content">
 {
     "eventName" : "__join",
     "data" : {
@@ -251,10 +251,14 @@
                                           // 这个名字目前在测试平台上并不启用, 在比赛前夕会通过私密的方式通告给每个参赛玩家
                                           // 每个玩家的私有名会对应一个展示名(由 Task Force事先录入), 比赛当日大屏幕上显示的为展示名以区分玩家
                                           // 以下文档中所有涉及到的 playerName 均为<b>私有名</b>, 为了阅读方便, 文档中暂时用类似 bobi, cicy, geoge 等拟名代替
+                                          // 后台在收到玩家 __join 消息之后, 将这个名字做 128bit 的 MD5 hash,
+                                          // 生成一个 token, 这个 token 将作为后续所有指令中的 playerName 出现,
+                                          // 如果玩家希望在客户端代码中做相应的匹配, 请自行在客户端中生成 128bit 的 MD5 hash, 英文字母小写, 也可以使用
+                                          // 开发工具中的哈希工具来帮助生成并加入 hard code 到目标代码中
     }
 }</pre>
                         <p>指令说明:</p>
-                        <p>1. playerName必须是 Task Force赋予玩家的名字, 不可冒名顶替, 一旦被程序检查出冒名行为,将取消比赛资格</p>
+                        <p>1. playerName 必须是 Task Force 赋予玩家的名字, 不可冒名顶替, 一旦被程序检查出冒名行为,将取消比赛资格</p>
                         <p>2. 如果加入成功, 那么服务器会将当前牌桌上所有玩家的列表向所有在线的客户端广播一次, 广播格式如下:</p>
                         <pre>
 {
@@ -282,17 +286,17 @@
             "raiseCount" : 0,
             "betCount" : 0,
             "smallBlind": {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "amount": 10
             },
             "bigBlind": {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "amount": 20
             }
         },
         "players" : [
             {
-                "playerName" : "bobi",
+                "playerName" : "bobi(MD5 Hash)",
                 "chips" : 20,
                 "folded" : true,
                 "allIn" : false,
@@ -303,7 +307,7 @@
                 <span class="new_content">"cards": [] // 只有自己的手牌才可见 </span>
             },
             {
-                "playerName" : "cicy",
+                "playerName" : "cicy(MD5 Hash)",
                 "chips" : 0,
                 "folded" : true,
                 "allIn" : true,
@@ -314,7 +318,7 @@
                 <span class="new_content">"cards": [] // 只有自己的手牌才可见 </span>
             },
             {
-                "playerName" : "geoge",
+                "playerName" : "geoge(MD5 Hash)",
                 "chips" : 500,
                 "folded" : true,
                 "allIn" : false,
@@ -347,7 +351,7 @@
     "data" : {
         "players": [
             {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "chips": 960,
                 "folded": false,
                 "": false,
@@ -355,7 +359,7 @@
                 "reloadCount": 0
             },
             {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "chips": 960,
                 "folded": false,
                 "allIn": false,
@@ -363,7 +367,7 @@
                 "reloadCount": 0
             },
             {
-                "playerName": "geoge",
+                "playerName": "geoge(MD5 Hash)",
                 "chips": 960,
                 "folded": false,
                 "allIn": false,
@@ -394,7 +398,7 @@
     "data" : {
         "players": [
             {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "chips": 980,
                 "folded": false,
                 "allIn": false,
@@ -405,7 +409,7 @@
                 "cards": []
             },
             {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "chips": 980,
                 "folded": false,
                 "allIn": false,
@@ -416,7 +420,7 @@
                 "cards": []
             },
             {
-                "playerName": "geoge",
+                "playerName": "geoge(MD5 Hash)",
                 "chips": 980,
                 "folded": false,
                 "allIn": false,
@@ -440,11 +444,11 @@
         "raiseCount": 0,
         "betCount": 0,
         "smallBlind": {
-            "playerName": "geoge",
+            "playerName": "geoge(MD5 Hash)",
             "amount": 10
         },
         "bigBlind": {
-            "playerName": "tryest",
+            "playerName": "tryest(MD5 Hash)",
             "amount": 20
         }
     }
@@ -461,7 +465,7 @@
     "data" : {
         "tableNumber" : 1,
         "self" : {
-            "playerName" : "bobi",
+            "playerName" : "bobi(MD5 Hash)",
             "chips" : 1000,
             "folded" : false,
             "allIn" : false,
@@ -473,11 +477,11 @@
         },
         "game" : {
             "smallBlind": {
-                "playerName" : "bobi",
+                "playerName" : "bobi(MD5 Hash)",
                 "amount" : 10
             },
             "bigBlind": {
-                "playerName" : "cicy",
+                "playerName" : "cicy(MD5 Hash)",
                 "amount" : 20
             },
             "board" : [XX, XX, XX],
@@ -487,7 +491,7 @@
             "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
             "players" : [
                 {
-                    "playerName" : "bobi",
+                    "playerName" : "bobi(MD5 Hash)",
                     "chips" : 20,
                     "folded" : true,
                     "allIn" : false,
@@ -498,7 +502,7 @@
                     "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌
                 },
                 {
-                    "playerName" : "cicy",
+                    "playerName" : "cicy(MD5 Hash)",
                     "chips" : 0,
                     "folded" : true,
                     "allIn" : true,
@@ -508,7 +512,7 @@
                     "bet" : 10
                 },
                 {
-                    "playerName" : "geoge",
+                    "playerName" : "geoge(MD5 Hash)",
                     "chips" : 500,
                     "folded" : true,
                     "allIn" : false,
@@ -550,7 +554,7 @@
     "data" : {
         "tableNumber" : 1,
         "self" : {
-            "playerName" : "bobi",
+            "playerName" : "bobi(MD5 Hash)",
             "chips" : 1000,
             "folded" : false,
             "allIn" : false,
@@ -559,11 +563,11 @@
         },
         "game" : {
             "smallBlind": {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "amount": 10
             },
             "bigBlind": {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "amount": 20
             },
             "board" : [],
@@ -573,7 +577,7 @@
             "roundName" : "Deal", // 其它可能的值为 : "Flop", "Turn", "River"
             "players" : [
                 {
-                    "playerName" : "bobi",
+                    "playerName" : "bobi(MD5 Hash)",
                     "chips" : 20,
                     "folded" : true,
                     "allIn" : false,
@@ -584,7 +588,7 @@
                     "cards" : ["JC", "KS"] // 由于 self 也是 bobi, 所以在 player 列表里只公开 bobi 的手牌
                 },
                 {
-                    "playerName" : "cicy",
+                    "playerName" : "cicy(MD5 Hash)",
                     "chips" : 0,
                     "folded" : true,
                     "allIn" : true,
@@ -594,7 +598,7 @@
                     "bet" : 10
                 },
                 {
-                    "playerName" : "geoge",
+                    "playerName" : "geoge(MD5 Hash)",
                     "chips" : 500,
                     "folded" : true,
                     "allIn" : false,
@@ -635,7 +639,7 @@
     "data" : {
         "action" : {
             "action" : "call",
-            "playerName" : "alex",
+            "playerName" : "alex(MD5 Hash)",
             "amount" : 10,
             "chips" : 500
         },
@@ -648,17 +652,17 @@
             "betCount" : 1,
             <span class="new_content">"totalBet" : 2000,</span>
             "smallBlind": {
-                "playerName": "geoge",
+                "playerName": "geoge(MD5 Hash)",
                 "amount": 10
             },
             "bigBlind": {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "amount": 20
             }
         },
         "players" : [
             {
-                "playerName" : "bobi",
+                "playerName" : "bobi(MD5 Hash)",
                 "chips" : 20,
                 "folded" : true,
                 "allIn" : false,
@@ -669,7 +673,7 @@
                 "bet" : 40
             },
             {
-                "playerName" : "cicy",
+                "playerName" : "cicy(MD5 Hash)",
                 "chips" : 0,
                 "folded" : true,
                 "allIn" : true,
@@ -680,7 +684,7 @@
                 "bet" : 40
             },
             {
-                "playerName" : "geoge",
+                "playerName" : "geoge(MD5 Hash)",
                 "chips" : 500,
                 "folded" : true,
                 "allIn" : false,
@@ -714,7 +718,7 @@
     "data" : {
         "players": [
             {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "chips": 960,
                 "folded": true,
                 "allIn": false,
@@ -741,7 +745,7 @@
                 "isOnline": true</span>
             },
             {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "chips": 1280,
                 "folded": true,
                 "allIn": false,
@@ -768,11 +772,11 @@
             "raiseCount" : 0,
             "betCount" : 1,
             "smallBlind": {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "amount": 10
             },
             "bigBlind": {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "amount": 20
             }
         }
@@ -794,7 +798,7 @@
         "players":
         [
             {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "chips": 0,
                 "folded": false,
                 "allIn": true,
@@ -809,7 +813,7 @@
                 "bet" : 40
             },
             {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "chips": 15900,
                 "folded": true,
                 "allIn": true,
@@ -824,7 +828,7 @@
                 "bet" : 40
             },
             {
-                "playerName": "alex",
+                "playerName": "alex(MD5 Hash)",
                 "chips": 0,
                 "folded": true,
                 "allIn": true,
@@ -854,17 +858,17 @@
             "raiseCount" : 0,
             "betCount" : 1,
             "smallBlind": {
-                "playerName": "bobi",
+                "playerName": "bobi(MD5 Hash)",
                 "amount": 10
             },
             "bigBlind": {
-                "playerName": "cicy",
+                "playerName": "cicy(MD5 Hash)",
                 "amount": 20
             }
         },
         "winners": [
             {
-                "playerName": "andy",
+                "playerName": "andy(MD5 Hash)",
                 "hand": {
                     "cards": [
                         "AD",
@@ -881,7 +885,7 @@
                 "chips": 15900
             },
             {
-                "playerName": "lance1",
+                "playerName": "lance1(MD5 Hash)",
                 "hand": {
                     "cards": [
                         "8H",
@@ -898,7 +902,7 @@
                 "chips": 1360
             },
             {
-                "playerName": "tryest",
+                "playerName": "tryest(MD5 Hash)",
                 "hand": {
                     "cards": [
                         "9D",
@@ -938,7 +942,7 @@
                     <p><span>请开发者自行修改示例代码中的 Socket 地址和接入用户名信息以方便自助测试</span></p>
                     <div class="row">
                         <div class="col-md-4">
-                            <h2>Javascript V1.0.1</h2>
+                            <h2>Javascript V1.0.2</h2>
                             <p>启动方式：双击用浏览器打开 player.html, 并附加URL参数name=your_name, <br>例如: file:///D:/player.html?name=bobi<br><br></p>
                             <p><a class="btn btn-large btn-default" href="./example/js-example.zip" role="button">js 示例下载 &raquo;</a></p>
                         </div>
@@ -969,6 +973,19 @@
                         </div>
                         <br>
                         <p><a class="btn btn-default" role="button" onclick="createDummy();">启动Dummy &raquo;</a></p>
+                    </div>
+                    <hr>
+                    <div>
+                        <h2>MD5 Hash</h2>
+                        <p>您可以在这里 Hash 您的用户名以便在代码中进行自我判断, 当然您也可以在代码中集成 128bit 的 MD5 算法(输出为32字节 hex 格式文本, 英文字母小写)</p>
+                        <div class="input-group">
+                            <span class="input-group-addon">玩家名称</span>
+                            <input type="text"class="form-control" placeholder="输入玩家名称" id="hash_name_in">
+                            <span class="input-group-addon">MD5报文</span>
+                            <input type="text"class="form-control" id="hash_name_out" readonly>
+                        </div>
+                        <br>
+                        <p><a class="btn btn-default" role="button" onclick="hashName();">生成散列报文 &raquo;</a></p>
                     </div>
                 </div>
                 <div class="tab-pane" id="faq">
@@ -1037,9 +1054,10 @@
                         A:<br>
                         1. 请先移步"玩家管理"页面, 找到一个没有人使用的桌号, 任意添加不少于 3 名玩家, 玩家用不同名称区分<br>
                         2. 编写自己的AI程序, 注意Websocket接入地址正确<br>
-                        3. 点击"游戏"输入创建玩家时录入的桌号, 可进入游戏界面<br>
+                        3. 点击"直播"输入创建玩家时录入的桌号, 可进入游戏界面, 可以配置关于游戏的各种参数, 以调试你的AI<br>
                         4. 将AI程序中的玩家名逐个替换成不同玩家名, 逐个接入, 在游戏界面即可看见玩家进场<br>
-                        5. 点击PLAY按钮, 开始比赛
+                        5. 点击Play按钮, 开始比赛<br>
+                        6. 人类玩家在菜单中点击"游戏"输入任意同桌玩家名可加入
                     </p>
                     <br>
                     <p class="question">
@@ -1047,6 +1065,22 @@
                     </p>
                     <p class="answer">
                         A: 10s之内接入还有机会, 加入后可以通过侦听 __show_action 指令重新获得牌桌状态, 否则系统将用一直FOLD的算法接管这个掉线的玩家, 请认真coding & testing, 确保程序不会crash
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: 怎样从客户端收到的消息中得到玩家座位顺序?
+                    </p>
+                    <p class="answer">
+                        A: 在任何的players列表中给出的玩家都是按照入座先后排序的, 这个顺序不会变, 即使玩家比赛过程中掉线退出并重新加入之后也不会变
+                    </p>
+                    <br>
+                    <p class="question">
+                        Q: 新的玩家命名规则在客户端需要做哪些处理?
+                    </p>
+                    <p class="answer">
+                        A: 正式比赛中, 系统分配给玩家的是一个私密难以解读的随机字符串, 这个字符串在玩家 __join 之后会由服务器做 MD5 的哈希报文处理, 在整个游戏牌局的交互过程中, 这个散列过的报文将作为玩家的唯一标识符用于识别.
+                        也就是说, 玩家只需要在 __join 消息中附带随机串明文(当然, 在自助测试过程中, 这个明文即为在玩家管理中添加的用户名, 并非显示名), 而后客户端接收到的消息中, 将完全用明文哈希过后的报文作为标识符.
+                        在文档的开发工具中有MD5工具帮助玩家生成这个哈希报文, 请妥善使用.
                     </p>
                     <br>
                 </div>
@@ -1158,14 +1192,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">指令间隔</span>
+                                    <span class="input-group-addon">指令间隔&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="为了让您看清楚 Live 上玩家的出牌顺序, 服务器上可以在连续两条 action 请求之间加上一定时间间隔"></span></span>
                                     <input type="number" min="0" max="2" step="0.2" class="form-control" placeholder="指令间隔" id="game_command_interval" value="1" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">回合间隔</span>
+                                    <span class="input-group-addon">回合间隔&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="在每回合清算的时候将展示玩家手牌, 得分和牌面组合, 以及让客户端请求reload 的这个时间间隔"></span></span>
                                     <input type="number" min="5" max="30" step="5" class="form-control" placeholder="回合间隔" id="game_round_interval" value="10" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
@@ -1175,14 +1209,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">指令超时</span>
+                                    <span class="input-group-addon">指令超时&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="服务器等待客户端决策指令的超时时间, 正式比赛为 2 秒"></span></span>
                                     <input type="number" min="1" max="10" step="1" class="form-control" placeholder="指令超时" id="game_command_timeout" value="2" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">掉线超时</span>
+                                    <span class="input-group-addon">掉线超时&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="客户端因为各种原因掉线之后服务器的等待时间, 正式比赛为 10 秒"></span></span>
                                     <input type="number" min="10" max="15" step="1" class="form-control" placeholder="回合间隔" id="game_lost_timeout" value="10" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
@@ -1192,13 +1226,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">默认小盲</span>
+                                    <span class="input-group-addon">默认小盲&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="默认初始小盲注, 正式比赛为 10"></span></span>
                                     <input type="number" min="10" max="100" step="10" class="form-control" placeholder="默认小盲" id="game_default_sb" value="10" onkeydown="return false">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">默认筹码</span>
+                                    <span class="input-group-addon">默认筹码&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="默认玩家初始以及每次reload可获得的筹码, 正式比赛为 1000"></span></span>
                                     <input type="number" min="1000" max="2000" step="100" class="form-control" placeholder="默认筹码" id="game_default_chips" value="1000" onkeydown="return false">
                                 </div>
                             </div>
@@ -1207,18 +1241,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon">重载次数</span>
+                                    <span class="input-group-addon">重载次数&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="玩家可申请的reload的机会, 正式比赛为 2 次"></span></span>
                                     <input type="number" min="0" max="5" step="1" class="form-control" placeholder="重载次数" id="game_reload_chance" value="2" onkeydown="return false">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group" style="padding-top: 6px;">
-                                    <input type="checkbox" id="game_bgm" checked/> 背景音效
+                                    <input type="checkbox" id="game_bgm" checked/> 背景音效&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="无限洗脑循环"></span>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="input-group" style="padding-top: 6px;">
-                                    <input type="checkbox" id="auto_restart"/> 自动重启
+                                    <input type="checkbox" id="auto_restart"/> 自动重启&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="自动重新开始下一局比赛"></span>
                                 </div>
                             </div>
                         </div>
@@ -1260,6 +1294,7 @@
 <script src="./js/public/bower_components/bootstrap/js/modal.js"></script>
 <script src="./js/public/bower_components/select2/dist/js/select2.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/js/alert.js"></script>
-<script src="js/platform/basic.js"></script>
-<script src="js/platform/document.js"></script>
+<script src="./js/utils/ciphering.js"></script>
+<script src="./js/platform/basic.js"></script>
+<script src="./js/platform/document.js"></script>
 </html>

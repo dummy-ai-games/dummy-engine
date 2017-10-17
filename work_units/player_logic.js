@@ -34,6 +34,7 @@ exports.getPlayersWorkUnit = function(tableNumber, callback) {
                     "" === players[i].displayName) {
                     players[i].displayName = players[i].playerName;
                 }
+                players[i].plainName = players[i].playerName;
                 players[i].playerName = MD5Dao.MD5(players[i].playerName);
             }
         }
