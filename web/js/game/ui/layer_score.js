@@ -167,7 +167,7 @@ var ScoreLayer = cc.LayerColor.extend({
             this.addChild(this.cardsInfo[playerIndex], 2);
         }
 
-        if (playMode === MODE_LIVE) {
+        if (playMode === MODE_PLAYER) {
             this.reloadButton = new ccui.Button(s_o_reload_button,
                                                    s_o_reload_button_pressed,
                                                    s_o_reload_button_disabled);
