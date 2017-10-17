@@ -277,7 +277,7 @@ SkyRTC.prototype.notifyJoin = function () {
     for(var tableNumber in tableAndPlayer){
         if(that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING){
             tableAndData[tableNumber] = poker.getBasicData(that.table[tableNumber]);
-            tableAndData[tableNumber].currentPlayer = that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
+            tableAndData[tableNumber].table.currentPlayer = that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
         }
     }
     var message, tableNumber;
