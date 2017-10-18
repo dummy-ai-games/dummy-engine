@@ -34,18 +34,25 @@
         </div>
         <h2>文档 V1.0.7</h2>
         <h4>2017-10-18</h4>
-        <div class="alert alert-warning" role="alert" style="margin-top: 5px;">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <div>重要提醒: 初赛最终会以所有参赛玩家总排名的筹码总数的前30位作为晋级队伍, 而并非每一桌游戏的胜出者, 请各位玩家注意策略</div>
-        </div>
         <div class="alert alert-danger" role="alert" style="margin-top: 5px;">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
-            <div>非常重要的提醒: 从平台 1.2.1 版本开始, 客户端登录时采用的 playerName 在服务器上将被哈希生成一个 token, 后续的所有交互指令中各位参赛玩家的标识符均为这个 token, 所以请客户端开发者在本地保留一份 playerName 的 Hash 值, 以便作为判断依据, 详情可以参考最新的 "__join" 指令说明, 以及 "实用工具" 中的 "MD5 Hash"</div>
+            <div>从平台 1.2.1 版本开始, 客户端登录时采用的 playerName 在服务器上将被哈希生成一个 token, 后续的所有交互指令中各位参赛玩家的标识符均为这个 token, 所以请客户端开发者在本地保留一份 playerName 的 Hash 值, 以便作为判断依据, 详情可以参考最新的 "__join" 指令说明, 以及 "实用工具" 中的 "MD5 Hash"</div>
         </div>
+        <div class="alert alert-warning" role="alert" style="margin-top: 5px;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div>原来的 __action 和 __bet 指令中的 data.game.minBet 移动到了 data.self.minBet, 代表这位玩家本次 action 最少能押下的注码, 用于判断如果执行一次 call 或者 bet 最小需要付出多少代价</div>
+        </div>
+        <div class="alert alert-info" role="alert" style="margin-top: 5px;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div>初赛最终会以所有参赛玩家总排名的筹码总数的前30位作为晋级队伍, 而并非每一桌游戏的胜出者, 请各位玩家注意策略</div>
+        </div>
+
         <hr>
         <div>
             <ul class="nav nav-tabs" id="main_tab">
@@ -483,9 +490,9 @@
             "cards" : [XX, XX],
             "isSurvive" : true,
             "roundBet" : 0,
-		    "bet" : 10,
+            "bet" : 10,
             <span class="new_content">"minBet" : 10,</span>
-		    "cards" : ["JC", "KS"]
+            "cards" : ["JC", "KS"]
         },
         "game" : {
             "smallBlind": {
@@ -572,7 +579,7 @@
             "cards" : [XX, XX],
             "isSurvive" : true
             "roundBet" : 0,
-		    "bet" : 10,
+            "bet" : 10,
             <span class="new_content">"minBet" : 10,</span>
         },
         "game" : {
