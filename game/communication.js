@@ -90,8 +90,8 @@ function SkyRTC() {
 
     this.on('__prepare_game', function (data) {
         this.prepareGame(data.tableNumber, data.defaultChips, data.defaultSb,
-                            data.commandInterval, data.roundInterval, data.reloadChance,
-                            data.commandTimeout, data.lostTimeout);
+            data.commandInterval, data.roundInterval, data.reloadChance,
+            data.commandTimeout, data.lostTimeout);
     });
 
     this.on('__start_game', function (data) {
@@ -281,8 +281,8 @@ SkyRTC.prototype.notifyJoin = function () {
             tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
         }
     }
-    for(var tableNumber in tableAndPlayer){
-        if(that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING){
+    for (var tableNumber in tableAndPlayer) {
+        if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
             tableAndData[tableNumber] = poker.getBasicData(that.table[tableNumber]);
             tableAndData[tableNumber].table.currentPlayer = that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
         }
@@ -291,17 +291,17 @@ SkyRTC.prototype.notifyJoin = function () {
 
     // TODO: to make clear how the Live and Player UI would be affected by aliens join and left
     for (var guest in that.guests) {
-        tableNumber = that.guests[guest].tableNumber;       
+        tableNumber = that.guests[guest].tableNumber;
         message = {
-             'eventName': '__new_peer',
-             'data' : tableAndPlayer[tableNumber]
-        };       
+            'eventName': '__new_peer',
+            'data': tableAndPlayer[tableNumber]
+        };
         that.sendMessage(that.guests[guest], message);
         // for backward compatibility, send another command to Live and Player UI
         message = {
             'eventName': '__new_peer_2',
             'data': {
-                'tableNumber' : tableNumber,
+                'tableNumber': tableNumber,
                 'players': tableAndPlayer[tableNumber],
                 'basicData': tableAndData[tableNumber]
             }
@@ -314,17 +314,17 @@ SkyRTC.prototype.notifyJoin = function () {
     }
     for (var player in that.players) {
         if (that.players[player]) {
-            tableNumber = that.players[player].tableNumber;           
+            tableNumber = that.players[player].tableNumber;
             message = {
-             'eventName': '__new_peer',
-             'data' : tableAndPlayer[tableNumber]
-            };       
+                'eventName': '__new_peer',
+                'data': tableAndPlayer[tableNumber]
+            };
             that.sendMessage(that.players[player], message);
             // for backward compatibility, send another command to Live and Player UI
             message = {
                 'eventName': '__new_peer_2',
                 'data': {
-                    'tableNumber' : tableNumber,
+                    'tableNumber': tableNumber,
                     'players': tableAndPlayer[tableNumber],
                     'basicData': tableAndData[tableNumber]
                 }
@@ -364,7 +364,7 @@ SkyRTC.prototype.notifyLeft = function () {
         message = {
             'eventName': '__left',
             'data': {
-                'tableNumber' : tableNumber,
+                'tableNumber': tableNumber,
                 'players': tableAndPlayer[tableNumber]
             }
         };
@@ -383,7 +383,7 @@ SkyRTC.prototype.notifyLeft = function () {
             message = {
                 'eventName': '__left',
                 'data': {
-                    'tableNumber' : tableNumber,
+                    'tableNumber': tableNumber,
                     'players': tableAndPlayer[tableNumber]
                 }
             };
@@ -803,20 +803,21 @@ SkyRTC.prototype.init = function (socket) {
         that.exitHandle(socket);
     });
 
-    if(!that.playerAndTable[socket.id]){
-        playerDao.getAllPlayers(function (getPlayerErr, players) {
-            if (getPlayerErr.code === errorCode.SUCCESS.code) {
-                for (var i = 0; i < players.length; i++) {
-                    var player = players[i];
-                    that.playerAndTable[player.playerName] = player.tableNumber;
-                }
-                logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
-            } else {
-                logger.error('no players found');
+
+    playerDao.getAllPlayers(function (getPlayerErr, players) {
+        if (getPlayerErr.code === errorCode.SUCCESS.code) {
+            that.playerAndTable = {};
+            for (var i = 0; i < players.length; i++) {
+                var player = players[i];
+                that.playerAndTable[player.playerName] = player.tableNumber;
             }
-            that.emit('new_connect', socket);
-        });
-    }
+            logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
+        } else {
+            logger.error('no players found');
+        }
+        that.emit('new_connect', socket);
+    });
+
 };
 
 exports.listen = function (server) {
