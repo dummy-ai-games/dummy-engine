@@ -90,7 +90,7 @@ exports.updatePlayerWorkUnit = function(player, callback) {
 
 exports.deletePlayerWorkUnit = function(player, callback) {
     var conditions = {
-        playerName: player.playerName
+        playerName: player.plainName
     };
 
     Player.deletePlayer(conditions, function(deletePlayerErr) {
