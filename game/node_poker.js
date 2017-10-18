@@ -229,6 +229,8 @@ function getBasicData(table) {
     myTable['raiseCount'] = table.raiseCount;
     myTable['betCount'] = table.betCount;
     myTable['totalBet'] = totalBet;
+    myTable['initChips'] = table.initChips;
+    myTable['maxReloadCount'] = table.maxReloadCount;
     if (-1 !== sbPlayerIndex) {
         myTable['smallBlind'] = {
             playerName: table.players[sbPlayerIndex].playerName,
