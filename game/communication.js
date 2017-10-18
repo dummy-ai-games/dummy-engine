@@ -803,18 +803,20 @@ SkyRTC.prototype.init = function (socket) {
         that.exitHandle(socket);
     });
 
-    playerDao.getAllPlayers(function (getPlayerErr, players) {
-        if (getPlayerErr.code === errorCode.SUCCESS.code) {
-            for (var i = 0; i < players.length; i++) {
-                var player = players[i];
-                that.playerAndTable[player.playerName] = player.tableNumber;
+    if(!that.playerAndTable[socket.id]){
+        playerDao.getAllPlayers(function (getPlayerErr, players) {
+            if (getPlayerErr.code === errorCode.SUCCESS.code) {
+                for (var i = 0; i < players.length; i++) {
+                    var player = players[i];
+                    that.playerAndTable[player.playerName] = player.tableNumber;
+                }
+                logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
+            } else {
+                logger.error('no players found');
             }
-            logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
-        } else {
-            logger.error('no players found');
-        }
-        that.emit('new_connect', socket);
-    });
+            that.emit('new_connect', socket);
+        });
+    }
 };
 
 exports.listen = function (server) {
