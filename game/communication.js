@@ -491,7 +491,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     var message;
     for (var player in that.players) {
         if (that.players[player] && that.players[player].tableNumber === tableNumber)
-            that.table[tableNumber].AddPlayer(player);
+            that.table[tableNumber].AddPlayer(player, that.players[player].id);
     }
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
