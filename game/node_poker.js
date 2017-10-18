@@ -332,7 +332,10 @@ function takeAction(table, action) {
                 player['plainName'] = table.players[i]['plainName'];
                 if (i === table.currentPlayer) {
                     player['cards'] = table.players[i]['cards'];
-                    player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
+                    if(action == "__bet")
+                      player['minBet'] = table.bigBlind;
+                    else
+                      player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
                     destPlayer = player;
                 }
                 players.push(player);
