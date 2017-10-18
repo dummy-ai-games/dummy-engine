@@ -143,7 +143,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 if (that.players[j].chips === 0)
                     isSurvive = false;
                 that.players[j] = new Player(that.players[j].playerName, that.players[j].chips,
-                    that, isSurvive, that.players[j].reloadCount);
+                    that, isSurvive, that.players[j].reloadCount, that.players[j].plainName);
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
             var nextDealer = getNextDealer(that);
