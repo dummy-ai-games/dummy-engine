@@ -4,13 +4,33 @@
  */
 
 var events = require('events');
-var playerDao = require('../models/player_dao.js');
 var winnerDao = require('../models/winner_dao.js');
+var scoreDao = require('../models/game_dao.js');
+
 var logger = require('../poem/logging/logger4js').helper;
 
 var Enums = require('../constants/enums.js');
 var enums = new Enums();
 
+var MD5Dao = require('../poem/crypto/md5.js');
+var dateUtils = require('../poem/utils/date_utils.js');
+
+/**
+ * Class Table
+ * @param smallBlind
+ * @param bigBlind
+ * @param minPlayers
+ * @param maxPlayers
+ * @param initChips
+ * @param maxReloadCount
+ * @param maxRoundCount
+ * @param commandInterval
+ * @param roundInterval
+ * @param commandTimeout
+ * @param lostTimeout
+ * @returns {*}
+ * @constructor
+ */
 function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloadCount, maxRoundCount,
                commandInterval, roundInterval, commandTimeout, lostTimeout) {
     this.smallBlind = smallBlind || 10;
@@ -47,10 +67,13 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.commandTimeout = commandTimeout || 2;
     this.lostTimeout = lostTimeout || 10;
 
+    // generate a game instance with ID
+    this.startTime = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+
     // Validate acceptable value ranges.
     var err;
     if (minPlayers < 3) { // Require at least 3 players to start a game.
-        err = new Error(101, 'Parameter [minPlayers] must be a postive integer of a minimum value of 2.');
+        err = new Error(101, 'Parameter [minPlayers] must be a positive integer of a minimum value of 2.');
     } else if (maxPlayers > 10) { // Hard limit of 10 players at a table.
         err = new Error(102, 'Parameter [maxPlayers] must be a positive integer less than or equal to 10.');
     } else if (minPlayers > maxPlayers) { // Without this we can never start a game!
@@ -72,15 +95,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
         logGame(that.tableNumber, 'start get first player:' + that.currentPlayer + ' action ');
         takeAction(that, '__turn');
-
-        var tempData = [];
-        for (var i = 0; i < that.players.length; i++) {
-            tempData.push({playerName: that.players[i].playerName, chips: that.players[i].chips});
-        }
-        playerDao.updatePlayerChips(tempData, function () {
-            // Do nothing
-            logGame(that.tableNumber, 'update player chip success ');
-        });
+        updateScore(that);
     });
 
     this.eventEmitter.on('showAction', function (data) {
@@ -187,190 +202,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     });
 }
 
-function getBasicData(table) {
-    var players = [];
-    var myTable = {};
-    var data = {};
-    var totalBet = 0;
-
-    for (var i = 0; i < table.players.length; i++) {
-        var player = {};
-        player['playerName'] = table.players[i]['playerName'];
-        player['chips'] = table.players[i]['chips'];
-        player['folded'] = table.players[i]['folded'];
-        player['allIn'] = table.players[i]['allIn'];
-        player['cards'] = table.players[i]['cards'];
-        player['isSurvive'] = table.players[i]['isSurvive'];
-        player['reloadCount'] = table.players[i]['reloadCount'];
-        player['plainName'] = table.players[i]['plainName'];
-        // include bets info
-        if (!table.game.roundBets[i]) {
-            table.game.roundBets[i] = 0;
-        }
-        if (!table.game.bets[i]) {
-            table.game.bets[i] = 0;
-        }
-
-        if (table.game) {
-            player['roundBet'] = table.game.roundBets[i];
-            player['bet'] = table.game.bets[i];
-        }
-        totalBet += parseInt(player['roundBet']) + parseInt(player['bet']);
-        players.push(player);
-    }
-    var sbPlayerIndex = table.smallBlindIndex;
-    var bbPlayerIndex = table.bigBlindIndex;
-
-    myTable['tableNumber'] = table.tableNumber;
-    myTable['status'] = table.status;
-    myTable['roundName'] = table.game.roundName;
-    myTable['board'] = table.game.board;
-    myTable['roundCount'] = table.roundCount;
-    myTable['raiseCount'] = table.raiseCount;
-    myTable['betCount'] = table.betCount;
-    myTable['totalBet'] = totalBet;
-    if (-1 !== sbPlayerIndex) {
-        myTable['smallBlind'] = {
-            playerName: table.players[sbPlayerIndex].playerName,
-            amount: table.smallBlind
-        };
-    }
-
-    if (-1 !== bbPlayerIndex) {
-        myTable['bigBlind'] = {
-            playerName: table.players[bbPlayerIndex].playerName,
-            amount: table.bigBlind
-        };
-    }
-    data.players = players;
-    data.table = myTable;
-    return data;
-}
-
-function getPlayerReloadData(table) {
-    var players = [];
-    var data = {};
-    for (var i = 0; i < table.players.length; i++) {
-        var player = {};
-        player['playerName'] = table.players[i]['playerName'];
-        player['chips'] = table.players[i]['chips'];
-        player['folded'] = table.players[i]['folded'];
-        player['allIn'] = table.players[i]['allIn'];
-        player['isSurvive'] = table.players[i]['isSurvive'];
-        player['reloadCount'] = table.players[i]['reloadCount'];
-        players.push(player);
-    }
-    data.players = players;
-    data.tableNumber = table.tableNumber;
-    return data;
-}
-
-function getNextPlayer(table) {
-    if (!table) {
-        logger.error('table is destroyed');
-    }
-
-    logGame(table.tableNumber, "get next player");
-    var maxBet = getMaxBet(table.game.bets);
-    do {
-        table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ?
-            (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
-        logGame(table.tableNumber, 'traverse : ' + table.players[table.currentPlayer].playerName);
-
-    } while (!table.players[table.currentPlayer].isSurvive ||
-    table.players[table.currentPlayer].folded ||
-    table.players[table.currentPlayer].allIn ||
-    (table.players[table.currentPlayer].talked === true &&
-        table.game.bets[table.currentPlayer] === maxBet));
-}
-
-function getNextDealer(table) {
-    var index = table.dealer;
-    var players = table.players;
-    var isNeedModifyFirstDealer = false;
-    do {
-        index = (index >= players.length - 1) ? (index - players.length + 1) : index + 1;
-        if (index === table.firstDealer) {
-            table.smallBlind = table.smallBlind * 2;
-            table.bigBlind = table.bigBlind * 2;
-            isNeedModifyFirstDealer = true;
-        }
-    } while (!players[index].isSurvive);
-    if (isNeedModifyFirstDealer)
-        table.firstDealer = index;
-    return index;
-}
-
-function sort(data) {
-    for (var k = 0; k < data.length; k++) {
-        for (var p = k + 1; p < data.length; p++) {
-            if (data[p].chips > data[k].chips || (data[p].chips === data[k].chips && data[p].hand.rank > data[k].hand.rank)) {
-                var temp = data[k];
-                data[k] = data[p];
-                data[p] = temp;
-            }
-        }
-    }
-}
-
-function takeAction(table, action) {
-    table.timeout = setTimeout(function () {
-        table.timeout = null;
-        if (table.status === enums.GAME_STATUS_RUNNING) {
-            var players = [];
-            var destPlayer = {};
-            for (var i = 0; i < table.players.length; i++) {
-                var player = {};
-                player['playerName'] = table.players[i]['playerName'];
-                player['chips'] = table.players[i]['chips'];
-                player['folded'] = table.players[i]['folded'];
-                player['allIn'] = table.players[i]['allIn'];
-                player['isSurvive'] = table.players[i]['isSurvive'];
-                player['reloadCount'] = table.players[i]['reloadCount'];
-                player['roundBet'] = table.game.roundBets[i];
-                player['bet'] = table.game.bets[i];
-                player['plainName'] = table.players[i]['plainName'];
-                if (i === table.currentPlayer) {
-                    player['cards'] = table.players[i]['cards'];
-                    if (action === "__bet") {
-                        player['minBet'] = table.bigBlind;
-                    } else {
-                        player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
-                    }
-                    destPlayer = player;
-                }
-                players.push(player);
-            }
-
-            var sbPlayerIndex = table.smallBlindIndex;
-            var bbPlayerIndex = table.bigBlindIndex;
-
-            var data = {
-                'tableNumber': table.tableNumber,
-                'self': destPlayer,
-                'game': {
-                    'board': table.game.board,
-                    'roundName': table.game.roundName,
-                    'roundCount': table.roundCount,
-                    'raiseCount': table.raiseCount,
-                    'betCount': table.betCount,
-                    'players': players,
-                    'smallBlind': {
-                        playerName: table.players[sbPlayerIndex].playerName,
-                        amount: table.smallBlind
-                    },
-                    'bigBlind': {
-                        playerName: table.players[bbPlayerIndex].playerName,
-                        amount: table.bigBlind
-                    }
-                }
-            };
-            table.eventEmitter.emit(action, data);
-            table.isActionTime = true;
-        }
-    }, table.commandInterval * 1000);
-}
-
 Table.prototype.resetCountDown = function () {
     this.countDown = 3;
 };
@@ -379,6 +210,202 @@ Table.prototype.checkPlayer = function (player) {
     return player === this.currentPlayer;
 };
 
+Table.prototype.getHandForPlayerName = function (playerName) {
+    for (var i in this.players) {
+        if (this.players[i].playerName === playerName) {
+            return this.players[i].cards;
+        }
+    }
+    return [];
+};
+
+Table.prototype.getDeal = function () {
+    return this.game.board;
+};
+
+Table.prototype.getEventEmitter = function () {
+    return this.eventEmitter;
+};
+
+Table.prototype.getCurrentPlayer = function () {
+    return this.players[this.currentPlayer].playerName;
+};
+
+Table.prototype.getPreviousPlayerAction = function () {
+    return this.turnBet;
+};
+
+// Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
+
+Table.prototype.getWinners = function () {
+    return this.gameWinners;
+};
+
+Table.prototype.getLosers = function () {
+    return this.gameLosers;
+};
+
+Table.prototype.getAllHands = function () {
+    var all = this.losers.concat(this.players);
+    var allHands = [];
+    for (var i in all) {
+        allHands.push({
+            playerName: all[i].playerName,
+            chips: all[i].chips,
+            hand: all[i].cards,
+        });
+    }
+    return allHands;
+};
+
+Table.prototype.StartGame = function () {
+    // If there is no current game and we have enough players, start a new game.
+    console.log('start game');
+    if (!this.game) {
+        this.playersToRemove = [];
+        this.dealer = parseInt(Math.random() * (this.surviveCount));
+        this.firstDealer = this.dealer;
+        this.status = enums.GAME_STATUS_RUNNING;
+        this.game = new Game(this.smallBlind, this.bigBlind);
+        this.NewRound();
+    }
+};
+
+Table.prototype.StopGame = function () {
+    console.log('stop game');
+    if (!this.game) {
+        // TODO: to implement a status for game PAUSED
+        this.status = enums.GAME_STATUS_STANDBY;
+    }
+};
+
+Table.prototype.AddPlayer = function (playerName, plainName) {
+    var that = this;
+    var player = new Player(playerName, that.initChips, this, true, 0, plainName);
+    this.playersToAdd.push(player);
+    this.surviveCount++;
+};
+
+Table.prototype.removePlayer = function (playerName) {
+    for (var i in this.players) {
+        if (this.players[i].playerName === playerName) {
+            this.playersToRemove.push(i);
+            this.players[i].Fold();
+        }
+    }
+    for (var i in this.playersToAdd) {
+        if (this.playersToAdd[i].playerName === playerName) {
+            this.playersToAdd.splice(i, 1);
+        }
+    }
+};
+
+Table.prototype.NewRound = function () {
+    // Add players in waiting list
+    logGame(this.tableNumber, 'newRound function, start init data');
+    var removeIndex = 0;
+    var i;
+    for (i in this.playersToAdd) {
+        var temp = i;
+        this.players.push(this.playersToAdd[i]);
+    }
+    this.playersToAdd = [];
+    this.gameWinners = [];
+    this.gameLosers = [];
+
+    var smallBlindIndex, bigBlindIndex;
+    // Deal 2 cards to each player
+    for (i = 0; i < this.players.length; i += 1) {
+        if (this.players[i].isSurvive) {
+            this.players[i].cards.push(this.game.deck.pop());
+            this.players[i].cards.push(this.game.deck.pop());
+        }
+        this.players[i].winMoney = 0;
+        this.game.bets[i] = 0;
+        this.game.roundBets[i] = 0;
+    }
+
+    // Identify Small and Big Blind player indexes
+    smallBlindIndex = this.findSmallBlind();
+    bigBlindIndex = this.findBigBlind(smallBlindIndex);
+    this.smallBlindIndex = smallBlindIndex;
+    this.bigBlindIndex = bigBlindIndex;
+
+    // Identify Small and Big Blind player indexes
+    // Force Blind Bets
+    if (this.smallBlind >= this.players[smallBlindIndex].chips) {
+        this.game.bets[smallBlindIndex] = this.players[smallBlindIndex].chips;
+        this.players[smallBlindIndex].chips = 0;
+        this.players[smallBlindIndex].allIn = true;
+        this.players[smallBlindIndex].talked = true;
+        this.surviveCount--;
+    } else {
+        this.players[smallBlindIndex].chips -= this.smallBlind;
+        this.game.bets[smallBlindIndex] = this.smallBlind;
+    }
+
+    if (this.bigBlind >= this.players[bigBlindIndex].chips) {
+        this.game.bets[bigBlindIndex] = this.players[bigBlindIndex].chips;
+        this.players[bigBlindIndex].chips = 0;
+        this.players[bigBlindIndex].allIn = true;
+        this.players[bigBlindIndex].talked = true;
+        this.surviveCount--;
+    } else {
+        this.players[bigBlindIndex].chips -= this.bigBlind;
+        //if (this.players[bigBlindIndex].chips % 1 !== 0)
+        // this.players[bigBlindIndex].chips = parseInt(this.players[bigBlindIndex].chips);
+        this.game.bets[bigBlindIndex] = this.bigBlind;
+    }
+
+    // emit __new_round message after small blind and big blind is decided
+    var data = getBasicData(this);
+    this.eventEmitter.emit('__new_round', data);//add first round notification
+
+    // Get currentPlayer
+    this.currentPlayer = bigBlindIndex;
+    this.eventEmitter.emit('newRound');
+};
+
+Table.prototype.findSmallBlind = function () {
+    var smallBlind = this.dealer;
+    if (smallBlind >= this.players.length) {
+        smallBlind = 0;
+    }
+    while (!this.players[smallBlind].isSurvive) {
+        smallBlind++;
+        //fix bug out of index
+        if (smallBlind >= this.players.length) {
+            smallBlind = 0;
+        }
+    }
+    return smallBlind;
+};
+
+Table.prototype.findBigBlind = function (smallBindIndex) {
+    var bigBlind = smallBindIndex + 1;
+    if (bigBlind >= this.players.length) {
+        bigBlind -= this.players.length;
+    }
+    while (!this.players[bigBlind].isSurvive) {
+        bigBlind++;
+        //fix bug out of index
+        if (bigBlind >= this.players.length) {
+            bigBlind -= this.players.length;
+        }
+    }
+    return bigBlind;
+};
+
+/**
+ * Class Player
+ * @param playerName
+ * @param chips
+ * @param table
+ * @param isSurvive
+ * @param reloadCount
+ * @param plainName
+ * @constructor
+ */
 function Player(playerName, chips, table, isSurvive, reloadCount, plainName) {
     this.playerName = playerName;
     this.chips = chips;
@@ -392,6 +419,259 @@ function Player(playerName, chips, table, isSurvive, reloadCount, plainName) {
     this.plainName = plainName;
 }
 
+Player.prototype.GetChips = function (cash) {
+    this.chips += cash;
+};
+
+// Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
+Player.prototype.Check = function () {
+    var checkAllow, v, i;
+    checkAllow = true;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to CHECK');
+    for (v = 0; v < this.table.game.bets.length; v += 1) {
+        if (this.table.game.bets[v] !== 0) {
+            checkAllow = false;
+        }
+    }
+    if (checkAllow) {
+        for (i = 0; i < this.table.players.length; i += 1) {
+            if (this === this.table.players[i]) {
+                this.table.game.bets[i] = 0;
+                this.talked = true;
+            }
+        }
+        // Attempt to progress the game
+        this.turnBet = {action: 'check', playerName: this.playerName, chips: this.chips};
+        this.table.eventEmitter.emit('showAction', this.turnBet);
+
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CHECK performed');
+        progress(this.table);
+    } else {
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CHECK is not allowed, default to CALL');
+        this.Call();
+    }
+};
+
+Player.prototype.Fold = function () {
+    var i, bet;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to FOLD');
+
+    // Move any current bet into the pot
+    for (i = 0; i < this.table.players.length; i += 1) {
+        if (this === this.table.players[i]) {
+            bet = parseInt(this.table.game.bets[i], 10);
+            this.talked = true;
+        }
+    }
+    // Mark the player as folded
+    this.folded = true;
+    this.turnBet = {action: 'fold', playerName: this.playerName, chips: this.chips};
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ' FOLD performed');
+    this.table.eventEmitter.emit('showAction', this.turnBet);
+    this.table.surviveCount--;
+    // Attempt to progress the game
+    progress(this.table);
+};
+
+Player.prototype.Raise = function () {
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to RAISE');
+
+    if (this.table.raiseCount >= 4) {
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', table raise times(' + this.table.raiseCount + ') exceeded, default to Call');
+        this.Call();
+    } else {
+        var maxBet, i, bet;
+        maxBet = getMaxBet(this.table.game.bets);
+        for (i = 0; i < this.table.players.length; i += 1) {
+            if (this === this.table.players[i]) {
+                var myBet = 0;
+                if (this.table.game.bets[i] >= 0) {
+                    myBet = this.table.game.bets[i];
+                }
+                bet = 2 * maxBet;
+                if (this.chips + myBet > bet) {
+                    this.chips = this.chips + myBet - bet;
+                    //if (this.chips % 1 !== 0)
+                    //this.chips = parseFloat(this.chips.toFixed(2));
+
+                    var addMoney = parseInt(bet - myBet);
+                    this.table.game.bets[i] = bet;
+                    this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
+                    this.table.eventEmitter.emit('showAction', this.turnBet);
+                    this.table.raiseCount++;
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', RAISE performed, table raise times = ' +
+                        this.table.raiseCount);
+
+                    for (var j = 0; j < this.table.players.length; j += 1) {
+                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
+                            this.table.players[j].talked = false;
+                        }
+                    }
+
+                    this.talked = true;
+                    progress(this.table);
+                } else {
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips(chips: ' +
+                        this.chips + ', bet : ' + myBet + ', going to bet : ' + bet + ') default to ALLIN');
+                    this.AllIn();
+                }
+                break;
+            }
+        }
+    }
+};
+
+Player.prototype.Bet = function (bet) {
+    var maxBet = getMaxBet(this.table.game.bets);
+    this.table.isBet = false;
+    var i;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to BET:' + bet);
+
+    if (bet < this.table.bigBlind) {
+        logGame(this.table.tableNumber, 'player : ' +
+            this.playerName + ', bet(' + bet + ') < big blind(' + this.table.bigBlind + '), default to bet big blind : ' + this.table.bigBlind);
+        bet = this.table.bigBlind;
+    }
+    if (this.chips > bet) {
+        for (i = 0; i < this.table.players.length; i += 1) {
+            if (this === this.table.players[i]) {
+                var myBet = this.table.game.bets[i];
+                if (myBet + bet > maxBet && this.table.betCount < 4) {
+                    this.table.betCount++;
+                    this.table.game.bets[i] += bet;
+                    this.table.players[i].chips -= bet;
+
+                    //if (this.table.players[i].chips % 1 !== 0)
+                    //this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
+
+                    //update other player
+                    for (var j = 0; j < this.table.players.length; j += 1) {
+                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
+                            this.table.players[j].talked = false;
+
+                        }
+                    }
+
+                    this.talked = true;
+
+                    // Attempt to progress the game
+                    this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips};
+                    this.table.eventEmitter.emit('showAction', this.turnBet);
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
+                    progress(this.table);
+                } else {
+                    if (myBet + bet > maxBet)
+                        logGame(this.table.tableNumber, "betCount =" + this.table.betCount + " can't bet again, auto call");
+                    else
+                        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
+                    this.Call();
+                }
+                break;
+            }
+        }
+    } else {
+        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
+        this.AllIn();
+    }
+};
+
+Player.prototype.Call = function () {
+    var maxBet, i;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to CALL');
+
+    maxBet = getMaxBet(this.table.game.bets);
+
+    // Match the highest bet
+    for (i = 0; i < this.table.players.length; i += 1) {
+        if (this === this.table.players[i]) {
+            var myBet = 0;
+            if (this.table.game.bets[i] >= 0) {
+                myBet = this.table.game.bets[i];
+            }
+            if (this.chips + myBet > maxBet) {
+                this.chips = this.chips + myBet - maxBet;
+                //if (this.chips % 1 !== 0)
+                //this.chips = parseFloat(this.chips.toFixed(2));
+
+                var addMoney = parseInt(maxBet - myBet);
+                this.table.game.bets[i] = maxBet;
+                this.talked = true;
+
+                this.turnBet = {action: 'call', playerName: this.playerName, amount: addMoney, chips: this.chips};
+                this.table.eventEmitter.emit('showAction', this.turnBet);
+                logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CALL performed');
+                progress(this.table);
+            } else {
+                logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
+                this.AllIn();
+            }
+        }
+    }
+};
+
+Player.prototype.AllIn = function () {
+    var i, allInValue = 0, myBet = 0;
+
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to ALLIN');
+
+    for (i = 0; i < this.table.players.length; i += 1) {
+        if (this === this.table.players[i]) {
+            if (this.table.players[i].chips !== 0) {
+                allInValue = this.table.players[i].chips;
+                this.table.game.bets[i] += this.table.players[i].chips;
+                this.table.players[i].chips = 0;
+                this.allIn = true;
+                this.talked = true;
+                this.table.surviveCount--;
+                myBet = this.table.game.bets[i];
+            }
+            break;
+        }
+    }
+
+    // if player bet < myBet, the player need to call
+    for (i = 0; i < this.table.players.length; i++) {
+        var bet = this.table.game.bets[i];
+        var player = this.table.players[i];
+        if (player.isSurvive && !player.folded && !player.allIn && bet < myBet) {
+            player.talked = false;
+        }
+    }
+
+    // Attempt to progress the game
+    this.turnBet = {action: 'allin', playerName: this.playerName, amount: allInValue, chips: this.chips};
+    this.table.eventEmitter.emit('showAction', this.turnBet);
+    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', ALLIN performed');
+    progress(this.table);
+};
+
+/**
+ * Class Game
+ * @param smallBlind
+ * @param bigBlind
+ * @constructor
+ */
+function Game(smallBlind, bigBlind) {
+    this.smallBlind = smallBlind;
+    this.bigBlind = bigBlind;
+    this.pot = 0;
+    this.roundName = 'Deal'; // Start the first round
+    this.betName = 'bet'; // Bet, raise, re-raise, cap
+    this.bets = [];
+    this.roundBets = [];
+    this.deck = [];
+    this.board = [];
+    fillDeck(this.deck);
+}
+
+
+/**
+ * public functions
+ */
 function fillDeck(deck) {
     deck.push('AS');
     deck.push('KS');
@@ -1862,468 +2142,205 @@ function progress(table) {
     }
 }
 
-function Game(smallBlind, bigBlind) {
-    this.smallBlind = smallBlind;
-    this.bigBlind = bigBlind;
-    this.pot = 0;
-    this.roundName = 'Deal'; // Start the first round
-    this.betName = 'bet'; // Bet, raise, re-raise, cap
-    this.bets = [];
-    this.roundBets = [];
-    this.deck = [];
-    this.board = [];
-    fillDeck(this.deck);
+function getBasicData(table) {
+    var players = [];
+    var myTable = {};
+    var data = {};
+    var totalBet = 0;
+
+    for (var i = 0; i < table.players.length; i++) {
+        var player = {};
+        player['playerName'] = table.players[i]['playerName'];
+        player['chips'] = table.players[i]['chips'];
+        player['folded'] = table.players[i]['folded'];
+        player['allIn'] = table.players[i]['allIn'];
+        player['cards'] = table.players[i]['cards'];
+        player['isSurvive'] = table.players[i]['isSurvive'];
+        player['reloadCount'] = table.players[i]['reloadCount'];
+        player['plainName'] = table.players[i]['plainName'];
+        // include bets info
+        if (!table.game.roundBets[i]) {
+            table.game.roundBets[i] = 0;
+        }
+        if (!table.game.bets[i]) {
+            table.game.bets[i] = 0;
+        }
+
+        if (table.game) {
+            player['roundBet'] = table.game.roundBets[i];
+            player['bet'] = table.game.bets[i];
+        }
+        totalBet += parseInt(player['roundBet']) + parseInt(player['bet']);
+        players.push(player);
+    }
+    var sbPlayerIndex = table.smallBlindIndex;
+    var bbPlayerIndex = table.bigBlindIndex;
+
+    myTable['tableNumber'] = table.tableNumber;
+    myTable['status'] = table.status;
+    myTable['roundName'] = table.game.roundName;
+    myTable['board'] = table.game.board;
+    myTable['roundCount'] = table.roundCount;
+    myTable['raiseCount'] = table.raiseCount;
+    myTable['betCount'] = table.betCount;
+    myTable['totalBet'] = totalBet;
+    if (-1 !== sbPlayerIndex) {
+        myTable['smallBlind'] = {
+            playerName: table.players[sbPlayerIndex].playerName,
+            amount: table.smallBlind
+        };
+    }
+
+    if (-1 !== bbPlayerIndex) {
+        myTable['bigBlind'] = {
+            playerName: table.players[bbPlayerIndex].playerName,
+            amount: table.bigBlind
+        };
+    }
+    data.players = players;
+    data.table = myTable;
+    return data;
 }
 
-/*
- * Helper Methods Public
- */
-Table.prototype.getHandForPlayerName = function (playerName) {
-    for (var i in this.players) {
-        if (this.players[i].playerName === playerName) {
-            return this.players[i].cards;
+function getPlayerReloadData(table) {
+    var players = [];
+    var data = {};
+    for (var i = 0; i < table.players.length; i++) {
+        var player = {};
+        player['playerName'] = table.players[i]['playerName'];
+        player['chips'] = table.players[i]['chips'];
+        player['folded'] = table.players[i]['folded'];
+        player['allIn'] = table.players[i]['allIn'];
+        player['isSurvive'] = table.players[i]['isSurvive'];
+        player['reloadCount'] = table.players[i]['reloadCount'];
+        players.push(player);
+    }
+    data.players = players;
+    data.tableNumber = table.tableNumber;
+    return data;
+}
+
+function getNextPlayer(table) {
+    if (!table) {
+        logger.error('table is destroyed');
+    }
+
+    logGame(table.tableNumber, "get next player");
+    var maxBet = getMaxBet(table.game.bets);
+    do {
+        table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ?
+            (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
+        logGame(table.tableNumber, 'traverse : ' + table.players[table.currentPlayer].playerName);
+
+    } while (!table.players[table.currentPlayer].isSurvive ||
+    table.players[table.currentPlayer].folded ||
+    table.players[table.currentPlayer].allIn ||
+    (table.players[table.currentPlayer].talked === true &&
+        table.game.bets[table.currentPlayer] === maxBet));
+}
+
+function getNextDealer(table) {
+    var index = table.dealer;
+    var players = table.players;
+    var isNeedModifyFirstDealer = false;
+    do {
+        index = (index >= players.length - 1) ? (index - players.length + 1) : index + 1;
+        if (index === table.firstDealer) {
+            table.smallBlind = table.smallBlind * 2;
+            table.bigBlind = table.bigBlind * 2;
+            isNeedModifyFirstDealer = true;
         }
-    }
-    return [];
-};
+    } while (!players[index].isSurvive);
+    if (isNeedModifyFirstDealer)
+        table.firstDealer = index;
+    return index;
+}
 
-Table.prototype.getDeal = function () {
-    return this.game.board;
-};
-
-Table.prototype.getEventEmitter = function () {
-    return this.eventEmitter;
-};
-
-Table.prototype.getCurrentPlayer = function () {
-    return this.players[this.currentPlayer].playerName;
-};
-
-Table.prototype.getPreviousPlayerAction = function () {
-    return this.turnBet;
-};
-
-// Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
-
-Table.prototype.getWinners = function () {
-    return this.gameWinners;
-};
-
-Table.prototype.getLosers = function () {
-    return this.gameLosers;
-};
-
-Table.prototype.getAllHands = function () {
-    var all = this.losers.concat(this.players);
-    var allHands = [];
-    for (var i in all) {
-        allHands.push({
-            playerName: all[i].playerName,
-            chips: all[i].chips,
-            hand: all[i].cards,
-        });
-    }
-    return allHands;
-};
-
-/*
- Table.prototype.initNewRound = function () {
- var i;
- this.dealer += 1;
- if (this.dealer >= this.players.length) {
- this.dealer = 0;
- }
- this.game.pot = 0;
- this.game.roundName = 'Deal'; // Start the first round
- this.game.betName = 'bet'; // bet, raise, re-raise, cap
- this.game.bets.splice(0, this.game.bets.length);
- this.game.deck.splice(0, this.game.deck.length);
- this.game.board.splice(0, this.game.board.length);
- for (i = 0; i < this.players.length; i += 1) {
- this.players[i].folded = false;
- this.players[i].talked = false;
- this.players[i].allIn = false;
- this.players[i].cards.splice(0, this.players[i].cards.length);
- }
- fillDeck(this.game.deck);
- this.NewRound();
- };
- */
-
-Table.prototype.StartGame = function () {
-    // If there is no current game and we have enough players, start a new game.
-    console.log('start game');
-    if (!this.game) {
-        this.playersToRemove = [];
-        this.dealer = parseInt(Math.random() * (this.surviveCount));
-        this.firstDealer = this.dealer;
-        this.status = enums.GAME_STATUS_RUNNING;
-        this.game = new Game(this.smallBlind, this.bigBlind);
-        this.NewRound();
-    }
-};
-
-Table.prototype.StopGame = function () {
-    console.log('stop game');
-    if (!this.game) {
-        // TODO: to implement a status for game PAUSED
-        this.status = enums.GAME_STATUS_STANDBY;
-    }
-};
-
-Table.prototype.AddPlayer = function (playerName, plainName) {
-    var that = this;
-    var player = new Player(playerName, that.initChips, this, true, 0, plainName);
-    this.playersToAdd.push(player);
-    this.surviveCount++;
-};
-
-Table.prototype.removePlayer = function (playerName) {
-    for (var i in this.players) {
-        if (this.players[i].playerName === playerName) {
-            this.playersToRemove.push(i);
-            this.players[i].Fold();
-        }
-    }
-    for (var i in this.playersToAdd) {
-        if (this.playersToAdd[i].playerName === playerName) {
-            this.playersToAdd.splice(i, 1);
-        }
-    }
-};
-
-Table.prototype.NewRound = function () {
-    // Add players in waiting list
-    logGame(this.tableNumber, 'newRound function, start init data');
-    var removeIndex = 0;
-    var i;
-    for (i in this.playersToAdd) {
-        var temp = i;
-        this.players.push(this.playersToAdd[i]);
-    }
-    this.playersToAdd = [];
-    this.gameWinners = [];
-    this.gameLosers = [];
-
-    var smallBlindIndex, bigBlindIndex;
-    // Deal 2 cards to each player
-    for (i = 0; i < this.players.length; i += 1) {
-        if (this.players[i].isSurvive) {
-            this.players[i].cards.push(this.game.deck.pop());
-            this.players[i].cards.push(this.game.deck.pop());
-        }
-        this.players[i].winMoney = 0;
-        this.game.bets[i] = 0;
-        this.game.roundBets[i] = 0;
-    }
-
-    // Identify Small and Big Blind player indexes
-    smallBlindIndex = this.findSmallBlind();
-    bigBlindIndex = this.findBigBlind(smallBlindIndex);
-    this.smallBlindIndex = smallBlindIndex;
-    this.bigBlindIndex = bigBlindIndex;
-
-    // Identify Small and Big Blind player indexes
-    // Force Blind Bets
-    if (this.smallBlind >= this.players[smallBlindIndex].chips) {
-        this.game.bets[smallBlindIndex] = this.players[smallBlindIndex].chips;
-        this.players[smallBlindIndex].chips = 0;
-        this.players[smallBlindIndex].allIn = true;
-        this.players[smallBlindIndex].talked = true;
-        this.surviveCount--;
-    } else {
-        this.players[smallBlindIndex].chips -= this.smallBlind;
-        this.game.bets[smallBlindIndex] = this.smallBlind;
-    }
-
-    if (this.bigBlind >= this.players[bigBlindIndex].chips) {
-        this.game.bets[bigBlindIndex] = this.players[bigBlindIndex].chips;
-        this.players[bigBlindIndex].chips = 0;
-        this.players[bigBlindIndex].allIn = true;
-        this.players[bigBlindIndex].talked = true;
-        this.surviveCount--;
-    } else {
-        this.players[bigBlindIndex].chips -= this.bigBlind;
-        //if (this.players[bigBlindIndex].chips % 1 !== 0)
-        // this.players[bigBlindIndex].chips = parseInt(this.players[bigBlindIndex].chips);
-        this.game.bets[bigBlindIndex] = this.bigBlind;
-    }
-
-    // emit __new_round message after small blind and big blind is decided
-    var data = getBasicData(this);
-    this.eventEmitter.emit('__new_round', data);//add first round notification
-
-    // Get currentPlayer
-    this.currentPlayer = bigBlindIndex;
-    this.eventEmitter.emit('newRound');
-};
-
-Table.prototype.findSmallBlind = function () {
-    var smallBlind = this.dealer;
-    if (smallBlind >= this.players.length) {
-        smallBlind = 0;
-    }
-    while (!this.players[smallBlind].isSurvive) {
-        smallBlind++;
-        //fix bug out of index
-        if (smallBlind >= this.players.length) {
-            smallBlind = 0;
-        }
-    }
-    return smallBlind;
-};
-
-Table.prototype.findBigBlind = function (smallBindIndex) {
-    var bigBlind = smallBindIndex + 1;
-    if (bigBlind >= this.players.length) {
-        bigBlind -= this.players.length;
-    }
-    while (!this.players[bigBlind].isSurvive) {
-        bigBlind++;
-        //fix bug out of index
-        if (bigBlind >= this.players.length) {
-            bigBlind -= this.players.length;
-        }
-    }
-    return bigBlind;
-};
-
-/*
- Table.prototype.start1stRound = function() {
- // emit a fake gameOver to kick off the 1st round
- this.eventEmitter.emit('1stRound');
- };
- */
-
-Player.prototype.GetChips = function (cash) {
-    this.chips += cash;
-};
-
-// Player actions: Check(), Fold(), Bet(bet), Call(), AllIn()
-Player.prototype.Check = function () {
-    var checkAllow, v, i;
-    checkAllow = true;
-
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to CHECK');
-    for (v = 0; v < this.table.game.bets.length; v += 1) {
-        if (this.table.game.bets[v] !== 0) {
-            checkAllow = false;
-        }
-    }
-    if (checkAllow) {
-        for (i = 0; i < this.table.players.length; i += 1) {
-            if (this === this.table.players[i]) {
-                this.table.game.bets[i] = 0;
-                this.talked = true;
+function sort(data) {
+    for (var k = 0; k < data.length; k++) {
+        for (var p = k + 1; p < data.length; p++) {
+            if (data[p].chips > data[k].chips || (data[p].chips === data[k].chips && data[p].hand.rank > data[k].hand.rank)) {
+                var temp = data[k];
+                data[k] = data[p];
+                data[p] = temp;
             }
         }
-        // Attempt to progress the game
-        this.turnBet = {action: 'check', playerName: this.playerName, chips: this.chips};
-        this.table.eventEmitter.emit('showAction', this.turnBet);
-
-        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CHECK performed');
-        progress(this.table);
-    } else {
-        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CHECK is not allowed, default to CALL');
-        this.Call();
     }
-};
+}
 
-Player.prototype.Fold = function () {
-    var i, bet;
+function updateScore(table) {
+    var conditions = {
+        tableNumber: table.tableNumber
+    };
 
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to FOLD');
-
-    // Move any current bet into the pot
-    for (i = 0; i < this.table.players.length; i += 1) {
-        if (this === this.table.players[i]) {
-            bet = parseInt(this.table.game.bets[i], 10);
-            this.talked = true;
-        }
+    var scores = [];
+    for (var i = 0; i < table.players.length; i++) {
+        scores.push({playerName: that.players[i].playerName, chips: that.players[i].chips});
     }
-    // Mark the player as folded
-    this.folded = true;
-    this.turnBet = {action: 'fold', playerName: this.playerName, chips: this.chips};
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ' FOLD performed');
-    this.table.eventEmitter.emit('showAction', this.turnBet);
-    this.table.surviveCount--;
-    // Attempt to progress the game
-    progress(this.table);
-};
 
-Player.prototype.Raise = function () {
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to RAISE');
+    scoreDao.updatePlayerChips(tempData, function () {
+        // Do nothing
+        logGame(that.tableNumber, 'update player chip success ');
+    });
+}
 
-    if (this.table.raiseCount >= 4) {
-        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', table raise times(' + this.table.raiseCount + ') exceeded, default to Call');
-        this.Call();
-    } else {
-        var maxBet, i, bet;
-        maxBet = getMaxBet(this.table.game.bets);
-        for (i = 0; i < this.table.players.length; i += 1) {
-            if (this === this.table.players[i]) {
-                var myBet = 0;
-                if (this.table.game.bets[i] >= 0) {
-                    myBet = this.table.game.bets[i];
-                }
-                bet = 2 * maxBet;
-                if (this.chips + myBet > bet) {
-                    this.chips = this.chips + myBet - bet;
-                    //if (this.chips % 1 !== 0)
-                    //this.chips = parseFloat(this.chips.toFixed(2));
-
-                    var addMoney = parseInt(bet - myBet);
-                    this.table.game.bets[i] = bet;
-                    this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
-                    this.table.eventEmitter.emit('showAction', this.turnBet);
-                    this.table.raiseCount++;
-                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', RAISE performed, table raise times = ' +
-                        this.table.raiseCount);
-
-                    for (var j = 0; j < this.table.players.length; j += 1) {
-                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
-                            this.table.players[j].talked = false;
-                        }
+function takeAction(table, action) {
+    table.timeout = setTimeout(function () {
+        table.timeout = null;
+        if (table.status === enums.GAME_STATUS_RUNNING) {
+            var players = [];
+            var destPlayer = {};
+            for (var i = 0; i < table.players.length; i++) {
+                var player = {};
+                player['playerName'] = table.players[i]['playerName'];
+                player['chips'] = table.players[i]['chips'];
+                player['folded'] = table.players[i]['folded'];
+                player['allIn'] = table.players[i]['allIn'];
+                player['isSurvive'] = table.players[i]['isSurvive'];
+                player['reloadCount'] = table.players[i]['reloadCount'];
+                player['roundBet'] = table.game.roundBets[i];
+                player['bet'] = table.game.bets[i];
+                player['plainName'] = table.players[i]['plainName'];
+                if (i === table.currentPlayer) {
+                    player['cards'] = table.players[i]['cards'];
+                    if (action === "__bet") {
+                        player['minBet'] = table.bigBlind;
+                    } else {
+                        player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
                     }
-
-                    this.talked = true;
-                    progress(this.table);
-                } else {
-                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips(chips: ' +
-                        this.chips + ', bet : ' + myBet + ', going to bet : ' + bet + ') default to ALLIN');
-                    this.AllIn();
+                    destPlayer = player;
                 }
-                break;
+                players.push(player);
             }
-        }
-    }
-};
 
-Player.prototype.Bet = function (bet) {
-    var maxBet = getMaxBet(this.table.game.bets);
-    this.table.isBet = false;
-    var i;
+            var sbPlayerIndex = table.smallBlindIndex;
+            var bbPlayerIndex = table.bigBlindIndex;
 
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to BET:' + bet);
-
-    if (bet < this.table.bigBlind) {
-        logGame(this.table.tableNumber, 'player : ' +
-            this.playerName + ', bet(' + bet + ') < big blind(' + this.table.bigBlind + '), default to bet big blind : ' + this.table.bigBlind);
-        bet = this.table.bigBlind;
-    }
-    if (this.chips > bet) {
-        for (i = 0; i < this.table.players.length; i += 1) {
-            if (this === this.table.players[i]) {
-                var myBet = this.table.game.bets[i];
-                if (myBet + bet > maxBet && this.table.betCount < 4) {
-                    this.table.betCount++;
-                    this.table.game.bets[i] += bet;
-                    this.table.players[i].chips -= bet;
-
-                    //if (this.table.players[i].chips % 1 !== 0)
-                    //this.table.players[i].chips = parseFloat(this.table.players[i].chips.toFixed(2));
-
-                    //update other player
-                    for (var j = 0; j < this.table.players.length; j += 1) {
-                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
-                            this.table.players[j].talked = false;
-
-                        }
+            var data = {
+                'tableNumber': table.tableNumber,
+                'self': destPlayer,
+                'game': {
+                    'board': table.game.board,
+                    'roundName': table.game.roundName,
+                    'roundCount': table.roundCount,
+                    'raiseCount': table.raiseCount,
+                    'betCount': table.betCount,
+                    'players': players,
+                    'smallBlind': {
+                        playerName: table.players[sbPlayerIndex].playerName,
+                        amount: table.smallBlind
+                    },
+                    'bigBlind': {
+                        playerName: table.players[bbPlayerIndex].playerName,
+                        amount: table.bigBlind
                     }
-
-                    this.talked = true;
-
-                    // Attempt to progress the game
-                    this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips};
-                    this.table.eventEmitter.emit('showAction', this.turnBet);
-                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
-                    progress(this.table);
-                } else {
-                    if (myBet + bet > maxBet)
-                        logGame(this.table.tableNumber, "betCount =" + this.table.betCount + " can't bet again, auto call");
-                    else
-                        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
-                    this.Call();
                 }
-                break;
-            }
+            };
+            table.eventEmitter.emit(action, data);
+            table.isActionTime = true;
         }
-    } else {
-        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
-        this.AllIn();
-    }
-};
-
-Player.prototype.Call = function () {
-    var maxBet, i;
-
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to CALL');
-
-    maxBet = getMaxBet(this.table.game.bets);
-
-    // Match the highest bet
-    for (i = 0; i < this.table.players.length; i += 1) {
-        if (this === this.table.players[i]) {
-            var myBet = 0;
-            if (this.table.game.bets[i] >= 0) {
-                myBet = this.table.game.bets[i];
-            }
-            if (this.chips + myBet > maxBet) {
-                this.chips = this.chips + myBet - maxBet;
-                //if (this.chips % 1 !== 0)
-                //this.chips = parseFloat(this.chips.toFixed(2));
-
-                var addMoney = parseInt(maxBet - myBet);
-                this.table.game.bets[i] = maxBet;
-                this.talked = true;
-
-                this.turnBet = {action: 'call', playerName: this.playerName, amount: addMoney, chips: this.chips};
-                this.table.eventEmitter.emit('showAction', this.turnBet);
-                logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CALL performed');
-                progress(this.table);
-            } else {
-                logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
-                this.AllIn();
-            }
-        }
-    }
-};
-
-Player.prototype.AllIn = function () {
-    var i, allInValue = 0, myBet = 0;
-
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to ALLIN');
-
-    for (i = 0; i < this.table.players.length; i += 1) {
-        if (this === this.table.players[i]) {
-            if (this.table.players[i].chips !== 0) {
-                allInValue = this.table.players[i].chips;
-                this.table.game.bets[i] += this.table.players[i].chips;
-                this.table.players[i].chips = 0;
-                this.allIn = true;
-                this.talked = true;
-                this.table.surviveCount--;
-                myBet = this.table.game.bets[i];
-            }
-            break;
-        }
-    }
-
-    // if player bet < myBet, the player need to call
-    for (i = 0; i < this.table.players.length; i++) {
-        var bet = this.table.game.bets[i];
-        var player = this.table.players[i];
-        if (player.isSurvive && !player.folded && !player.allIn && bet < myBet) {
-            player.talked = false;
-        }
-    }
-
-    // Attempt to progress the game
-    this.turnBet = {action: 'allin', playerName: this.playerName, amount: allInValue, chips: this.chips};
-    this.table.eventEmitter.emit('showAction', this.turnBet);
-    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', ALLIN performed');
-    progress(this.table);
-};
+    }, table.commandInterval * 1000);
+}
 
 function rankHands(hands) {
     var x, myResult;
@@ -2341,6 +2358,9 @@ function logGame(tableNumber, msg) {
     logger.info('>>> table ' + tableNumber + ' >>> ' + msg);
 }
 
+/**
+ * Exported functions
+ */
 exports.Table = Table;
 exports.getBasicData = getBasicData;
 exports.getPlayerReloadData = getPlayerReloadData;

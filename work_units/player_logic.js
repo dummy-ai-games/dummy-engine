@@ -7,8 +7,8 @@
 var logger = require('../poem/logging/logger4js').helper;
 
 // local inclusion
-var Player = require('../models/player_dao.js');
-var Table = require('../models/table_dao.js');
+var playerDao = require('../models/player_dao.js');
+var tableDao = require('../models/table_dao.js');
 
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
@@ -16,7 +16,7 @@ var errorCode = new ErrorCode();
 var MD5Dao = require('../poem/crypto/md5');
 
 exports.listTablesWorkUnit = function(callback) {
-    Table.listTables(function(getTablesErr, tables) {
+    tableDao.listTables(function(getTablesErr, tables) {
         callback(getTablesErr, tables);
     });
 };
@@ -26,7 +26,7 @@ exports.getPlayersWorkUnit = function(tableNumber, callback) {
         tableNumber: tableNumber
     };
 
-    Player.getPlayers(conditions, function(getPlayersErr, players) {
+    playerDao.getPlayers(conditions, function(getPlayersErr, players) {
         if (errorCode.SUCCESS.code === getPlayersErr.code && null !== players && players.length > 0) {
             for (var i = 0; i < players.length; i++) {
                 if (undefined === players[i].displayName ||
@@ -44,7 +44,7 @@ exports.getPlayersWorkUnit = function(tableNumber, callback) {
 };
 
 exports.getAllTablesWorkUnit = function(callback) {
-    Player.getAllTables(function(getTablesErr, tables) {
+    playerDao.getAllTables(function(getTablesErr, tables) {
         callback(getTablesErr, tables);
     });
 };
@@ -57,7 +57,7 @@ exports.updatePlayerWorkUnit = function(player, callback) {
     };
 
     // create table
-    Table.getTable(conditions, function(getTableErr, tables) {
+    tableDao.getTable(conditions, function(getTableErr, tables) {
         if (getTableErr.code === errorCode.SUCCESS.code && null !== tables && tables.length > 0) {
             logger.info("table : " + player.tableNumber + " already exist");
         } else {
@@ -65,7 +65,7 @@ exports.updatePlayerWorkUnit = function(player, callback) {
             var newTable = {
                 tableNumber: player.tableNumber
             };
-            Table.createTable(newTable, function(createTableErr) {
+            tableDao.createTable(newTable, function(createTableErr) {
                 // do nothing
             });
         }
@@ -74,13 +74,13 @@ exports.updatePlayerWorkUnit = function(player, callback) {
         conditions = {
             playerName: player.playerName
         };
-        Player.getPlayers(conditions, function(getPlayersErr, players) {
+        playerDao.getPlayers(conditions, function(getPlayersErr, players) {
             if (getPlayersErr.code === errorCode.SUCCESS.code && null !== players && players.length > 0) {
                 logger.info("player : " + player.playerName + " already exist");
                 callback(errorCode.PLAYER_EXIST);
             } else {
                 logger.info("player : " + player.playerName + " does not exist, create new");
-                Player.createPlayer(player, function(createPlayerErr) {
+                playerDao.createPlayer(player, function(createPlayerErr) {
                     callback(createPlayerErr);
                 });
             }
@@ -93,17 +93,17 @@ exports.deletePlayerWorkUnit = function(player, callback) {
         playerName: player.plainName
     };
 
-    Player.deletePlayer(conditions, function(deletePlayerErr) {
+    playerDao.deletePlayer(conditions, function(deletePlayerErr) {
         callback(deletePlayerErr);
     });
 };
 
-exports.getTableNumberByPlayer = function(playerName, callback) {
+exports.getTableNumberByPlayerWorkUnit = function(playerName, callback) {
     var conditions = {
         playerName: playerName
     };
 
-    Player.getPlayers(conditions, function(getPlayersErr, players) {
+    playerDao.getPlayers(conditions, function(getPlayersErr, players) {
         if (getPlayersErr.code === errorCode.SUCCESS.code &&
             null !== players && players.length > 0) {
             var tableNumber = players[0].tableNumber;

@@ -23,13 +23,12 @@ exports.addOrUpdateWinner = function (data) {
             } else {
                 collection.insert(data, function (err, docs) {
                     if (!err)
-                        logger.info("insert table "+ data.tableNumber + " winner success");
+                        logger.info("insert table " + data.tableNumber + " winner success");
                     else
-                        logger.error("insert table "+ data.tableNumber + " winner fail" + err);
+                        logger.error("insert table " + data.tableNumber + " winner fail" + err);
                 });
             }
         });
-
     });
 };
 

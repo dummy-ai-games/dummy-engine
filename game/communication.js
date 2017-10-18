@@ -7,7 +7,7 @@ var WebSocketServer = require('ws').Server;
 var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
-var poker = require('./node_poker');
+var poker = require('./node_poker.js');
 var playerDao = require('../models/player_dao');
 
 var logger = require('../poem/logging/logger4js').helper;
@@ -18,7 +18,7 @@ var ErrorCode = require('../constants/error_code.js');
 var enums = new Enums();
 var errorCode = new ErrorCode();
 
-var MD5Dao = require('../poem/crypto/md5');
+var MD5Dao = require('../poem/crypto/md5.js');
 
 var errorCb = function (rtc) {
     return function (error) {
@@ -29,6 +29,10 @@ var errorCb = function (rtc) {
     };
 };
 
+/**
+ * Class SkyRTC
+ * @constructor
+ */
 function SkyRTC() {
     this.table = {};
     this.admin = null;
@@ -195,16 +199,6 @@ function SkyRTC() {
 
 util.inherits(SkyRTC, events.EventEmitter);
 
-function getPlayerIndex(playerName, players) {
-    for (var i in players) {
-        var player = players[i];
-        if (player.playerName === playerName) {
-            return i;
-        }
-    }
-    return -1;
-}
-
 SkyRTC.prototype.initGuestData = function (guest) {
     logger.info('initGuestData');
     var that = this;
@@ -281,8 +275,8 @@ SkyRTC.prototype.notifyJoin = function () {
             tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
         }
     }
-    for(var tableNumber in tableAndPlayer){
-        if(that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING){
+    for (var tableNumber in tableAndPlayer) {
+        if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
             tableAndData[tableNumber] = poker.getBasicData(that.table[tableNumber]);
             tableAndData[tableNumber].table.currentPlayer = that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
         }
@@ -291,17 +285,17 @@ SkyRTC.prototype.notifyJoin = function () {
 
     // TODO: to make clear how the Live and Player UI would be affected by aliens join and left
     for (var guest in that.guests) {
-        tableNumber = that.guests[guest].tableNumber;       
+        tableNumber = that.guests[guest].tableNumber;
         message = {
              'eventName': '__new_peer',
-             'data' : tableAndPlayer[tableNumber]
-        };       
+            'data': tableAndPlayer[tableNumber]
+        };
         that.sendMessage(that.guests[guest], message);
         // for backward compatibility, send another command to Live and Player UI
         message = {
             'eventName': '__new_peer_2',
             'data': {
-                'tableNumber' : tableNumber,
+                'tableNumber': tableNumber,
                 'players': tableAndPlayer[tableNumber],
                 'basicData': tableAndData[tableNumber]
             }
@@ -314,17 +308,17 @@ SkyRTC.prototype.notifyJoin = function () {
     }
     for (var player in that.players) {
         if (that.players[player]) {
-            tableNumber = that.players[player].tableNumber;           
+            tableNumber = that.players[player].tableNumber;
             message = {
              'eventName': '__new_peer',
-             'data' : tableAndPlayer[tableNumber]
-            };       
+                'data': tableAndPlayer[tableNumber]
+            };
             that.sendMessage(that.players[player], message);
             // for backward compatibility, send another command to Live and Player UI
             message = {
                 'eventName': '__new_peer_2',
                 'data': {
-                    'tableNumber' : tableNumber,
+                    'tableNumber': tableNumber,
                     'players': tableAndPlayer[tableNumber],
                     'basicData': tableAndData[tableNumber]
                 }
@@ -333,10 +327,7 @@ SkyRTC.prototype.notifyJoin = function () {
                 message.data.tableStatus = that.table[tableNumber].status;
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
-
-
             that.sendMessage(that.players[player], message);
-
         }
     }
 };
@@ -364,7 +355,7 @@ SkyRTC.prototype.notifyLeft = function () {
         message = {
             'eventName': '__left',
             'data': {
-                'tableNumber' : tableNumber,
+                'tableNumber': tableNumber,
                 'players': tableAndPlayer[tableNumber]
             }
         };
@@ -383,7 +374,7 @@ SkyRTC.prototype.notifyLeft = function () {
             message = {
                 'eventName': '__left',
                 'data': {
-                    'tableNumber' : tableNumber,
+                    'tableNumber': tableNumber,
                     'players': tableAndPlayer[tableNumber]
                 }
             };
@@ -817,6 +808,22 @@ SkyRTC.prototype.init = function (socket) {
     });
 };
 
+/**
+ * Public functions
+ */
+function getPlayerIndex(playerName, players) {
+    for (var i in players) {
+        var player = players[i];
+        if (player.playerName === playerName) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * Exported functions
+ */
 exports.listen = function (server) {
     var SkyRTCServer;
     if (typeof server === 'number') {

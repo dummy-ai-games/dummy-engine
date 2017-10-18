@@ -108,7 +108,23 @@ exports.getTableByPlayer = function (req, res) {
     var playerName = req.body.playerName;
     var integerResponse = new IntegerResponse();
 
-    playerLogic.getTableNumberByPlayer(playerName, function(getTableNumberErr, tableNumber) {
+    playerLogic.getTableNumberByPlayerWorkUnit(playerName, function(getTableNumberErr, tableNumber) {
+        integerResponse.status = getTableNumberErr;
+        integerResponse.entity = tableNumber;
+        res.send(integerResponse);
+        res.end();
+    });
+};
+
+/**
+ * function :   List kanban
+ * parameter :  none
+ * return :     Player ranks
+ */
+exports.listKanban = function (req, res) {
+    var playerResponse = new PlayerResponse();
+
+    playerLogic.getAllPlayersOrderedWorkUnit(playerName, function(getTableNumberErr, tableNumber) {
         integerResponse.status = getTableNumberErr;
         integerResponse.entity = tableNumber;
         res.send(integerResponse);
@@ -122,13 +138,7 @@ exports.getTableByPlayer = function (req, res) {
  * return :     File redirect
  */
 exports.dumpLog = function (req, res) {
-    /*
-    var date = req.query.log_date;
-    var tableNumber = req.query.table_number;
-    var filePath = __dirname + "/../logs/game/" + date + "_game_" + tableNumber + ".txt";
-    // serve file redirect to client
-    res.download(filePath, "");
-    */
+    // deprecated
     res.end();
 };
 
