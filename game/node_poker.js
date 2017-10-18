@@ -129,12 +129,12 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
         if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
             data = getBasicData(that);
-            for(var i = 0;i<data.players.length;i++) {
+            for (var i = 0; i < data.players.length; i++) {
                 var player = data.players[i];
                 player.hand = that.players[i].hand;
                 player.winMoney = that.players[i].winMoney;
-                if(player.winMoney > 0)
-                  player.folded = false;
+                if (player.winMoney > 0)
+                    player.folded = false;
             }
             that.eventEmitter.emit('__round_end', data);
             that.surviveCount = count;
@@ -281,7 +281,7 @@ function getNextPlayer(table) {
     table.players[table.currentPlayer].folded ||
     table.players[table.currentPlayer].allIn ||
     (table.players[table.currentPlayer].talked === true &&
-    table.game.bets[table.currentPlayer] === maxBet));
+        table.game.bets[table.currentPlayer] === maxBet));
 }
 
 function getNextDealer(table) {
@@ -332,10 +332,11 @@ function takeAction(table, action) {
                 player['plainName'] = table.players[i]['plainName'];
                 if (i === table.currentPlayer) {
                     player['cards'] = table.players[i]['cards'];
-                    if(action == "__bet")
-                      player['minBet'] = table.bigBlind;
-                    else
-                      player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
+                    if (action === "__bet") {
+                        player['minBet'] = table.bigBlind;
+                    } else {
+                        player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
+                    }
                     destPlayer = player;
                 }
                 players.push(player);
