@@ -202,6 +202,7 @@ function getBasicData(table) {
         player['cards'] = table.players[i]['cards'];
         player['isSurvive'] = table.players[i]['isSurvive'];
         player['reloadCount'] = table.players[i]['reloadCount'];
+        player['plainName'] = table.players[i]['plainName'];
         // include bets info
         if (!table.game.roundBets[i]) {
             table.game.roundBets[i] = 0;
@@ -328,6 +329,7 @@ function takeAction(table, action) {
                 player['reloadCount'] = table.players[i]['reloadCount'];
                 player['roundBet'] = table.game.roundBets[i];
                 player['bet'] = table.game.bets[i];
+                player['plainName'] = table.players[i]['plainName'];
                 if (i === table.currentPlayer) {
                     player['cards'] = table.players[i]['cards'];
                     player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
@@ -373,7 +375,7 @@ Table.prototype.checkPlayer = function (player) {
     return player === this.currentPlayer;
 };
 
-function Player(playerName, chips, table, isSurvive, reloadCount) {
+function Player(playerName, chips, table, isSurvive, reloadCount, plainName) {
     this.playerName = playerName;
     this.chips = chips;
     this.folded = false;
@@ -383,6 +385,7 @@ function Player(playerName, chips, table, isSurvive, reloadCount) {
     this.cards = [];
     this.isSurvive = isSurvive;
     this.reloadCount = reloadCount;
+    this.plainName = plainName;
 }
 
 function fillDeck(deck) {
@@ -1964,9 +1967,9 @@ Table.prototype.StopGame = function () {
     }
 };
 
-Table.prototype.AddPlayer = function (playerName) {
+Table.prototype.AddPlayer = function (playerName, plainName) {
     var that = this;
-    var player = new Player(playerName, that.initChips, this, true, 0);
+    var player = new Player(playerName, that.initChips, this, true, 0, plainName);
     this.playersToAdd.push(player);
     this.surviveCount++;
 };
