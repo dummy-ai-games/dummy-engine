@@ -23,6 +23,7 @@ var dateUtils = require('../poem/utils/date_utils.js');
  *      updateTime
  */
 exports.createGame = function (game, callback) {
+    logger.info('create game : ' + JSON.stringify(game));
     game.updateTime = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
     db.collection("game", function (err, collection) {
         collection.insert(game, function (err, docs) {
@@ -44,6 +45,7 @@ exports.updateGame = function(conditions, newGame, callback) {
                 tableNumber: newGame.tableNumber,
                 status: newGame.status,
                 players: newGame.players,
+                startTime: newGame.startTime,
                 updateTime: dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
             }
         }, function (err, result) {
@@ -53,6 +55,19 @@ exports.updateGame = function(conditions, newGame, callback) {
             } else {
                 logger.error("update game " + newGame.tableNumber + " failed: " + err);
                 callback(errorCode.FAILED);
+            }
+        });
+    });
+};
+
+exports.getGame = function(conditions, callback) {
+    db.collection("game", function (err, collection) {
+        collection.find(conditions).toArray(function (err, results) {
+            if (!err) {
+                callback(errorCode.SUCCESS, results);
+            } else {
+                logger.error("get game error : " + err);
+                callback(errorCode.FAILED, null);
             }
         });
     });

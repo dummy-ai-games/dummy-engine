@@ -5,12 +5,14 @@
 
 var events = require('events');
 var winnerDao = require('../models/winner_dao.js');
-var scoreDao = require('../models/game_dao.js');
+var gameDao = require('../models/game_dao.js');
 
 var logger = require('../poem/logging/logger4js').helper;
 
 var Enums = require('../constants/enums.js');
 var enums = new Enums();
+var ErrorCode = require('../constants/error_code.js');
+var errorCode = new ErrorCode();
 
 var MD5Dao = require('../poem/crypto/md5.js');
 var dateUtils = require('../poem/utils/date_utils.js');
@@ -95,7 +97,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
         logGame(that.tableNumber, 'start get first player:' + that.currentPlayer + ' action ');
         takeAction(that, '__turn');
-        updateScore(that);
+        updateGame(that);
     });
 
     this.eventEmitter.on('showAction', function (data) {
@@ -134,14 +136,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }
         }
 
-        logGame(that.tableNumber, 'round end');
-        logGame(that.tableNumber, '********');
-        logGame(that.tableNumber, 'alive player count = ' + count + ', players.length / 2 = ' +
-            that.players.length / 2);
-        logGame(that.tableNumber, 'minPlayers = ' + that.minPlayers);
-        logGame(that.tableNumber, 'roundCount = ' + that.roundCount + ', maxRoundCount = ' + that.maxRoundCount);
-        logGame(that.tableNumber, '********');
-
         if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
             data = getBasicData(that);
             for (var i = 0; i < data.players.length; i++) {
@@ -158,7 +152,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 if (that.players[j].chips === 0)
                     isSurvive = false;
                 that.players[j] = new Player(that.players[j].playerName, that.players[j].chips,
-                    that, isSurvive, that.players[j].reloadCount, that.players[j].plainName);
+                    that, isSurvive, that.players[j].reloadCount,
+                    that.players[j].plainName, that.players[j].displayName);
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
             var nextDealer = getNextDealer(that);
@@ -279,9 +274,9 @@ Table.prototype.StopGame = function () {
     }
 };
 
-Table.prototype.AddPlayer = function (playerName, plainName) {
+Table.prototype.AddPlayer = function (playerName, plainName, displayName) {
     var that = this;
-    var player = new Player(playerName, that.initChips, this, true, 0, plainName);
+    var player = new Player(playerName, that.initChips, this, true, 0, plainName, displayName);
     this.playersToAdd.push(player);
     this.surviveCount++;
 };
@@ -406,7 +401,7 @@ Table.prototype.findBigBlind = function (smallBindIndex) {
  * @param plainName
  * @constructor
  */
-function Player(playerName, chips, table, isSurvive, reloadCount, plainName) {
+function Player(playerName, chips, table, isSurvive, reloadCount, plainName, displayName) {
     this.playerName = playerName;
     this.chips = chips;
     this.folded = false;
@@ -417,6 +412,7 @@ function Player(playerName, chips, table, isSurvive, reloadCount, plainName) {
     this.isSurvive = isSurvive;
     this.reloadCount = reloadCount;
     this.plainName = plainName;
+    this.displayName = displayName;
 }
 
 Player.prototype.GetChips = function (cash) {
@@ -2270,19 +2266,44 @@ function sort(data) {
     }
 }
 
-function updateScore(table) {
+function updateGame(table) {
     var conditions = {
         tableNumber: table.tableNumber
     };
 
-    var scores = [];
+    var players = [];
     for (var i = 0; i < table.players.length; i++) {
-        scores.push({playerName: that.players[i].playerName, chips: that.players[i].chips});
+        var player = {
+            playerName: table.players[i].playerName,
+            displayName: table.players[i].displayName,
+            chips: table.players[i].chips
+        }
+        players.push(player);
     }
 
-    scoreDao.updatePlayerChips(tempData, function () {
-        // Do nothing
-        logGame(that.tableNumber, 'update player chip success ');
+    var newGame = {
+        tableNumber: table.tableNumber,
+        status: table.status,
+        players: players,
+        startTime: table.startTime
+    };
+    gameDao.getGame(conditions, function(getGameErr, game) {
+        if (getGameErr.code === errorCode.SUCCESS.code &&
+            null !== game && game.length > 0) {
+            logger.info('get game successfully, update it');
+            gameDao.updateGame(conditions, newGame, function(updateGameErr) {
+                if (updateGameErr.code === errorCode.SUCCESS.code) {
+                    logger.info('update game for table ' + table.tableNumber + ' successfully');
+                }
+            });
+        } else {
+            logger.info('get game failed, create a new one');
+            gameDao.createGame(newGame, function(createGameErr) {
+                if (createGameErr.code === errorCode.SUCCESS.code) {
+                    logger.info('create game for table ' + table.tableNumber + ' successfully');
+                }
+            });
+        }
     });
 }
 

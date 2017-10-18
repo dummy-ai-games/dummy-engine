@@ -47,7 +47,6 @@ function SkyRTC() {
         var table = data.tableNumber;
         var isHuman = data.isHuman || false;
 
-
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
         if (that.playerAndTable[playerName]) {
             socket.id = playerName;
@@ -61,28 +60,48 @@ function SkyRTC() {
 
         var tableNumber = that.playerAndTable[socket.id];
         if (tableNumber !== undefined) {
-            if (that.players[socket.MD5Id]) {
-                logger.warn('player: ' + socket.id + ' already exist, reject');
-                return;
-            }
-            var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
-            if (exitPlayerTableNum !== undefined) {
-                socket.tableNumber = exitPlayerTableNum;
-                delete that.exitPlayers[socket.MD5Id];
-                logger.info('player rejoin, accept join');
-            } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
-                socket.tableNumber = that.playerAndTable[socket.id];
-                logger.info('game not start, accept join');
-            }
+            // check player first
+            var conditions = {
+                playerName: playerName
+            };
+            playerDao.getPlayers(conditions, function(getPlayersErr, players) {
+                if (getPlayersErr.code === errorCode.SUCCESS.code &&
+                    null !== players &&
+                    players.length > 0) {
+                    var displayName;
+                    if (players[0].displayName) {
+                        displayName = players[0].displayName;
+                    } else {
+                        displayName = players[0].playerName;
+                    }
+                    logger.info('player ' + displayName + ' is validated');
+                    socket.displayName = displayName;
+                    if (that.players[socket.MD5Id]) {
+                        logger.warn('player: ' + socket.id + ' already exist, reject');
+                        return;
+                    }
+                    var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
+                    if (exitPlayerTableNum !== undefined) {
+                        socket.tableNumber = exitPlayerTableNum;
+                        delete that.exitPlayers[socket.MD5Id];
+                        logger.info('player rejoin, accept join');
+                    } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                        socket.tableNumber = that.playerAndTable[socket.id];
+                        logger.info('game not start, accept join');
+                    }
 
-            if (socket.tableNumber) {
-                logger.info('player : ' + data.playerName + ' join!!');
-                that.players[socket.MD5Id] = socket;
-                this.emit('new_peer', socket.id);
-                that.notifyJoin();
-                that.initPlayerData(socket.MD5Id);
-            } else
-                logger.info('player : ' + data.playerName + ' can not join because game has start');
+                    if (socket.tableNumber) {
+                        logger.info('player : ' + data.playerName + ' join!!');
+                        that.players[socket.MD5Id] = socket;
+                        that.emit('new_peer', socket.id);
+                        that.notifyJoin();
+                        that.initPlayerData(socket.MD5Id);
+                    } else
+                        logger.info('player : ' + data.playerName + ' can not join because game has start');
+                } else {
+                    logger.error('player ' + playerName + ' is not valid');
+                }
+            });
         } else {
             logger.info('guest join!!');
             that.guests[socket.id] = socket;
@@ -482,7 +501,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     var message;
     for (var player in that.players) {
         if (that.players[player] && that.players[player].tableNumber === tableNumber)
-            that.table[tableNumber].AddPlayer(player, that.players[player].id);
+            that.table[tableNumber].AddPlayer(player, that.players[player].id, that.players[player].displayName);
     }
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
