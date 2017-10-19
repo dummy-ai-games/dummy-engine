@@ -335,7 +335,7 @@ function takeAction(table, action) {
                     if (action === "__bet") {
                         player['minBet'] = table.bigBlind;
                     } else {
-                        player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
+                        player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i] + 1;
                     }
                     destPlayer = player;
                 }
