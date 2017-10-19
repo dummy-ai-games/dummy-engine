@@ -7,3 +7,4 @@ var server = require('../the-engine.js');
 
 require('./player_routes.js');
 require('./table_routes.js');
+require('./game_routes.js');

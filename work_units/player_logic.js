@@ -15,6 +15,27 @@ var errorCode = new ErrorCode();
 
 var MD5Utils = require('../poem/crypto/md5');
 
+exports.getPlayerByName = function(playerName, callback) {
+    var conditions = {
+        playerName: playerName
+    };
+
+    playerDao.getPlayers(conditions, function(getPlayersErr, players) {
+        if (getPlayersErr.code === errorCode.SUCCESS.code && null !== players && players.length > 0) {
+            var displayName;
+            if (players[0].displayName) {
+                displayName = players[0].displayName;
+            } else {
+                displayName = players[0].playerName;
+            }
+            logger.info('player ' + displayName + ' is validated');
+            callback(getPlayersErr, players[0]);
+        } else {
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
 exports.getPlayersByTableWorkUnit = function(tableNumber, callback) {
     var conditions = {
         tableNumber: tableNumber
@@ -70,7 +91,6 @@ exports.listPlayersInternalWorkUnit = function(callback) {
     });
 };
 
-
 exports.getAllTablesWorkUnit = function(callback) {
     playerDao.getAllTables(function(getTablesErr, tables) {
         callback(getTablesErr, tables);
@@ -85,7 +105,7 @@ exports.updatePlayerWorkUnit = function(player, callback) {
     };
 
     // create table
-    tableDao.getTable(conditions, function(getTableErr, tables) {
+    tableDao.getTables(conditions, function(getTableErr, tables) {
         if (getTableErr.code === errorCode.SUCCESS.code && null !== tables && tables.length > 0) {
             logger.info("table : " + player.tableNumber + " already exist");
         } else {

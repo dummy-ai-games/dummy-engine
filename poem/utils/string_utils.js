@@ -1,3 +1,8 @@
+/*
+ * Created by Strawmanbobi
+ * 2015-03-02
+ */
+
 exports.randomChar = function(l) {
     var x = "0123456789qwertyuioplkjhgfdsazxcvbnm";
     var tmp = "";

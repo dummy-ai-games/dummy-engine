@@ -70,7 +70,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.lostTimeout = lostTimeout || 10;
 
     // generate a game_services instance with ID
-    this.startTime = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+    this.startTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
 
     // Validate acceptable value ranges.
     var err;
@@ -171,7 +171,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 }
                 that.isReloadTime = false;
                 that.isBet = false;
-                logGame(that.tableNumber, "reload time end, start new round");
+                logGame(that.tableNumber, 'reload time end, start new round');
                 that.NewRound();
             }, that.roundInterval * 1000);
         } else {
@@ -255,7 +255,7 @@ Table.prototype.getAllHands = function () {
 
 Table.prototype.StartGame = function () {
     // If there is no current game_services and we have enough players, start a new game_services.
-    console.log('start game_services');
+    logger.info('start game_services');
     if (!this.game) {
         this.playersToRemove = [];
         this.dealer = parseInt(Math.random() * (this.surviveCount));
@@ -267,7 +267,7 @@ Table.prototype.StartGame = function () {
 };
 
 Table.prototype.StopGame = function () {
-    console.log('stop game_services');
+    logger.info('stop game_services');
     if (!this.game) {
         // TODO: to implement a status for game_services PAUSED
         this.status = enums.GAME_STATUS_STANDBY;
@@ -399,6 +399,7 @@ Table.prototype.findBigBlind = function (smallBindIndex) {
  * @param isSurvive
  * @param reloadCount
  * @param plainName
+ * @param displayName
  * @constructor
  */
 function Player(playerName, chips, table, isSurvive, reloadCount, plainName, displayName) {
@@ -475,7 +476,8 @@ Player.prototype.Raise = function () {
     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', request to RAISE');
 
     if (this.table.raiseCount >= 4) {
-        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', table raise times(' + this.table.raiseCount + ') exceeded, default to Call');
+        logGame(this.table.tableNumber, 'player : ' + this.playerName +
+            ', table raise times(' + this.table.raiseCount + ') exceeded, default to Call');
         this.Call();
     } else {
         var maxBet, i, bet;
@@ -497,11 +499,14 @@ Player.prototype.Raise = function () {
                     this.turnBet = {action: 'raise', playerName: this.playerName, amount: addMoney, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
                     this.table.raiseCount++;
-                    logGame(this.table.tableNumber, 'player : ' + this.playerName + ', RAISE performed, table raise times = ' +
+                    logGame(this.table.tableNumber, 'player : ' + this.playerName +
+                        ', RAISE performed, table raise times = ' +
                         this.table.raiseCount);
 
                     for (var j = 0; j < this.table.players.length; j += 1) {
-                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
+                        if (!this.table.players[j].allIn &&
+                            !this.table.players[j].folded &&
+                            this.table.players[j].isSurvive) {
                             this.table.players[j].talked = false;
                         }
                     }
@@ -528,7 +533,8 @@ Player.prototype.Bet = function (bet) {
 
     if (bet < this.table.bigBlind) {
         logGame(this.table.tableNumber, 'player : ' +
-            this.playerName + ', bet(' + bet + ') < big blind(' + this.table.bigBlind + '), default to bet big blind : ' + this.table.bigBlind);
+            this.playerName + ', bet(' + bet + ') < big blind(' + this.table.bigBlind +
+            '), default to bet big blind : ' + this.table.bigBlind);
         bet = this.table.bigBlind;
     }
     if (this.chips > bet) {
@@ -545,7 +551,9 @@ Player.prototype.Bet = function (bet) {
 
                     //update other player
                     for (var j = 0; j < this.table.players.length; j += 1) {
-                        if (!this.table.players[j].allIn && !this.table.players[j].folded && this.table.players[j].isSurvive) {
+                        if (!this.table.players[j].allIn &&
+                            !this.table.players[j].folded &&
+                            this.table.players[j].isSurvive) {
                             this.table.players[j].talked = false;
 
                         }
@@ -560,16 +568,19 @@ Player.prototype.Bet = function (bet) {
                     progress(this.table);
                 } else {
                     if (myBet + bet > maxBet)
-                        logGame(this.table.tableNumber, "betCount =" + this.table.betCount + " can't bet again, auto call");
+                        logGame(this.table.tableNumber, 'betCount =' + this.table.betCount +
+                            ' can not bet again, auto call');
                     else
-                        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
+                        logGame(this.table.tableNumber, 'player : ' + this.playerName +
+                            ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
                     this.Call();
                 }
                 break;
             }
         }
     } else {
-        logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
+        logGame(this.table.tableNumber, 'player : ' + this.playerName +
+            ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
         this.AllIn();
     }
 };
@@ -931,7 +942,7 @@ function rankHandInt(hand) {
     handSuits = [];
 
     for (i = 0; i < hand.cards.length; i += 1) {
-        logger.info("hand.cards[" + i + "] = " + hand.cards[i]);
+        logger.info('hand.cards[' + i + '] = ' + hand.cards[i]);
         handRanks[i] = hand.cards[i].substr(0, 1);
         handSuits[i] = hand.cards[i].substr(1, 2);
     }
@@ -2223,7 +2234,7 @@ function getNextPlayer(table) {
         logger.error('table is destroyed');
     }
 
-    logGame(table.tableNumber, "get next player");
+    logGame(table.tableNumber, 'get next player');
     var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ?
@@ -2309,7 +2320,7 @@ function takeAction(table, action) {
                 player['plainName'] = table.players[i]['plainName'];
                 if (i === table.currentPlayer) {
                     player['cards'] = table.players[i]['cards'];
-                    if (action === "__bet") {
+                    if (action === '__bet') {
                         player['minBet'] = table.bigBlind;
                     } else {
                         player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];

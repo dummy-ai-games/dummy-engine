@@ -6,20 +6,20 @@
 function ErrorCode() {
     this.SUCCESS = {
         code: 0,
-        cause: "成功"
+        cause: "Success"
     };
     this.FAILED = {
         code: -1,
-        cause: "网络故障，请稍后再试"
+        cause: "Generic error"
     };
     this.WRONG_ENV = {
         code: -2,
-        cause: "错误的运行环境配置"
+        cause: "Wrong environment"
     };
 
     this.PLAYER_EXIST = {
         code: 1,
-        cause: "玩家已存在"
+        cause: "Player existed"
     };
 }
 

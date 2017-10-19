@@ -144,7 +144,7 @@ function initWebsock() {
             console.log('guest join');
         }
 
-        if (gameStatus === STATUS_GAME_RUNNING) {
+        if (gameStatus === STATUS_GAME_RUNNING || gameStatus === STATUS_GAME_FINISHED) {
             // do not handle this command while game_services is running, to prevent player status reset
             return;
         }
@@ -175,14 +175,14 @@ function initWebsock() {
             console.log('guest left');
         }
         gameStatus = tableStatus;
-        if (gameStatus === STATUS_GAME_RUNNING) {
+        if (gameStatus === STATUS_GAME_RUNNING || gameStatus === STATUS_GAME_FINISHED) {
             // do not handle this command while game_services is running, to prevent player status reset
             return;
         }
 
         if (undefined !== inPlayers && null !== inPlayers) {
             var index;
-            if (gameStatus === STATUS_GAME_STANDBY || gameStatus === STATUS_GAME_FINISHED) {
+            if (gameStatus === STATUS_GAME_STANDBY) {
                 // rebuild player list
                 currentPlayers = inPlayers.length;
                 players = [];
