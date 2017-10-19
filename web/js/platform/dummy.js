@@ -100,7 +100,7 @@ function initRTC() {
     });
 
     rtc.on('__game_over', function(data) {
-        writeToCommands('<<< game over: ' + JSON.stringify(data, null, 4));
+        writeToCommands('<<< game_services over: ' + JSON.stringify(data, null, 4));
     });
 }
 

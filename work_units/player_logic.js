@@ -13,15 +13,9 @@ var tableDao = require('../models/table_dao.js');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 
-var MD5Dao = require('../poem/crypto/md5');
+var MD5Utils = require('../poem/crypto/md5');
 
-exports.listTablesWorkUnit = function(callback) {
-    tableDao.listTables(function(getTablesErr, tables) {
-        callback(getTablesErr, tables);
-    });
-};
-
-exports.getPlayersWorkUnit = function(tableNumber, callback) {
+exports.getPlayersByTableWorkUnit = function(tableNumber, callback) {
     var conditions = {
         tableNumber: tableNumber
     };
@@ -35,13 +29,47 @@ exports.getPlayersWorkUnit = function(tableNumber, callback) {
                     players[i].displayName = players[i].playerName;
                 }
                 players[i].plainName = players[i].playerName;
-                players[i].playerName = MD5Dao.MD5(players[i].playerName);
+                players[i].playerName = MD5Utils.MD5(players[i].playerName);
             }
         }
         logger.info("get players : " + JSON.stringify(players));
         callback(getPlayersErr, players);
     });
 };
+
+exports.listPlayersWorkUnit = function(callback) {
+    playerDao.listPlayers(function(listPlayersErr, players) {
+        if (errorCode.SUCCESS.code === listPlayersErr.code && null !== players && players.length > 0) {
+            for (var i = 0; i < players.length; i++) {
+                if (undefined === players[i].displayName ||
+                    null === players[i].displayName ||
+                    "" === players[i].displayName) {
+                    players[i].displayName = players[i].playerName;
+                }
+                players[i].plainName = players[i].playerName;
+                players[i].playerName = MD5Utils.MD5(players[i].playerName);
+            }
+        }
+        callback(listPlayersErr, players);
+    });
+};
+
+// for server internal usage, do not hash player name
+exports.listPlayersInternalWorkUnit = function(callback) {
+    playerDao.listPlayers(function(listPlayersErr, players) {
+        if (errorCode.SUCCESS.code === listPlayersErr.code && null !== players && players.length > 0) {
+            for (var i = 0; i < players.length; i++) {
+                if (undefined === players[i].displayName ||
+                    null === players[i].displayName ||
+                    "" === players[i].displayName) {
+                    players[i].displayName = players[i].playerName;
+                }
+            }
+        }
+        callback(listPlayersErr, players);
+    });
+};
+
 
 exports.getAllTablesWorkUnit = function(callback) {
     playerDao.getAllTables(function(getTablesErr, tables) {

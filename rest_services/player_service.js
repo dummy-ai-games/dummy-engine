@@ -3,38 +3,12 @@
  * 2017-09-08
  */
 
-var constants = require('../poem/configuration/constants');
-var logger = require('../poem/logging/logger4js').helper;
-
 var ServiceResponse = require('../responses/service_response.js');
 var IntegerResponse = require('../responses/integer_response.js');
 var PlayersResponse = require('../responses/players_response.js');
-var TablesResponse = require('../responses/tables_response.js');
-var TablesNPlayersRespons = require('../responses/tablesnplayers_response.js');
+var TablesNPlayersResponse = require('../responses/tablesnplayers_response.js');
 
 var playerLogic = require('../work_units/player_logic.js');
-
-var Enums = require('../constants/enums');
-var ErrorCode = require('../constants/error_code');
-
-var enums = new Enums();
-var errorCode = new ErrorCode();
-
-/**
- * function :   List tables
- * parameter :
- * return :     TablesResponse
- */
-exports.listTables = function (req, res) {
-    var tablesResponse = new TablesResponse();
-
-    playerLogic.listTablesWorkUnit(function (listTablesErr, tables) {
-        tablesResponse.status = listTablesErr;
-        tablesResponse.entity = tables;
-        res.send(tablesResponse);
-        res.end();
-    });
-};
 
 /**
  * function :   Get players
@@ -44,7 +18,7 @@ exports.listTables = function (req, res) {
 exports.getPlayers = function (req, res) {
     var tableNumber = req.query.table_number;
 
-    playerLogic.getPlayersWorkUnit(tableNumber, function (getPlayersErr, players) {
+    playerLogic.getPlayersByTableWorkUnit(tableNumber, function (getPlayersErr, players) {
         res.send(players);
         res.end();
     });
@@ -59,7 +33,7 @@ exports.listPlayers = function (req, res) {
     var tableNumber = req.body.table_number;
 
     var playersResponse = new PlayersResponse();
-    playerLogic.getPlayersWorkUnit(tableNumber, function (getPlayersErr, players) {
+    playerLogic.getPlayersByTableWorkUnit(tableNumber, function (getPlayersErr, players) {
         playersResponse.status = getPlayersErr;
         playersResponse.entity = players;
         res.send(playersResponse);
@@ -117,22 +91,6 @@ exports.getTableByPlayer = function (req, res) {
 };
 
 /**
- * function :   List kanban
- * parameter :  none
- * return :     Player ranks
- */
-exports.listKanban = function (req, res) {
-    var playerResponse = new PlayerResponse();
-
-    playerLogic.getAllPlayersOrderedWorkUnit(playerName, function(getTableNumberErr, tableNumber) {
-        integerResponse.status = getTableNumberErr;
-        integerResponse.entity = tableNumber;
-        res.send(integerResponse);
-        res.end();
-    });
-};
-
-/**
  * function :   Dump log
  * parameter :  Table object
  * return :     File redirect
@@ -148,7 +106,7 @@ exports.dumpLog = function (req, res) {
  * return :     TablesNPlayersResponse
  */
 exports.getTables = function (req, res) {
-    var tablesNPlayersResponse = new TablesNPlayersRespons();
+    var tablesNPlayersResponse = new TablesNPlayersResponse();
 
     playerLogic.getAllTablesWorkUnit(function (getTablesErr, tables) {
         tablesNPlayersResponse.status = getTablesErr;
@@ -157,4 +115,3 @@ exports.getTables = function (req, res) {
         res.end();
     });
 };
-

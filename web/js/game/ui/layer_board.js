@@ -21,7 +21,7 @@ var BoardLayer = cc.Layer.extend({
     maxPlayerCount: 10,
     maxPublicCardCount: 5,
 
-    // game model variables
+    // game_services model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
@@ -135,7 +135,7 @@ var BoardLayer = cc.Layer.extend({
         this._super();
     },
 
-    // game initializer
+    // game_services initializer
     init: function () {
         this._super();
 
@@ -470,7 +470,7 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.startButton, 2);
             this.startButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
-                    console.log('start game');
+                    console.log('start game_services');
                     if (gameStatus !== STATUS_GAME_RUNNING) {
                         startGame();
                     }
@@ -485,7 +485,7 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.stopButton, 2);
             this.stopButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
-                    console.log('stop game');
+                    console.log('stop game_services');
                     if (gameStatus === STATUS_GAME_RUNNING) {
                         stopGame();
                     }
@@ -520,7 +520,7 @@ var BoardLayer = cc.Layer.extend({
         this.scheduleUpdate();
     },
 
-    // game operations
+    // game_services operations
     playerAction: function(callback, param) {
         callback(param);
     },

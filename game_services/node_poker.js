@@ -4,8 +4,9 @@
  */
 
 var events = require('events');
-var winnerDao = require('../models/winner_dao.js');
-var gameDao = require('../models/game_dao.js');
+
+var gameLogic = require('../work_units/game_logic.js');
+var winnersLogic = require('../work_units/winners_logic.js');
 
 var logger = require('../poem/logging/logger4js').helper;
 
@@ -14,7 +15,6 @@ var enums = new Enums();
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 
-var MD5Dao = require('../poem/crypto/md5.js');
 var dateUtils = require('../poem/utils/date_utils.js');
 
 /**
@@ -69,16 +69,16 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.commandTimeout = commandTimeout || 2;
     this.lostTimeout = lostTimeout || 10;
 
-    // generate a game instance with ID
+    // generate a game_services instance with ID
     this.startTime = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
 
     // Validate acceptable value ranges.
     var err;
-    if (minPlayers < 3) { // Require at least 3 players to start a game.
+    if (minPlayers < 3) { // Require at least 3 players to start a game_services.
         err = new Error(101, 'Parameter [minPlayers] must be a positive integer of a minimum value of 2.');
     } else if (maxPlayers > 10) { // Hard limit of 10 players at a table.
         err = new Error(102, 'Parameter [maxPlayers] must be a positive integer less than or equal to 10.');
-    } else if (minPlayers > maxPlayers) { // Without this we can never start a game!
+    } else if (minPlayers > maxPlayers) { // Without this we can never start a game_services!
         err = new Error(103, 'Parameter [minPlayers] must be less than or equal to [maxPlayers].');
     }
     var that = this;
@@ -166,7 +166,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.timeout = setTimeout(function () {
                 that.timeout = null;
                 if (that.status !== enums.GAME_STATUS_RUNNING) {
-                    logGame(that.tableNumber, 'game is not started yet or is over, do nothing');
+                    logGame(that.tableNumber, 'game_services is not started yet or is over, do nothing');
                     return;
                 }
                 that.isReloadTime = false;
@@ -175,7 +175,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 that.NewRound();
             }, that.roundInterval * 1000);
         } else {
-            logGame(that.tableNumber, 'game over, winners : ');
+            logGame(that.tableNumber, 'game_services over, winners : ');
             that.status = enums.GAME_STATUS_FINISHED;
             for (i = 0; i < that.players.length; i++) {
                 var player = that.players[i];
@@ -191,7 +191,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             logGame(that.tableNumber, JSON.stringify(that.gameWinners));
             data = getBasicData(that);
             data.winners = that.gameWinners;
-            winnerDao.addOrUpdateWinner({tableNumber: that.tableNumber, winners: that.gameWinners});
+            winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners);
             that.eventEmitter.emit('__game_over', data);
         }
     });
@@ -254,8 +254,8 @@ Table.prototype.getAllHands = function () {
 };
 
 Table.prototype.StartGame = function () {
-    // If there is no current game and we have enough players, start a new game.
-    console.log('start game');
+    // If there is no current game_services and we have enough players, start a new game_services.
+    console.log('start game_services');
     if (!this.game) {
         this.playersToRemove = [];
         this.dealer = parseInt(Math.random() * (this.surviveCount));
@@ -267,9 +267,9 @@ Table.prototype.StartGame = function () {
 };
 
 Table.prototype.StopGame = function () {
-    console.log('stop game');
+    console.log('stop game_services');
     if (!this.game) {
-        // TODO: to implement a status for game PAUSED
+        // TODO: to implement a status for game_services PAUSED
         this.status = enums.GAME_STATUS_STANDBY;
     }
 };
@@ -437,7 +437,7 @@ Player.prototype.Check = function () {
                 this.talked = true;
             }
         }
-        // Attempt to progress the game
+        // Attempt to progress the game_services
         this.turnBet = {action: 'check', playerName: this.playerName, chips: this.chips};
         this.table.eventEmitter.emit('showAction', this.turnBet);
 
@@ -467,7 +467,7 @@ Player.prototype.Fold = function () {
     logGame(this.table.tableNumber, 'player : ' + this.playerName + ' FOLD performed');
     this.table.eventEmitter.emit('showAction', this.turnBet);
     this.table.surviveCount--;
-    // Attempt to progress the game
+    // Attempt to progress the game_services
     progress(this.table);
 };
 
@@ -553,7 +553,7 @@ Player.prototype.Bet = function (bet) {
 
                     this.talked = true;
 
-                    // Attempt to progress the game
+                    // Attempt to progress the game_services
                     this.turnBet = {action: 'bet', playerName: this.playerName, amount: bet, chips: this.chips};
                     this.table.eventEmitter.emit('showAction', this.turnBet);
                     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', BET performed : ' + bet);
@@ -638,7 +638,7 @@ Player.prototype.AllIn = function () {
         }
     }
 
-    // Attempt to progress the game
+    // Attempt to progress the game_services
     this.turnBet = {action: 'allin', playerName: this.playerName, amount: allInValue, chips: this.chips};
     this.table.eventEmitter.emit('showAction', this.turnBet);
     logGame(this.table.tableNumber, 'player : ' + this.playerName + ', ALLIN performed');
@@ -829,7 +829,7 @@ function checkForWinner(table) {
         logGame(table.tableNumber, 'table.game.roundBets[' + l + '] = ' + table.game.roundBets[l]);
 
         if (table.game.roundBets[l] !== 0) {
-            //logGame(table.tableNumber, 'roundBets[' + l + '] = ' + table.game.roundBets[l] + ' part = ' + part);
+            //logGame(table.tableNumber, 'roundBets[' + l + '] = ' + table.game_services.roundBets[l] + ' part = ' + part);
             roundEnd = false;
         }
     }
@@ -2085,7 +2085,7 @@ function progress(table) {
                 table.game.deck.pop(); // Burn a card
                 table.game.board.push(table.game.deck.pop()); // Turn a card
                 /*
-                 table.game.bets.splice(0, table.game.bets.length - 1);
+                 table.game_services.bets.splice(0, table.game_services.bets.length - 1);
                  */
                 for (i = 0; i < table.game.bets.length; i += 1) {
                     table.game.bets[i] = 0;
@@ -2114,7 +2114,7 @@ function progress(table) {
                     table.game.board.push(table.game.deck.pop());
                 }
                 /*
-                 table.game.bets.splice(0,table.game.bets.length - 1);
+                 table.game_services.bets.splice(0,table.game_services.bets.length - 1);
                  */
                 for (i = 0; i < table.game.bets.length; i += 1) {
                     table.game.bets[i] = 0;
@@ -2267,17 +2267,13 @@ function sort(data) {
 }
 
 function updateGame(table) {
-    var conditions = {
-        tableNumber: table.tableNumber
-    };
-
     var players = [];
     for (var i = 0; i < table.players.length; i++) {
         var player = {
             playerName: table.players[i].playerName,
             displayName: table.players[i].displayName,
             chips: table.players[i].chips
-        }
+        };
         players.push(player);
     }
 
@@ -2287,22 +2283,9 @@ function updateGame(table) {
         players: players,
         startTime: table.startTime
     };
-    gameDao.getGame(conditions, function(getGameErr, game) {
-        if (getGameErr.code === errorCode.SUCCESS.code &&
-            null !== game && game.length > 0) {
-            logger.info('get game successfully, update it');
-            gameDao.updateGame(conditions, newGame, function(updateGameErr) {
-                if (updateGameErr.code === errorCode.SUCCESS.code) {
-                    logger.info('update game for table ' + table.tableNumber + ' successfully');
-                }
-            });
-        } else {
-            logger.info('get game failed, create a new one');
-            gameDao.createGame(newGame, function(createGameErr) {
-                if (createGameErr.code === errorCode.SUCCESS.code) {
-                    logger.info('create game for table ' + table.tableNumber + ' successfully');
-                }
-            });
+    gameLogic.updateGame(table.tableNumber, newGame, function(updateGameErr) {
+        if (updateGameErr.code === errorCode.SUCCESS.code) {
+            logger.info('update game_services ' + table.tableNumber + ' successfully');
         }
     });
 }

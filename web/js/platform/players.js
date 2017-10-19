@@ -34,8 +34,8 @@ function initData() {
 // data related functions
 function loadTables() {
     $.ajax({
-        url: '/player/list_tables',
-        type: 'GET',
+        url: '/table/list_tables',
+        type: 'POST',
         dataType: 'json',
         data: {},
         timeout: 20000,

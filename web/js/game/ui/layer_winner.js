@@ -13,7 +13,7 @@ var WinnerLayer = cc.LayerColor.extend({
     debug: true,
     maxWinners: 5,
 
-    // game model variables
+    // game_services model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
@@ -54,7 +54,7 @@ var WinnerLayer = cc.LayerColor.extend({
         this.gameScale = gameScale;
     },
 
-    // game initializer
+    // game_services initializer
     init: function () {
         this._super(cc.color(0, 0, 0, 239));
 
@@ -129,7 +129,7 @@ var WinnerLayer = cc.LayerColor.extend({
         cc.eventManager.addListener(this.eventListener, this);
     },
 
-    // game operations
+    // game_services operations
     update: function () {
         this.doUpdate();
     },

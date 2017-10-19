@@ -23,15 +23,15 @@ var dateUtils = require('../poem/utils/date_utils.js');
  *      updateTime
  */
 exports.createGame = function (game, callback) {
-    logger.info('create game : ' + JSON.stringify(game));
+    logger.info('create game_services : ' + JSON.stringify(game));
     game.updateTime = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
     db.collection("game", function (err, collection) {
         collection.insert(game, function (err, docs) {
             if (!err) {
-                logger.info("create game " + game.tableNumber + ",  successfully");
+                logger.info("create game_services " + game.tableNumber + ",  successfully");
                 callback(errorCode.SUCCESS);
             } else {
-                logger.error("create game " + game.tableNumber + ", failed : " + err);
+                logger.error("create game_services " + game.tableNumber + ", failed : " + err);
                 callback(errorCode.FAILED);
             }
         });
@@ -50,23 +50,23 @@ exports.updateGame = function(conditions, newGame, callback) {
             }
         }, function (err, result) {
             if (!err) {
-                logger.info("update game " + newGame.tableNumber + " successfully : " + JSON.stringify(result));
+                logger.info("update game_services " + newGame.tableNumber + " successfully : " + JSON.stringify(result));
                 callback(errorCode.SUCCESS);
             } else {
-                logger.error("update game " + newGame.tableNumber + " failed: " + err);
+                logger.error("update game_services " + newGame.tableNumber + " failed: " + err);
                 callback(errorCode.FAILED);
             }
         });
     });
 };
 
-exports.getGame = function(conditions, callback) {
+exports.getGames = function(conditions, callback) {
     db.collection("game", function (err, collection) {
         collection.find(conditions).toArray(function (err, results) {
             if (!err) {
                 callback(errorCode.SUCCESS, results);
             } else {
-                logger.error("get game error : " + err);
+                logger.error("get game_services error : " + err);
                 callback(errorCode.FAILED, null);
             }
         });

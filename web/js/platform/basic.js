@@ -30,7 +30,7 @@ function gotoGame() {
     if (null === tableNumber || isNaN(tableNumber)) {
         return;
     }
-    window.open('./game.html?table='+tableNumber+'&bgm='+bgm+'&auto='+autoRestart+'&defaultChips='+defaultChips+
+    window.open('./game_services.html?table='+tableNumber+'&bgm='+bgm+'&auto='+autoRestart+'&defaultChips='+defaultChips+
         '&defaultSb='+defaultSb+'&roundInterval='+defaultRoundInterval+'&commandInterval='+defaultCommandInterval+
         '&reloadChance='+reloadChance+'&commandTimeout='+defaultCommandTimeout+'&lostTimeout='+defaultLostTimeout,
             '_blank');
@@ -73,7 +73,7 @@ function gotoPlay() {
 }
 
 function joinGame(tableNumber, playerName) {
-    window.open('./game.html?table='+tableNumber+'&name='+playerName, '_blank');
+    window.open('./game_services.html?table='+tableNumber+'&name='+playerName, '_blank');
     $('#play_player_name').val('');
     localStorage.setItem('game_table', tableNumber);
     $('#goto_play_dialog').modal('hide');

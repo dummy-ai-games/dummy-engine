@@ -24,7 +24,7 @@ exports.getPlayers = function (conditions, callback) {
     });
 };
 
-exports.getAllPlayers = function (callback) {
+exports.listPlayers = function (callback) {
     db.collection("players", function (err, collection) {
         collection.find({}).toArray(function (err, results) {
             if (!err) {

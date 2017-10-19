@@ -18,7 +18,7 @@ var PlayerLayer = cc.Layer.extend({
     maxChipLevel: 10,
     maxReloadCount: 2,
 
-    // game model variables
+    // game_services model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
@@ -114,7 +114,7 @@ var PlayerLayer = cc.Layer.extend({
         this.chipsXFix = chipsXFix;
     },
 
-    // game initializer
+    // game_services initializer
     init: function () {
         this._super();
 
@@ -498,7 +498,7 @@ var PlayerLayer = cc.Layer.extend({
         this.initializeAltFrames();
     },
 
-    // game operations
+    // game_services operations
     update: function () {
         this.doUpdate();
     },

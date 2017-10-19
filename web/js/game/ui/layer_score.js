@@ -14,7 +14,7 @@ var ScoreLayer = cc.LayerColor.extend({
     cardsInfoTextSize: 16,
     debug: true,
 
-    // game model variables
+    // game_services model variables
     size: null,
     validWidth: 0,
     validHeight: 0,
@@ -75,7 +75,7 @@ var ScoreLayer = cc.LayerColor.extend({
         this.gameScale = gameScale;
     },
 
-    // game initializer
+    // game_services initializer
     init: function () {
         this._super(cc.color(15, 15, 15, 239));
 
@@ -228,7 +228,7 @@ var ScoreLayer = cc.LayerColor.extend({
         cc.eventManager.addListener(this.eventListener, this);
     },
 
-    // game operations
+    // game_services operations
     update: function () {
         this.doUpdate();
     },

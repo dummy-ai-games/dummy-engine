@@ -25,7 +25,7 @@ var httpServer = require('http').createServer(app);
 var httpPort = normalizePort(process.env.PORT || LISTEN_PORT);
 httpServer.listen(httpPort);
 
-var SkyRTC = require('./game/communication').listen(httpServer);
+var SkyRTC = require('./game_services/communication').listen(httpServer);
 
 function normalizePort(val) {
     var port = parseInt(val, 10);

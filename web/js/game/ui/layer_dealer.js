@@ -61,7 +61,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.gameScale = gameScale;
     },
 
-    // game initializer
+    // game_services initializer
     init: function () {
         this._super(cc.color(0, 0, 0, 239));
 
@@ -84,7 +84,7 @@ var DealerLayer = cc.LayerColor.extend({
             this.startButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     if (STATUS_GAME_RUNNING !== gameStatus) {
-                        console.log('prepare start game');
+                        console.log('prepare start game_services');
                         this.resetCountDown();
                         startGame();
                     }
@@ -102,7 +102,7 @@ var DealerLayer = cc.LayerColor.extend({
             this.stopButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     if (STATUS_GAME_RUNNING === gameStatus) {
-                        console.log('stop game');
+                        console.log('stop game_services');
                         stopGame();
                     }
                 }
@@ -182,7 +182,7 @@ var DealerLayer = cc.LayerColor.extend({
         cc.eventManager.addListener(this.eventListener, this);
     },
 
-    // game operations
+    // game_services operations
     update: function () {
         this.doUpdate();
     },

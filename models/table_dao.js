@@ -50,3 +50,12 @@ exports.getTable = function(conditions, callback) {
         });
     });
 };
+
+exports.clearTables = function () {
+    db.collection("tables", function (err, collection) {
+        collection.remove({}, function (err, docs) {
+            if (!err)
+                logger.info("remove all tables success");
+        });
+    });
+};
