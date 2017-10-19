@@ -103,7 +103,7 @@ function initRTC() {
     });
 
     rtc.on('__game_over', function(data) {
-        console.log('received game_services over:' + JSON.stringify(data));
+        console.log('received game over:' + JSON.stringify(data));
     });
 }
 

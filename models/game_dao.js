@@ -28,10 +28,10 @@ exports.createGame = function (game, callback) {
             game.updateTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
             collection.insert(game, function (err, docs) {
                 if (!err) {
-                    logger.info('create game_services ' + game.tableNumber + ',  successfully');
+                    logger.info('create game ' + game.tableNumber + ',  successfully');
                     callback(errorCode.SUCCESS);
                 } else {
-                    logger.error('create game_services ' + game.tableNumber + ', failed : ' + err);
+                    logger.error('create game ' + game.tableNumber + ', failed : ' + err);
                     callback(errorCode.FAILED);
                 }
             });
@@ -55,10 +55,10 @@ exports.updateGame = function(conditions, newGame, callback) {
                 }
             }, function (err, result) {
                 if (!err) {
-                    logger.info('update game_services ' + newGame.tableNumber + ' successfully : ' + JSON.stringify(result));
+                    logger.info('update game ' + newGame.tableNumber + ' successfully : ' + JSON.stringify(result));
                     callback(errorCode.SUCCESS);
                 } else {
-                    logger.error('update game_services ' + newGame.tableNumber + ' failed: ' + err);
+                    logger.error('update game ' + newGame.tableNumber + ' failed: ' + err);
                     callback(errorCode.FAILED);
                 }
             });
@@ -76,7 +76,7 @@ exports.getGames = function(conditions, from, count, callback) {
                 if (!err) {
                     callback(errorCode.SUCCESS, results);
                 } else {
-                    logger.error('get game_services error : ' + err);
+                    logger.error('get game error : ' + err);
                     callback(errorCode.FAILED, null);
                 }
             });

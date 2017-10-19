@@ -18,12 +18,12 @@ var defaultSb = 10;
 var defaultChips = 1000;
 var reloadChance = 2;
 
-// game_services board related
+// game board related
 var winWidth, winHeight;
 var gameWidth, gameHeight;
 var audio1, audio2;
 
-// game_services model related
+// game model related
 var STATUS_GAME_STANDBY = 0;
 var STATUS_GAME_PREPARING = 1;
 var STATUS_GAME_RUNNING = 2;
@@ -124,7 +124,7 @@ function initPlayerInfo() {
     });
 }
 
-// game_services communication with back-end
+// game communication with back-end
 function initWebsock() {
     // initialize web communication
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0],
@@ -145,7 +145,7 @@ function initWebsock() {
         }
 
         if (gameStatus === STATUS_GAME_RUNNING || gameStatus === STATUS_GAME_FINISHED) {
-            // do not handle this command while game_services is running, to prevent player status reset
+            // do not handle this command while game is running, to prevent player status reset
             return;
         }
 
@@ -159,8 +159,8 @@ function initWebsock() {
             }
         }
 
-        // sync game_services status here
-        console.log('game_services status = ' + tableStatus);
+        // sync game status here
+        console.log('game status = ' + tableStatus);
         console.log('local players = ' + JSON.stringify(players));
         gameStatus = tableStatus;
     });
@@ -176,7 +176,7 @@ function initWebsock() {
         }
         gameStatus = tableStatus;
         if (gameStatus === STATUS_GAME_RUNNING || gameStatus === STATUS_GAME_FINISHED) {
-            // do not handle this command while game_services is running, to prevent player status reset
+            // do not handle this command while game is running, to prevent player status reset
             return;
         }
 
@@ -195,7 +195,7 @@ function initWebsock() {
     });
 
     rtc.on('__game_over', function (data) {
-        console.log('game_services over : ' + JSON.stringify(data));
+        console.log('game over : ' + JSON.stringify(data));
         // set winners
         winners = data.winners;
         for (var index = 0; index < winners.length; index++) {
@@ -206,7 +206,7 @@ function initWebsock() {
         gameStatus = STATUS_GAME_FINISHED;
 
         if (undefined !== autoStart && (autoStart === 1 || autoStart === '1')) {
-            // auto start another game_services in 3s
+            // auto start another game in 3s
             setTimeout(function () {
                 startGame();
             }, 20 * 1000);
@@ -216,14 +216,14 @@ function initWebsock() {
     });
 
     rtc.on('__game_prepare', function (data) {
-        console.log('game_services preparing : ' + JSON.stringify(data));
+        console.log('game preparing : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_PREPARING;
         gameCountDown = data.countDown;
     });
 
     rtc.on('__game_start', function (data) {
-        // update in game_services engine
-        console.log('game_services start : ' + JSON.stringify(data));
+        // update in game engine
+        console.log('game start : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
         if (1 === parseInt(gameBgm)) {
             stopAudios();
@@ -233,8 +233,8 @@ function initWebsock() {
     });
 
     rtc.on('__game_stop', function (data) {
-        // update in game_services engine
-        console.log('game_services stop : ' + JSON.stringify(data));
+        // update in game engine
+        console.log('game stop : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_STANDBY;
         stopAudios();
     });
@@ -252,7 +252,7 @@ function initWebsock() {
             players[i].setTakeAction(ACTION_STATUS_NONE);
         }
 
-        // update in game_services engine
+        // update in game engine
         gameStatus = STATUS_GAME_RUNNING;
         updateGame(data, false);
     });
@@ -261,7 +261,7 @@ function initWebsock() {
         console.log('new round : ' + JSON.stringify(data));
         reloadTime = false;
         gameStatus = STATUS_GAME_RUNNING;
-        // update in game_services engine
+        // update in game engine
         updateGame(data, true);
     });
 
@@ -344,7 +344,7 @@ function initWebsock() {
             roundAction.action === 'fold' ||
             roundAction.action === 'raise' ||
             roundAction.action === 'call') {
-            // update in game_services engine
+            // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
                 players[playerIndex].setAction(roundAction.action);
@@ -355,7 +355,7 @@ function initWebsock() {
                 }
             }
         } else {
-            // update in game_services engine
+            // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
                 players[playerIndex].setAction(roundAction.action);
@@ -469,7 +469,7 @@ function ccLoad() {
     }, false);
 }
 
-// game_services helper
+// game helper
 function startGame() {
     rtc.startGame(tableNumber, commandInterval, roundInterval,
         defaultSb, defaultChips, reloadChance, commandTimeout, lostTimeout);

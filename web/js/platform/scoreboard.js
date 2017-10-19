@@ -10,7 +10,7 @@ $(document).ready(function() {
 
 function updateScoreBoard() {
     $.ajax({
-        url: '/game_services/list_ranked_players',
+        url: '/game/list_ranked_players',
         type: 'POST',
         dataType: 'json',
         timeout: 20000,
@@ -29,23 +29,28 @@ function updateScoreBoard() {
 }
 
 function onScoreBoardUpdated(rankedPlayers) {
-    var level1 = 30;
-    var level2 = 60;
+    var level1 = 25;
+    var level2 = 50;
+    var level3 = 75;
     var table1 = document.getElementById('1st_rank');
     var table2 = document.getElementById('2nd_rank');
     var table3 = document.getElementById('3rd_rank');
+    var table4 = document.getElementById('4th_rank');
     table1.innerHTML = '';
     table2.innerHTML = '';
     table3.innerHTML = '';
+    table4.innerHTML = '';
 
     for (var i = 0; i < rankedPlayers.length; i++) {
-        var target, style;
+        var target;
         if (i < level1) {
             target = $('#1st_rank');
         } else if (i < level2) {
             target = $('#2nd_rank');
-        } else {
+        } else if (i < level3) {
             target = $('#3rd_rank');
+        } else {
+            target = $('#4th_rank');
         }
         var row = '<tr>' +
             '<th scope="row">' + (i + 1) + '</th>' +

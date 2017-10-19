@@ -76,7 +76,7 @@ function SkyRTC() {
                         logger.info('player rejoin, accept join');
                     } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                         socket.tableNumber = tableNumber;
-                        logger.info('game_services not start, accept join');
+                        logger.info('game not start, accept join');
                     }
                     if (socket.tableNumber) {
                         logger.info('player : ' + data.playerName + ' join!!');
@@ -85,7 +85,7 @@ function SkyRTC() {
                         that.notifyJoin();
                         that.initPlayerData(socket.MD5Id);
                     } else {
-                        logger.info('player : ' + data.playerName + ' can not join because game_services has start');
+                        logger.info('player : ' + data.playerName + ' can not join because game has started');
                     }
                 } else {
                     logger.info('player ' + playerName + ' is not valid, connection should be dropped');
@@ -408,11 +408,11 @@ SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
     try {
         parseInt(tableNumber);
     } catch (e) {
-        logger.error('table : ' + tableNumber + ' start game_services failed, type is not correct');
+        logger.error('table : ' + tableNumber + ' start game failed, type is not correct');
         return;
     }
 
-    logger.info('game_services preparing start for table: ' + tableNumber);
+    logger.info('game preparing start for table: ' + tableNumber);
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
@@ -421,7 +421,7 @@ SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
         logger.info('remove table ' + tableNumber + ' timeout');
     }
 
-    // initialize game_services parameters
+    // initialize game parameters
     var sb = 10;
     var bb = 20;
     var initChips = 1000;
@@ -534,11 +534,11 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
     try {
         parseInt(tableNumber);
     } catch (e) {
-        logger.error('table : ' + tableNumber + ' stop game_services failed, type is not correct');
+        logger.error('table : ' + tableNumber + ' stop game failed, type is not correct');
         return;
     }
 
-    logger.info('game_services stop for table: ' + tableNumber);
+    logger.info('game stop for table: ' + tableNumber);
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].timeout)
             clearTimeout(that.table[tableNumber].timeout);
@@ -682,7 +682,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
                 currentTable.isActionTime = false;
                 currentTable.players[currentTable.currentPlayer].Fold();
             }
-        }, commandTimeout * 1000); // for BETA test, set to 1 min, for official game_services, set to 2 sec
+        }, commandTimeout * 1000); // for BETA test, set to 1 min, for official game, set to 2 sec
     } else if (!isSecond) {
         currentTable.timeout = setTimeout(function () {
             currentTable.timeout = null;

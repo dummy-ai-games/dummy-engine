@@ -22,12 +22,12 @@ exports.updateGame = function(tableNumber, newGame, callback) {
     gameDao.getGames(conditions, 0, 1, function(getGameErr, game) {
         if (getGameErr.code === errorCode.SUCCESS.code &&
             null !== game && game.length > 0) {
-            logger.info('get game_services successfully, update it');
+            logger.info('get game successfully, update it');
             gameDao.updateGame(conditions, newGame, function(updateGameErr) {
                 callback(updateGameErr);
             });
         } else {
-            logger.info('get game_services failed, create a new one');
+            logger.info('get game failed, create a new one');
             gameDao.createGame(newGame, function(createGameErr) {
                 callback(createGameErr);
             });
