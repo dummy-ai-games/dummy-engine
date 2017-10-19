@@ -153,7 +153,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++) {
                 var isSurvive = true;
-                if (that.players[j].chips === 0)
+                if (that.players[j].chips <= 0)
                     isSurvive = false;
                 that.players[j] = new Player(that.players[j].playerName, that.players[j].chips,
                     that, isSurvive, that.players[j].reloadCount,
