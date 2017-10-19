@@ -783,7 +783,7 @@ SkyRTC.prototype.exitHandle = function (socket) {
     var that = this;
     if (socket) {
         var tableNumber = socket.tableNumber;
-        if (tableNumber && that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
+        if (that.players[socket.MD5Id] && tableNumber && that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.MD5Id] = socket.tableNumber;
             that.players[socket.MD5Id] = null;
             logger.info('player : ' + socket.id + ' exit!!');
