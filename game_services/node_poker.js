@@ -88,6 +88,10 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
     this.eventEmitter.on('newRound', function () {
         logGame(that.tableNumber, 'new round : ' + that.roundCount);
+
+        if (1 === that.roundCount) {
+            updateGame(that);
+        }
         // reset raise count and bet count
         that.raiseCount = 0;
         that.betCount = 0;
@@ -138,7 +142,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
         if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
             data = getBasicData(that);
-            for (var i = 0; i < data.players.length; i++) {
+            for (i = 0; i < data.players.length; i++) {
                 var player = data.players[i];
                 player.hand = that.players[i].hand;
                 player.winMoney = that.players[i].winMoney;
@@ -191,7 +195,11 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             logGame(that.tableNumber, JSON.stringify(that.gameWinners));
             data = getBasicData(that);
             data.winners = that.gameWinners;
-            winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners);
+            winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners, function(updateWinnersErr) {
+                if (updateWinnersErr.code === errorCode.SUCCESS.code) {
+                    logger.info('update winners successfully');
+                }
+            });
             that.eventEmitter.emit('__game_over', data);
         }
     });
@@ -613,7 +621,8 @@ Player.prototype.Call = function () {
                 logGame(this.table.tableNumber, 'player : ' + this.playerName + ', CALL performed');
                 progress(this.table);
             } else {
-                logGame(this.table.tableNumber, 'player : ' + this.playerName + ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
+                logGame(this.table.tableNumber, 'player : ' + this.playerName +
+                    ', not enough chips (chips: ' + this.chips + ') default to ALLIN');
                 this.AllIn();
             }
         }
@@ -1480,163 +1489,203 @@ function rankHandInt(hand) {
         }
 
         // Straight flush
-        if (cards.indexOf('TC') > -1 && cards.indexOf('JC') > -1 && cards.indexOf('QC') > -1 && cards.indexOf('KC') > -1 && cards.indexOf('AC') > -1 && rank === 123) {
+        if (cards.indexOf('TC') > -1 && cards.indexOf('JC') > -1 && cards.indexOf('QC') > -1 &&
+            cards.indexOf('KC') > -1 && cards.indexOf('AC') > -1 && rank === 123) {
             rank = 302;
             message = 'Royal Flush';
         }
-        if (cards.indexOf('TD') > -1 && cards.indexOf('JD') > -1 && cards.indexOf('QD') > -1 && cards.indexOf('KD') > -1 && cards.indexOf('AD') > -1 && rank === 123) {
+        if (cards.indexOf('TD') > -1 && cards.indexOf('JD') > -1 && cards.indexOf('QD') > -1 &&
+            cards.indexOf('KD') > -1 && cards.indexOf('AD') > -1 && rank === 123) {
             rank = 302;
             message = 'Royal Flush';
         }
-        if (cards.indexOf('TH') > -1 && cards.indexOf('JH') > -1 && cards.indexOf('QH') > -1 && cards.indexOf('KH') > -1 && cards.indexOf('AH') > -1 && rank === 123) {
+        if (cards.indexOf('TH') > -1 && cards.indexOf('JH') > -1 && cards.indexOf('QH') > -1 &&
+            cards.indexOf('KH') > -1 && cards.indexOf('AH') > -1 && rank === 123) {
             rank = 302;
             message = 'Royal Flush';
         }
-        if (cards.indexOf('TS') > -1 && cards.indexOf('JS') > -1 && cards.indexOf('QS') > -1 && cards.indexOf('KS') > -1 && cards.indexOf('AS') > -1 && rank === 123) {
+        if (cards.indexOf('TS') > -1 && cards.indexOf('JS') > -1 && cards.indexOf('QS') > -1 &&
+            cards.indexOf('KS') > -1 && cards.indexOf('AS') > -1 && rank === 123) {
             rank = 302;
             message = 'Royal Flush';
         }
-        if (cards.indexOf('9C') > -1 && cards.indexOf('TC') > -1 && cards.indexOf('JC') > -1 && cards.indexOf('QC') > -1 && cards.indexOf('KC') > -1 && rank === 123) {
+        if (cards.indexOf('9C') > -1 && cards.indexOf('TC') > -1 && cards.indexOf('JC') > -1 &&
+            cards.indexOf('QC') > -1 && cards.indexOf('KC') > -1 && rank === 123) {
             rank = 301;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('9D') > -1 && cards.indexOf('TD') > -1 && cards.indexOf('JD') > -1 && cards.indexOf('QD') > -1 && cards.indexOf('KD') > -1 && rank === 123) {
+        if (cards.indexOf('9D') > -1 && cards.indexOf('TD') > -1 && cards.indexOf('JD') > -1 &&
+            cards.indexOf('QD') > -1 && cards.indexOf('KD') > -1 && rank === 123) {
             rank = 301;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('9H') > -1 && cards.indexOf('TH') > -1 && cards.indexOf('JH') > -1 && cards.indexOf('QH') > -1 && cards.indexOf('KH') > -1 && rank === 123) {
+        if (cards.indexOf('9H') > -1 && cards.indexOf('TH') > -1 && cards.indexOf('JH') > -1 &&
+            cards.indexOf('QH') > -1 && cards.indexOf('KH') > -1 && rank === 123) {
             rank = 301;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('9S') > -1 && cards.indexOf('TS') > -1 && cards.indexOf('JS') > -1 && cards.indexOf('QS') > -1 && cards.indexOf('KS') > -1 && rank === 123) {
+        if (cards.indexOf('9S') > -1 && cards.indexOf('TS') > -1 && cards.indexOf('JS') > -1 &&
+            cards.indexOf('QS') > -1 && cards.indexOf('KS') > -1 && rank === 123) {
             rank = 301;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('8C') > -1 && cards.indexOf('9C') > -1 && cards.indexOf('TC') > -1 && cards.indexOf('JC') > -1 && cards.indexOf('QC') > -1 && rank === 123) {
+        if (cards.indexOf('8C') > -1 && cards.indexOf('9C') > -1 && cards.indexOf('TC') > -1 &&
+            cards.indexOf('JC') > -1 && cards.indexOf('QC') > -1 && rank === 123) {
             rank = 300;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('8D') > -1 && cards.indexOf('9D') > -1 && cards.indexOf('TD') > -1 && cards.indexOf('JD') > -1 && cards.indexOf('QD') > -1 && rank === 123) {
+        if (cards.indexOf('8D') > -1 && cards.indexOf('9D') > -1 && cards.indexOf('TD') > -1 &&
+            cards.indexOf('JD') > -1 && cards.indexOf('QD') > -1 && rank === 123) {
             rank = 300;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('8H') > -1 && cards.indexOf('9H') > -1 && cards.indexOf('TH') > -1 && cards.indexOf('JH') > -1 && cards.indexOf('QH') > -1 && rank === 123) {
+        if (cards.indexOf('8H') > -1 && cards.indexOf('9H') > -1 && cards.indexOf('TH') > -1 &&
+            cards.indexOf('JH') > -1 && cards.indexOf('QH') > -1 && rank === 123) {
             rank = 300;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('8S') > -1 && cards.indexOf('9S') > -1 && cards.indexOf('TS') > -1 && cards.indexOf('JS') > -1 && cards.indexOf('QS') > -1 && rank === 123) {
+        if (cards.indexOf('8S') > -1 && cards.indexOf('9S') > -1 && cards.indexOf('TS') > -1 &&
+            cards.indexOf('JS') > -1 && cards.indexOf('QS') > -1 && rank === 123) {
             rank = 300;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('7C') > -1 && cards.indexOf('8C') > -1 && cards.indexOf('9C') > -1 && cards.indexOf('TC') > -1 && cards.indexOf('JC') > -1 && rank === 123) {
+        if (cards.indexOf('7C') > -1 && cards.indexOf('8C') > -1 && cards.indexOf('9C') > -1 &&
+            cards.indexOf('TC') > -1 && cards.indexOf('JC') > -1 && rank === 123) {
             rank = 299;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('7D') > -1 && cards.indexOf('8D') > -1 && cards.indexOf('9D') > -1 && cards.indexOf('TD') > -1 && cards.indexOf('JD') > -1 && rank === 123) {
+        if (cards.indexOf('7D') > -1 && cards.indexOf('8D') > -1 && cards.indexOf('9D') > -1 &&
+            cards.indexOf('TD') > -1 && cards.indexOf('JD') > -1 && rank === 123) {
             rank = 299;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('7H') > -1 && cards.indexOf('8H') > -1 && cards.indexOf('9H') > -1 && cards.indexOf('TH') > -1 && cards.indexOf('JH') > -1 && rank === 123) {
+        if (cards.indexOf('7H') > -1 && cards.indexOf('8H') > -1 && cards.indexOf('9H') > -1 &&
+            cards.indexOf('TH') > -1 && cards.indexOf('JH') > -1 && rank === 123) {
             rank = 299;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('7S') > -1 && cards.indexOf('8S') > -1 && cards.indexOf('9S') > -1 && cards.indexOf('TS') > -1 && cards.indexOf('JS') > -1 && rank === 123) {
+        if (cards.indexOf('7S') > -1 && cards.indexOf('8S') > -1 && cards.indexOf('9S') > -1 &&
+            cards.indexOf('TS') > -1 && cards.indexOf('JS') > -1 && rank === 123) {
             rank = 299;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('6C') > -1 && cards.indexOf('7C') > -1 && cards.indexOf('8C') > -1 && cards.indexOf('9C') > -1 && cards.indexOf('TC') > -1 && rank === 123) {
+        if (cards.indexOf('6C') > -1 && cards.indexOf('7C') > -1 && cards.indexOf('8C') > -1 &&
+            cards.indexOf('9C') > -1 && cards.indexOf('TC') > -1 && rank === 123) {
             rank = 298;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('6D') > -1 && cards.indexOf('7D') > -1 && cards.indexOf('8D') > -1 && cards.indexOf('9D') > -1 && cards.indexOf('TD') > -1 && rank === 123) {
+        if (cards.indexOf('6D') > -1 && cards.indexOf('7D') > -1 && cards.indexOf('8D') > -1 &&
+            cards.indexOf('9D') > -1 && cards.indexOf('TD') > -1 && rank === 123) {
             rank = 298;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('6H') > -1 && cards.indexOf('7H') > -1 && cards.indexOf('8H') > -1 && cards.indexOf('9H') > -1 && cards.indexOf('TH') > -1 && rank === 123) {
+        if (cards.indexOf('6H') > -1 && cards.indexOf('7H') > -1 && cards.indexOf('8H') > -1 &&
+            cards.indexOf('9H') > -1 && cards.indexOf('TH') > -1 && rank === 123) {
             rank = 298;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('6S') > -1 && cards.indexOf('7S') > -1 && cards.indexOf('8S') > -1 && cards.indexOf('9S') > -1 && cards.indexOf('TS') > -1 && rank === 123) {
+        if (cards.indexOf('6S') > -1 && cards.indexOf('7S') > -1 && cards.indexOf('8S') > -1 &&
+            cards.indexOf('9S') > -1 && cards.indexOf('TS') > -1 && rank === 123) {
             rank = 298;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('5C') > -1 && cards.indexOf('6C') > -1 && cards.indexOf('7C') > -1 && cards.indexOf('8C') > -1 && cards.indexOf('9C') > -1 && rank === 123) {
+        if (cards.indexOf('5C') > -1 && cards.indexOf('6C') > -1 && cards.indexOf('7C') > -1 &&
+            cards.indexOf('8C') > -1 && cards.indexOf('9C') > -1 && rank === 123) {
             rank = 297;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('5D') > -1 && cards.indexOf('6D') > -1 && cards.indexOf('7D') > -1 && cards.indexOf('8D') > -1 && cards.indexOf('9D') > -1 && rank === 123) {
+        if (cards.indexOf('5D') > -1 && cards.indexOf('6D') > -1 && cards.indexOf('7D') > -1 &&
+            cards.indexOf('8D') > -1 && cards.indexOf('9D') > -1 && rank === 123) {
             rank = 297;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('5H') > -1 && cards.indexOf('6H') > -1 && cards.indexOf('7H') > -1 && cards.indexOf('8H') > -1 && cards.indexOf('9H') > -1 && rank === 123) {
+        if (cards.indexOf('5H') > -1 && cards.indexOf('6H') > -1 && cards.indexOf('7H') > -1 &&
+            cards.indexOf('8H') > -1 && cards.indexOf('9H') > -1 && rank === 123) {
             rank = 297;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('5S') > -1 && cards.indexOf('6S') > -1 && cards.indexOf('7S') > -1 && cards.indexOf('8S') > -1 && cards.indexOf('9S') > -1 && rank === 123) {
+        if (cards.indexOf('5S') > -1 && cards.indexOf('6S') > -1 && cards.indexOf('7S') > -1 &&
+            cards.indexOf('8S') > -1 && cards.indexOf('9S') > -1 && rank === 123) {
             rank = 297;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('4C') > -1 && cards.indexOf('5C') > -1 && cards.indexOf('6C') > -1 && cards.indexOf('7C') > -1 && cards.indexOf('8C') > -1 && rank === 123) {
+        if (cards.indexOf('4C') > -1 && cards.indexOf('5C') > -1 && cards.indexOf('6C') > -1 &&
+            cards.indexOf('7C') > -1 && cards.indexOf('8C') > -1 && rank === 123) {
             rank = 296;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('4D') > -1 && cards.indexOf('5D') > -1 && cards.indexOf('6D') > -1 && cards.indexOf('7D') > -1 && cards.indexOf('8D') > -1 && rank === 123) {
+        if (cards.indexOf('4D') > -1 && cards.indexOf('5D') > -1 && cards.indexOf('6D') > -1 &&
+            cards.indexOf('7D') > -1 && cards.indexOf('8D') > -1 && rank === 123) {
             rank = 296;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('4H') > -1 && cards.indexOf('5H') > -1 && cards.indexOf('6H') > -1 && cards.indexOf('7H') > -1 && cards.indexOf('8H') > -1 && rank === 123) {
+        if (cards.indexOf('4H') > -1 && cards.indexOf('5H') > -1 && cards.indexOf('6H') > -1 &&
+            cards.indexOf('7H') > -1 && cards.indexOf('8H') > -1 && rank === 123) {
             rank = 296;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('4S') > -1 && cards.indexOf('5S') > -1 && cards.indexOf('6S') > -1 && cards.indexOf('7S') > -1 && cards.indexOf('8S') > -1 && rank === 123) {
+        if (cards.indexOf('4S') > -1 && cards.indexOf('5S') > -1 && cards.indexOf('6S') > -1 &&
+            cards.indexOf('7S') > -1 && cards.indexOf('8S') > -1 && rank === 123) {
             rank = 296;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('3C') > -1 && cards.indexOf('4C') > -1 && cards.indexOf('5C') > -1 && cards.indexOf('6C') > -1 && cards.indexOf('7C') > -1 && rank === 123) {
+        if (cards.indexOf('3C') > -1 && cards.indexOf('4C') > -1 && cards.indexOf('5C') > -1 &&
+            cards.indexOf('6C') > -1 && cards.indexOf('7C') > -1 && rank === 123) {
             rank = 295;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('3D') > -1 && cards.indexOf('4D') > -1 && cards.indexOf('5D') > -1 && cards.indexOf('6D') > -1 && cards.indexOf('7D') > -1 && rank === 123) {
+        if (cards.indexOf('3D') > -1 && cards.indexOf('4D') > -1 && cards.indexOf('5D') > -1 &&
+            cards.indexOf('6D') > -1 && cards.indexOf('7D') > -1 && rank === 123) {
             rank = 295;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('3H') > -1 && cards.indexOf('4H') > -1 && cards.indexOf('5H') > -1 && cards.indexOf('6H') > -1 && cards.indexOf('7H') > -1 && rank === 123) {
+        if (cards.indexOf('3H') > -1 && cards.indexOf('4H') > -1 && cards.indexOf('5H') > -1 &&
+            cards.indexOf('6H') > -1 && cards.indexOf('7H') > -1 && rank === 123) {
             rank = 295;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('3S') > -1 && cards.indexOf('4S') > -1 && cards.indexOf('5S') > -1 && cards.indexOf('6S') > -1 && cards.indexOf('7S') > -1 && rank === 123) {
+        if (cards.indexOf('3S') > -1 && cards.indexOf('4S') > -1 && cards.indexOf('5S') > -1 &&
+            cards.indexOf('6S') > -1 && cards.indexOf('7S') > -1 && rank === 123) {
             rank = 295;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('2C') > -1 && cards.indexOf('3C') > -1 && cards.indexOf('4C') > -1 && cards.indexOf('5C') > -1 && cards.indexOf('6C') > -1 && rank === 123) {
+        if (cards.indexOf('2C') > -1 && cards.indexOf('3C') > -1 && cards.indexOf('4C') > -1 &&
+            cards.indexOf('5C') > -1 && cards.indexOf('6C') > -1 && rank === 123) {
             rank = 294;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('2D') > -1 && cards.indexOf('3D') > -1 && cards.indexOf('4D') > -1 && cards.indexOf('5D') > -1 && cards.indexOf('6D') > -1 && rank === 123) {
+        if (cards.indexOf('2D') > -1 && cards.indexOf('3D') > -1 && cards.indexOf('4D') > -1 &&
+            cards.indexOf('5D') > -1 && cards.indexOf('6D') > -1 && rank === 123) {
             rank = 294;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('2H') > -1 && cards.indexOf('3H') > -1 && cards.indexOf('4H') > -1 && cards.indexOf('5H') > -1 && cards.indexOf('6H') > -1 && rank === 123) {
+        if (cards.indexOf('2H') > -1 && cards.indexOf('3H') > -1 && cards.indexOf('4H') > -1 &&
+            cards.indexOf('5H') > -1 && cards.indexOf('6H') > -1 && rank === 123) {
             rank = 294;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('2S') > -1 && cards.indexOf('3S') > -1 && cards.indexOf('4S') > -1 && cards.indexOf('5S') > -1 && cards.indexOf('6S') > -1 && rank === 123) {
+        if (cards.indexOf('2S') > -1 && cards.indexOf('3S') > -1 && cards.indexOf('4S') > -1 &&
+            cards.indexOf('5S') > -1 && cards.indexOf('6S') > -1 && rank === 123) {
             rank = 294;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('AC') > -1 && cards.indexOf('2C') > -1 && cards.indexOf('3C') > -1 && cards.indexOf('4C') > -1 && cards.indexOf('5C') > -1 && rank === 123) {
+        if (cards.indexOf('AC') > -1 && cards.indexOf('2C') > -1 && cards.indexOf('3C') > -1 &&
+            cards.indexOf('4C') > -1 && cards.indexOf('5C') > -1 && rank === 123) {
             rank = 293;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('AS') > -1 && cards.indexOf('2S') > -1 && cards.indexOf('3S') > -1 && cards.indexOf('4S') > -1 && cards.indexOf('5S') > -1 && rank === 123) {
+        if (cards.indexOf('AS') > -1 && cards.indexOf('2S') > -1 && cards.indexOf('3S') > -1 &&
+            cards.indexOf('4S') > -1 && cards.indexOf('5S') > -1 && rank === 123) {
             rank = 293;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('AH') > -1 && cards.indexOf('2H') > -1 && cards.indexOf('3H') > -1 && cards.indexOf('4H') > -1 && cards.indexOf('5H') > -1 && rank === 123) {
+        if (cards.indexOf('AH') > -1 && cards.indexOf('2H') > -1 && cards.indexOf('3H') > -1 &&
+            cards.indexOf('4H') > -1 && cards.indexOf('5H') > -1 && rank === 123) {
             rank = 293;
             message = 'Straight Flush';
         }
-        if (cards.indexOf('AD') > -1 && cards.indexOf('2D') > -1 && cards.indexOf('3D') > -1 && cards.indexOf('4D') > -1 && cards.indexOf('5D') > -1 && rank === 123) {
+        if (cards.indexOf('AD') > -1 && cards.indexOf('2D') > -1 && cards.indexOf('3D') > -1 &&
+            cards.indexOf('4D') > -1 && cards.indexOf('5D') > -1 && rank === 123) {
             rank = 293;
             message = 'Straight Flush';
         }
@@ -1648,34 +1697,44 @@ function rankHandInt(hand) {
 
     // Straight
     if (rank === 0) {
-        if (cards.indexOf('T') > -1 && cards.indexOf('J') > -1 && cards.indexOf('Q') > -1 && cards.indexOf('K') > -1 && cards.indexOf('A') > -1) {
+        if (cards.indexOf('T') > -1 && cards.indexOf('J') > -1 && cards.indexOf('Q') > -1 &&
+            cards.indexOf('K') > -1 && cards.indexOf('A') > -1) {
             rank = 122;
         }
-        if (cards.indexOf('9') > -1 && cards.indexOf('T') > -1 && cards.indexOf('J') > -1 && cards.indexOf('Q') > -1 && cards.indexOf('K') > -1 && rank === 0) {
+        if (cards.indexOf('9') > -1 && cards.indexOf('T') > -1 && cards.indexOf('J') > -1 &&
+            cards.indexOf('Q') > -1 && cards.indexOf('K') > -1 && rank === 0) {
             rank = 121;
         }
-        if (cards.indexOf('8') > -1 && cards.indexOf('9') > -1 && cards.indexOf('T') > -1 && cards.indexOf('J') > -1 && cards.indexOf('Q') > -1 && rank === 0) {
+        if (cards.indexOf('8') > -1 && cards.indexOf('9') > -1 && cards.indexOf('T') > -1 &&
+            cards.indexOf('J') > -1 && cards.indexOf('Q') > -1 && rank === 0) {
             rank = 120;
         }
-        if (cards.indexOf('7') > -1 && cards.indexOf('8') > -1 && cards.indexOf('9') > -1 && cards.indexOf('T') > -1 && cards.indexOf('J') > -1 && rank === 0) {
+        if (cards.indexOf('7') > -1 && cards.indexOf('8') > -1 && cards.indexOf('9') > -1 &&
+            cards.indexOf('T') > -1 && cards.indexOf('J') > -1 && rank === 0) {
             rank = 119;
         }
-        if (cards.indexOf('6') > -1 && cards.indexOf('7') > -1 && cards.indexOf('8') > -1 && cards.indexOf('9') > -1 && cards.indexOf('T') > -1 && rank === 0) {
+        if (cards.indexOf('6') > -1 && cards.indexOf('7') > -1 && cards.indexOf('8') > -1 &&
+            cards.indexOf('9') > -1 && cards.indexOf('T') > -1 && rank === 0) {
             rank = 118;
         }
-        if (cards.indexOf('5') > -1 && cards.indexOf('6') > -1 && cards.indexOf('7') > -1 && cards.indexOf('8') > -1 && cards.indexOf('9') > -1 && rank === 0) {
+        if (cards.indexOf('5') > -1 && cards.indexOf('6') > -1 && cards.indexOf('7') > -1 &&
+            cards.indexOf('8') > -1 && cards.indexOf('9') > -1 && rank === 0) {
             rank = 117;
         }
-        if (cards.indexOf('4') > -1 && cards.indexOf('5') > -1 && cards.indexOf('6') > -1 && cards.indexOf('7') > -1 && cards.indexOf('8') > -1 && rank === 0) {
+        if (cards.indexOf('4') > -1 && cards.indexOf('5') > -1 && cards.indexOf('6') > -1 &&
+            cards.indexOf('7') > -1 && cards.indexOf('8') > -1 && rank === 0) {
             rank = 116;
         }
-        if (cards.indexOf('3') > -1 && cards.indexOf('4') > -1 && cards.indexOf('5') > -1 && cards.indexOf('6') > -1 && cards.indexOf('7') > -1 && rank === 0) {
+        if (cards.indexOf('3') > -1 && cards.indexOf('4') > -1 && cards.indexOf('5') > -1 &&
+            cards.indexOf('6') > -1 && cards.indexOf('7') > -1 && rank === 0) {
             rank = 115;
         }
-        if (cards.indexOf('2') > -1 && cards.indexOf('3') > -1 && cards.indexOf('4') > -1 && cards.indexOf('5') > -1 && cards.indexOf('6') > -1 && rank === 0) {
+        if (cards.indexOf('2') > -1 && cards.indexOf('3') > -1 && cards.indexOf('4') > -1 &&
+            cards.indexOf('5') > -1 && cards.indexOf('6') > -1 && rank === 0) {
             rank = 114;
         }
-        if (cards.indexOf('A') > -1 && cards.indexOf('2') > -1 && cards.indexOf('3') > -1 && cards.indexOf('4') > -1 && cards.indexOf('5') > -1 && rank === 0) {
+        if (cards.indexOf('A') > -1 && cards.indexOf('2') > -1 && cards.indexOf('3') > -1 &&
+            cards.indexOf('4') > -1 && cards.indexOf('5') > -1 && rank === 0) {
             rank = 113;
         }
         if (rank !== 0) {
@@ -2268,7 +2327,8 @@ function getNextDealer(table) {
 function sort(data) {
     for (var k = 0; k < data.length; k++) {
         for (var p = k + 1; p < data.length; p++) {
-            if (data[p].chips > data[k].chips || (data[p].chips === data[k].chips && data[p].hand.rank > data[k].hand.rank)) {
+            if (data[p].chips > data[k].chips ||
+                (data[p].chips === data[k].chips && data[p].hand.rank > data[k].hand.rank)) {
                 var temp = data[k];
                 data[k] = data[p];
                 data[p] = temp;
@@ -2280,7 +2340,8 @@ function sort(data) {
 function updateGame(table) {
     var players = [];
     for (var i = 0; i < table.players.length; i++) {
-        var allChips = table.players[i].chips + (table.maxReloadCount - table.players[i].reloadCount) * table.initChips;
+        var allChips = table.players[i].chips +
+            (table.maxReloadCount - table.players[i].reloadCount) * table.initChips;
         var player = {
             playerName: table.players[i].playerName,
             displayName: table.players[i].displayName,

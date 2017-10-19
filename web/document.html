@@ -56,16 +56,17 @@
         <hr>
         <div>
             <ul class="nav nav-tabs" id="main_tab">
-                <li class="active" style="cursor: pointer;"><a data-target="#competition_rules" data-toggle="tab">比赛规则</a></li>
+                <li style="cursor: pointer;"><a data-target="#competition_rules" data-toggle="tab">比赛规则</a></li>
                 <li style="cursor: pointer;"><a data-target="#game_rules" data-toggle="tab">游戏规则</a></li>
-                <li style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
+                <li class="active" style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
                 <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">实用工具</a></li>
                 <li style="cursor: pointer;"><a data-target="#faq" data-toggle="tab">FAQ</a></li>
                 <li style="cursor: pointer;"><a data-target="#release_note" data-toggle="tab">更新日志</a></li>
+                <li style="cursor: pointer;"><a data-target="#thank_list" data-toggle="tab">Thank List</a></li>
             </ul>
 
             <div class="tab-content" style="margin-top: 40px; margin-bottom: 80px;">
-                <div class="tab-pane active" id="competition_rules">
+                <div class="tab-pane" id="competition_rules">
                     <a style="text-decoration: none;"><h4><strong>日程安排</strong></h4></a>
                     <p>1.  每个Camp桌开发两个AI程序(可以采用相同AI或全面不同的AI)</p>
                     <p>2.  组委会于九月中旬提供测试服务器供测试</p>
@@ -139,7 +140,7 @@
                     <br>
                     <p>更详细的规则请参考 <a href="https://baike.baidu.com/item/%E5%BE%B7%E5%85%8B%E8%90%A8%E6%96%AF%E6%89%91%E5%85%8B/83440?fr=aladdin">百度百科</a></p>
                 </div>
-                <div class="tab-pane" id="api_doc">
+                <div class="tab-pane active" id="api_doc">
                     <div id="bs-example-navbar-collapse-2" class="navbar" style="margin-top: -20px; margin-bottom: -20px;">
                         <ul class="nav navbar-nav" style="float: left;">
                             <li class="dropdown">
@@ -1199,6 +1200,25 @@
                         THE-engine V1.0.0上线
                     </div>
                 </div>
+                <div class="tab-pane" id="thank_list">
+                    <a style="text-decoration: none;"><h4><strong>制作组</strong></h4></a>
+                    <div>
+                        <p>Director: Franson Fang</p>
+                        <p>Programmer: Strawmanbobi, JiePing Yang</p>
+                        <p>Design: Teresa Wu</p>
+                    </div>
+                    <br>
+                    <a style="text-decoration: none;"><h4><strong>特别感谢</strong></h4></a>
+                    <div>
+                        <p>Andy Du</p>
+                        <p>Ace Luo
+                        <p>Luffy Huang</p>
+                        <p>Toby Zhang</p>
+                        <p>Joseph D Wang</p>
+                        <p>David Z Zhang</p>
+                        <p>Boris Xiao</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1325,7 +1345,7 @@
 <script src="./js/public/bower_components/bootstrap/js/modal.js"></script>
 <script src="./js/public/bower_components/select2/dist/js/select2.min.js"></script>
 <script src="./js/public/bower_components/bootstrap/js/alert.js"></script>
-<script src="./js/utils/ciphering.js"></script>
+<script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
 <script src="./js/platform/basic.js"></script>
 <script src="./js/platform/document.js"></script>
 </html>

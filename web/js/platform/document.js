@@ -35,6 +35,6 @@ function createDummy() {
 
 function hashName() {
     var playerName = $('#hash_name_in').val();
-    var digest = MD5(playerName);
+    var digest = md5(playerName);
     $('#hash_name_out').val(digest);
 }

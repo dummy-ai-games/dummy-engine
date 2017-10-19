@@ -74,7 +74,8 @@ function SkyRTC() {
                         socket.tableNumber = exitPlayerTableNum;
                         delete that.exitPlayers[socket.MD5Id];
                         logger.info('player rejoin, accept join');
-                    } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                    } else if (!(that.table[tableNumber] &&
+                            that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                         socket.tableNumber = tableNumber;
                         logger.info('game not start, accept join');
                     }
@@ -152,7 +153,8 @@ function SkyRTC() {
                     if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
                         if (currentTable.timeout)
                             clearTimeout(currentTable.timeout);
-                        currentTable.isActionTime = false;//fix bug, should not accept action util server have request action
+                        //fix bug, should not accept action util server have request action
+                        currentTable.isActionTime = false;
                         try {
                             switch (action) {
                                 case 'bet':
@@ -290,7 +292,8 @@ SkyRTC.prototype.notifyJoin = function () {
             for(var i = 0;i < tableAndData[tableNumber].players.length;i++){
                 delete tableAndData[tableNumber].players[i].cards;
             }
-            tableAndData[tableNumber].table.currentPlayer = that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
+            tableAndData[tableNumber].table.currentPlayer =
+                that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
         }
     }
     var message, tableNumber;
@@ -500,11 +503,13 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     }
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
-        logger.info('table ' + tableNumber + ' start fail, it need at least ' + that.table[tableNumber].minPlayers + ' users to attend');
+        logger.info('table ' + tableNumber + ' start fail, it need at least ' +
+            that.table[tableNumber].minPlayers + ' users to attend');
         message = {
             'eventName': '__game_start',
             'data': {
-                'msg': 'table ' + tableNumber + ' need at least ' + that.table[tableNumber].minPlayers + ' users to attend',
+                'msg': 'table ' + tableNumber + ' need at least ' +
+                that.table[tableNumber].minPlayers + ' users to attend',
                 'tableNumber': tableNumber,
                 'error_code': 0
             }
@@ -772,7 +777,8 @@ SkyRTC.prototype.exitHandle = function (socket) {
     var that = this;
     if (socket) {
         var tableNumber = socket.tableNumber;
-        if (that.players[socket.MD5Id] && tableNumber && that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
+        if (that.players[socket.MD5Id] && tableNumber && that.table[tableNumber] &&
+            that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.MD5Id] = socket.tableNumber;
             that.players[socket.MD5Id] = null;
             logger.info('player : ' + socket.id + ' exit!!');           
