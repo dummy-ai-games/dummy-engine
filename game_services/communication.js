@@ -101,7 +101,7 @@ function SkyRTC() {
 
                 } else {
                     console.log('player ' + playerName + ' is not valid, connection should be dropped');
-                    
+                    socket.close();  
                 }
             });
         }else{            
