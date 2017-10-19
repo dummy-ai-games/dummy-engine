@@ -39,7 +39,7 @@ function SkyRTC() {
     this.players = {};
     this.guests = {};
     this.exitPlayers = {};
-    this.playerAndTable = {};
+    //this.playerAndTable = {};
 
     this.on('__join', function (data, socket) {
         var that = this;
@@ -48,46 +48,22 @@ function SkyRTC() {
         var isHuman = data.isHuman || false;
 
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
-        if (that.playerAndTable[playerName]) {
-            socket.id = playerName;
+        if (playerName) {           
             socket.MD5Id = MD5Utils.MD5(playerName);
             socket.isHuman = isHuman;
         } else if (table) {
             socket.tableNumber = table;
         } else {
             logger.info('player is invalid, close its socket');
-            socket.close();
-            that.removeSocket(socket);
+            socket.close();            
             return;
         }
 
-        var tableNumber = that.playerAndTable[socket.id];
-        if (tableNumber !== undefined) {
+        if(playerName){
             if (that.players[socket.MD5Id]) {
                 logger.warn('player: ' + socket.id + ' already exist, reject');
                 return;
             }
-            var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
-            if (exitPlayerTableNum !== undefined) {
-                socket.tableNumber = exitPlayerTableNum;
-                delete that.exitPlayers[socket.MD5Id];
-                logger.info('player rejoin, accept join');
-            } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
-                socket.tableNumber = that.playerAndTable[socket.id];
-                logger.info('game_services not start, accept join');
-            }
-
-            if (socket.tableNumber) {
-                logger.info('player : ' + data.playerName + ' join!!');
-                that.players[socket.MD5Id] = socket;
-                that.emit('new_peer', socket.id);
-                that.notifyJoin();
-                that.initPlayerData(socket.MD5Id);
-            } else {
-                logger.info('player : ' + data.playerName + ' can not join because game_services has start');
-            }
-            /*
-            // check player first
             var conditions = {
                 playerName: playerName
             };
@@ -100,22 +76,42 @@ function SkyRTC() {
                         displayName = players[0].playerName;
                     }
                     logger.info('player ' + displayName + ' is validated');
+                    socket.id = playerName;                    
                     socket.displayName = displayName;
+                    var tableNumber = player[0].tableNumber;
+                    var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
+                    if (exitPlayerTableNum !== undefined) {
+                        socket.tableNumber = exitPlayerTableNum;
+                        delete that.exitPlayers[socket.MD5Id];
+                        logger.info('player rejoin, accept join');
+                    } else if (!(that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                        socket.tableNumber = tableNumber;
+                        logger.info('game_services not start, accept join');
+                    }
+
+                    if (socket.tableNumber) {
+                        logger.info('player : ' + data.playerName + ' join!!');
+                        that.players[socket.MD5Id] = socket;
+                        that.emit('new_peer', socket.id);
+                        that.notifyJoin();
+                        that.initPlayerData(socket.MD5Id);
+                    } else {
+                        logger.info('player : ' + data.playerName + ' can not join because game_services has start');
+                    }
 
                 } else {
                     console.log('player ' + playerName + ' is not valid, connection should be dropped');
-                    // that.socket.close();
-                    // that.removeSocket(socket);
+                    
                 }
             });
-            */
-        } else {
+        }else{            
             logger.info('guest join!!');
             that.guests[socket.id] = socket;
             that.initGuestData(socket.id);
             // updated by strawmanbobi - the Live UI need this command to show joined players
             that.notifyJoin();
         }
+        
     });
 
     this.on('__prepare_game', function (data) {
@@ -783,7 +779,7 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
 SkyRTC.prototype.exitHandle = function (socket) {
     var that = this;
     if (socket) {
-        var tableNumber = that.playerAndTable[socket.id];
+        var tableNumber = socket.tableNumber;
         if (tableNumber && that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.MD5Id] = socket.tableNumber;
             that.players[socket.MD5Id] = null;
@@ -822,7 +818,7 @@ SkyRTC.prototype.init = function (socket) {
         that.exitHandle(socket);
     });
 
-    playerLogic.listPlayersInternalWorkUnit(function (getPlayerErr, players) {
+    /*playerLogic.listPlayersInternalWorkUnit(function (getPlayerErr, players) {
         if (getPlayerErr.code === errorCode.SUCCESS.code) {
             that.playerAndTable = {};
             for (var i = 0; i < players.length; i++) {
@@ -834,7 +830,7 @@ SkyRTC.prototype.init = function (socket) {
             logger.error('no players found');
         }
         that.emit('new_connect', socket);
-    });
+    });*/
 };
 
 /**
