@@ -563,7 +563,6 @@ Player.prototype.Bet = function (bet) {
                             !this.table.players[j].folded &&
                             this.table.players[j].isSurvive) {
                             this.table.players[j].talked = false;
-
                         }
                     }
 
