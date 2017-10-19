@@ -96,8 +96,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         getNextPlayer(that);
 
         logGame(that.tableNumber, 'start get first player:' + that.currentPlayer + ' action ');
-        takeAction(that, '__turn');
-        updateGame(that);
+        takeAction(that, '__turn');        
     });
 
     this.eventEmitter.on('showAction', function (data) {
@@ -125,7 +124,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.eventEmitter.on('roundEnd', function () {
         var count = 0;
         var i;
-        var data;
+        var data;        
+        updateGame(that);
         for (i = 0; i < that.players.length; i++) {
             if (that.players[i].chips <= 0 && that.players[i].reloadCount < that.maxReloadCount) {
                 that.players[i].reloadCount++;
@@ -2280,10 +2280,11 @@ function sort(data) {
 function updateGame(table) {
     var players = [];
     for (var i = 0; i < table.players.length; i++) {
+        var allChips = table.players[i].chips + (table.maxReloadCount - table.players[i].reloadCount) * table.initChips;
         var player = {
             playerName: table.players[i].playerName,
             displayName: table.players[i].displayName,
-            chips: table.players[i].chips
+            chips: allChips
         };
         players.push(player);
     }
