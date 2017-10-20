@@ -370,6 +370,9 @@ SkyRTC.prototype.notifyLeft = function () {
 
     var message, tableNumber;
     for (var guest in that.guests) {
+        if (that.guests[guest].readyState !== 1) {
+            continue;
+        }
         tableNumber = that.guests[guest].tableNumber;
         if (undefined === tableAndPlayer[that.guests[guest].tableNumber]) {
             tableAndPlayer[that.guests[guest].tableNumber] = [];
