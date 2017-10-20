@@ -715,13 +715,15 @@ SkyRTC.prototype.removeSocket = function (socket) {
     var id = socket.MD5Id;
     var that = this;
 
-    delete that.guests[socket.id];
+
     // broadcast player left
     if (that.players[id] || that.players[id] === null) {
         if (that.players[id]) {
             delete that.players[id];
         }
         that.notifyLeft();
+    }else {
+        delete that.guests[socket.id];
     }
 
 };
