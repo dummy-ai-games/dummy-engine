@@ -12,7 +12,7 @@ var DealerLayer = cc.LayerColor.extend({
     boardFont: 'IMPACT',
     boardTextSize: 36,
     nameFont: 'IMPACT',
-    nameTextSize: 32,
+    nameTextSize: 20,
     debug: true,
     maxPlayerCount: 10,
     minPlayerCount: 3,

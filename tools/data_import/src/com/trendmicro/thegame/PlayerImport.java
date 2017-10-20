@@ -1,12 +1,14 @@
 package com.trendmicro.thegame;
 
 import com.mongodb.*;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.bson.Document;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -131,33 +133,45 @@ public class PlayerImport {
             // create tables
             int playersInTable = 0;
             int targetTableNumber = 1;
-            List<Document> seedData = new ArrayList<Document>();
+            List<Document> playerDocument = new ArrayList<Document>();
+            List<Document> tableDocument = new ArrayList<Document>();
 
             for (int i = 0; i < playerList.size(); i++) {
                 Player player = playerList.get(i);
                 player.setTableNumber(targetTableNumber);
                 System.out.println("table " + player.getTableNumber() + ": " + player.getPlayerName() +
                         " - " + player.getDisplayName());
-                // insert into DB
-                BasicDBObject document = new BasicDBObject();
-                document.put("playerName", player.getPlayerName());
-                document.put("displayName", player.getDisplayName());
-                document.put("tableNumber", player.getTableNumber());
-                collection.insert(document);
+
+                // insert into player collection
+                playerDocument.add(new Document("playerName", player.getPlayerName())
+                        .append("displayName", player.getDisplayName())
+                        .append("tableNumber", player.getTableNumber() + "")
+                );
 
                 playersInTable++;
                 if(playersInTable == 10) {
                     playersInTable = 0;
+                    // insert into table collection
+                    tableDocument.add(new Document("tableNumber", targetTableNumber));
                     targetTableNumber++;
                 }
             }
+            MongoCollection<Document> collection = db.getCollection("tables");
+            collection.insertMany(tableDocument);
+
+            collection = db.getCollection("players");
+            collection.insertMany(playerDocument);
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                fs.close();
-                fis.close();
+                if (null != fs) {
+                    fs.close();
+                }
+                if (null != fis) {
+                    fis.close();
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
