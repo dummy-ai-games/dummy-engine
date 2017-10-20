@@ -32,9 +32,9 @@ function updateScoreBoard() {
 }
 
 function onScoreBoardUpdated(rankedPlayers) {
-    var level1 = 5;
-    var level2 = 10;
-    var level3 = 15;
+    var level1 = 25;
+    var level2 = 50;
+    var level3 = 75;
     var table1 = document.getElementById('1st_rank');
     var table2 = document.getElementById('2nd_rank');
     var table3 = document.getElementById('3rd_rank');

@@ -10,6 +10,7 @@ var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCoun
     this.isSurvive = _isSurvive;
     this.online = true;
     this.chips = _chips;
+    this.totalChips = 0;
     this.reloadCount = _reloadCount;
     this.bet = 0;
     this.roundBet = 0;
@@ -28,6 +29,7 @@ var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCoun
     // optional fields for round clear
     this.hand = null;
     this.prize = 0;
+    this.reloadCount = 0;
 };
 
 Player.prototype.setId = function(_id) {
@@ -48,6 +50,10 @@ Player.prototype.setOnline = function(_online) {
 
 Player.prototype.setChips = function(_chips) {
     this.chips = _chips;
+};
+
+Player.prototype.setTotalChips = function(defaultChips, reloadChance) {
+    this.totalChips = this.chips + defaultChips * (reloadChance - this.reloadCount);
 };
 
 Player.prototype.setReloadCount = function(_reloadCount) {

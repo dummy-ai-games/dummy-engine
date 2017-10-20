@@ -484,11 +484,25 @@ function updateGame(data, isNewRound, roundClear) {
     var i;
 
     // update round
-    if (data.table && data.table.roundCount) {
-        currentRound = data.table.roundCount;
-        currentRaiseCount = data.table.raiseCount;
-        currentBetCount = data.table.betCount;
-        currentRoundName = data.table.roundName;
+    if (data.table) {
+        if (data.table.roundCount) {
+            currentRound = data.table.roundCount;
+        }
+        if (data.table.raiseCount) {
+            currentRaiseCount = data.table.raiseCount;
+        }
+        if (data.table.betCount) {
+            currentBetCount = data.table.betCount;
+        }
+        if (data.table.roundName) {
+            currentRoundName = data.table.roundName;
+        }
+        if (data.table.initChips) {
+            defaultChips = data.table.initChips;
+        }
+        if (data.table.maxReloadCount) {
+            reloadChance = data.table.maxReloadCount;
+        }
     }
 
     // update table
@@ -513,6 +527,11 @@ function updateGame(data, isNewRound, roundClear) {
             }
             targetPlayer.setDisplayName(findDBPlayerNameByName(data.players[i].playerName));
             targetPlayer.setOnline(data.players[i].isOnline);
+
+            if (undefined !== data.players[i].reloadCount && null !== data.players[i].reloadCount) {
+                targetPlayer.setReloadCount(data.players[i].reloadCount);
+            }
+
             if (isNewRound) {
                 targetPlayer.setAction('');
                 targetPlayer.setPrivateCards(null, null);
@@ -529,6 +548,7 @@ function updateGame(data, isNewRound, roundClear) {
                 targetPlayer.setBet(data.players[i].bet);
                 targetPlayer.setRoundBet(data.players[i].roundBet);
                 targetPlayer.setChips(data.players[i].chips);
+                targetPlayer.setTotalChips(defaultChips, reloadChance);
                 targetPlayer.setSurvive(data.players[i].isSurvive);
                 targetPlayer.setFolded(data.players[i].folded);
                 targetPlayer.setAllin(data.players[i].allIn);

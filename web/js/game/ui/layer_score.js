@@ -265,11 +265,14 @@ var ScoreLayer = cc.LayerColor.extend({
                     }
 
                     // update prize
-                    var prizeString = this.players[playerIndex].displayName + ' : ' + this.players[playerIndex].chips;
+                    var prizeString = this.players[playerIndex].displayName + ' : ' +
+                        this.players[playerIndex].totalChips;
                     if (null !== this.players[playerIndex].prize) {
+                        var unReloadedChips = parseInt((reloadChance - this.players[playerIndex].reloadCount)
+                            * defaultChips);
                         var originalChip = parseInt(this.players[playerIndex].chips) -
                             parseInt(this.players[playerIndex].prize);
-                        prizeString += '(' + originalChip + '+' + this.players[playerIndex].prize + ')';
+                        prizeString += '(' + unReloadedChips + '+' + originalChip + '+' + this.players[playerIndex].prize + ')';
                     }
                     this.scoreLabels[playerIndex].setString(prizeString);
                     this.scoreLabels[playerIndex].setVisible(true);
@@ -358,9 +361,9 @@ var ScoreLayer = cc.LayerColor.extend({
 
 // utils
 function compare(a, b) {
-    if (a.chips < b.chips)
+    if (a.totalChips < b.totalChips)
         return 1;
-    if (a.chips > b.chips)
+    if (a.totalChips > b.totalChips)
         return -1;
     return 0;
 }
