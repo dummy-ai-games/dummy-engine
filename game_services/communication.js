@@ -95,6 +95,7 @@ function SkyRTC() {
             });
         } else {
             logger.info('guest join!!');
+            socket.isGuest = true;
             that.guests[socket.id] = socket;
             that.initGuestData(socket.id);
             // updated by strawmanbobi - the Live UI need this command to show joined players
@@ -722,7 +723,7 @@ SkyRTC.prototype.removeSocket = function (socket) {
             delete that.players[id];
         }
         that.notifyLeft();
-    }else {
+    }else if(socket.isGuest) {
         delete that.guests[socket.id];
     }
 
