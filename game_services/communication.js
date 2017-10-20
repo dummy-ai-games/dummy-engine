@@ -261,10 +261,7 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
     var errorFunc = function (error) {
         if (error) {
             if (socket) {
-                if(that.players[socket.MD5Id]) {
-                    that.exitPlayers[socket.MD5Id] = socket.tableNumber;
-                    that.players[socket.MD5Id] = null;
-                }
+                that.exitHandle(socket);
                 logger.error('player:' + socket.id + ' socket error, msg: ' + error);
             } else
                 logger.error('socket error, msg: ' + error);
