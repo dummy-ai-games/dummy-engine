@@ -48,25 +48,25 @@ function SkyRTC() {
         var isHuman = data.isHuman || false;
 
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
-        if (playerName) {           
+        if (playerName) {
             socket.MD5Id = MD5Utils.MD5(playerName);
             socket.isHuman = isHuman;
         } else if (table) {
             socket.tableNumber = table;
         } else {
             logger.info('player is invalid, close its socket');
-            socket.close();            
+            socket.close();
             return;
         }
 
-        if(playerName) {
+        if (playerName) {
             if (that.players[socket.MD5Id]) {
                 logger.warn('player: ' + socket.id + ' already exist, reject');
                 return;
             }
-            playerLogic.getPlayerByName(playerName, function(getPlayerErr, player) {
+            playerLogic.getPlayerByName(playerName, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    socket.id = playerName;                    
+                    socket.id = playerName;
                     socket.displayName = player.displayName;
                     var tableNumber = player.tableNumber;
                     var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
@@ -75,7 +75,7 @@ function SkyRTC() {
                         delete that.exitPlayers[socket.MD5Id];
                         logger.info('player rejoin, accept join');
                     } else if (!(that.table[tableNumber] &&
-                            that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                        that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                         socket.tableNumber = tableNumber;
                         logger.info('game not start, accept join');
                     }
@@ -261,8 +261,9 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
     var errorFunc = function (error) {
         if (error) {
             if (socket) {
+                that.exitPlayers[socket.MD5Id] = socket.tableNumber;
+                that.players[socket.MD5Id] = null;
                 logger.error('player:' + socket.id + ' socket error, msg: ' + error);
-                that.exitHandle(socket);
             } else
                 logger.error('socket error, msg: ' + error);
         }
@@ -294,7 +295,7 @@ SkyRTC.prototype.notifyJoin = function () {
     for (var tableNumber in tableAndPlayer) {
         if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
             tableAndData[tableNumber] = poker.getBasicData(that.table[tableNumber]);
-            for(var i = 0;i < tableAndData[tableNumber].players.length;i++){
+            for (var i = 0; i < tableAndData[tableNumber].players.length; i++) {
                 delete tableAndData[tableNumber].players[i].cards;
             }
             tableAndData[tableNumber].table.currentPlayer =
@@ -370,9 +371,6 @@ SkyRTC.prototype.notifyLeft = function () {
 
     var message, tableNumber;
     for (var guest in that.guests) {
-        if (that.guests[guest].readyState !== 1) {
-            break;
-        }
         tableNumber = that.guests[guest].tableNumber;
         if (undefined === tableAndPlayer[that.guests[guest].tableNumber]) {
             tableAndPlayer[that.guests[guest].tableNumber] = [];
@@ -717,14 +715,16 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
 SkyRTC.prototype.removeSocket = function (socket) {
     var id = socket.MD5Id;
     var that = this;
-    if (that.players[id]) {
-        delete that.players[id];
-    }
-     // broadcast player left
-    if(that.players[id] || that.players[id] == null)
-        that.notifyLeft();
+
     delete that.guests[socket.id];
-   
+    // broadcast player left
+    if (that.players[id] || that.players[id] === null) {
+        if (that.players[id]) {
+            delete that.players[id];
+        }
+        that.notifyLeft();
+    }
+
 };
 
 SkyRTC.prototype.broadcastInGuests = function (message) {
@@ -789,7 +789,7 @@ SkyRTC.prototype.exitHandle = function (socket) {
             that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.MD5Id] = socket.tableNumber;
             that.players[socket.MD5Id] = null;
-            logger.info('player : ' + socket.id + ' exit!!');           
+            logger.info('player : ' + socket.id + ' exit!!');
         }
         that.removeSocket(socket);
     }
@@ -825,18 +825,18 @@ SkyRTC.prototype.init = function (socket) {
     });
 
     /*playerLogic.listPlayersInternalWorkUnit(function (getPlayerErr, players) {
-        if (getPlayerErr.code === errorCode.SUCCESS.code) {
-            that.playerAndTable = {};
-            for (var i = 0; i < players.length; i++) {
-                var player = players[i];
-                that.playerAndTable[player.playerName] = player.tableNumber;
-            }
-            logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
-        } else {
-            logger.error('no players found');
-        }
-        that.emit('new_connect', socket);
-    });*/
+     if (getPlayerErr.code === errorCode.SUCCESS.code) {
+     that.playerAndTable = {};
+     for (var i = 0; i < players.length; i++) {
+     var player = players[i];
+     that.playerAndTable[player.playerName] = player.tableNumber;
+     }
+     logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
+     } else {
+     logger.error('no players found');
+     }
+     that.emit('new_connect', socket);
+     });*/
 };
 
 /**
