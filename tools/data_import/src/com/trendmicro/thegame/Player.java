@@ -1,13 +1,13 @@
 package com.trendmicro.thegame;
 
 public class Player {
-    private int team;
+    private String team;
     private String author;
     private String displayName;
     private String playerName;
     private int tableNumber;
 
-    public Player(int team, String author, String displayName, String playerName, int tableNumber) {
+    public Player(String team, String author, String displayName, String playerName, int tableNumber) {
         this.team = team;
         this.author = author;
         this.displayName = displayName;
@@ -19,11 +19,11 @@ public class Player {
         // empty constructor
     }
 
-    public int getTeam() {
+    public String getTeam() {
         return team;
     }
 
-    public void setTeam(int team) {
+    public void setTeam(String team) {
         this.team = team;
     }
 
