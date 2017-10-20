@@ -717,7 +717,7 @@ SkyRTC.prototype.removeSocket = function (socket) {
 
     delete that.guests[socket.id];
     // broadcast player left
-    if (that.players[id] || that.players[id] === "offline") {
+    if (that.players[id] || that.players[id] === null) {
         if (that.players[id]) {
             delete that.players[id];
         }
@@ -787,7 +787,7 @@ SkyRTC.prototype.exitHandle = function (socket) {
         if (that.players[socket.MD5Id] && tableNumber && that.table[tableNumber] &&
             that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.MD5Id] = socket.tableNumber;
-            that.players[socket.MD5Id] = "offline";
+            that.players[socket.MD5Id] = null;
             logger.info('player : ' + socket.id + ' exit!!');
         }
         that.removeSocket(socket);
