@@ -213,16 +213,18 @@ util.inherits(SkyRTC, events.EventEmitter);
 SkyRTC.prototype.initGuestData = function (guest) {
     logger.info('initGuestData');
     var that = this;
-
-    var data = that.getBasicData(that.guests[guest].tableNumber);
-    var message = {
-        'eventName': '_join',
-        'data': data
-    };
-    if (!that.guests[guest]) {
-        logger.info('guest socket is null');
+    var tableNumber = that.guests[guest].tableNumber;
+    if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
+        var data = that.getBasicData(that.guests[guest].tableNumber);
+        var message = {
+            'eventName': '_join',
+            'data': data
+        };
+        if (!that.guests[guest]) {
+            logger.info('guest socket is null');
+        }
+        that.sendMessage(that.guests[guest], message);
     }
-    that.sendMessage(that.guests[guest], message);
 };
 
 SkyRTC.prototype.initPlayerData = function (player) {
