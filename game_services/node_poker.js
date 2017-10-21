@@ -2384,7 +2384,9 @@ function takeAction(table, action) {
                     if (action === '__bet') {
                         player['minBet'] = table.bigBlind;
                     } else {
-                        player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i] + 1;
+                        // strawmanbobi: allow player to bet as call since this does not matter
+                        // however, if we add 1 to minBet, there might cause strange behavior in player mode
+                        player['minBet'] = getMaxBet(table.game.bets) - table.game.bets[i];
                     }
                     destPlayer = player;
                 }

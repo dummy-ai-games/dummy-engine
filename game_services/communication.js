@@ -674,7 +674,8 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     if (!currentTable)
         return;
 
-    // updated by strawmanbobi - also send this message to guests
+    // updated by strawmanbobi - also send this message to guests and human players(without private card if
+    // self is not target player)
     that.broadcastInGuests(message);
 
     if (that.players[player]) {
@@ -730,15 +731,6 @@ SkyRTC.prototype.removeSocket = function (socket) {
 
 };
 
-SkyRTC.prototype.broadcastInGuests = function (message) {
-    var that = this;
-    var tableNumber = message.data.tableNumber || message.data.table.tableNumber;
-    for (var guest in that.guests) {
-        if (that.guests[guest].tableNumber === tableNumber)
-            that.sendMessage(that.guests[guest], message);
-    }
-};
-
 SkyRTC.prototype.broadcastInPlayersForReload = function (message) {
     var tableNumber = message.data.tableNumber;
     var that = this;
@@ -749,6 +741,15 @@ SkyRTC.prototype.broadcastInPlayersForReload = function (message) {
     }
 };
 
+SkyRTC.prototype.broadcastInGuests = function (message) {
+    var that = this;
+    var tableNumber = message.data.tableNumber || message.data.table.tableNumber;
+    for (var guest in that.guests) {
+        if (that.guests[guest].tableNumber === tableNumber)
+            that.sendMessage(that.guests[guest], message);
+    }
+};
+
 SkyRTC.prototype.broadcastInPlayers = function (message) {
     var that = this;
     if (message.eventName === '__game_start' ||
@@ -756,7 +757,7 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
         message.eventName === '__game_stop') {
         var tableNumber = message.data.tableNumber;
         for (var player in this.players) {
-            if (this.players[player] && this.players[player].tableNumber == tableNumber) {
+            if (this.players[player] && this.players[player].tableNumber === tableNumber) {
                 that.sendMessage(this.players[player], message);
             }
         }
