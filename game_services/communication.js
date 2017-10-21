@@ -359,7 +359,6 @@ SkyRTC.prototype.notifyLeft = function () {
     var that = this;
     var tableAndPlayer = [];
 
-    logger.info('notify left');
     for (var playerName in that.players) {
         if (that.players[playerName]) {
             if (!tableAndPlayer[that.players[playerName].tableNumber]) {
@@ -371,6 +370,7 @@ SkyRTC.prototype.notifyLeft = function () {
 
     var message, tableNumber;
     for (var guest in that.guests) {
+        // logger.info("guest = " + JSON.stringify(guest));
         tableNumber = that.guests[guest].tableNumber;
         if (undefined === tableAndPlayer[that.guests[guest].tableNumber]) {
             tableAndPlayer[that.guests[guest].tableNumber] = [];
@@ -389,6 +389,7 @@ SkyRTC.prototype.notifyLeft = function () {
         that.sendMessage(that.guests[guest], message);
     }
     for (var player in that.players) {
+        // logger.info("player = " + JSON.stringify(player));
         if (that.players[player]) {
             tableNumber = that.players[player].tableNumber;
             if (undefined === tableAndPlayer[that.players[player].tableNumber]) {

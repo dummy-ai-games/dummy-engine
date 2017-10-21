@@ -68,8 +68,7 @@ var currentBigBlind = 0;
 // communication related
 var rtc = SkyRTC();
 
-window.onbeforeunload = function ()
-{
+window.onbeforeunload = function () {
     return 'Are you sure to leave?';
 };
 
@@ -138,13 +137,17 @@ function initWebsock() {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
 
+        if (gameStatus === STATUS_GAME_FINISHED) {
+            return;
+        }
+
         if (inPlayers) {
             console.log('player join : ' + JSON.stringify(data));
         } else {
             console.log('guest join');
         }
 
-        if (gameStatus === STATUS_GAME_RUNNING || gameStatus === STATUS_GAME_FINISHED) {
+        if (gameStatus === STATUS_GAME_RUNNING) {
             // do not handle this command while game is running, to prevent player status reset
             return;
         }
@@ -169,13 +172,17 @@ function initWebsock() {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
 
+        if (gameStatus === STATUS_GAME_FINISHED) {
+            return;
+        }
+
         if (undefined !== inPlayers && null !== inPlayers) {
             console.log('player left : ' + JSON.stringify(data));
         } else {
             console.log('guest left');
         }
         gameStatus = tableStatus;
-        if (gameStatus === STATUS_GAME_RUNNING || gameStatus === STATUS_GAME_FINISHED) {
+        if (gameStatus === STATUS_GAME_RUNNING) {
             // do not handle this command while game is running, to prevent player status reset
             return;
         }

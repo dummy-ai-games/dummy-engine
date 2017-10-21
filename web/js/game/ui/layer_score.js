@@ -155,7 +155,7 @@ var ScoreLayer = cc.LayerColor.extend({
                 this.cardHeight * this.cardScale;
             var cardPosX = this.scoreLabels[playerIndex].getPositionX();
             for (var cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
-                this.playerHands[playerIndex][cardIndex] = new cc.Sprite(s_p_2C);
+                this.playerHands[playerIndex][cardIndex] = new cc.Sprite(s_p_empty);
                 this.playerHands[playerIndex][cardIndex].setAnchorPoint(0, 0);
                 this.playerHands[playerIndex][cardIndex].setScale(this.cardScale);
                 this.playerHands[playerIndex][cardIndex]
@@ -181,10 +181,10 @@ var ScoreLayer = cc.LayerColor.extend({
             this.cardsInfo[playerIndex].boundingHeight = this.scoreTextHeight;
             this.cardsInfo[playerIndex].setScale(this.gameScale);
             this.cardsInfo[playerIndex]
-                .setPosition(this.playerHands[playerIndex][6].getPositionX() +
-                    this.playerHands[playerIndex][6].getContentSize().width * this.cardScale -
+                .setPosition(this.playerHands[playerIndex][4].getPositionX() +
+                    this.playerHands[playerIndex][4].getContentSize().width * this.cardScale -
                     this.cardsInfo[playerIndex].getContentSize().width * this.gameScale,
-                    this.playerHands[playerIndex][6].getPositionY() -
+                    this.playerHands[playerIndex][4].getPositionY() -
                     this.cardsInfo[playerIndex].getContentSize().height * this.gameScale);
             this.addChild(this.cardsInfo[playerIndex], 2);
         }
@@ -252,6 +252,7 @@ var ScoreLayer = cc.LayerColor.extend({
                 if (this.scoreLabels && this.scoreLabels[playerIndex] && playerIndex < this.players.length) {
                     // handle dead players
                     if (!this.players[playerIndex].isSurvive) {
+                        this.scoreLabels[playerIndex].setColor(cc.color(255, 0, 0, 255));
                         this.scoreLabels[playerIndex].setString(this.players[playerIndex].displayName + ' : K.O');
                         this.scoreLabels[playerIndex].setVisible(true);
                         for (cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
@@ -267,24 +268,54 @@ var ScoreLayer = cc.LayerColor.extend({
                     // update prize
                     var prizeString = this.players[playerIndex].displayName + ' : ' +
                         this.players[playerIndex].totalChips;
+
                     if (null !== this.players[playerIndex].prize) {
+                        if (parseInt(this.players[playerIndex].prize) > 0) {
+                            this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 0, 255));
+                        } else {
+                            this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 255, 255));
+                        }
                         var unReloadedChips = parseInt((reloadChance - this.players[playerIndex].reloadCount)
                             * defaultChips);
                         var originalChip = parseInt(this.players[playerIndex].chips) -
                             parseInt(this.players[playerIndex].prize);
-                        prizeString += '(' + unReloadedChips + '+' + originalChip + '+' + this.players[playerIndex].prize + ')';
+                        var prize = parseInt(this.players[playerIndex].prize);
+
+                        if (unReloadedChips !== 0 || prize !== 0) {
+                            prizeString += '(';
+                            if (unReloadedChips !== 0) {
+                                prizeString += unReloadedChips + '+';
+                            }
+                            prizeString += originalChip;
+                            if (prize !== 0) {
+                                prizeString += '+' + prize;
+                            }
+                            prizeString += ')';
+                        }
                     }
                     this.scoreLabels[playerIndex].setString(prizeString);
                     this.scoreLabels[playerIndex].setVisible(true);
 
                     // update hands
-                    if (this.players[playerIndex].hand && this.players[playerIndex].hand.cards) {
+                    if (this.players[playerIndex].hand &&
+                        this.players[playerIndex].hand.cards &&
+                        this.players[playerIndex].hand.cards.length === this.maxCardsCount) {
+                        this.players[playerIndex].hand.winCards = rankHandInt(this.players[playerIndex].hand.cards);
                         var cardIndex;
-                        for (cardIndex = 0; cardIndex < this.players[playerIndex].hand.cards.length; cardIndex++) {
-                            if (null !== this.players[playerIndex].hand.cards[cardIndex] &&
-                                '' !== this.players[playerIndex].hand.cards[cardIndex]) {
+                        // hide all cards first
+                        for (cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
+                            this.playerHands[playerIndex][cardIndex].setVisible(false);
+                        }
+                        // show win cards only
+                        for (cardIndex = 0; cardIndex < this.players[playerIndex].hand.winCards.length; cardIndex++) {
+                            if (this.players[playerIndex].hand.winCards[cardIndex] &&
+                                '' !== this.players[playerIndex].hand.winCards[cardIndex]) {
+
+                                console.log('change card[' + cardIndex + '] to ' +
+                                    this.players[playerIndex].hand.winCards[cardIndex]);
+
                                 this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
-                                    this.pokerFrames.get(this.players[playerIndex].hand.cards[cardIndex]));
+                                    this.pokerFrames.get(this.players[playerIndex].hand.winCards[cardIndex]));
                                 this.playerHands[playerIndex][cardIndex].setVisible(true);
                             } else {
                                 this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
@@ -292,20 +323,13 @@ var ScoreLayer = cc.LayerColor.extend({
                                 this.playerHands[playerIndex][cardIndex].setVisible(false);
                             }
                         }
-                    } else {
-                        for (cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
-                            this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
-                                this.pokerEmptyFrame);
-                            this.playerHands[playerIndex][cardIndex].setVisible(false);
-                        }
                     }
 
                     // update cards information
                     if (this.players[playerIndex].hand &&
                         this.players[playerIndex].hand.rank &&
                         this.players[playerIndex].hand.message) {
-                        this.cardsInfo[playerIndex].setString(this.players[playerIndex].hand.message + '! rank: ' +
-                            this.players[playerIndex].hand.rank.toFixed(1));
+                        this.cardsInfo[playerIndex].setString(this.players[playerIndex].hand.message);
                         this.cardsInfo[playerIndex].setVisible(true);
                     } else {
                         this.cardsInfo[playerIndex].setString('');
