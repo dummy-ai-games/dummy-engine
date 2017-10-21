@@ -628,7 +628,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             };
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
-            if (that.table[data.table.tableNumber].timeout)
+            if (that.table[data.table.tableNumber] && that.table[data.table.tableNumber].timeout)
                 clearTimeout(data.table.tableNumber.timeout);
 
             //delete offline player
