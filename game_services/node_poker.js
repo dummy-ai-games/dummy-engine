@@ -798,7 +798,7 @@ function checkForWinner(table) {
     winners = [];
     maxRank = 0.000;
     for (k = 0; k < table.players.length; k += 1) {
-        if (table.players[k].hand.rank === maxRank && table.players[k].folded === false && table.players[k].isSurvive) {
+        if (table.players[k].hand.rank === maxRank && table.players[k].folded === false && table.players[k].isSurvive) {//must remove no survive player, otherwise dead player will relive
             winners.push(k);
         }
         if (table.players[k].hand.rank > maxRank && table.players[k].folded === false && table.players[k].isSurvive) {
