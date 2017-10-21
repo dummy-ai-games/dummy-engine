@@ -184,4 +184,3 @@ function MD5(sMessage, fullSize) {
     return temp.toLowerCase();
 }
 
-exports.MD5 = MD5;

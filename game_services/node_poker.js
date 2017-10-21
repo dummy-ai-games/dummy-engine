@@ -111,6 +111,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     });
 
     this.eventEmitter.on('deal', function () {
+        that.eventEmitter.emit('__deal', getBasicData(that));
         if (that.surviveCount <= 1) {
             for (var j = 0; j < that.players.length; j++)
                 that.players[j].talked = true;
@@ -2379,8 +2380,8 @@ function takeAction(table, action) {
                 player['roundBet'] = table.game.roundBets[i];
                 player['bet'] = table.game.bets[i];
                 player['plainName'] = table.players[i]['plainName'];
+                player['cards'] = table.players[i]['cards'];
                 if (i === table.currentPlayer) {
-                    player['cards'] = table.players[i]['cards'];
                     if (action === '__bet') {
                         player['minBet'] = table.bigBlind;
                     } else {

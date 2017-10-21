@@ -44,7 +44,7 @@ function initRTC() {
         board = data.game.board;
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
-        otherPlayers = data.game.otherPlayers;
+        otherPlayers = data.game.players;
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
@@ -62,7 +62,7 @@ function initRTC() {
         board = data.game.board;
         minBet = data.game.minBet;
         raiseCount = data.game.raiseCount;
-        otherPlayers = data.game.otherPlayers;
+        otherPlayers = data.game.players;
         takeAction(self.cards, self.cards.concat(board), otherPlayers);
     });
 
@@ -100,6 +100,10 @@ function initRTC() {
 
     rtc.on('__round_end', function(data) {
         console.log('received round end:' + JSON.stringify(data));
+    });
+
+    rtc.on('__deal', function(data) {
+        console.log('received deal:' + JSON.stringify(data));
     });
 
     rtc.on('__game_over', function(data) {
