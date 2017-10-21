@@ -620,25 +620,27 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__game_over', function (data) {
-        that.addPlayerStatus(data);
-        var message = {
-            'eventName': '__game_over',
-            'data': data
-        };
-        that.broadcastInGuests(message);
-        that.broadcastInPlayers(message);
-        if (that.table[data.table.tableNumber].timeout)
-            clearTimeout(data.table.tableNumber.timeout);
+        setTimeout(function(){
+            that.addPlayerStatus(data);
+            var message = {
+                'eventName': '__game_over',
+                'data': data
+            };
+            that.broadcastInGuests(message);
+            that.broadcastInPlayers(message);
+            if (that.table[data.table.tableNumber].timeout)
+                clearTimeout(data.table.tableNumber.timeout);
 
-        //delete offline player
-        for (var player in that.players) {
-            if (!that.players[player] && that.exitPlayers[player] === data.table.tableNumber) {
-                delete that.players[player];
-                delete that.exitPlayers[player];
+            //delete offline player
+            for (var player in that.players) {
+                if (!that.players[player] && that.exitPlayers[player] === data.table.tableNumber) {
+                    delete that.players[player];
+                    delete that.exitPlayers[player];
+                }
             }
-        }
 
-        delete that.table[data.table.tableNumber];
+            delete that.table[data.table.tableNumber];
+        },1000);
     });
 
     that.table[tableNumber].eventEmitter.on('__new_round', function (data) {
@@ -660,13 +662,15 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__round_end', function (data) {
-        that.addPlayerStatus(data);
-        var message = {
-            'eventName': '__round_end',
-            'data': data
-        };
-        that.broadcastInPlayers(message);
-        that.broadcastInGuests(message);
+        setTimeout(function() {
+            that.addPlayerStatus(data);
+            var message = {
+                'eventName': '__round_end',
+                'data': data
+            };
+            that.broadcastInPlayers(message);
+            that.broadcastInGuests(message);
+        },1000);
     });
 
     that.table[tableNumber].eventEmitter.on('__show_action', function (data) {
