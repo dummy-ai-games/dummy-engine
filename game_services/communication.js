@@ -291,18 +291,13 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
         if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": true});
             tableAndPlayer.push(playerName);
-        } else if (that.exitPlayers[playerName] === tableNumber) {
+        } else if (that.exitPlayers[playerName] === tableNumber && that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
             tablePlayers.push({"playerName": playerName, "isOnline": false});
         }
     }
 
     if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
         tableDatas = poker.getBasicData(that.table[tableNumber]);
-        for (var i = 0; i < tableDatas.players.length; i++) {
-            cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
-            delete tableDatas.players[i].cards;
-            playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
-        }
         tableDatas.table.currentPlayer =
             that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
     }
@@ -327,6 +322,15 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
             that.sendMessage(that.guests[guest], message);
         }
     }
+
+    if(tableDatas) {
+        for (var i = 0; i < tableDatas.players.length; i++) {
+            cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
+            delete tableDatas.players[i].cards;
+            playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
+        }
+    }
+
     for (var player in that.players) {
         if (that.players[player] && that.players[player].tableNumber === tableNumber) {
             message = {
@@ -362,10 +366,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
 SkyRTC.prototype.notifyLeft = function (tableNumber) {
     var that = this;
     var tablePlayers = [];
-    var tableDatas;
-    var cards = {};
     var tableAndPlayer = [];
-    var playerData = {};
 
     logger.info('notify left');
     for (var playerName in that.players) {
@@ -374,15 +375,6 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
             tableAndPlayer.push(playerName);
         } else if (that.exitPlayers[playerName] === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": false});
-        }
-    }
-
-    if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
-        tableDatas = poker.getBasicData(that.table[tableNumber]);
-        for (var i = 0; i < tableDatas.players.length; i++) {
-            cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
-            delete tableDatas.players[i].cards;
-            playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
         }
     }
 
@@ -395,8 +387,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
                 'eventName': '__left_2',
                 'data': {
                     'tableNumber': tableNumber,
-                    'players': tablePlayers,
-                    'basicData': tableDatas
+                    'players': tablePlayers
                 }
             };
             if (that.table[tableNumber])
@@ -415,15 +406,12 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
             that.sendMessage(that.players[player], message);
             // for backward compatibility, send another command to Live and Player UI
             // TODO: hide players' private cards from this message
-            if (playerData[player])
-                playerData[player].cards = cards[player];//add cards
 
             message = {
                 'eventName': '__left_2',
                 'data': {
                     'tableNumber': tableNumber,
-                    'players': tablePlayers,
-                    'basicData': tableDatas
+                    'players': tablePlayers
                 }
             };
             if (that.table[tableNumber])
@@ -431,9 +419,6 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
             that.sendMessage(that.players[player], message);
-
-            if (playerData[player])
-                playerData[player].cards = [];//remove cards
         }
     }
 };
