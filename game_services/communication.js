@@ -630,7 +630,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
 
         //delete offline player
         for (var player in that.players) {
-            if (!that.players[player]) {
+            if (!that.players[player] && that.exitPlayers[player] === data.table.tableNumber) {
                 delete that.players[player];
                 delete that.exitPlayers[player];
             }
