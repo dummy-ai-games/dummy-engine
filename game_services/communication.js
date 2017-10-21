@@ -83,7 +83,7 @@ function SkyRTC() {
                         logger.info('player : ' + data.playerName + ' join!!');
                         that.players[socket.MD5Id] = socket;
                         that.emit('new_peer', socket.id);
-                        that.notifyJoin();
+                        that.notifyJoin(socket.tableNumber);
                         that.initPlayerData(socket.MD5Id);
                     } else {
                         logger.info('player : ' + data.playerName + ' can not join because game has started');
@@ -99,7 +99,7 @@ function SkyRTC() {
             that.guests[socket.id] = socket;
             that.initGuestData(socket.id);
             // updated by strawmanbobi - the Live UI need this command to show joined players
-            that.notifyJoin();
+            that.notifyJoin(socket.tableNumber);
         }
     });
 
@@ -278,72 +278,73 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
     }
 };
 
-SkyRTC.prototype.notifyJoin = function () {
+SkyRTC.prototype.notifyJoin = function (tableNumber) {
     var that = this;
-    var tableAndPlayer = {};
-    var tableAndData = {};
+    var tablePlayers = [];
+    var tableDatas;
+    var cards = {};
+    var tableAndPlayer = [];
+    var playerData = {};
 
     logger.info('notify join');
     for (var playerName in that.players) {
-        if (that.players[playerName]) {
-            if (!tableAndPlayer[that.players[playerName].tableNumber]) {
-                tableAndPlayer[that.players[playerName].tableNumber] = [];
-            }
-            tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
+        if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
+            tablePlayers.push({"playerName": playerName, "isOnline": true});
+            tableAndPlayer.push(playerName);
+        } else if (that.exitPlayers[playerName] === tableNumber) {
+            tablePlayers.push({"playerName": playerName, "isOnline": false});
         }
     }
-    for (var tableNumber in tableAndPlayer) {
-        if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
-            tableAndData[tableNumber] = poker.getBasicData(that.table[tableNumber]);
-            for (var i = 0; i < tableAndData[tableNumber].players.length; i++) {
-                delete tableAndData[tableNumber].players[i].cards;
-            }
-            tableAndData[tableNumber].table.currentPlayer =
-                that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
+
+    if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
+        tableDatas = poker.getBasicData(that.table[tableNumber]);
+        for (var i = 0; i < tableDatas.players.length; i++) {
+            cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
+            delete tableDatas.players[i].cards;
+            playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
         }
+        tableDatas.table.currentPlayer =
+            that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
     }
-    var message, tableNumber;
+
+    var message;
 
     // TODO: to make clear how the Live and Player UI would be affected by aliens join and left
     for (var guest in that.guests) {
-        tableNumber = that.guests[guest].tableNumber;
-        message = {
-            'eventName': '__new_peer',
-            'data': tableAndPlayer[tableNumber]
-        };
-        that.sendMessage(that.guests[guest], message);
-        // for backward compatibility, send another command to Live and Player UI
-        // TODO: hide players' private cards from this message though it is for LIVE UI
-        message = {
-            'eventName': '__new_peer_2',
-            'data': {
-                'tableNumber': tableNumber,
-                'players': tableAndPlayer[tableNumber],
-                'basicData': tableAndData[tableNumber]
-            }
-        };
-        if (that.table[tableNumber])
-            message.data.tableStatus = that.table[tableNumber].status;
-        else
-            message.data.tableStatus = enums.GAME_STATUS_STANDBY;
-        that.sendMessage(that.guests[guest], message);
-    }
-    for (var player in that.players) {
-        if (that.players[player]) {
-            tableNumber = that.players[player].tableNumber;
-            message = {
-                'eventName': '__new_peer',
-                'data': tableAndPlayer[tableNumber]
-            };
-            that.sendMessage(that.players[player], message);
-            // for backward compatibility, send another command to Live and Player UI
-            // TODO: hide players' private cards from this message
+        if (that.guests[guest].tableNumber === tableNumber) {
             message = {
                 'eventName': '__new_peer_2',
                 'data': {
                     'tableNumber': tableNumber,
-                    'players': tableAndPlayer[tableNumber],
-                    'basicData': tableAndData[tableNumber]
+                    'players': tablePlayers,
+                    'basicData': tableDatas
+                }
+            };
+            if (that.table[tableNumber])
+                message.data.tableStatus = that.table[tableNumber].status;
+            else
+                message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+            that.sendMessage(that.guests[guest], message);
+        }
+    }
+    for (var player in that.players) {
+        if (that.players[player] && that.players[player].tableNumber === tableNumber) {
+            message = {
+                'eventName': '__new_peer',
+                'data': tableAndPlayer
+            };
+            that.sendMessage(that.players[player], message);
+            // for backward compatibility, send another command to Live and Player UI
+            // TODO: hide players' private cards from this message
+            if (playerData[player])
+                playerData[player].cards = cards[player];//add cards
+
+            message = {
+                'eventName': '__new_peer_2',
+                'data': {
+                    'tableNumber': tableNumber,
+                    'players': tablePlayers,
+                    'basicData': tableDatas
                 }
             };
             if (that.table[tableNumber])
@@ -351,55 +352,78 @@ SkyRTC.prototype.notifyJoin = function () {
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
             that.sendMessage(that.players[player], message);
+
+            if (playerData[player])
+                playerData[player].cards = [];//remove cards
         }
     }
 };
 
-SkyRTC.prototype.notifyLeft = function () {
+SkyRTC.prototype.notifyLeft = function (tableNumber) {
     var that = this;
+    var tablePlayers = [];
+    var tableDatas;
+    var cards = {};
     var tableAndPlayer = [];
+    var playerData = {};
 
+    logger.info('notify left');
     for (var playerName in that.players) {
-        if (that.players[playerName]) {
-            if (!tableAndPlayer[that.players[playerName].tableNumber]) {
-                tableAndPlayer[that.players[playerName].tableNumber] = [];
-            }
-            tableAndPlayer[that.players[playerName].tableNumber].push(playerName);
+        if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
+            tablePlayers.push({"playerName": playerName, "isOnline": true});
+            tableAndPlayer.push(playerName);
+        } else if (that.exitPlayers[playerName] === tableNumber) {
+            tablePlayers.push({"playerName": playerName, "isOnline": false});
         }
     }
 
-    var message, tableNumber;
-    for (var guest in that.guests) {
-        // logger.info("guest = " + JSON.stringify(guest));
-        tableNumber = that.guests[guest].tableNumber;
-        if (undefined === tableAndPlayer[that.guests[guest].tableNumber]) {
-            tableAndPlayer[that.guests[guest].tableNumber] = [];
+    if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
+        tableDatas = poker.getBasicData(that.table[tableNumber]);
+        for (var i = 0; i < tableDatas.players.length; i++) {
+            cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
+            delete tableDatas.players[i].cards;
+            playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
         }
-        message = {
-            'eventName': '__left',
-            'data': {
-                'tableNumber': tableNumber,
-                'players': tableAndPlayer[tableNumber]
-            }
-        };
-        if (that.table[tableNumber])
-            message.data.tableStatus = that.table[tableNumber].status;
-        else
-            message.data.tableStatus = enums.GAME_STATUS_STANDBY;
-        that.sendMessage(that.guests[guest], message);
     }
-    for (var player in that.players) {
-        // logger.info("player = " + JSON.stringify(player));
-        if (that.players[player]) {
-            tableNumber = that.players[player].tableNumber;
-            if (undefined === tableAndPlayer[that.players[player].tableNumber]) {
-                tableAndPlayer[that.players[player].tableNumber] = [];
-            }
+
+    var message;
+
+    // TODO: to make clear how the Live and Player UI would be affected by aliens join and left
+    for (var guest in that.guests) {
+        if (that.guests[guest].tableNumber === tableNumber) {
             message = {
-                'eventName': '__left',
+                'eventName': '__left_2',
                 'data': {
                     'tableNumber': tableNumber,
-                    'players': tableAndPlayer[tableNumber]
+                    'players': tablePlayers,
+                    'basicData': tableDatas
+                }
+            };
+            if (that.table[tableNumber])
+                message.data.tableStatus = that.table[tableNumber].status;
+            else
+                message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+            that.sendMessage(that.guests[guest], message);
+        }
+    }
+    for (var player in that.players) {
+        if (that.players[player] && that.players[player].tableNumber === tableNumber) {
+            message = {
+                'eventName': '__left',
+                'data': tableAndPlayer
+            };
+            that.sendMessage(that.players[player], message);
+            // for backward compatibility, send another command to Live and Player UI
+            // TODO: hide players' private cards from this message
+            if (playerData[player])
+                playerData[player].cards = cards[player];//add cards
+
+            message = {
+                'eventName': '__left_2',
+                'data': {
+                    'tableNumber': tableNumber,
+                    'players': tablePlayers,
+                    'basicData': tableDatas
                 }
             };
             if (that.table[tableNumber])
@@ -407,6 +431,9 @@ SkyRTC.prototype.notifyLeft = function () {
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
             that.sendMessage(that.players[player], message);
+
+            if (playerData[player])
+                playerData[player].cards = [];//remove cards
         }
     }
 };
@@ -731,7 +758,7 @@ SkyRTC.prototype.removeSocket = function (socket) {
         if (that.players[id]) {
             delete that.players[id];
         }
-        that.notifyLeft();
+        that.notifyLeft(socket.tableNumber);
     } else if (socket.isGuest) {
         delete that.guests[socket.id];
     }
@@ -852,7 +879,7 @@ SkyRTC.prototype.init = function (socket) {
     });
 
     socket.on('close', function () {
-        //that.emit('remove_peer', socket.id);       
+        //that.emit('remove_peer', socket.id);
         that.exitHandle(socket);
     });
 

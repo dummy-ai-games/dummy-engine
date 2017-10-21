@@ -106,6 +106,14 @@ function initRTC() {
         console.log('received deal:' + JSON.stringify(data));
     });
 
+    rtc.on('__new_peer_2', function(data) {
+        console.log('received new_peer_2:' + JSON.stringify(data));
+    });
+
+    rtc.on('__left_2', function(data) {
+        console.log('received __left_2:' + JSON.stringify(data));
+    });
+
     rtc.on('__game_over', function(data) {
         console.log('received game over:' + JSON.stringify(data));
     });
