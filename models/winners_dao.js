@@ -38,10 +38,10 @@ exports.updateWinners = function(conditions, newWinner, callback) {
                 }
             }, function (err, result) {
                 if (result) {
-                    logger.info('update winners ' + newWinner.tableNumber + ' successfully');
+                    logger.info('update winners ' + newWinner.playerName + ' successfully');
                     callback(errorCode.SUCCESS);
                 } else {
-                    logger.error('update winners ' + newWinner.tableNumber + ' failed');
+                    logger.error('update winners ' + newWinner.playerName + ' failed');
                     callback(errorCode.FAILED);
                 }
             });
