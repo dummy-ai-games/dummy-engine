@@ -212,7 +212,9 @@ var DealerLayer = cc.LayerColor.extend({
                     var playerName = dbPlayers[playerIndex].playerName;
                     var displayName = dbPlayers[playerIndex].displayName;
                     this.playerLabels[playerIndex].setString(displayName);
-                    if (this.isPlayerIn(playerName)) {
+                    var targetPlayer = findTargetPlayer(playerName);
+                    JSON.stringify(' === ' + targetPlayer);
+                    if (targetPlayer && true === targetPlayer.online) {
                         this.playerLabels[playerIndex].setColor(cc.color(255, 255, 0, 255));
                     } else {
                         this.playerLabels[playerIndex].setColor(cc.color(128, 128, 128, 128));
@@ -229,7 +231,7 @@ var DealerLayer = cc.LayerColor.extend({
         if (gameStatus === STATUS_GAME_STANDBY || gameStatus === STATUS_GAME_FINISHED) {
             this.stopButton.setVisible(false);
             this.startButton.setVisible(true);
-            if (players && players.length >= this.minPlayerCount) {
+            if (players && onLinePlayers >= this.minPlayerCount) {
                 this.enableButton(this.startButton, true);
             } else {
                 this.enableButton(this.startButton, false);
@@ -242,7 +244,7 @@ var DealerLayer = cc.LayerColor.extend({
         } else if (gameStatus === STATUS_GAME_RUNNING) {
             this.stopButton.setVisible(true);
             this.startButton.setVisible(false);
-            if (players && players.length >= this.minPlayerCount) {
+            if (players && onLinePlayers >= this.minPlayerCount) {
                 this.enableButton(this.stopButton, true);
             } else {
                 this.enableButton(this.stopButton, false);
@@ -274,7 +276,8 @@ var DealerLayer = cc.LayerColor.extend({
         }
         var playerIndex;
         for (playerIndex = 0; playerIndex < players.length; playerIndex++) {
-            if (players[playerIndex].playerName === playerName) {
+            if (players[playerIndex] &&
+                players[playerIndex].playerName === playerName) {
                 return true;
             }
         }

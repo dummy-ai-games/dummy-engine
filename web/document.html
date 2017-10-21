@@ -549,14 +549,12 @@
                         <p>1.0. "需要玩家行动" 是指的系统请求玩家决策除了下注(bet)之外的任意一种行动, 可以是 "call", "check", "raise", "fold", "allin", "bet" 中的一种</p>
                         <p>1.1. data.self 字段表示当前己方(玩家自己)的状态, 除了 playerName, chips和几个状态之外, 通过这条信息玩家可以了解到自己的私有牌, 由于此消息是点对点发送, 因此玩家自己的私有牌不会泄露给其它玩家</p>
                         <p>1.2. data.game 表示当前牌局的状态, 其中 data.game.otherPlayers 字段中的牌桌上的所有玩家列表数据格式和内容含义均和 __new_round 指令中一致, 此处不再赘述</p>
-                        <p>1.3. data.game.gameBets.roundBet 表示该玩家从本轮游戏开始之后所下的赌注(不包括本回合)</p>
-                        <p>1.3. data.game.gameBets.bet 表示该玩家从本回合游戏开始之后所下的赌注</p>
-                        <p>1.5. data.game.board 字段表示目前牌桌上的公共牌信息</p>
-                        <p class="new_content">1.6. data.self.minBet 字段表示当前可以押注的最小值</p>
-                        <p>1.7. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
-                        <p>1.8. data.game.betCount 字段表示本回合中所有玩家总共下注 (bet) 的次数</p>
-                        <p>1.9. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
-                        <p>1.10.data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
+                        <p>1.3. data.game.board 字段表示目前牌桌上的公共牌信息</p>
+                        <p>1.4. data.self.minBet 字段表示当前可以押注的最小值</p>
+                        <p>1.5. data.game.raiseCount 字段表示本回合中所有玩家总共加注 (raise) 的次数</p>
+                        <p>1.6. data.game.betCount 字段表示本回合中所有玩家总共下注 (bet) 的次数</p>
+                        <p>1.7. data.game.roundName 字段表示牌局的当前状态, 有如下取值: Deal(还未发公共牌), Flop(第1次发3张公共牌), Turn(发第4张公共牌), River(发第5张公共牌), 详情请参考文档末尾附表 </p>
+                        <p>1.8.data.game.smallBlind 和 data.game.bigBlind 分别展示了小盲注和大盲注玩家的位置和注额</p>
                         <p>玩家客户端收到此条指令之后, 需要向服务器提交 __action 决策, action 的类型可以是 "call", "check", "fold", "allin", "raise", "bet" 中的一种, 决策的数据格式如下</p>
 <pre>
 {

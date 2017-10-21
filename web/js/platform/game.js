@@ -57,6 +57,7 @@ var PLAYER_AT_RIGHT = 1;
 
 var players = [];
 var currentPlayers = 0;
+var onLinePlayers = 0;
 var winners = [];
 
 var defaultInitChips = 1000;
@@ -136,7 +137,7 @@ function initWebsock() {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
 
-        if (gameStatus === STATUS_GAME_FINISHED) {
+        if (gameStatus === STATUS_GAME_FINISHED || gameStatus === STATUS_GAME_RUNNING) {
             return;
         }
 
@@ -146,20 +147,20 @@ function initWebsock() {
             console.log('guest join');
         }
 
-        if (gameStatus === STATUS_GAME_RUNNING) {
-            // do not handle this command while game is running, to prevent player status reset
-            return;
-        }
-
         if (undefined !== inPlayers && null !== inPlayers) {
-            currentPlayers = inPlayers.length;
             // rebuild player list
             players = [];
-            for (var i = 0; i < currentPlayers; i++) {
-                var playerName = inPlayers[i].playerName;
-                var playerDisplayName = findDBPlayerNameByName(playerName);
-                players[i] = new Player(playerName, playerDisplayName,
-                    defaultInitChips, true, 0, inPlayers[i].isOnline);
+            currentPlayers = inPlayers.length;
+            onLinePlayers = 0;
+            for (var i = 0; i < inPlayers.length; i++) {
+                if (inPlayers[i].isOnline && true === inPlayers[i].isOnline) {
+                    var playerName = inPlayers[i].playerName;
+                    var playerDisplayName = findDBPlayerNameByName(playerName);
+                    console.log('create player ' + playerName);
+                    players[i] = new Player(playerName, playerDisplayName,
+                        defaultInitChips, true, 0, inPlayers[i].isOnline);
+                    onLinePlayers++;
+                }
             }
         }
 
@@ -188,25 +189,34 @@ function initWebsock() {
         }
         gameStatus = tableStatus;
         if (inPlayers) {
-            currentPlayers = inPlayers.length;
             var i;
             if (gameStatus === STATUS_GAME_RUNNING) {
                 // update player online status while game is running
+                currentPlayers = inPlayers.length;
+                onLinePlayers = 0;
                 for (i = 0; i < currentPlayers; i++) {
                     var playerName = inPlayers[i].playerName;
-                    console.log('find target player by playerName : ' + playerName +
-                        ', players.length = ' + players.length);
                     var targetPlayer = findTargetPlayer(playerName);
                     targetPlayer.setOnline(inPlayers[i].isOnline);
+                    if (inPlayers[i].isOnline) {
+                        onLinePlayers++;
+                    }
                 }
             } else if (gameStatus === STATUS_GAME_STANDBY) {
                 // rebuild player list
                 players = [];
+                currentPlayers = inPlayers.length;
+                onLinePlayers = 0;
                 for (i = 0; i < currentPlayers; i++) {
-                    var playerName = inPlayers[i].playerName;
-                    var playerDisplayName = findDBPlayerNameByName(playerName);
-                    players[i] = new Player(playerName, playerDisplayName,
-                        defaultInitChips, true, 0, inPlayers[i].isOnline);
+                    console.log(inPlayers[i].playerName + ', online = ' + inPlayers[i].isOnline);
+                    if (inPlayers[i].isOnline && true === inPlayers[i].isOnline) {
+                        var playerName = inPlayers[i].playerName;
+                        var playerDisplayName = findDBPlayerNameByName(playerName);
+                        console.log('create player : ' + playerDisplayName);
+                        players[i] = new Player(playerName, playerDisplayName,
+                            defaultInitChips, true, 0, inPlayers[i].isOnline);
+                        onLinePlayers++;
+                    }
                 }
             }
         }
@@ -595,7 +605,7 @@ function updateGame(data, isNewRound, roundClear) {
 
 function findTargetPlayer(playerName) {
     for (var i = 0; i < players.length; i++) {
-        if (players[i].playerName === playerName) {
+        if (players[i] && players[i].playerName === playerName) {
             return players[i];
         }
     }
@@ -604,7 +614,7 @@ function findTargetPlayer(playerName) {
 
 function findPlayerIndexByName(playerName) {
     for (var i = 0; i < players.length; i++) {
-        if (players[i].playerName === playerName) {
+        if (players[i] && players[i].playerName === playerName) {
             return i;
         }
     }
@@ -626,7 +636,7 @@ function playerOnline(playerName, playerList) {
 function findDBPlayerNameByName(playerName) {
     if (dbPlayers) {
         for (var i = 0; i < dbPlayers.length; i++) {
-            if (dbPlayers[i].playerName === playerName) {
+            if (dbPlayers[i] && dbPlayers[i].playerName === playerName) {
                 if (dbPlayers[i].displayName) {
                     return dbPlayers[i].displayName;
                 } else {
