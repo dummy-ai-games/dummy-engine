@@ -12,7 +12,7 @@ var DealerLayer = cc.LayerColor.extend({
     boardFont: 'IMPACT',
     boardTextSize: 36,
     nameFont: 'IMPACT',
-    nameTextSize: 20,
+    nameTextSize: 28,
     debug: true,
     maxPlayerCount: 10,
     minPlayerCount: 3,
@@ -49,8 +49,8 @@ var DealerLayer = cc.LayerColor.extend({
     titleTextHeight: 144,
     boardTextWidth: 640,
     boardTextHeight: 40,
-    nameTextWidth: 160,
     nameTextHeight: 32,
+    roundTextMarginBottom: 480,
 
     // event managers
     eventListener: null,
@@ -72,13 +72,13 @@ var DealerLayer = cc.LayerColor.extend({
 
         // initialize start and stop button
         if (MODE_LIVE === playMode) {
-            this.buttonScale = this.gameScale * 0.8;
+            this.buttonScale = this.gameScale * 0.7;
             this.startButton = new ccui.Button(s_start_button, s_start_button_pressed, s_start_button_disabled);
             this.startButton.setAnchorPoint(0, 0);
             this.startButton.setScale(this.buttonScale);
             this.startButton.setPosition((this.validWidth -
                 this.startButton.getContentSize().width * this.buttonScale) / 2,
-                this.validHeight / 12 * 2);
+                this.validHeight / 12);
             this.addChild(this.startButton, 2);
             this.enableButton(this.startButton, false);
             this.startButton.addTouchEventListener(function (sender, type) {
@@ -96,7 +96,7 @@ var DealerLayer = cc.LayerColor.extend({
             this.stopButton.setScale(this.buttonScale);
             this.stopButton.setPosition((this.validWidth -
                 this.stopButton.getContentSize().width * this.buttonScale) / 2,
-                this.validHeight / 12 * 2);
+                this.validHeight / 12);
             this.addChild(this.stopButton, 2);
             this.enableButton(this.stopButton, false);
             this.stopButton.addTouchEventListener(function (sender, type) {
@@ -136,7 +136,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.boardLabel.boundingHeight = this.boardTextHeight;
         this.boardLabel.setScale(this.gameScale);
         this.boardLabel.setPosition((this.validWidth - this.boardLabel.getContentSize().width * this.gameScale) / 2,
-                this.validHeight / 12 * 7.2);
+                this.roundTextMarginBottom * this.gameScale);
         this.addChild(this.boardLabel, 2);
 
         // initialize name labels
@@ -149,17 +149,19 @@ var DealerLayer = cc.LayerColor.extend({
             this.playerLabels[playerIndex].setAnchorPoint(0, 0);
             this.playerLabels[playerIndex].setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
             this.playerLabels[playerIndex].setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
-            this.playerLabels[playerIndex].boundingWidth = this.nameTextWidth;
+            this.playerLabels[playerIndex].boundingWidth = this.validWidth / 4 / this.gameScale;
             this.playerLabels[playerIndex].boundingHeight = this.nameTextHeight;
             this.playerLabels[playerIndex].setScale(this.gameScale);
-            if (playerIndex < 5) {
-                this.playerLabels[playerIndex].setPosition(this.validWidth / 7 * (playerIndex + 1),
+            if (playerIndex < 4) {
+                this.playerLabels[playerIndex].setPosition(this.validWidth / 4 * (playerIndex),
                     this.validHeight / 12 * 6);
-            } else {
-                this.playerLabels[playerIndex].setPosition(this.validWidth / 7 * (playerIndex - 5 + 1),
+            } else if (playerIndex < 8) {
+                this.playerLabels[playerIndex].setPosition(this.validWidth / 4 * (playerIndex - 4),
                     this.validHeight / 12 * 5);
+            } else {
+                this.playerLabels[playerIndex].setPosition(this.validWidth / 4 * (playerIndex - 8),
+                    this.validHeight / 12 * 4);
             }
-
             this.addChild(this.playerLabels[playerIndex], 2);
         }
 
