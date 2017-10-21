@@ -386,10 +386,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
                     'players': tablePlayers
                 }
             };
-            if (that.table[tableNumber])
-                message.data.tableStatus = that.table[tableNumber].status;
-            else
-                message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+
             that.sendMessage(that.guests[guest], message);
         }
     }
@@ -410,10 +407,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
                     'players': tablePlayers
                 }
             };
-            if (that.table[tableNumber])
-                message.data.tableStatus = that.table[tableNumber].status;
-            else
-                message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+
             that.sendMessage(that.players[player], message);
         }
     }
