@@ -620,7 +620,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__game_over', function (data) {
-        setTimeout(function(){
+        setTimeout(function () {
             that.addPlayerStatus(data);
             var message = {
                 'eventName': '__game_over',
@@ -628,19 +628,20 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             };
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
-            if (that.table[data.table.tableNumber] && that.table[data.table.tableNumber].timeout)
-                clearTimeout(data.table.tableNumber.timeout);
+            var tableNumber = data.table.tableNumber;
+            if (that.table[tableNumber] && that.table[tableNumber].timeout)
+                clearTimeout(that.table[tableNumber].timeout);
 
             //delete offline player
             for (var player in that.players) {
-                if (!that.players[player] && that.exitPlayers[player] === data.table.tableNumber) {
+                if (!that.players[player] && that.exitPlayers[player] === tableNumber) {
                     delete that.players[player];
                     delete that.exitPlayers[player];
                 }
             }
-
-            delete that.table[data.table.tableNumber];
-        },1000);
+            if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
+                delete that.table[tableNumber];
+        }, 1000);
     });
 
     that.table[tableNumber].eventEmitter.on('__new_round', function (data) {
@@ -662,7 +663,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__round_end', function (data) {
-        setTimeout(function() {
+        setTimeout(function () {
             that.addPlayerStatus(data);
             var message = {
                 'eventName': '__round_end',
@@ -670,7 +671,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             };
             that.broadcastInPlayers(message);
             that.broadcastInGuests(message);
-        },1000);
+        }, 1000);
     });
 
     that.table[tableNumber].eventEmitter.on('__show_action', function (data) {
