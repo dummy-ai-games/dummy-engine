@@ -38,7 +38,6 @@ exports.updateWinners = function(conditions, newWinner, callback) {
                 }
             }, function (err, result) {
                 if (result) {
-                    logger.info('update winners ' + newWinner.playerName + ' successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('update winners ' + newWinner.playerName + ' failed');
