@@ -798,10 +798,10 @@ function checkForWinner(table) {
     winners = [];
     maxRank = 0.000;
     for (k = 0; k < table.players.length; k += 1) {
-        if (table.players[k].hand.rank === maxRank && table.players[k].folded === false) {
+        if (table.players[k].hand.rank === maxRank && table.players[k].folded === false && table.players[k].isSurvive) {
             winners.push(k);
         }
-        if (table.players[k].hand.rank > maxRank && table.players[k].folded === false) {
+        if (table.players[k].hand.rank > maxRank && table.players[k].folded === false && table.players[k].isSurvive) {
             maxRank = table.players[k].hand.rank;
             winners.splice(0, winners.length);
             winners.push(k);
