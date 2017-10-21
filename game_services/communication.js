@@ -760,6 +760,7 @@ SkyRTC.prototype.broadcastInGuests = function (message) {
 SkyRTC.prototype.broadcastInHumanPlayers = function (message) {
     var cards = {};
     var playersData = {};
+    var that = this;
     for (var i = 0; i < message.data.game.players.length; i++) {
         var player = message.data.game.players[i];
         cards[player.playerName] = player.cards;
