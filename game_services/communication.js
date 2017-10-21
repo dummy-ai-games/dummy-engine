@@ -434,6 +434,8 @@ SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
         return;
     }
 
+    tableNumber += "";
+
     logger.info('game preparing start for table: ' + tableNumber);
     if (that.table[tableNumber]) {
         if (that.table[tableNumber].timeout)
