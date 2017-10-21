@@ -768,10 +768,10 @@ SkyRTC.prototype.broadcastInHumanPlayers = function (message) {
         delete player.cards;
     }
     var tableNumber = message.data.tableNumber;
-    for (var player in this.players) {
-        if (this.players[player] && this.players[player].isHuman && this.players[player].tableNumber === tableNumber && playersData[player]) {
+    for (var player in that.players) {
+        if (that.players[player] && that.players[player].isHuman && that.players[player].tableNumber === tableNumber && playersData[player]) {
             playersData[player].cards = cards[player];
-            that.sendMessage(this.players[player], message);
+            that.sendMessage(that.players[player], message);
             playersData[player].cards = [];
         }
     }
