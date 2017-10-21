@@ -3,12 +3,12 @@
  * 2017-08-22
  */
 
-var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCount) {
+var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCount, _online) {
     this.id = 0;
     this.playerName = _playerName;
     this.displayName = _displayName;
     this.isSurvive = _isSurvive;
-    this.online = true;
+    this.online = _online || true;
     this.chips = _chips;
     this.totalChips = 0;
     this.reloadCount = _reloadCount;
