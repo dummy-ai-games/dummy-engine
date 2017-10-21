@@ -291,7 +291,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
         if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": true});
             tableAndPlayer.push(playerName);
-        } else if (that.exitPlayers[playerName] === tableNumber && that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
+        } else if (that.exitPlayers[playerName] === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": false});
         }
     }
@@ -323,7 +323,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
         }
     }
 
-    if(tableDatas) {
+    if (tableDatas) {
         for (var i = 0; i < tableDatas.players.length; i++) {
             cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
             delete tableDatas.players[i].cards;
@@ -627,6 +627,15 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInPlayers(message);
         if (that.table[data.table.tableNumber].timeout)
             clearTimeout(data.table.tableNumber.timeout);
+
+        //delete offline player
+        for (var player in that.players) {
+            if (!that.players[player]) {
+                delete that.players[player];
+                delete that.exitPlayers[player];
+            }
+        }
+
         delete that.table[data.table.tableNumber];
     });
 
