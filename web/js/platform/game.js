@@ -109,7 +109,6 @@ function initPlayerInfo() {
         timeout: 20000,
         success: function (response) {
             if (response.status.code === 0) {
-                console.log('get db players: ' + JSON.stringify(response.entity));
                 dbPlayers = response.entity;
             } else if (response.status.code === 1) {
                 console.log('list player failed, use player name as display name');
