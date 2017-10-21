@@ -137,7 +137,7 @@ function initWebsock() {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
 
-        if (gameStatus === STATUS_GAME_FINISHED || gameStatus === STATUS_GAME_RUNNING) {
+        if (gameStatus === STATUS_GAME_FINISHED) {
             return;
         }
 
@@ -168,6 +168,10 @@ function initWebsock() {
         console.log('game status = ' + tableStatus);
         console.log('local players = ' + JSON.stringify(players));
         gameStatus = tableStatus;
+
+        if (gameStatus === STATUS_GAME_RUNNING) {
+            updateGame(data.basicData, false, false);
+        }
     });
 
     rtc.on('__left', function(data) {
@@ -530,6 +534,21 @@ function updateGame(data, isNewRound, roundClear) {
         }
         if (data.table.maxReloadCount) {
             reloadChance = data.table.maxReloadCount;
+        }
+        if (data.table.currentPlayer) {
+            if (data.table.currentPlayer === playerName) {
+                // show thinking
+                var targetPlayer = findTargetPlayer(playerName);
+                if (targetPlayer) {
+                    targetPlayer.setInTurn(true);
+                    console.log('set player ' + targetPlayer.playerName + ' thinking after reloaded');
+                    turnAnimationShowed = false;
+                    yourTurn = true;
+                    playerMinBet = data.table.bigBlind.amount;
+                    playerMaxBet = targetPlayer.chips;
+                    targetPlayer.setTakeAction(ACTION_STATUS_THINKING);
+                }
+            }
         }
     }
 
