@@ -310,10 +310,6 @@ var ScoreLayer = cc.LayerColor.extend({
                         for (cardIndex = 0; cardIndex < this.players[playerIndex].hand.winCards.length; cardIndex++) {
                             if (this.players[playerIndex].hand.winCards[cardIndex] &&
                                 '' !== this.players[playerIndex].hand.winCards[cardIndex]) {
-
-                                console.log('change card[' + cardIndex + '] to ' +
-                                    this.players[playerIndex].hand.winCards[cardIndex]);
-
                                 this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
                                     this.pokerFrames.get(this.players[playerIndex].hand.winCards[cardIndex]));
                                 this.playerHands[playerIndex][cardIndex].setVisible(true);
