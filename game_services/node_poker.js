@@ -197,11 +197,11 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             logGame(that.tableNumber, JSON.stringify(that.gameWinners));
             data = getBasicData(that);
             data.winners = that.gameWinners;
-            /*winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners, function (updateWinnersErr) {
+            winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners, function (updateWinnersErr) {
                 if (updateWinnersErr.code === errorCode.SUCCESS.code) {
                     logger.info('update winners successfully');
                 }
-            });*/
+            });
             that.eventEmitter.emit('__game_over', data);
         }
     });

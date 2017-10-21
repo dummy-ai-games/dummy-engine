@@ -117,7 +117,7 @@ function rankHandInt(handCards) {
                     continue;
                 var data2 = '';
                 for (j = 0; j < 2; j++)
-                    data2 += basicCard[j];
+                    data2 += basicCard[k];
                 if (ranks.indexOf(data) > -1 && ranks.indexOf(data2) > -1 && rankCards.length === 0) {
                     getCardsByNumber(handCards, data, rankCards);
                     getCardsByNumber(handCards, data2, rankCards);
@@ -266,6 +266,5 @@ function rankHandInt(handCards) {
             message = 'High Card';
         }
     }
-    
     return rankCards;
 }
