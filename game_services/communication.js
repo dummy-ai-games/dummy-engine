@@ -298,11 +298,6 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
 
     if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
         tableDatas = poker.getBasicData(that.table[tableNumber]);
-        for (var i = 0; i < tableDatas.players.length; i++) {
-            cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
-            delete tableDatas.players[i].cards;
-            playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
-        }
         tableDatas.table.currentPlayer =
             that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
     }
@@ -327,6 +322,13 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
             that.sendMessage(that.guests[guest], message);
         }
     }
+
+    for (var i = 0; i < tableDatas.players.length; i++) {
+        cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
+        delete tableDatas.players[i].cards;
+        playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
+    }
+
     for (var player in that.players) {
         if (that.players[player] && that.players[player].tableNumber === tableNumber) {
             message = {
