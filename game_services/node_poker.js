@@ -71,6 +71,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
     // generate a game instance with ID
     this.startTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
+    this.isDeal = false;
 
     // Validate acceptable value ranges.
     var err;
@@ -100,7 +101,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         getNextPlayer(that);
 
         logGame(that.tableNumber, 'start get first player:' + that.currentPlayer + ' action ');
-        takeAction(that, '__turn');        
+        takeAction(that, '__turn');
     });
 
     this.eventEmitter.on('showAction', function (data) {
@@ -111,7 +112,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     });
 
     this.eventEmitter.on('deal', function () {
-        that.eventEmitter.emit('__deal', getBasicData(that));
+        that.isDeal = true;
         if (that.surviveCount <= 1) {
             for (var j = 0; j < that.players.length; j++)
                 that.players[j].talked = true;
@@ -129,7 +130,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.eventEmitter.on('roundEnd', function () {
         var count = 0;
         var i;
-        var data;        
+        var data;
         updateGame(that);
         for (i = 0; i < that.players.length; i++) {
             if (that.players[i].chips <= 0 && that.players[i].reloadCount < that.maxReloadCount) {
@@ -196,7 +197,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             logGame(that.tableNumber, JSON.stringify(that.gameWinners));
             data = getBasicData(that);
             data.winners = that.gameWinners;
-            winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners, function(updateWinnersErr) {
+            winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners, function (updateWinnersErr) {
                 if (updateWinnersErr.code === errorCode.SUCCESS.code) {
                     logger.info('update winners successfully');
                 }
@@ -513,8 +514,7 @@ Player.prototype.Raise = function () {
                         this.table.raiseCount);
 
                     for (var j = 0; j < this.table.players.length; j += 1) {
-                        if (!this.table.players[j].allIn &&
-                            !this.table.players[j].folded &&
+                        if (!this.table.players[j].allIn && !this.table.players[j].folded &&
                             this.table.players[j].isSurvive) {
                             this.table.players[j].talked = false;
                         }
@@ -560,8 +560,7 @@ Player.prototype.Bet = function (bet) {
 
                     //update other player
                     for (var j = 0; j < this.table.players.length; j += 1) {
-                        if (!this.table.players[j].allIn &&
-                            !this.table.players[j].folded &&
+                        if (!this.table.players[j].allIn && !this.table.players[j].folded &&
                             this.table.players[j].isSurvive) {
                             this.table.players[j].talked = false;
                         }
@@ -2304,7 +2303,7 @@ function getNextPlayer(table) {
     table.players[table.currentPlayer].folded ||
     table.players[table.currentPlayer].allIn ||
     (table.players[table.currentPlayer].talked === true &&
-        table.game.bets[table.currentPlayer] === maxBet));
+    table.game.bets[table.currentPlayer] === maxBet));
 }
 
 function getNextDealer(table) {
@@ -2356,7 +2355,7 @@ function updateGame(table) {
         players: players,
         startTime: table.startTime
     };
-    gameLogic.updateGame(table.tableNumber, newGame, function(updateGameErr) {
+    gameLogic.updateGame(table.tableNumber, newGame, function (updateGameErr) {
         if (updateGameErr.code === errorCode.SUCCESS.code) {
             logger.info('update game ' + table.tableNumber + ' successfully');
         }
@@ -2367,6 +2366,10 @@ function takeAction(table, action) {
     table.timeout = setTimeout(function () {
         table.timeout = null;
         if (table.status === enums.GAME_STATUS_RUNNING) {
+            if(action === "__bet" && table.isDeal){
+                table.eventEmitter.emit('__deal', getBasicData(table));
+                table.isDeal = false;//only first __bet need deal
+            }
             var players = [];
             var destPlayer = {};
             for (var i = 0; i < table.players.length; i++) {
