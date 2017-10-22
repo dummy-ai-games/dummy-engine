@@ -63,3 +63,5 @@ typings/
 
 # Backup folder
 backup/
+
+_config.yml

@@ -18,11 +18,8 @@ var db = require('./database/msession');
 var flash = require('connect-flash');
 var app = module.exports = express();
 
-var port = normalizePort(process.env.PORT || LISTEN_PORT || '443');
-app.set('port', port);
-
 var httpServer = require('http').createServer(app);
-var httpPort = normalizePort(process.env.PORT || LISTEN_PORT);
+var httpPort = normalizePort(process.argv[2] || LISTEN_PORT);
 httpServer.listen(httpPort);
 
 var SkyRTC = require('./game_services/communication').listen(httpServer);

@@ -90,9 +90,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.eventEmitter.on('newRound', function () {
         logGame(that.tableNumber, 'new round : ' + that.roundCount);
 
-        if (1 === that.roundCount) {
-            updateGame(that);
-        }
         // reset raise count and bet count
         that.raiseCount = 0;
         that.betCount = 0;
@@ -265,6 +262,7 @@ Table.prototype.getAllHands = function () {
 
 Table.prototype.StartGame = function () {
     // If there is no current game and we have enough players, start a new game.
+    var that = this;
     logger.info('start game');
     if (!this.game) {
         this.playersToRemove = [];
@@ -273,6 +271,7 @@ Table.prototype.StartGame = function () {
         this.status = enums.GAME_STATUS_RUNNING;
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
+        updateGame(that);
     }
 };
 
@@ -2454,3 +2453,4 @@ exports.getBasicData = getBasicData;
 exports.getPlayerReloadData = getPlayerReloadData;
 exports.getNextPlayer = getNextPlayer;
 exports.getNextDealer = getNextDealer;
+exports.updateGame = updateGame;
