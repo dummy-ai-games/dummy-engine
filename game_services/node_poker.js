@@ -2137,11 +2137,9 @@ function progress(table) {
                 table.game.bets.splice(0, table.game.bets.length);
                 // Evaluate each hand
                 for (j = 0; j < table.players.length; j += 1) {
-                    if(table.players[j].isSurvive) {
-                        cards = table.players[j].cards.concat(table.game.board);
-                        hand = new Hand(cards);
-                        table.players[j].hand = rankHand(hand);
-                    }
+                    cards = table.players[j].cards.concat(table.game.board);
+                    hand = new Hand(cards);
+                    table.players[j].hand = rankHand(hand);
                 }
                 checkForWinner(table);
                 /*
@@ -2368,7 +2366,7 @@ function takeAction(table, action) {
     table.timeout = setTimeout(function () {
         table.timeout = null;
         if (table.status === enums.GAME_STATUS_RUNNING) {
-            if(action === "__bet" && table.isDeal){
+            if (action === "__bet" && table.isDeal) {
                 table.eventEmitter.emit('__deal', getBasicData(table));
                 table.isDeal = false;//only first __bet need deal
             }
