@@ -8,7 +8,8 @@ var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
 var poker = require('./node_poker.js');
-var playerLogic = require('../work_units/player_logic');
+var playerLogic = require('../work_units/player_logic.js');
+var gameLogic = require('../work_units/game_logic.js');
 
 var logger = require('../poem/logging/logger4js').helper;
 
@@ -77,14 +78,17 @@ function SkyRTC() {
                     } else if (!(that.table[tableNumber] &&
                         that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                         socket.tableNumber = tableNumber;
-                        logger.info('game not start, accept join');
+                        logger.info('game not started, accept join');
                     }
                     if (socket.tableNumber) {
                         logger.info('player : ' + data.playerName + ' join!!');
                         that.players[socket.MD5Id] = socket;
                         that.emit('new_peer', socket.id);
-                        that.notifyJoin(socket.tableNumber);
+                        var tablePlayers = that.notifyJoin(socket.tableNumber);
                         that.initPlayerData(socket.MD5Id);
+
+                        // update game
+                        that.updateGame(socket.tableNumber, tablePlayers);
                     } else {
                         logger.info('player : ' + data.playerName + ' can not join because game has started');
                     }
@@ -232,7 +236,7 @@ SkyRTC.prototype.initPlayerData = function (player) {
     logger.info('initPlayerData');
     var that = this;
     var tableNumber = that.players[player].tableNumber;
-    if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
+    if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
         var data = that.getBasicData(that.players[player].tableNumber);
         for (var i in data.players) {
             if (data.players[i].playerName !== that.players[player].id)
@@ -255,6 +259,38 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     }
 
     return data;
+};
+
+SkyRTC.prototype.updateGame = function (tableNumber, tablePlayers) {
+    var players = [];
+    var playerLength;
+    var onlinePlayers = 0;
+    if (tablePlayers) {
+        playerLength = tablePlayers.length;
+    } else {
+        playerLength = 0;
+    }
+    // only update game before game started
+    for (var i = 0; i < playerLength; i++) {
+        var player = {
+            playerName: tablePlayers[i].playerName
+        };
+        players.push(player);
+        if (tablePlayers[i].isOnline) {
+            onlinePlayers++;
+        }
+    }
+    var newGame = {
+        tableNumber: tableNumber,
+        status: enums.GAME_STATUS_STANDBY,
+        players: players,
+        startTime: '',
+        playerCount: onlinePlayers
+    };
+    logger.info('update game before game started');
+    gameLogic.updateGame(tableNumber, newGame, function(updateGameErr) {
+        logger.info('update game before game started done');
+    });
 };
 
 SkyRTC.prototype.sendMessage = function (socket, message) {
@@ -361,6 +397,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
                 playerData[player].cards = [];//remove cards
         }
     }
+    return tablePlayers;
 };
 
 SkyRTC.prototype.notifyLeft = function (tableNumber) {
@@ -380,7 +417,6 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
 
     var message;
 
-    // TODO: to make clear how the Live and Player UI would be affected by aliens join and left
     for (var guest in that.guests) {
         if (that.guests[guest].tableNumber === tableNumber) {
             message = {
@@ -421,6 +457,8 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
             that.sendMessage(that.players[player], message);
         }
     }
+
+    that.updateGame(tableNumber, tablePlayers);
 };
 
 SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,

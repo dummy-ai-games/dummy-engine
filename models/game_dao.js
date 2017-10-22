@@ -51,7 +51,8 @@ exports.updateGame = function(conditions, newGame, callback) {
                     status: newGame.status,
                     players: newGame.players,
                     startTime: newGame.startTime,
-                    updateTime: dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
+                    updateTime: dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+                    playerCount: newGame.playerCount
                 }
             }, function (err, result) {
                 if (!err) {

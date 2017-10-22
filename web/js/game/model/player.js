@@ -3,6 +3,16 @@
  * 2017-08-22
  */
 
+/**
+ *
+ * @param _playerName
+ * @param _displayName
+ * @param _chips
+ * @param _isSurvive
+ * @param _reloadCount
+ * @param _online
+ * @constructor
+ */
 var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCount, _online) {
     this.id = 0;
     this.playerName = _playerName;

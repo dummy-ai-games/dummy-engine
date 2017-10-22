@@ -2341,6 +2341,7 @@ function sort(data) {
 
 function updateGame(table) {
     var players = [];
+    var playerCount;
     for (var i = 0; i < table.players.length; i++) {
         var allChips = table.players[i].chips +
             (table.maxReloadCount - table.players[i].reloadCount) * table.initChips;
@@ -2352,11 +2353,18 @@ function updateGame(table) {
         players.push(player);
     }
 
+    if (players) {
+        playerCount = players.length;
+    } else {
+        playerCount = 0;
+    }
+
     var newGame = {
         tableNumber: table.tableNumber,
         status: table.status,
         players: players,
-        startTime: table.startTime
+        startTime: table.startTime,
+        playerCount: playerCount
     };
     gameLogic.updateGame(table.tableNumber, newGame, function (updateGameErr) {
         if (updateGameErr.code === errorCode.SUCCESS.code) {
@@ -2453,4 +2461,3 @@ exports.getBasicData = getBasicData;
 exports.getPlayerReloadData = getPlayerReloadData;
 exports.getNextPlayer = getNextPlayer;
 exports.getNextDealer = getNextDealer;
-exports.updateGame = updateGame;

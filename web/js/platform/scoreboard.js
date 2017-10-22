@@ -57,8 +57,8 @@ function onScoreBoardUpdated(rankedPlayers) {
         }
         var row = '<tr>' +
             '<th scope="row">' + (i + 1) + '</th>' +
-            '<td>' + rankedPlayers[i].displayName + '</td>' +
-            '<td>' + rankedPlayers[i].chips + '</td>' +
+            '<td style="text-align: left;">' + rankedPlayers[i].displayName + '</td>' +
+            '<td style="text-align: left;">' + rankedPlayers[i].chips + '</td>' +
             '</tr>';
         target.append(row);
     }
