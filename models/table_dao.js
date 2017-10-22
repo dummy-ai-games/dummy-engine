@@ -11,7 +11,13 @@ var logger = require('../poem/logging/logger4js').helper;
 var ErrorCode = require('../constants/error_code');
 var errorCode = new ErrorCode();
 
-exports.createTable = function (table, callback) {
+/**
+ * Table
+ * Fields:
+ *      tableNumber (key)
+ *      players
+ */
+exports.createTable = function(table, callback) {
     db.collection('tables', function (err, collection) {
         if (!err) {
             collection.insert(table, function (err, docs) {
@@ -20,6 +26,31 @@ exports.createTable = function (table, callback) {
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('insert player ' + table.tableNumber + ' failed : ' + err);
+                    callback(errorCode.FAILED);
+                }
+            });
+        } else {
+            logger.error('get collection table failed : ' + err);
+            callback(errorCode.FAILED);
+        }
+    });
+};
+
+exports.updateTable = function(conditions, newTable, callback) {
+    db.collection('tables', function (err, collection) {
+        if (!err) {
+            logger.info('update table, set players = ' + JSON.stringify(newTable.players));
+            collection.update(conditions, {
+                $set: {
+                    tableNumber: newTable.tableNumber,
+                    players: newTable.players
+                }
+            }, function (err, result) {
+                if (!err) {
+                    logger.info('update table ' + newTable.tableNumber + ' successfully');
+                    callback(errorCode.SUCCESS);
+                } else {
+                    logger.error('update table ' + newTable.tableNumber + ' failed: ' + err);
                     callback(errorCode.FAILED);
                 }
             });

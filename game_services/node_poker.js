@@ -6,7 +6,6 @@
 var events = require('events');
 
 var gameLogic = require('../work_units/game_logic.js');
-var winnersLogic = require('../work_units/winners_logic.js');
 
 var logger = require('../poem/logging/logger4js').helper;
 
@@ -16,6 +15,7 @@ var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 
 var dateUtils = require('../poem/utils/date_utils.js');
+var MD5Utils = require('../poem/crypto/md5.js');
 
 /**
  * Class Table
@@ -69,8 +69,9 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.commandTimeout = commandTimeout || 2;
     this.lostTimeout = lostTimeout || 10;
 
-    // generate a game instance with ID
     this.startTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
+    // generate a game instance with ID
+    this.instID = MD5Utils.MD5(this.startTime);
     this.isDeal = false;
 
     // Validate acceptable value ranges.
@@ -194,11 +195,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             logGame(that.tableNumber, JSON.stringify(that.gameWinners));
             data = getBasicData(that);
             data.winners = that.gameWinners;
-            winnersLogic.updateWinnersWorkUnit(data.tableNumber, data.winners, function (updateWinnersErr) {
-                if (updateWinnersErr.code === errorCode.SUCCESS.code) {
-                    logger.info('update winners successfully');
-                }
-            });
             that.eventEmitter.emit('__game_over', data);
         }
     });
@@ -2341,7 +2337,6 @@ function sort(data) {
 
 function updateGame(table) {
     var players = [];
-    var playerCount;
     for (var i = 0; i < table.players.length; i++) {
         var allChips = table.players[i].chips +
             (table.maxReloadCount - table.players[i].reloadCount) * table.initChips;
@@ -2353,20 +2348,14 @@ function updateGame(table) {
         players.push(player);
     }
 
-    if (players) {
-        playerCount = players.length;
-    } else {
-        playerCount = 0;
-    }
-
     var newGame = {
         tableNumber: table.tableNumber,
         status: table.status,
         players: players,
         startTime: table.startTime,
-        playerCount: playerCount
+        instID: table.instID
     };
-    gameLogic.updateGame(table.tableNumber, newGame, function (updateGameErr) {
+    gameLogic.updateGameWorkUnit(table.tableNumber, table.instID, newGame, function (updateGameErr) {
         if (updateGameErr.code === errorCode.SUCCESS.code) {
             logger.info('update game ' + table.tableNumber + ' successfully');
         }

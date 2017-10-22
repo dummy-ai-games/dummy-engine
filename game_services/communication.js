@@ -9,7 +9,7 @@ var events = require('events');
 var util = require('util');
 var poker = require('./node_poker.js');
 var playerLogic = require('../work_units/player_logic.js');
-var gameLogic = require('../work_units/game_logic.js');
+var tableLogic = require('../work_units/table_logic.js');
 
 var logger = require('../poem/logging/logger4js').helper;
 
@@ -88,7 +88,7 @@ function SkyRTC() {
                         that.initPlayerData(socket.MD5Id);
 
                         // update game
-                        that.updateGame(socket.tableNumber, tablePlayers);
+                        that.updateTable(socket.tableNumber, tablePlayers);
                     } else {
                         logger.info('player : ' + data.playerName + ' can not join because game has started');
                     }
@@ -261,10 +261,9 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     return data;
 };
 
-SkyRTC.prototype.updateGame = function (tableNumber, tablePlayers) {
+SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers) {
     var players = [];
     var playerLength;
-    var onlinePlayers = 0;
     if (tablePlayers) {
         playerLength = tablePlayers.length;
     } else {
@@ -273,23 +272,18 @@ SkyRTC.prototype.updateGame = function (tableNumber, tablePlayers) {
     // only update game before game started
     for (var i = 0; i < playerLength; i++) {
         var player = {
-            playerName: tablePlayers[i].playerName
+            playerName: tablePlayers[i].playerName,
+            isOnline: tablePlayers[i].isOnline
         };
         players.push(player);
-        if (tablePlayers[i].isOnline) {
-            onlinePlayers++;
-        }
     }
-    var newGame = {
+    var newTable = {
         tableNumber: tableNumber,
-        status: enums.GAME_STATUS_STANDBY,
-        players: players,
-        startTime: '',
-        playerCount: onlinePlayers
+        players: players
     };
-    logger.info('update game before game started');
-    gameLogic.updateGame(tableNumber, newGame, function(updateGameErr) {
-        logger.info('update game before game started done');
+    logger.info('update table before game started : ' + JSON.stringify(newTable));
+    tableLogic.updateTableWorkUnit(tableNumber, newTable, function(updateTableErr) {
+        logger.info('update table before game started done');
     });
 };
 
@@ -458,7 +452,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
         }
     }
 
-    that.updateGame(tableNumber, tablePlayers);
+    that.updateTable(tableNumber, tablePlayers);
 };
 
 SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,

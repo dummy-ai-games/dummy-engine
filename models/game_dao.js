@@ -17,13 +17,14 @@ var dateUtils = require('../poem/utils/date_utils.js');
  * Game is an instance of Table
  * Fields:
  *      tableNumber (key)
+ *      instID (key)
  *      status
  *      players
  *      createTime
  *      updateTime
  */
 exports.createGame = function (game, callback) {
-    db.collection('game', function (err, collection) {
+    db.collection('games', function (err, collection) {
         if (!err) {
             game.updateTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
             collection.insert(game, function (err, docs) {
@@ -42,8 +43,8 @@ exports.createGame = function (game, callback) {
     });
 };
 
-exports.updateGame = function(conditions, newGame, callback) {
-    db.collection('game', function (err, collection) {
+exports.updateTable = function(conditions, newGame, callback) {
+    db.collection('games', function (err, collection) {
         if (!err) {
             collection.update(conditions, {
                 $set: {
@@ -51,12 +52,11 @@ exports.updateGame = function(conditions, newGame, callback) {
                     status: newGame.status,
                     players: newGame.players,
                     startTime: newGame.startTime,
-                    updateTime: dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'),
-                    playerCount: newGame.playerCount
+                    updateTime: dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
                 }
             }, function (err, result) {
                 if (!err) {
-                    logger.info('update game ' + newGame.tableNumber + ' successfully : ' + JSON.stringify(result));
+                    logger.info('update game ' + newGame.tableNumber + ' successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('update game ' + newGame.tableNumber + ' failed: ' + err);
@@ -71,9 +71,11 @@ exports.updateGame = function(conditions, newGame, callback) {
 };
 
 exports.getGames = function(conditions, from, count, callback) {
-    db.collection('game', function (err, collection) {
+    db.collection('games', function (err, collection) {
         if (!err) {
-            collection.find(conditions).skip(from).limit(count).toArray(function (err, results) {
+            collection.find(conditions).skip(from).limit(count)
+                .sort({startTime: -1})
+                .toArray(function (err, results) {
                 if (!err) {
                     callback(errorCode.SUCCESS, results);
                 } else {

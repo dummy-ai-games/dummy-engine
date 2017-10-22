@@ -11,6 +11,13 @@ var logger = require('../poem/logging/logger4js').helper;
 var ErrorCode = require('../constants/error_code');
 var errorCode = new ErrorCode();
 
+/**
+ * Player
+ * Fields:
+ *      playerName (key)
+ *      displayName
+ *      tableNumber
+ */
 exports.getPlayers = function (conditions, callback) {
     db.collection('players', function (err, collection) {
         if (!err) {
