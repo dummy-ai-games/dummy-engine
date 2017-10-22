@@ -2137,9 +2137,11 @@ function progress(table) {
                 table.game.bets.splice(0, table.game.bets.length);
                 // Evaluate each hand
                 for (j = 0; j < table.players.length; j += 1) {
-                    cards = table.players[j].cards.concat(table.game.board);
-                    hand = new Hand(cards);
-                    table.players[j].hand = rankHand(hand);
+                    if(table.players[j].isSurvive) {
+                        cards = table.players[j].cards.concat(table.game.board);
+                        hand = new Hand(cards);
+                        table.players[j].hand = rankHand(hand);
+                    }
                 }
                 checkForWinner(table);
                 /*
