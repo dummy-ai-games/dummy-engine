@@ -797,13 +797,15 @@ function checkForWinner(table) {
     winners = [];
     maxRank = 0.000;
     for (k = 0; k < table.players.length; k += 1) {
-        if (table.players[k].hand.rank === maxRank && table.players[k].folded === false && table.players[k].isSurvive) {//must remove no survive player, otherwise dead player will relive
-            winners.push(k);
-        }
-        if (table.players[k].hand.rank > maxRank && table.players[k].folded === false && table.players[k].isSurvive) {
-            maxRank = table.players[k].hand.rank;
-            winners.splice(0, winners.length);
-            winners.push(k);
+        if(table.players[k].isSurvive) {//must remove no survive player, otherwise dead player will relive
+            if (table.players[k].hand.rank === maxRank && table.players[k].folded === false) {
+                winners.push(k);
+            }
+            if (table.players[k].hand.rank > maxRank && table.players[k].folded === false) {
+                maxRank = table.players[k].hand.rank;
+                winners.splice(0, winners.length);
+                winners.push(k);
+            }
         }
     }
 
@@ -2137,9 +2139,11 @@ function progress(table) {
                 table.game.bets.splice(0, table.game.bets.length);
                 // Evaluate each hand
                 for (j = 0; j < table.players.length; j += 1) {
-                    cards = table.players[j].cards.concat(table.game.board);
-                    hand = new Hand(cards);
-                    table.players[j].hand = rankHand(hand);
+                    if(table.players[j].isSurvive) {
+                        cards = table.players[j].cards.concat(table.game.board);
+                        hand = new Hand(cards);
+                        table.players[j].hand = rankHand(hand);
+                    }
                 }
                 checkForWinner(table);
                 /*
