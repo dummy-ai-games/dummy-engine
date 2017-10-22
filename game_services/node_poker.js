@@ -6,6 +6,7 @@
 var events = require('events');
 
 var gameLogic = require('../work_units/game_logic.js');
+var tableLogic = require('../work_units/table_logic.js');
 
 var logger = require('../poem/logging/logger4js').helper;
 
@@ -130,6 +131,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         var i;
         var data;
         updateGame(that);
+        updateTable(that);
         for (i = 0; i < that.players.length; i++) {
             if (that.players[i].chips <= 0 && that.players[i].reloadCount < that.maxReloadCount) {
                 that.players[i].reloadCount++;
@@ -268,6 +270,7 @@ Table.prototype.StartGame = function () {
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
         updateGame(that);
+        updateTable(that);
     }
 };
 
@@ -2360,6 +2363,18 @@ function updateGame(table) {
             logger.info('update game ' + table.tableNumber + ' successfully');
         }
     });
+}
+
+function updateTable(table) {
+    var newTable = {
+        tableNumber: table.tableNumber,
+        players: table.players
+    };
+    tableLogic.updateTableWorkUnit(table.tableNumber, newTable, function(updateTableErr) {
+        if (updateTableErr.code === errorCode.SUCCESS.code) {
+            logger.info('update table ' + table.tableNumber + ' successfully');
+        }
+    })
 }
 
 function takeAction(table, action) {

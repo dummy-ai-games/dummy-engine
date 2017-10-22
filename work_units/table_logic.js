@@ -11,8 +11,8 @@ var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 
 exports.listTablesWorkUnit = function(callback) {
-    tableDao.listTables(function(getTablesErr, tables) {
-        callback(getTablesErr, tables);
+    tableDao.listTables(function(listTablesErr, tables) {
+        callback(listTablesErr, tables);
     });
 };
 
@@ -34,5 +34,11 @@ exports.updateTableWorkUnit = function(tableNumber, newTable, callback) {
                 callback(createTableErr);
             });
         }
+    });
+};
+
+exports.listTablesForTraceWorkUnit = function(from, count, callback) {
+    tableDao.listTablesForTrace(from, count, function(listTablesErr, tables) {
+        callback(listTablesErr, tables);
     });
 };

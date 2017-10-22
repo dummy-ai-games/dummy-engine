@@ -11,6 +11,8 @@ var logger = require('../poem/logging/logger4js').helper;
 var ErrorCode = require('../constants/error_code');
 var errorCode = new ErrorCode();
 
+var dateUtils = require('../poem/utils/date_utils.js');
+
 /**
  * Table
  * Fields:
@@ -20,6 +22,7 @@ var errorCode = new ErrorCode();
 exports.createTable = function(table, callback) {
     db.collection('tables', function (err, collection) {
         if (!err) {
+            table.updateTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
             collection.insert(table, function (err, docs) {
                 if (!err) {
                     logger.info('insert table ' + table.tableNumber + ' successfully');
@@ -43,7 +46,8 @@ exports.updateTable = function(conditions, newTable, callback) {
             collection.update(conditions, {
                 $set: {
                     tableNumber: newTable.tableNumber,
-                    players: newTable.players
+                    players: newTable.players,
+                    updateTime: dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
                 }
             }, function (err, result) {
                 if (!err) {
@@ -65,6 +69,25 @@ exports.listTables = function (callback) {
     db.collection('tables', function (err, collection) {
         if (!err) {
             collection.find().sort({tableNumber: 1}).toArray(function (err, results) {
+                if (!err) {
+                    logger.info('list tables successfully');
+                    callback(errorCode.SUCCESS, results);
+                } else {
+                    logger.error('list tables error : ' + err);
+                    callback(errorCode.FAILED, null);
+                }
+            });
+        } else {
+            logger.error('get collection table failed : ' + err);
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
+exports.listTablesForTrace = function (from, count, callback) {
+    db.collection('tables', function (err, collection) {
+        if (!err) {
+            collection.find().skip(parseInt(from)).limit(parseInt(count)).sort({updateTime: -1}).toArray(function (err, results) {
                 if (!err) {
                     logger.info('list tables successfully');
                     callback(errorCode.SUCCESS, results);

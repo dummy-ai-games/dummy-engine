@@ -22,3 +22,23 @@ exports.listTables = function (req, res) {
         res.end();
     });
 };
+
+/**
+ * function :   List tables for trace
+ * parameter :  from
+ *              count
+ * return :     TablesResponse
+ */
+exports.listTablesForTrace = function (req, res) {
+    var from = req.body.from;
+    var count = req.body.count;
+
+    var tablesResponse = new TablesResponse();
+
+    tableLogic.listTablesForTraceWorkUnit(from, count, function (listTablesErr, tables) {
+        tablesResponse.status = listTablesErr;
+        tablesResponse.entity = tables;
+        res.send(tablesResponse);
+        res.end();
+    });
+};
