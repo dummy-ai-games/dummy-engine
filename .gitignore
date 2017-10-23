@@ -65,3 +65,6 @@ typings/
 backup/
 
 _config.yml
+
+nohup.out
+
