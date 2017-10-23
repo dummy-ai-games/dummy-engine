@@ -34,12 +34,13 @@ var errorCb = function (rtc) {
  * Class SkyRTC
  * @constructor
  */
-function SkyRTC() {
+function SkyRTC(tableNumber) {
     this.table = {};
     this.admin = null;
     this.players = {};
     this.guests = {};
     this.exitPlayers = {};
+    this.tableNumber = tableNumber;
     //this.playerAndTable = {};
 
     this.on('__join', function (data, socket) {
@@ -67,30 +68,35 @@ function SkyRTC() {
             }
             playerLogic.getPlayerByName(playerName, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    socket.id = playerName;
-                    socket.displayName = player.displayName;
-                    var tableNumber = player.tableNumber;
-                    var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
-                    if (exitPlayerTableNum !== undefined) {
-                        socket.tableNumber = exitPlayerTableNum;
-                        delete that.exitPlayers[socket.MD5Id];
-                        logger.info('player rejoin, accept join');
-                    } else if (!(that.table[tableNumber] &&
-                        that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
-                        socket.tableNumber = tableNumber;
-                        logger.info('game not started, accept join');
-                    }
-                    if (socket.tableNumber) {
-                        logger.info('player : ' + data.playerName + ' join!!');
-                        that.players[socket.MD5Id] = socket;
-                        that.emit('new_peer', socket.id);
-                        var tablePlayers = that.notifyJoin(socket.tableNumber);
-                        that.initPlayerData(socket.MD5Id);
+                    var tableNumber = player.tableNumber + "";
+                    if (!that.tableNumber || tableNumber === that.tableNumber) {
+                        socket.id = playerName;
+                        socket.displayName = player.displayName;
+                        var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
+                        if (exitPlayerTableNum !== undefined) {
+                            socket.tableNumber = exitPlayerTableNum;
+                            delete that.exitPlayers[socket.MD5Id];
+                            logger.info('player rejoin, accept join');
+                        } else if (!(that.table[tableNumber] &&
+                                that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                            socket.tableNumber = tableNumber;
+                            logger.info('game not started, accept join');
+                        }
+                        if (socket.tableNumber) {
+                            logger.info('player : ' + data.playerName + ' join!!');
+                            that.players[socket.MD5Id] = socket;
+                            that.emit('new_peer', socket.id);
+                            var tablePlayers = that.notifyJoin(socket.tableNumber);
+                            that.initPlayerData(socket.MD5Id);
 
-                        // update game
-                        that.updateTable(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
+                            // update game
+                            that.updateTable(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
+                        } else {
+                            logger.info('player : ' + data.playerName + ' can not join because game has started');
+                        }
                     } else {
-                        logger.info('player : ' + data.playerName + ' can not join because game has started');
+                        logger.info('player ' + playerName + ' tableNumber is wrong, connection should be dropped');
+                        socket.close();
                     }
                 } else {
                     logger.info('player ' + playerName + ' is not valid, connection should be dropped');
@@ -283,7 +289,7 @@ SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers, status) {
         status: status
     };
     logger.info('update table before game started : ' + JSON.stringify(newTable));
-    tableLogic.updateTableWorkUnit(tableNumber, newTable, function(updateTableErr) {
+    tableLogic.updateTableWorkUnit(tableNumber, newTable, function (updateTableErr) {
         logger.info('update table before game started done');
     });
 };
@@ -382,13 +388,10 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
                     'basicData': tableDatas
                 }
             };
-            if (that.table[tableNumber]) {
-                logger.info('send __new_peer_2 with status = ' + that.table[tableNumber].status);
+            if (that.table[tableNumber])
                 message.data.tableStatus = that.table[tableNumber].status;
-            } else {
-                logger.info('send __new_peer_2 with status = ' + enums.GAME_STATUS_STANDBY);
+            else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
-            }
             that.sendMessage(that.players[player], message);
 
             if (playerData[player])
@@ -951,7 +954,7 @@ function getPlayerIndex(playerName, players) {
 /**
  * Exported functions
  */
-exports.listen = function (server) {
+exports.listen = function (server, tableNumber, tablePort) {
     var SkyRTCServer;
     if (typeof server === 'number') {
         SkyRTCServer = new WebSocketServer({
@@ -963,7 +966,7 @@ exports.listen = function (server) {
         });
     }
 
-    SkyRTCServer.rtc = new SkyRTC();
+    SkyRTCServer.rtc = new SkyRTC(tableNumber);
     errorCb = errorCb(SkyRTCServer.rtc);
     SkyRTCServer.on('connection', function (socket) {
         this.rtc.init(socket);

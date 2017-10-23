@@ -138,7 +138,6 @@ function initWebsock() {
         var tableStatus = data.tableStatus;
         gameStatus = tableStatus;
         if (gameStatus === STATUS_GAME_FINISHED) {
-            // always show winners
             return;
         }
 

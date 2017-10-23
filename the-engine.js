@@ -22,7 +22,15 @@ var httpServer = require('http').createServer(app);
 var httpPort = normalizePort(process.argv[2] || LISTEN_PORT);
 httpServer.listen(httpPort);
 
-var SkyRTC = require('./game_services/communication').listen(httpServer);
+var tableNumber;
+if (process.argv.length > 3) {
+    tableNumber = process.argv[3] + "";
+}
+console.log("cmd parameter are as follows:");
+for (var i = 0; i < process.argv.length; i++) {
+    console.log(process.argv[i] + "   ");
+}
+var SkyRTC = require('./game_services/communication').listen(httpServer, tableNumber);
 
 function normalizePort(val) {
     var port = parseInt(val, 10);
@@ -49,7 +57,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(cookieParser());
 app.use(session({
-    cookie: { maxAge: 600000 },
+    cookie: {maxAge: 600000},
     secret: 'the-engine',
     store: new MongoStore({
         username: MONGO_DB_USER,
