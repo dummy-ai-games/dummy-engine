@@ -36,6 +36,25 @@ exports.getPlayers = function (conditions, callback) {
     });
 };
 
+exports.countPlayers = function (conditions, callback) {
+    db.collection('players', function (err, collection) {
+        if (!err) {
+            collection.find(conditions).count(function(err, count) {
+                if (!err) {
+                    logger.info('count players successfully');
+                    callback(errorCode.SUCCESS, count);
+                } else {
+                    logger.error('count players error : ' + err);
+                    callback(errorCode.FAILED, 0);
+                }
+            });
+        } else {
+            logger.error('get collection player failed : ' + err);
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
 exports.listPlayers = function (callback) {
     db.collection('players', function (err, collection) {
         if (!err) {

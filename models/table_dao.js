@@ -47,7 +47,8 @@ exports.updateTable = function(conditions, newTable, callback) {
                 $set: {
                     tableNumber: newTable.tableNumber,
                     players: newTable.players,
-                    updateTime: dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
+                    updateTime: dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+                    status: newTable.status
                 }
             }, function (err, result) {
                 if (!err) {
@@ -87,7 +88,8 @@ exports.listTables = function (callback) {
 exports.listTablesForTrace = function (from, count, callback) {
     db.collection('tables', function (err, collection) {
         if (!err) {
-            collection.find().skip(parseInt(from)).limit(parseInt(count)).sort({updateTime: -1}).toArray(function (err, results) {
+            collection.find().skip(parseInt(from)).limit(parseInt(count)).sort({tableNumber: 1})
+                .toArray(function (err, results) {
                 if (!err) {
                     logger.info('list tables successfully');
                     callback(errorCode.SUCCESS, results);

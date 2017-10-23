@@ -60,7 +60,7 @@ function loadTables() {
 
 function loadPlayersByTable() {
     var url;
-    url = '/player/get_players?table_number='+currentTableNumber;
+    url = '/player/get_players?tableNumber='+currentTableNumber;
     var tableContainer = $('#player_table_container');
     tableContainer.empty();
     tableContainer.append('<table id="player_table" data-row-style="rowStyle"></table>');
@@ -154,22 +154,6 @@ function onSelectedTableChanged() {
         $('#table_number').val(currentTableNumber);
     }
 }
-
-/*
-function dumpLog() {
-    currentTableNumber = $('#tables').val();
-    var logDate = $('#dump_log_date').val();
-    if(0 === currentTableNumber || null === logDate) {
-        popUpHintDialog('请选择桌号和日期');
-        return;
-    }
-    var downloadURL = '/player/dump_log?table_number='+currentTableNumber+'&log_date='+logDate;
-    window.open(
-        downloadURL,
-        '_blank'
-    );
-}
-*/
 
 // UI related functions
 function refreshTables(tablesList) {

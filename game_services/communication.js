@@ -88,7 +88,7 @@ function SkyRTC() {
                         that.initPlayerData(socket.MD5Id);
 
                         // update game
-                        that.updateTable(socket.tableNumber, tablePlayers);
+                        that.updateTable(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
                     } else {
                         logger.info('player : ' + data.playerName + ' can not join because game has started');
                     }
@@ -261,7 +261,7 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     return data;
 };
 
-SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers) {
+SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers, status) {
     var players = [];
     var playerLength;
     if (tablePlayers) {
@@ -279,7 +279,8 @@ SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers) {
     }
     var newTable = {
         tableNumber: tableNumber,
-        players: players
+        players: players,
+        status: status
     };
     logger.info('update table before game started : ' + JSON.stringify(newTable));
     tableLogic.updateTableWorkUnit(tableNumber, newTable, function(updateTableErr) {
@@ -452,7 +453,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
         }
     }
 
-    that.updateTable(tableNumber, tablePlayers);
+    that.updateTable(tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
 };
 
 SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,

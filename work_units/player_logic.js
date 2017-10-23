@@ -53,8 +53,17 @@ exports.getPlayersByTableWorkUnit = function(tableNumber, callback) {
                 players[i].playerName = MD5Utils.MD5(players[i].playerName);
             }
         }
-        logger.info("get players : " + JSON.stringify(players));
         callback(getPlayersErr, players);
+    });
+};
+
+exports.countPlayersByTableWorkUnit = function(tableNumber, callback) {
+    var conditions = {
+        tableNumber: tableNumber
+    };
+
+    playerDao.countPlayers(conditions, function(countPlayersErr, count) {
+        callback(countPlayersErr, count);
     });
 };
 

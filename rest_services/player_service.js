@@ -16,7 +16,7 @@ var playerLogic = require('../work_units/player_logic.js');
  * return :     raw player list
  */
 exports.getPlayers = function (req, res) {
-    var tableNumber = req.query.table_number;
+    var tableNumber = req.query.tableNumber;
 
     playerLogic.getPlayersByTableWorkUnit(tableNumber, function (getPlayersErr, players) {
         res.send(players);
@@ -30,13 +30,30 @@ exports.getPlayers = function (req, res) {
  * return :     PlayerResponse
  */
 exports.listPlayers = function (req, res) {
-    var tableNumber = req.body.table_number;
+    var tableNumber = req.body.tableNumber;
 
     var playersResponse = new PlayersResponse();
-    playerLogic.getPlayersByTableWorkUnit(tableNumber, function (getPlayersErr, players) {
-        playersResponse.status = getPlayersErr;
+    playerLogic.getPlayersByTableWorkUnit(tableNumber, function (listPlayersErr, players) {
+        playersResponse.status = listPlayersErr;
         playersResponse.entity = players;
         res.send(playersResponse);
+        res.end();
+    });
+};
+
+/**
+ * function :   Count players by table
+ * parameter :
+ * return :     IntegerResponse
+ */
+exports.countPlayersByTable = function (req, res) {
+    var tableNumber = req.body.tableNumber;
+
+    var integerResponse = new IntegerResponse();
+    playerLogic.countPlayersByTableWorkUnit(tableNumber, function (countPlayersErr, count) {
+        integerResponse.status = countPlayersErr;
+        integerResponse.entity = count;
+        res.send(integerResponse);
         res.end();
     });
 };

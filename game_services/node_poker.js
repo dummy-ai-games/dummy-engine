@@ -131,7 +131,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         var i;
         var data;
         updateGame(that);
-        updateTable(that);
+        updateTable(that, enums.GAME_STATUS_RUNNING);
         for (i = 0; i < that.players.length; i++) {
             if (that.players[i].chips <= 0 && that.players[i].reloadCount < that.maxReloadCount) {
                 that.players[i].reloadCount++;
@@ -270,7 +270,7 @@ Table.prototype.StartGame = function () {
         this.game = new Game(this.smallBlind, this.bigBlind);
         this.NewRound();
         updateGame(that);
-        updateTable(that);
+        updateTable(that, enums.GAME_STATUS_RUNNING);
     }
 };
 
@@ -2365,14 +2365,32 @@ function updateGame(table) {
     });
 }
 
-function updateTable(table) {
+function updateTable(table, status) {
+    var players = [];
+    var playerLength;
+
+    if (table.players) {
+        playerLength = table.players.length;
+    } else {
+        playerLength = 0;
+    }
+    for (var i = 0; i < playerLength; i++) {
+        var player = {
+            playerName: table.players[i].playerName,
+            isOnline: true
+        };
+        players.push(player);
+    }
+
     var newTable = {
         tableNumber: table.tableNumber,
-        players: table.players
+        players: players,
+        status: status
     };
+    logger.info('update table in game');
     tableLogic.updateTableWorkUnit(table.tableNumber, newTable, function(updateTableErr) {
         if (updateTableErr.code === errorCode.SUCCESS.code) {
-            logger.info('update table ' + table.tableNumber + ' successfully');
+            logger.info('update table ' + table.tableNumber + ' in game done');
         }
     })
 }

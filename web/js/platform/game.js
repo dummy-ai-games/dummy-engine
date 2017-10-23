@@ -105,7 +105,7 @@ function initPlayerInfo() {
         type: 'POST',
         dataType: 'json',
         data: {
-            table_number: tableNumber
+            tableNumber: tableNumber
         },
         timeout: 20000,
         success: function (response) {
