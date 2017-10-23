@@ -633,7 +633,9 @@ var BoardLayer = cc.Layer.extend({
                 // update bet info
                 var betTotal = 0;
                 for (var i = 0; i < players.length; i++) {
-                    betTotal += players[i].accumulate;
+                    if (players[i]) {
+                        betTotal += players[i].accumulate;
+                    }
                 }
                 this.betLabel.setString('TOTAL BET: $' + betTotal);
 

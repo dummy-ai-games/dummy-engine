@@ -281,7 +281,9 @@ function initWebsock() {
 
         // update player actions
         for (var i = 0; i < currentPlayers; i++) {
-            players[i].setTakeAction(ACTION_STATUS_NONE);
+            if (players[i]) {
+                players[i].setTakeAction(ACTION_STATUS_NONE);
+            }
         }
 
         // update in game engine
