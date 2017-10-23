@@ -18,7 +18,11 @@ var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCoun
     this.playerName = _playerName;
     this.displayName = _displayName;
     this.isSurvive = _isSurvive;
-    this.online = _online || true;
+    if (undefined !== _online && null !== _online) {
+        this.online = _online;
+    } else {
+        this.online = false;
+    }
     this.chips = _chips;
     this.totalChips = 0;
     this.reloadCount = _reloadCount;

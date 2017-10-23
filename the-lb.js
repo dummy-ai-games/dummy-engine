@@ -1,6 +1,6 @@
 /**
  * Created by the-engine team
- * 2017-09-08
+ * 2017-10-24
  */
 
 var constants = require('./poem/configuration/constants');
@@ -19,10 +19,10 @@ var flash = require('connect-flash');
 var app = module.exports = express();
 
 var httpServer = require('http').createServer(app);
-var httpPort = normalizePort(process.argv[2] || LISTEN_PORT);
+var httpPort = normalizePort(LB_LISTEN_PORT);
 httpServer.listen(httpPort);
 
-var SkyRTC = require('./game_services/communication').listen(httpServer);
+var SkyRTC = require('./game_services/load_balance.js').listen(httpServer);
 
 function normalizePort(val) {
     var port = parseInt(val, 10);
@@ -42,7 +42,6 @@ db.open(function (err, db) {
     });
 });
 
-
 app.use(flash());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -59,8 +58,7 @@ app.use(session({
     })
 }));
 
-app.use('/', express.static(__dirname + '/web/'));
-require('./routes');
+// require('./routes');
 
 app.use(function (req, res, next) {
     if (req.session.user)

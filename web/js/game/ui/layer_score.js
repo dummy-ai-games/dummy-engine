@@ -250,86 +250,90 @@ var ScoreLayer = cc.LayerColor.extend({
             for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
                 // update score stats
                 if (this.scoreLabels && this.scoreLabels[playerIndex] && playerIndex < this.players.length) {
-                    // handle dead players
-                    if (!this.players[playerIndex].isSurvive) {
-                        this.scoreLabels[playerIndex].setColor(cc.color(255, 0, 0, 255));
-                        this.scoreLabels[playerIndex].setString(this.players[playerIndex].displayName + ' : K.O');
-                        this.scoreLabels[playerIndex].setVisible(true);
-                        for (cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
-                            this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
-                                this.pokerEmptyFrame);
-                            this.playerHands[playerIndex][cardIndex].setVisible(false);
-                        }
-                        this.cardsInfo[playerIndex].setString('');
-                        this.cardsInfo[playerIndex].setVisible(false);
-                        continue;
-                    }
-
-                    // update prize
-                    var prizeString = this.players[playerIndex].displayName + ' : ' +
-                        this.players[playerIndex].totalChips;
-
-                    if (null !== this.players[playerIndex].prize) {
-                        if (parseInt(this.players[playerIndex].prize) > 0) {
-                            this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 0, 255));
-                        } else {
-                            this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 255, 255));
-                        }
-                        var unReloadedChips = parseInt((reloadChance - this.players[playerIndex].reloadCount)
-                            * defaultChips);
-                        var originalChip = parseInt(this.players[playerIndex].chips) -
-                            parseInt(this.players[playerIndex].prize);
-                        var prize = parseInt(this.players[playerIndex].prize);
-
-                        if (unReloadedChips !== 0 || prize !== 0) {
-                            prizeString += '(';
-                            if (unReloadedChips !== 0) {
-                                prizeString += unReloadedChips + '+';
-                            }
-                            prizeString += originalChip;
-                            if (prize !== 0) {
-                                prizeString += '+' + prize;
-                            }
-                            prizeString += ')';
-                        }
-                    }
-                    this.scoreLabels[playerIndex].setString(prizeString);
-                    this.scoreLabels[playerIndex].setVisible(true);
-
-                    // update hands
-                    if (this.players[playerIndex].hand &&
-                        this.players[playerIndex].hand.cards &&
-                        this.players[playerIndex].hand.cards.length === this.maxCardsCount) {
-                        this.players[playerIndex].hand.winCards = rankHandInt(this.players[playerIndex].hand.cards);
-                        var cardIndex;
-                        // hide all cards first
-                        for (cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
-                            this.playerHands[playerIndex][cardIndex].setVisible(false);
-                        }
-                        // show win cards only
-                        for (cardIndex = 0; cardIndex < this.players[playerIndex].hand.winCards.length; cardIndex++) {
-                            if (this.players[playerIndex].hand.winCards[cardIndex] &&
-                                '' !== this.players[playerIndex].hand.winCards[cardIndex]) {
-                                this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
-                                    this.pokerFrames.get(this.players[playerIndex].hand.winCards[cardIndex]));
-                                this.playerHands[playerIndex][cardIndex].setVisible(true);
-                            } else {
+                    if (this.players[playerIndex]) {
+                        // handle dead players
+                        if (!this.players[playerIndex].isSurvive) {
+                            this.scoreLabels[playerIndex].setColor(cc.color(255, 0, 0, 255));
+                            this.scoreLabels[playerIndex].setString(this.players[playerIndex].displayName + ' : K.O');
+                            this.scoreLabels[playerIndex].setVisible(true);
+                            for (cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
                                 this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
                                     this.pokerEmptyFrame);
                                 this.playerHands[playerIndex][cardIndex].setVisible(false);
                             }
+                            this.cardsInfo[playerIndex].setString('');
+                            this.cardsInfo[playerIndex].setVisible(false);
+                            continue;
                         }
-                    }
 
-                    // update cards information
-                    if (this.players[playerIndex].hand &&
-                        this.players[playerIndex].hand.rank &&
-                        this.players[playerIndex].hand.message) {
-                        this.cardsInfo[playerIndex].setString(this.players[playerIndex].hand.message);
-                        this.cardsInfo[playerIndex].setVisible(true);
+                        // update prize
+                        var prizeString = this.players[playerIndex].displayName + ' : ' +
+                            this.players[playerIndex].totalChips;
+
+                        if (null !== this.players[playerIndex].prize) {
+                            if (parseInt(this.players[playerIndex].prize) > 0) {
+                                this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 0, 255));
+                            } else {
+                                this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 255, 255));
+                            }
+                            var unReloadedChips = parseInt((reloadChance - this.players[playerIndex].reloadCount)
+                                * defaultChips);
+                            var originalChip = parseInt(this.players[playerIndex].chips) -
+                                parseInt(this.players[playerIndex].prize);
+                            var prize = parseInt(this.players[playerIndex].prize);
+
+                            if (unReloadedChips !== 0 || prize !== 0) {
+                                prizeString += '(';
+                                if (unReloadedChips !== 0) {
+                                    prizeString += unReloadedChips + '+';
+                                }
+                                prizeString += originalChip;
+                                if (prize !== 0) {
+                                    prizeString += '+' + prize;
+                                }
+                                prizeString += ')';
+                            }
+                        }
+                        this.scoreLabels[playerIndex].setString(prizeString);
+                        this.scoreLabels[playerIndex].setVisible(true);
+
+                        // update hands
+                        if (this.players[playerIndex].hand &&
+                            this.players[playerIndex].hand.cards &&
+                            this.players[playerIndex].hand.cards.length === this.maxCardsCount) {
+                            this.players[playerIndex].hand.winCards = rankHandInt(this.players[playerIndex].hand.cards);
+                            var cardIndex;
+                            // hide all cards first
+                            for (cardIndex = 0; cardIndex < this.maxCardsCount; cardIndex++) {
+                                this.playerHands[playerIndex][cardIndex].setVisible(false);
+                            }
+                            // show win cards only
+                            for (cardIndex = 0; cardIndex < this.players[playerIndex].hand.winCards.length; cardIndex++) {
+                                if (this.players[playerIndex].hand.winCards[cardIndex] &&
+                                    '' !== this.players[playerIndex].hand.winCards[cardIndex]) {
+                                    this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
+                                        this.pokerFrames.get(this.players[playerIndex].hand.winCards[cardIndex]));
+                                    this.playerHands[playerIndex][cardIndex].setVisible(true);
+                                } else {
+                                    this.changeSpriteImage(this.playerHands[playerIndex][cardIndex],
+                                        this.pokerEmptyFrame);
+                                    this.playerHands[playerIndex][cardIndex].setVisible(false);
+                                }
+                            }
+                        }
+
+                        // update cards information
+                        if (this.players[playerIndex].hand &&
+                            this.players[playerIndex].hand.rank &&
+                            this.players[playerIndex].hand.message) {
+                            this.cardsInfo[playerIndex].setString(this.players[playerIndex].hand.message);
+                            this.cardsInfo[playerIndex].setVisible(true);
+                        } else {
+                            this.cardsInfo[playerIndex].setString('');
+                            this.cardsInfo[playerIndex].setVisible(false);
+                        }
                     } else {
-                        this.cardsInfo[playerIndex].setString('');
-                        this.cardsInfo[playerIndex].setVisible(false);
+
                     }
                 } else {
                     this.scoreLabels[playerIndex].setString('');

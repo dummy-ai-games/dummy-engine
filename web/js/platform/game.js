@@ -136,8 +136,9 @@ function initWebsock() {
     rtc.on('__new_peer_2', function (data) {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
-
+        gameStatus = tableStatus;
         if (gameStatus === STATUS_GAME_FINISHED) {
+            // always show winners
             return;
         }
 
@@ -153,12 +154,12 @@ function initWebsock() {
             currentPlayers = inPlayers.length;
             onLinePlayers = 0;
             for (var i = 0; i < inPlayers.length; i++) {
-                if (inPlayers[i].isOnline && true === inPlayers[i].isOnline) {
-                    var playerName = inPlayers[i].playerName;
-                    var playerDisplayName = findDBPlayerNameByName(playerName);
-                    console.log('create player ' + playerName);
-                    players[i] = new Player(playerName, playerDisplayName,
-                        defaultInitChips, true, 0, inPlayers[i].isOnline);
+                var playerName = inPlayers[i].playerName;
+                var playerDisplayName = findDBPlayerNameByName(playerName);
+                console.log('create player ' + playerName);
+                players[i] = new Player(playerName, playerDisplayName,
+                    defaultInitChips, true, 0, inPlayers[i].isOnline);
+                if (undefined !== inPlayers[i].isOnline && null !== inPlayers[i].isOnline && inPlayers[i].isOnline) {
                     onLinePlayers++;
                 }
             }
@@ -167,7 +168,6 @@ function initWebsock() {
         // sync game status here
         console.log('game status = ' + tableStatus);
         console.log('local players = ' + JSON.stringify(players));
-        gameStatus = tableStatus;
 
         if (gameStatus === STATUS_GAME_RUNNING) {
             updateGame(data.basicData, false, false);
