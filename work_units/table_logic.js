@@ -17,6 +17,10 @@ exports.listTablesWorkUnit = function(callback) {
 };
 
 exports.updateTableWorkUnit = function(tableNumber, newTable, callback) {
+    if (null === tableNumber) {
+        callback(errorCode.FAILED);
+    }
+
     var conditions = {
         tableNumber: tableNumber
     };

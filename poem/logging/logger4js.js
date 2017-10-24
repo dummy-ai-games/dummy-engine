@@ -64,7 +64,7 @@ var userDevelopmentLog = log4js.getLogger('userDevelopmentLog');
 helper.info = function (msg) {
     var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
-        userDebugLog.info(date + ": " + msg);
+        console.log(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {
         userProductionLog.info(date + ": " + msg);
     } else {

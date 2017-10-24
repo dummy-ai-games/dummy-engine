@@ -58,8 +58,6 @@ exports.getRankedPlayersWorkUnit = function(callback) {
                                 players.push(game.players[pIndex]);
                             }
                         }
-                    } else {
-                        logger.info('game does not exist per tableNumber : ' + table.tableNumber);
                     }
                     innerCallback();
                 });
