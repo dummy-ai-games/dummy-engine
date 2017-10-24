@@ -133,7 +133,6 @@ public class PlayerImport {
                 playerDocument.add(new Document("playerName", player.getPlayerName())
                         .append("displayName", player.getDisplayName())
                         .append("tableNumber", player.getTableNumber() + "")
-                        .append("port", "" + targetPort)
                 );
 
                 playersInTable++;
