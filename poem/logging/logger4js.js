@@ -23,7 +23,7 @@ log4js.configure({
     appenders: {
         default: {
             type: "dateFile",
-            filename: logRoot + productionLogFolder + logFile,
+            filename: logRoot + devLogFolder + logFile,
             pattern: "-yyyy-MM-dd",
             alwaysIncludePattern: false,
             maxLogSize: 1024
@@ -37,7 +37,7 @@ log4js.configure({
         },
         userDebugLog: {
             type: "file",
-            filename: logRoot + productionLogFolder + logFile,
+            filename: logRoot + userDebugLogFolder + logFile,
             maxLogSize: 268435456,
             backups: 10,
             compress: true
