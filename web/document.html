@@ -1107,9 +1107,12 @@
                 <div class="tab-pane" id="release_note">
                     <div>
                         <h4>V1.3.2 (2017-10-25)</h4>
-                        修改了日志机制, 并减少了无用的日志<br>
-                        游戏中有玩家退出时, 刷新Live UI不会丢失玩家了<br>
-                        其它bug修复
+                        限制单个日志文件大小, 避免崩溃<br>
+                        修复了关键bug: 玩家用重复登录并退出时可以踢掉同名玩家<br>
+                        修复了关键bug: 由楼上的bug引起的LiveUI中玩家消失和指令错乱问题<br>
+                        修复了Round Clear时对Straight牌型显示错误的问题<br>
+                        更正了同为Flush牌型的比牌方式, 目前修改为只在Flush内部比较高牌<br>
+                        修复了导入玩家时出现table重复以及排名查询时找不到table的问题<br>
                     </div>
                     <br>
                     <div>
