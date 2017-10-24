@@ -29,7 +29,6 @@ exports.createGame = function (game, callback) {
             game.updateTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
             collection.insert(game, function (err, docs) {
                 if (!err) {
-                    logger.info('create game ' + game.tableNumber + ',  successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('create game ' + game.tableNumber + ', failed : ' + err);
@@ -56,7 +55,6 @@ exports.updateTable = function(conditions, newGame, callback) {
                 }
             }, function (err, result) {
                 if (!err) {
-                    logger.info('update game ' + newGame.tableNumber + ' successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('update game ' + newGame.tableNumber + ' failed: ' + err);

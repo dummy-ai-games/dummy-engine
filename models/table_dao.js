@@ -25,7 +25,6 @@ exports.createTable = function(table, callback) {
             table.updateTime = dateUtils.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
             collection.insert(table, function (err, docs) {
                 if (!err) {
-                    logger.info('insert table ' + table.tableNumber + ' successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('insert player ' + table.tableNumber + ' failed : ' + err);
@@ -52,7 +51,6 @@ exports.updateTable = function(conditions, newTable, callback) {
                 }
             }, function (err, result) {
                 if (!err) {
-                    logger.info('update table ' + newTable.tableNumber + ' successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('update table ' + newTable.tableNumber + ' failed: ' + err);
@@ -91,7 +89,6 @@ exports.listTablesForTrace = function (from, count, callback) {
             collection.find().skip(parseInt(from)).limit(parseInt(count)).sort({tableNumber: 1})
                 .toArray(function (err, results) {
                 if (!err) {
-                    logger.info('list tables successfully');
                     callback(errorCode.SUCCESS, results);
                 } else {
                     logger.error('list tables error : ' + err);
@@ -110,7 +107,6 @@ exports.getTables = function(conditions, callback) {
         if (!err) {
             collection.find(conditions).toArray(function (err, results) {
                 if (!err) {
-                    logger.info('get tables successfully');
                     callback(errorCode.SUCCESS, results);
                 } else {
                     logger.error('get tables error : ' + err);
@@ -129,7 +125,6 @@ exports.clearTables = function (callback) {
         if (!err) {
             collection.remove({}, function (err, docs) {
                 if (!err) {
-                    logger.info('remove all tables success');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('remove all tables failed');

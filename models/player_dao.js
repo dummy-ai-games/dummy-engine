@@ -41,7 +41,6 @@ exports.countPlayers = function (conditions, callback) {
         if (!err) {
             collection.find(conditions).count(function(err, count) {
                 if (!err) {
-                    logger.info('count players successfully');
                     callback(errorCode.SUCCESS, count);
                 } else {
                     logger.error('count players error : ' + err);
@@ -104,7 +103,6 @@ exports.createPlayer = function (player, callback) {
         if (!err) {
             collection.insert(player, function (err, docs) {
                 if (!err) {
-                    logger.info('insert player ' + player.playerName + ' successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('insert player ' + player.playerName + ' failed : ' + err);
@@ -129,7 +127,6 @@ exports.updatePlayer = function(conditions, newPlayer, callback) {
                 }
             }, function (err, result) {
                 if (!err) {
-                    logger.info('update player ' + newPlayer.playerName + ' successfully : ' + JSON.stringify(result));
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('update player ' + newPlayer.playerName + ' failed: ' + err);
@@ -148,7 +145,6 @@ exports.deletePlayer = function (conditions, callback) {
         if (!err) {
             collection.remove(conditions, function (err) {
                 if (!err) {
-                    logger.info('delete player successfully');
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.error('insert player failed : ' + err);

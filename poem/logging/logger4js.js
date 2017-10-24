@@ -29,18 +29,18 @@ log4js.configure({
             maxLogSize: 1024
         },
         userProductionLog: {
-            type: "dateFile",
+            type: "file",
             filename: logRoot + productionLogFolder + logFile,
-            pattern: "-yyyy-MM-dd",
-            alwaysIncludePattern: false,
-            maxLogSize: 1024
+            maxLogSize: 268435456,
+            backups: 10,
+            compress: true
         },
         userDebugLog: {
-            type: "dateFile",
-            filename: logRoot + userDebugLogFolder + logFile,
-            pattern: "-yyyy-MM-dd",
-            alwaysIncludePattern: false,
-            maxLogSize: 1024
+            type: "file",
+            filename: logRoot + productionLogFolder + logFile,
+            maxLogSize: 268435456,
+            backups: 10,
+            compress: true
         },
         userDevelopmentLog: {
             type: "dateFile",
