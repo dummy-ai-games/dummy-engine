@@ -3,10 +3,10 @@
  * 2017-10-19
  */
 
-$(document).ready(function() {
+$(document).ready(function () {
     // initialize score board
     updateScoreBoard();
-    setInterval(function() {
+    setInterval(function () {
         updateScoreBoard();
     }, 10 * 1000);
 });
@@ -18,7 +18,7 @@ function updateScoreBoard() {
         dataType: 'json',
         timeout: 20000,
         success: function (response) {
-            if(response.status.code === 0) {
+            if (response.status.code === 0) {
                 console.log(response.entity);
                 onScoreBoardUpdated(response.entity);
             } else {

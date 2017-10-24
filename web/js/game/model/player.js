@@ -13,7 +13,7 @@
  * @param _online
  * @constructor
  */
-var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCount, _online) {
+var Player = function (_playerName, _displayName, _chips, _isSurvive, _reloadCount, _online) {
     this.id = 0;
     this.playerName = _playerName;
     this.displayName = _displayName;
@@ -46,86 +46,86 @@ var Player = function(_playerName, _displayName, _chips, _isSurvive, _reloadCoun
     this.reloadCount = 0;
 };
 
-Player.prototype.setId = function(_id) {
+Player.prototype.setId = function (_id) {
     this.id = _id;
 };
 
-Player.prototype.setDisplayName = function(_displayName) {
+Player.prototype.setDisplayName = function (_displayName) {
     this.displayName = _displayName;
 };
 
-Player.prototype.setSurvive = function(_isSurvive) {
+Player.prototype.setSurvive = function (_isSurvive) {
     this.isSurvive = _isSurvive;
 };
 
-Player.prototype.setOnline = function(_online) {
+Player.prototype.setOnline = function (_online) {
     this.online = _online;
 };
 
-Player.prototype.setChips = function(_chips) {
+Player.prototype.setChips = function (_chips) {
     this.chips = _chips;
 };
 
-Player.prototype.setTotalChips = function(defaultChips, reloadChance) {
+Player.prototype.setTotalChips = function (defaultChips, reloadChance) {
     this.totalChips = this.chips + defaultChips * (reloadChance - this.reloadCount);
 };
 
-Player.prototype.setReloadCount = function(_reloadCount) {
+Player.prototype.setReloadCount = function (_reloadCount) {
     this.reloadCount = _reloadCount;
 };
 
-Player.prototype.setBet = function(_bet) {
+Player.prototype.setBet = function (_bet) {
     this.bet = _bet;
     this.accumulate = this.bet + this.roundBet;
 };
 
-Player.prototype.setRoundBet = function(_roundBet) {
+Player.prototype.setRoundBet = function (_roundBet) {
     this.roundBet = _roundBet;
     this.accumulate = this.bet + this.roundBet;
 };
 
-Player.prototype.setAccumulate = function(_accumulate) {
+Player.prototype.setAccumulate = function (_accumulate) {
     this.accumulate = _accumulate;
 };
 
-Player.prototype.setAction = function(_action) {
+Player.prototype.setAction = function (_action) {
     this.action = _action;
 };
 
-Player.prototype.setInTurn = function(_inTurn) {
+Player.prototype.setInTurn = function (_inTurn) {
     this.inTurn = _inTurn;
 };
 
-Player.prototype.setSmallBlind = function(_isSmallBlind) {
+Player.prototype.setSmallBlind = function (_isSmallBlind) {
     this.isSmallBlind = _isSmallBlind;
 };
 
-Player.prototype.setBigBlind = function(_isBigBlind) {
+Player.prototype.setBigBlind = function (_isBigBlind) {
     this.isBigBlind = _isBigBlind;
 };
 
-Player.prototype.setPrivateCards = function(_privateCard0, _privateCard1) {
+Player.prototype.setPrivateCards = function (_privateCard0, _privateCard1) {
     this.privateCards[0] = _privateCard0;
     this.privateCards[1] = _privateCard1;
 };
 
-Player.prototype.setFolded = function(_folded) {
+Player.prototype.setFolded = function (_folded) {
     this.folded = _folded;
 };
 
-Player.prototype.setAllin = function(_allin) {
+Player.prototype.setAllin = function (_allin) {
     this.allin = _allin;
 };
 
-Player.prototype.setTakeAction = function(_takeAction) {
+Player.prototype.setTakeAction = function (_takeAction) {
     this.takeAction = _takeAction;
 };
 
-Player.prototype.setHand = function(_hand) {
+Player.prototype.setHand = function (_hand) {
     this.hand = _hand;
 };
 
-Player.prototype.setPrize = function(_prize) {
+Player.prototype.setPrize = function (_prize) {
     this.prize = _prize;
 };
 

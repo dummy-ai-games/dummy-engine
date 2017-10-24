@@ -22,7 +22,7 @@ function gotoGame() {
     var defaultLostTimeout = $('#game_lost_timeout').val();
     var reloadChance = $('#game_reload_chance').val();
     var bgm = $('#game_bgm').is(':checked') ? 1 : 0;
-    var autoRestart = $('#auto_restart').is(':checked') ? 1 : 0 ;
+    var autoRestart = $('#auto_restart').is(':checked') ? 1 : 0;
 
     console.log('parameters : ' + tableNumber + ', ' + defaultChips + ', ' + defaultSb + ', ' + defaultRoundInterval +
         ', ' + defaultCommandInterval + ', ' + bgm + ', ' + autoRestart + ', ' + reloadChance);
@@ -33,7 +33,7 @@ function gotoGame() {
     window.open('./game.html?table='+tableNumber+'&bgm='+bgm+'&auto='+autoRestart+'&defaultChips='+defaultChips+
         '&defaultSb='+defaultSb+'&roundInterval='+defaultRoundInterval+'&commandInterval='+defaultCommandInterval+
         '&reloadChance='+reloadChance+'&commandTimeout='+defaultCommandTimeout+'&lostTimeout='+defaultLostTimeout,
-            '_blank');
+        '_blank');
     localStorage.setItem('game_table', tableNumber);
     $('#goto_game_dialog').modal('hide');
 
@@ -73,7 +73,7 @@ function gotoPlay() {
 }
 
 function joinGame(tableNumber, playerName) {
-    window.open('./game.html?table='+tableNumber+'&name='+playerName, '_blank');
+    window.open('./game.html?table=' + tableNumber + '&name=' + playerName, '_blank');
     $('#play_player_name').val('');
     localStorage.setItem('game_table', tableNumber);
     $('#goto_play_dialog').modal('hide');

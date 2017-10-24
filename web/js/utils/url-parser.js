@@ -4,15 +4,16 @@
  */
 
 function truncate(str, len) {
-    if(str.length > len)
+    if (str.length > len)
         return str.substring(0, len) + "...";
     else
         return str;
 }
 
 function getQueryStringRegExp(name) {
-    var reg = new RegExp("(^|\\?|&|)"+ name +"=([^&]*)(\\s|&|$|)", "i");
-    if (reg.test(decodeURI(location.href))) return unescape(RegExp.$2.replace(/\+/g, " ")); return "";
+    var reg = new RegExp("(^|\\?|&|)" + name + "=([^&]*)(\\s|&|$|)", "i");
+    if (reg.test(decodeURI(location.href))) return unescape(RegExp.$2.replace(/\+/g, " "));
+    return "";
 }
 
 function getParameter(name) {

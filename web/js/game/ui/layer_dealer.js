@@ -122,7 +122,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.titleLabel.enableShadow(shadowColor, cc.size(0, -4), 0);
         this.titleLabel.setScale(this.gameScale);
         this.titleLabel.setPosition((this.validWidth - this.titleLabel.getContentSize().width * this.gameScale) / 2,
-                this.validHeight / 12 * 9);
+            this.validHeight / 12 * 9);
         this.addChild(this.titleLabel, 2);
 
         // initialize board number
@@ -136,7 +136,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.boardLabel.boundingHeight = this.boardTextHeight;
         this.boardLabel.setScale(this.gameScale);
         this.boardLabel.setPosition((this.validWidth - this.boardLabel.getContentSize().width * this.gameScale) / 2,
-                this.roundTextMarginBottom * this.gameScale);
+            this.roundTextMarginBottom * this.gameScale);
         this.addChild(this.boardLabel, 2);
 
         // initialize name labels
@@ -189,14 +189,14 @@ var DealerLayer = cc.LayerColor.extend({
         this.doUpdate();
     },
 
-    reset: function() {
+    reset: function () {
     },
 
-    removeAll: function() {
+    removeAll: function () {
         this.reset();
     },
 
-    doUpdate: function() {
+    doUpdate: function () {
         if (playMode === MODE_LIVE) {
             this.updateControl();
         }
@@ -204,7 +204,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.updatePlayers();
     },
 
-    updatePlayers: function() {
+    updatePlayers: function () {
         var playerIndex;
         if (dbPlayers && this.playerLabels) {
             for (playerIndex = 0; playerIndex < dbPlayers.length; playerIndex++) {
@@ -227,7 +227,7 @@ var DealerLayer = cc.LayerColor.extend({
         }
     },
 
-    updateControl: function() {
+    updateControl: function () {
         if (gameStatus === STATUS_GAME_STANDBY || gameStatus === STATUS_GAME_FINISHED) {
             this.stopButton.setVisible(false);
             this.startButton.setVisible(true);
@@ -253,7 +253,7 @@ var DealerLayer = cc.LayerColor.extend({
         }
     },
 
-    updateCountDown: function() {
+    updateCountDown: function () {
         if (gameStatus === STATUS_GAME_PREPARING) {
             if (gameCountDown > 1) {
                 this.boardLabel.setString('Game will start in ' + gameCountDown + ' seconds');
@@ -266,11 +266,11 @@ var DealerLayer = cc.LayerColor.extend({
         }
     },
 
-    resetCountDown: function() {
+    resetCountDown: function () {
         gameCountDown = 3;
     },
 
-    isPlayerIn: function(playerName) {
+    isPlayerIn: function (playerName) {
         if (!players) {
             return false;
         }
@@ -285,7 +285,7 @@ var DealerLayer = cc.LayerColor.extend({
     },
 
     // UI helpers
-    enableButton: function(button, enable) {
+    enableButton: function (button, enable) {
         if (button && button.isEnabled() !== enable) {
             button.setEnabled(enable);
             button.setBright(enable);

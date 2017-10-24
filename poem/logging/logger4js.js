@@ -25,20 +25,19 @@ log4js.configure({
             type: "dateFile",
             filename: logRoot + devLogFolder + logFile,
             pattern: "-yyyy-MM-dd",
-            alwaysIncludePattern: false,
-            maxLogSize: 1024
+            alwaysIncludePattern: false
         },
         userProductionLog: {
             type: "file",
             filename: logRoot + productionLogFolder + logFile,
-            maxLogSize: 268435456,
+            maxLogSize: 104857600,
             backups: 10,
             compress: true
         },
         userDebugLog: {
             type: "file",
             filename: logRoot + userDebugLogFolder + logFile,
-            maxLogSize: 268435456,
+            maxLogSize: 104857600,
             backups: 10,
             compress: true
         },
@@ -46,8 +45,7 @@ log4js.configure({
             type: "dateFile",
             filename: logRoot + devLogFolder + logFile,
             pattern: "-yyyy-MM-dd",
-            alwaysIncludePattern: false,
-            maxLogSize: 1024
+            alwaysIncludePattern: false
         }
     },
     categories: {
@@ -66,7 +64,7 @@ var userDevelopmentLog = log4js.getLogger('userDevelopmentLog');
 helper.info = function (msg) {
     var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
-        console.log(date + ": " + msg);
+        userDebugLog.info(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {
         userProductionLog.info(date + ": " + msg);
     } else {

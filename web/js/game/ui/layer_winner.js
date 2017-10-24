@@ -74,7 +74,7 @@ var WinnerLayer = cc.LayerColor.extend({
         this.addChild(this.bgSprite, 0);
 
         // initialize title
-        this.congratulationLabel= new cc.LabelTTF('CONGRATULATIONS', this.titleFont, this.titleTextSize);
+        this.congratulationLabel = new cc.LabelTTF('CONGRATULATIONS', this.titleFont, this.titleTextSize);
         this.congratulationLabel.setColor(cc.color(255, 255, 0, 255));
         this.congratulationLabel.setAnchorPoint(0, 0);
         this.congratulationLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
@@ -87,7 +87,7 @@ var WinnerLayer = cc.LayerColor.extend({
         this.congratulationLabel
             .setPosition((this.bgSprite.getContentSize().width * this.bgScaleX -
                 this.congratulationLabel.getContentSize().width * this.gameScale) / 2,
-                    this.titleTextMarginBottom * this.gameScale);
+                this.titleTextMarginBottom * this.gameScale);
         this.addChild(this.congratulationLabel, 2);
 
         var winnerIndex;
@@ -134,14 +134,14 @@ var WinnerLayer = cc.LayerColor.extend({
         this.doUpdate();
     },
 
-    reset: function() {
+    reset: function () {
     },
 
-    removeAll: function() {
+    removeAll: function () {
         this.reset();
     },
 
-    doUpdate: function() {
+    doUpdate: function () {
         var winnerIndex;
         if (this.winners) {
             var winnersCount = Math.min(this.maxWinners, this.winners.length);
@@ -158,7 +158,7 @@ var WinnerLayer = cc.LayerColor.extend({
         }
     },
 
-    setWinners: function(_winners) {
+    setWinners: function (_winners) {
         this.winners = _winners;
     }
 });

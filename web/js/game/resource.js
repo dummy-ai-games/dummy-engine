@@ -129,7 +129,7 @@ var s_p_AH = './res/images/poker/AH.png';
 var s_p_AS = './res/images/poker/AS.png';
 var s_p_empty = './res/images/poker/empty.png';
 var s_p_back = './res/images/poker/back.png';
-var s_p_mask= './res/images/poker/mask.png';
+var s_p_mask = './res/images/poker/mask.png';
 
 var pokerMap = new Map();
 pokerMap.set('2C', s_p_2C);
@@ -240,8 +240,8 @@ var s_a_avatar_d = './res/images/avatars/avatar_d.png';
 var s_a_avatar_e = './res/images/avatars/avatar_e.png';
 var s_a_avatar_f = './res/images/avatars/avatar_f.png';
 var avatars = [s_a_avatar_0, s_a_avatar_1, s_a_avatar_2, s_a_avatar_3, s_a_avatar_4, s_a_avatar_5,
-                s_a_avatar_6, s_a_avatar_7, s_a_avatar_8, s_a_avatar_9, s_a_avatar_a, s_a_avatar_b,
-                s_a_avatar_c, s_a_avatar_d, s_a_avatar_e, s_a_avatar_f];
+    s_a_avatar_6, s_a_avatar_7, s_a_avatar_8, s_a_avatar_9, s_a_avatar_a, s_a_avatar_b,
+    s_a_avatar_c, s_a_avatar_d, s_a_avatar_e, s_a_avatar_f];
 
 
 // global resource list

@@ -6,26 +6,26 @@
 function Map() {
     this.elements = [];
 
-    this.size = function() {
+    this.size = function () {
         return this.elements.length;
     };
 
-    this.isEmpty = function() {
+    this.isEmpty = function () {
         return (this.elements.length < 1);
     };
 
-    this.clear = function() {
+    this.clear = function () {
         this.elements = [];
     };
 
-    this.put = function(_key, _value) {
-        this.elements.push( {
-            key : _key,
-            value : _value
+    this.put = function (_key, _value) {
+        this.elements.push({
+            key: _key,
+            value: _value
         });
     };
 
-    this.remove = function(_key) {
+    this.remove = function (_key) {
         var bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
@@ -40,7 +40,7 @@ function Map() {
         return bln;
     };
 
-    this.get = function(_key) {
+    this.get = function (_key) {
         try {
             for (i = 0; i < this.elements.length; i++) {
                 if (this.elements[i].key == _key) {
@@ -52,27 +52,27 @@ function Map() {
         }
     };
 
-    this.set = function(_key, _value) {
-        for(i = 0; i < this.elements.length; i++) {
+    this.set = function (_key, _value) {
+        for (i = 0; i < this.elements.length; i++) {
             if (this.elements[i].key == _key) {
                 this.elements[i].value = _value;
                 return;
             }
         }
         this.elements.push({
-            key : _key,
-            value : _value
+            key: _key,
+            value: _value
         });
     };
 
-    this.element = function(_index) {
+    this.element = function (_index) {
         if (_index < 0 || _index >= this.elements.length) {
             return null;
         }
         return this.elements[_index];
     };
 
-    this.containsKey = function(_key) {
+    this.containsKey = function (_key) {
         var bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
@@ -86,7 +86,7 @@ function Map() {
         return bln;
     };
 
-    this.containsValue = function(_value) {
+    this.containsValue = function (_value) {
         var bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
@@ -100,7 +100,7 @@ function Map() {
         return bln;
     };
 
-    this.values = function() {
+    this.values = function () {
         var arr = [];
         for (i = 0; i < this.elements.length; i++) {
             arr.push(this.elements[i].value);
@@ -108,7 +108,7 @@ function Map() {
         return arr;
     };
 
-    this.keys = function() {
+    this.keys = function () {
         var arr = [];
         for (i = 0; i < this.elements.length; i++) {
             arr.push(this.elements[i].key);

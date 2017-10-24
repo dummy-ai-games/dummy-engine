@@ -47,25 +47,23 @@ function getCardsByNumber(cards, data, result) {
 function getCardsByColor(cards, data, result) {
     for (var i = 0; i < data.length; i++)
         result.push(getCardByColor(cards, data[i]));
-    result.sort(sortNumber);
-}
 
-function sortNumber(a, b) {
-    var basicCard = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
-    var t = basicCard.indexOf(b[0]);
-    var t2 = basicCard.indexOf(a[0]);
-    return basicCard.indexOf(a[0]) - basicCard.indexOf(b[0]);
 }
 
 function getCardByColor(cards, color) {
     var result = "N/A";
+    var index = 0;
+    var maxRank = 22;
+    var basicCard = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
     for (var i = 0; i < cards.length; i++) {
-        if (cards[i][1] == color) {
-            result = cards[i];
-            cards.splice(i, 1);
-            break;
+        var rank = basicCard.indexOf(cards[i][0]);
+        if (cards[i][1] == color && rank < maxRank) {
+            index = i;
+            maxRank = rank;
         }
     }
+    result = cards[index];
+    cards.splice(index, 1);
     return result;
 }
 
@@ -193,6 +191,11 @@ function rankHandInt(handCards) {
 
         }
 
+        if (cards.indexOf("A") > -1 && cards.indexOf("2") > -1 && cards.indexOf("3") > -1 && cards.indexOf("4") > -1 && cards.indexOf("5") > -1 && rankCards.length === 0) {
+            var data = "A2345";
+            getCardsByNumber(handCards, data, rankCards);
+
+        }
         if (rankCards.length !== 0) {
             message = 'Straight';
         }

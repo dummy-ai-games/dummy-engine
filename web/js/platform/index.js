@@ -3,5 +3,5 @@
  * 2017-10-12
  */
 
-$(document).ready(function() {
+$(document).ready(function () {
 });

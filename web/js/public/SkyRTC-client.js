@@ -3,18 +3,18 @@
  * 2017-07-22
  */
 
-var SkyRTC = function() {
+var SkyRTC = function () {
 
     function EventEmitter() {
         this.events = {};
     }
 
-    EventEmitter.prototype.on = function(eventName, callback) {
+    EventEmitter.prototype.on = function (eventName, callback) {
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(callback);
     };
 
-    EventEmitter.prototype.emit = function(eventName, _) {
+    EventEmitter.prototype.emit = function (eventName, _) {
         var events = this.events[eventName],
             args = Array.prototype.slice.call(arguments, 1),
             i, m;
@@ -33,12 +33,12 @@ var SkyRTC = function() {
 
     skyrtc.prototype = new EventEmitter();
 
-    skyrtc.prototype.connect = function(server, playerName, tableNumber, isHuman) {
+    skyrtc.prototype.connect = function (server, playerName, tableNumber, isHuman) {
         var socket,
             that = this;
 
         socket = this.socket = new WebSocket(server);
-        socket.onopen = function() {
+        socket.onopen = function () {
             socket.send(JSON.stringify({
                 "eventName": "__join",
                 "data": {
@@ -50,7 +50,7 @@ var SkyRTC = function() {
             that.emit("socket_opened", socket);
         };
 
-        socket.onmessage = function(message) {
+        socket.onmessage = function (message) {
             var json = JSON.parse(message.data);
             if (json.eventName) {
                 that.emit(json.eventName, json.data);
@@ -59,25 +59,25 @@ var SkyRTC = function() {
             }
         };
 
-        socket.onerror = function(error) {
+        socket.onerror = function (error) {
             that.emit("socket_error", error, socket);
         };
 
-        socket.onclose = function(data) {
+        socket.onclose = function (data) {
 
             that.emit('socket_closed', socket);
         };
 
-        this.on('_peers', function(data) {
+        this.on('_peers', function (data) {
             that.emit('connected', socket);
         });
 
-        this.on('_remove_peer', function(data) {
+        this.on('_remove_peer', function (data) {
 
             that.emit("remove_peer", data.socketId);
         });
     };
-    skyrtc.prototype.Bet = function(amount) {
+    skyrtc.prototype.Bet = function (amount) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -88,7 +88,7 @@ var SkyRTC = function() {
             }
         }));
     };
-    skyrtc.prototype.Call = function(playerName) {
+    skyrtc.prototype.Call = function (playerName) {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -98,7 +98,7 @@ var SkyRTC = function() {
             }
         }));
     };
-    skyrtc.prototype.Check = function() {
+    skyrtc.prototype.Check = function () {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -109,7 +109,7 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.Raise = function() {
+    skyrtc.prototype.Raise = function () {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -120,7 +120,7 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.AllIn = function() {
+    skyrtc.prototype.AllIn = function () {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -131,7 +131,7 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.Fold = function() {
+    skyrtc.prototype.Fold = function () {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__action",
@@ -172,13 +172,11 @@ var SkyRTC = function() {
         }));
     };
 
-    skyrtc.prototype.Reload = function() {
+    skyrtc.prototype.Reload = function () {
         var that = this;
         that.socket.send(JSON.stringify({
             "eventName": "__reload",
-            "data": {
-
-            }
+            "data": {}
         }));
     };
 

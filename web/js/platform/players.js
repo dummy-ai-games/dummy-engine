@@ -6,14 +6,13 @@
 var currentTableNumber = 0;
 var selectedPlayer = null;
 
-$(document).ready(function() {
+$(document).ready(function () {
     initUI();
     initData();
 });
 
 function initUI() {
-    $('#tables').select2({
-    });
+    $('#tables').select2({});
 
     $('#display_name_tip').tooltip();
 
@@ -40,7 +39,7 @@ function loadTables() {
         data: {},
         timeout: 20000,
         success: function (response) {
-            if(response.status.code === 0) {
+            if (response.status.code === 0) {
                 console.log('list tables successfully');
                 refreshTables(response.entity);
                 if (0 === currentTableNumber) {
@@ -60,7 +59,7 @@ function loadTables() {
 
 function loadPlayersByTable() {
     var url;
-    url = '/player/get_players?tableNumber='+currentTableNumber;
+    url = '/player/get_players?tableNumber=' + currentTableNumber;
     var tableContainer = $('#player_table_container');
     tableContainer.empty();
     tableContainer.append('<table id="player_table" data-row-style="rowStyle"></table>');
@@ -167,13 +166,13 @@ function refreshTables(tablesList) {
         $.each(tablesList, function (i, table) {
             tables.append($('<option>', {
                 value: table.tableNumber,
-                text : table.tableNumber
+                text: table.tableNumber
             }));
         });
     } else {
         tables.append($('<option>', {
             value: 0,
-            text : '请选择游戏桌号'
+            text: '请选择游戏桌号'
         }));
     }
 
@@ -216,14 +215,14 @@ function updatePlayer() {
         data: selectedPlayer,
         timeout: 20000,
         success: function (response) {
-            if(response.status.code === 0) {
+            if (response.status.code === 0) {
                 popUpHintDialog('添加玩家成功');
                 currentTableNumber = selectedPlayer.tableNumber;
                 tableNumberInput.val(currentTableNumber);
                 onPlayerUnselected();
                 loadTables();
                 loadPlayersByTable();
-            } else if(response.status.code === 1) {
+            } else if (response.status.code === 1) {
                 popUpHintDialog('玩家已存在');
                 currentTableNumber = selectedPlayer.tableNumber;
                 tableNumberInput.val(currentTableNumber);
@@ -255,12 +254,12 @@ function removePlayer() {
         data: selectedPlayer,
         timeout: 20000,
         success: function (response) {
-            if(response.status.code === 0) {
+            if (response.status.code === 0) {
                 console.log('delete player successfully');
                 onPlayerUnselected();
                 loadTables();
                 loadPlayersByTable();
-            } else if(response.status.code === 1) {
+            } else if (response.status.code === 1) {
                 popUpHintDialog('删除玩家失败');
                 onPlayerUnselected();
                 loadTables();

@@ -86,17 +86,17 @@ var BoardLayer = cc.Layer.extend({
     mmMarginTop: 40,
     playerPosition: [
         // players at right side
-        { x: 640, y: 580, chipsYFix: -40, chipsXFix: 0 },
-        { x: 840, y: 500, chipsYFix: 0, chipsXFix: 0 },
-        { x: 860, y: 340, chipsYFix: 0, chipsXFix: 0 },
-        { x: 840, y: 180, chipsYFix: 40, chipsXFix: -30 },
-        { x: 600, y: 80, chipsYFix: 160, chipsXFix: 120 },
+        {x: 640, y: 580, chipsYFix: -40, chipsXFix: 0},
+        {x: 840, y: 500, chipsYFix: 0, chipsXFix: 0},
+        {x: 860, y: 340, chipsYFix: 0, chipsXFix: 0},
+        {x: 840, y: 180, chipsYFix: 40, chipsXFix: -30},
+        {x: 600, y: 80, chipsYFix: 160, chipsXFix: 120},
         // players at left side
-        { x: 280, y: 80, chipsYFix: 160, chipsXFix: -120 },
-        { x:  40, y: 180, chipsYFix: 40, chipsXFix: 30 },
-        { x:  10, y: 340, chipsYFix: 0, chipsXFix: 0 },
-        { x:  40, y: 500, chipsYFix: 0, chipsXFix: 0 },
-        { x: 230, y: 580, chipsYFix: -40, chipsXFix: 0 }
+        {x: 280, y: 80, chipsYFix: 160, chipsXFix: -120},
+        {x: 40, y: 180, chipsYFix: 40, chipsXFix: 30},
+        {x: 10, y: 340, chipsYFix: 0, chipsXFix: 0},
+        {x: 40, y: 500, chipsYFix: 0, chipsXFix: 0},
+        {x: 230, y: 580, chipsYFix: -40, chipsXFix: 0}
     ],
     cardVisualHeight: 100,
     cardVisualWidth: 72,
@@ -148,7 +148,7 @@ var BoardLayer = cc.Layer.extend({
         this.bgSprite = new cc.Sprite(s_bg);
         this.bgSprite.setAnchorPoint(0, 0);
         this.gameScale = this.bgScale = Math.max(this.validHeight / this.bgSprite.getContentSize().height,
-                                    this.validWidth / this.bgSprite.getContentSize().width);
+            this.validWidth / this.bgSprite.getContentSize().width);
         this.bgSprite.setScale(this.bgScale);
         this.bgSprite.setPosition(0, 0);
         this.addChild(this.bgSprite, 0);
@@ -184,7 +184,7 @@ var BoardLayer = cc.Layer.extend({
             this.raiseButton.setScale(this.operationButtonScale);
             this.raiseButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale,
-                    this.opButtonMarginBottom);
+                this.opButtonMarginBottom);
             this.enableButton(this.raiseButton, false);
             this.addChild(this.raiseButton, 2);
             this.raiseButton.addTouchEventListener(function (sender, type) {
@@ -200,7 +200,7 @@ var BoardLayer = cc.Layer.extend({
             this.checkButton.setScale(this.operationButtonScale);
             this.checkButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 2,
-                    this.opButtonMarginBottom);
+                this.opButtonMarginBottom);
             this.enableButton(this.checkButton, false);
             this.addChild(this.checkButton, 2);
             this.checkButton.addTouchEventListener(function (sender, type) {
@@ -216,7 +216,7 @@ var BoardLayer = cc.Layer.extend({
             this.foldButton.setScale(this.operationButtonScale);
             this.foldButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 3,
-                    this.opButtonMarginBottom);
+                this.opButtonMarginBottom);
             this.enableButton(this.foldButton, false);
             this.addChild(this.foldButton, 2);
             this.foldButton.addTouchEventListener(function (sender, type) {
@@ -232,7 +232,7 @@ var BoardLayer = cc.Layer.extend({
             this.allinButton.setScale(this.operationButtonScale);
             this.allinButton.setPosition(this.opButtonMarginLeft * this.gameScale +
                 (this.callButton.getContentSize().width + this.opButtonGap) * this.gameScale * 4,
-                    this.opButtonMarginBottom);
+                this.opButtonMarginBottom);
             this.enableButton(this.allinButton, false);
             this.addChild(this.allinButton, 2);
             this.allinButton.addTouchEventListener(function (sender, type) {
@@ -265,7 +265,7 @@ var BoardLayer = cc.Layer.extend({
             this.bgBet.setScale(this.operationButtonScale);
             this.bgBet.setPosition(this.betButton.getPositionX() +
                 this.betButton.getContentSize().width * this.operationButtonScale + this.betButtonGap,
-                    this.opButtonMarginBottom);
+                this.opButtonMarginBottom);
             this.addChild(this.bgBet, 2);
 
             // bet spinner
@@ -274,7 +274,7 @@ var BoardLayer = cc.Layer.extend({
             this.betSpinnerUp.setScale(this.operationButtonScale);
             this.betSpinnerUp.setPosition(this.bgBet.getPositionX(),
                 this.bgBet.getPositionY() + (this.bgBet.getContentSize().height - this.betSpinnerGap)
-                    * this.operationButtonScale);
+                * this.operationButtonScale);
             this.enableButton(this.betSpinnerUp, false);
             this.addChild(this.betSpinnerUp, 3);
             this.betSpinnerUp.addTouchEventListener(function (sender, type) {
@@ -333,9 +333,9 @@ var BoardLayer = cc.Layer.extend({
         this.bgBoard.setAnchorPoint(0, 0);
         this.boardScale = this.gameScale;
         var boardRealMarginLeft = (this.bgSprite.getContentSize().width - this.bgBoard.getContentSize().width) / 2
-                * this.gameScale;
+            * this.gameScale;
         var boardRealMarginBottom = (this.bgSprite.getContentSize().height - this.bgBoard.getContentSize().height) / 2
-                * this.gameScale;
+            * this.gameScale;
         this.bgBoard.setScale(this.boardScale);
         this.bgBoard.setPosition(boardRealMarginLeft, boardRealMarginBottom);
         this.addChild(this.bgBoard, 2);
@@ -357,7 +357,7 @@ var BoardLayer = cc.Layer.extend({
             this.playerLayers[playerIndex].setAnchorPoint(0, 0);
             this.playerLayers[playerIndex].setScale(this.playerScale);
             this.playerLayers[playerIndex].setPosition(this.playerPosition[playerIndex].x * this.gameScale,
-                                                       this.playerPosition[playerIndex].y * this.gameScale);
+                this.playerPosition[playerIndex].y * this.gameScale);
             this.addChild(this.playerLayers[playerIndex], 5);
             this.playerLayers[playerIndex].setVisible(false);
         }
@@ -370,10 +370,10 @@ var BoardLayer = cc.Layer.extend({
             this.publicCards[publicCardIndex].setAnchorPoint(0, 0);
             this.cardScale =
                 0.85 * Math.max(this.cardVisualHeight / this.publicCards[publicCardIndex].getContentSize().height,
-                    this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.gameScale;
+                this.cardVisualWidth / this.publicCards[publicCardIndex].getContentSize().width) * this.gameScale;
             this.publicCards[publicCardIndex].setScale(this.cardScale);
             this.publicCards[publicCardIndex].setPosition(this.cardMarginLeft[publicCardIndex] * this.gameScale,
-                    this.cardMarginBottom * this.gameScale);
+                this.cardMarginBottom * this.gameScale);
             this.addChild(this.publicCards[publicCardIndex], 2);
             this.publicCards[publicCardIndex].setVisible(false);
         }
@@ -395,8 +395,8 @@ var BoardLayer = cc.Layer.extend({
         this.roundLabel.setScale(this.gameScale);
         this.roundLabel
             .setPosition((this.bgSprite.getContentSize().width - this.roundLabel.getContentSize().width) / 2
-                    * this.gameScale,
-                        this.roundTextMarginBottom * this.gameScale);
+                * this.gameScale,
+                this.roundTextMarginBottom * this.gameScale);
         this.addChild(this.roundLabel, 2);
 
         // initialize board text
@@ -454,7 +454,7 @@ var BoardLayer = cc.Layer.extend({
         this.tmLogo.setScale(this.logoScale);
         this.tmLogo.setPosition((this.bgSprite.getContentSize().width -
             this.tmLogo.getContentSize().width - this.logoMarginRight) * this.gameScale,
-                (this.bgSprite.getContentSize().height -
+            (this.bgSprite.getContentSize().height -
                 this.tmLogo.getContentSize().height - this.logoMarginTop) * this.gameScale);
         this.addChild(this.tmLogo, 2);
 
@@ -521,18 +521,18 @@ var BoardLayer = cc.Layer.extend({
     },
 
     // game operations
-    playerAction: function(callback, param) {
+    playerAction: function (callback, param) {
         callback(param);
     },
 
-    betPlus: function() {
+    betPlus: function () {
         if (this.currentBet * 2 <= playerMaxBet) {
             this.currentBet *= 2;
             this.amountLabel.setString('$' + this.currentBet);
         }
     },
 
-    betMinus: function() {
+    betMinus: function () {
         if (this.currentBet / 2 >= playerMinBet) {
             this.currentBet /= 2;
             this.amountLabel.setString('$' + this.currentBet);
@@ -543,12 +543,12 @@ var BoardLayer = cc.Layer.extend({
         this.doUpdate();
     },
 
-    doUpdate: function() {
+    doUpdate: function () {
         this.updateLayers();
     },
 
-    updateLayers: function() {
-        switch(gameStatus) {
+    updateLayers: function () {
+        switch (gameStatus) {
             case STATUS_GAME_STANDBY:
             case STATUS_GAME_PREPARING:
                 this.showLayer(this.dealerLayer, true);
@@ -579,26 +579,26 @@ var BoardLayer = cc.Layer.extend({
         }
     },
 
-    updateBoardLayer: function() {
+    updateBoardLayer: function () {
         this.updateBoard();
         this.updatePlayers();
     },
 
-    updateScoreLayer: function() {
+    updateScoreLayer: function () {
         this.scoreLayer.setPlayers(players);
         this.scoreLayer.update();
     },
 
-    updateDealerLayer: function() {
+    updateDealerLayer: function () {
         this.dealerLayer.update();
     },
 
-    updateWinnerLayer: function() {
+    updateWinnerLayer: function () {
         this.winnerLayer.update();
     },
 
     // update sub layers
-    updatePlayers: function() {
+    updatePlayers: function () {
         if (!players || players.length === 0) {
             // no players at all
             return;
@@ -618,8 +618,8 @@ var BoardLayer = cc.Layer.extend({
         }
     },
 
-    updateBoard: function() {
-        switch(gameStatus) {
+    updateBoard: function () {
+        switch (gameStatus) {
             case STATUS_GAME_STANDBY:
                 this.roundLabel.setString('BOARD ' + tableNumber + ' - GET READY');
                 break;
@@ -686,17 +686,17 @@ var BoardLayer = cc.Layer.extend({
         }
     },
 
-    updatePublicCardsModel: function() {
+    updatePublicCardsModel: function () {
         this.publicCardsModel = publicCards;
     },
 
     // UI helpers
-    showLayer: function(layer, show) {
+    showLayer: function (layer, show) {
         layer.setVisible(show);
         layer.eventListener.swallowTouches = show;
     },
 
-    updatePlayer: function(playerLayer, player, show) {
+    updatePlayer: function (playerLayer, player, show) {
         if (playerLayer) {
             playerLayer.setPlayer(player);
             playerLayer.setVisible(show);
@@ -714,11 +714,11 @@ var BoardLayer = cc.Layer.extend({
         sprite.runAction(scaleSequence);
     },
 
-    cbYourTurnAnimationFinished: function(nodeExecutingAction, data) {
+    cbYourTurnAnimationFinished: function (nodeExecutingAction, data) {
         console.log('sprite animation finished');
     },
 
-    setYourTurn: function(isYourTurn) {
+    setYourTurn: function (isYourTurn) {
         this.yourTurn.setVisible(isYourTurn);
         this.enableButton(this.callButton, isYourTurn);
         this.enableButton(this.raiseButton, isYourTurn);
@@ -730,7 +730,7 @@ var BoardLayer = cc.Layer.extend({
         this.enableButton(this.betSpinnerDown, isYourTurn);
     },
 
-    initializeAltFrames: function() {
+    initializeAltFrames: function () {
         var index;
         this.pokerBackFrame = new cc.SpriteFrame(s_p_back, cc.rect(0, 0,
             this.publicCards[0].getContentSize().width, this.publicCards[0].getContentSize().height));
@@ -747,20 +747,20 @@ var BoardLayer = cc.Layer.extend({
         }
     },
 
-    changeSpriteImage: function(sprite, srcFrame) {
+    changeSpriteImage: function (sprite, srcFrame) {
         if (sprite && srcFrame) {
             sprite.setSpriteFrame(srcFrame);
         }
     },
 
-    enableButton: function(button, enable) {
+    enableButton: function (button, enable) {
         if (button && button.isEnabled() !== enable) {
             button.setEnabled(enable);
             button.setBright(enable);
         }
     },
 
-    findPlayerLayerByName: function(playerName) {
+    findPlayerLayerByName: function (playerName) {
         for (var i = 0; i < this.maxPlayerCount; i++) {
             if (this.playerLayers[i].player &&
                 this.playerLayers[i].player.playerName === playerName) {

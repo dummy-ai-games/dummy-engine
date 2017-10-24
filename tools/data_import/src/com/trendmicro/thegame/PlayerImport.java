@@ -8,6 +8,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.CellType;
 import org.bson.Document;
 
 import java.io.FileInputStream;
@@ -22,31 +23,21 @@ import java.util.Random;
  */
 public class PlayerImport {
 
-	final static int TEAM_COL = 0;
-	final static int GROUP_COL = 1;
-	final static int NAME_COL = 2;
-	final static int AUTHOR_COL = 3;
+	private final static int TEAM_COL = 0;
+    private final static int GROUP_COL = 1;
+    private final static int NAME_COL = 2;
+    private final static int AUTHOR_COL = 3;
 
     private String poiFile;
-	private String dbHost;
-    private String dbName;
-    private String user;
-    private String password;
 
     private List<Player> playerList;
 
-    private PlayerImport(String poiFile, String dbHost, String dbName, String user, String password) {
+    private PlayerImport(String poiFile) {
         this.poiFile = poiFile;
-        this.dbHost = dbHost;
-        this.dbName = dbName;
-        this.user = user;
-        this.password = password;
     }
 
     private void shufflePlayers() {
-        int playerCount = playerList.size();
-        int max = playerCount;
-        int min = 0;
+        int max = playerList.size();
         for (int i = 0; i < 10000; i++) {
             int index1 = (int)(Math.random() * max);
             int index2 = (int)(Math.random() * max);
@@ -69,25 +60,20 @@ public class PlayerImport {
             HSSFSheet sheet = wb.getSheetAt(0);
             int rowsTotal = sheet.getPhysicalNumberOfRows();
             System.out.println("total teams = " + rowsTotal);
-            // TODO: calculate this total table according to actual players
-            int totalTable = 9;
-
-            String playerName = "";
             String displayName = "";
             String authorName = "";
             String team = "";
             String lastTeam = "";
             int group = 0;
-            int tableNumber = 0;
-            playerList = new ArrayList<Player>();
+            playerList = new ArrayList<>();
             for (int i = 0; i < rowsTotal; i++) {
                 HSSFRow row = sheet.getRow(i);
 
                 if (row != null) {
                     for (int j = 0; j < row.getLastCellNum(); j++) {
                         HSSFCell cell = row.getCell((short) j);
-                        Object value = null;
-                        if (cell.getCellType() == 0) {
+                        Object value;
+                        if (cell.getCellTypeEnum() == CellType.NUMERIC) {
                             value = Math.round(cell.getNumericCellValue());
                         } else {
                             value = cell.getStringCellValue();
@@ -116,7 +102,7 @@ public class PlayerImport {
                     }
                 }
                 Player player =
-                        new Player(team, authorName, displayName, "", 0);
+                        new Player(team, group, authorName, displayName, "", 0);
                 // set random names
                 player.setPlayerName(randomString(16).toUpperCase());
                 playerList.add(player);
@@ -124,7 +110,7 @@ public class PlayerImport {
             // add 4 dummies
             for (int d = 0; d < 4; d++) {
                 Player dummy =
-                        new Player("D" + d, "Dummy", "Dummy" + d,
+                        new Player("D" + d, 0, "Dummy", "Dummy" + d,
                                 "", 0);
                 dummy.setPlayerName(randomString(16).toUpperCase());
                 playerList.add(dummy);
@@ -133,8 +119,9 @@ public class PlayerImport {
             // create tables
             int playersInTable = 0;
             int targetTableNumber = 1;
-            List<Document> playerDocument = new ArrayList<Document>();
-            List<Document> tableDocument = new ArrayList<Document>();
+            int targetPort = 3001;
+            List<Document> playerDocument = new ArrayList<>();
+            List<Document> tableDocument = new ArrayList<>();
 
             for (int i = 0; i < playerList.size(); i++) {
                 Player player = playerList.get(i);
@@ -146,6 +133,7 @@ public class PlayerImport {
                 playerDocument.add(new Document("playerName", player.getPlayerName())
                         .append("displayName", player.getDisplayName())
                         .append("tableNumber", player.getTableNumber() + "")
+                        .append("port", "" + targetPort)
                 );
 
                 playersInTable++;
@@ -154,6 +142,7 @@ public class PlayerImport {
                     // insert into table collection
                     tableDocument.add(new Document("tableNumber", targetTableNumber));
                     targetTableNumber++;
+                    targetPort++;
                 }
             }
             MongoCollection<Document> collection = db.getCollection("tables");
@@ -179,43 +168,36 @@ public class PlayerImport {
     }
 
 	public static void main(String[] args) {
-		if(args.length != 5) {
+		if(args.length != 1) {
 			System.out.println("execute this bin using parameters:");
-			System.out.println("PlayerImport [poiFile] [mongodbHost] [mongodbName] [mongodbUser] [mongodbPassword]");
+			System.out.println("PlayerImport [poiFile]");
 			return;
 		}
 		try {
             String poiFile = args[0];
-			String dbHost = args[1];
-			String dbName = args[2];
-			String user = args[3];
-			String password = args[4];
 
-			PlayerImport playerImport = new PlayerImport(poiFile, dbHost, dbName, user, password);
+			PlayerImport playerImport = new PlayerImport(poiFile);
 			playerImport.importPlayers();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-    public static String randomString(int length) {
-        Random randGen = null;
-        char[] numbersAndLetters = null;
-        Object initLock = new Object();
+    private final static Object initLock = new Object();
+
+    private static String randomString(int length) {
+        Random randGen;
+        char[] numbersAndLetters;
         if (length < 1) {
             return null;
         }
-        if (randGen == null) {
-            synchronized (initLock) {
-                if (randGen == null) {
-                    randGen = new Random();
-                    numbersAndLetters = ("0123456789abcdefghijklmnopqrstuvwxyz" +
-                            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ").toCharArray();
-                }
-            }
+        synchronized (initLock) {
+            randGen = new Random();
+            numbersAndLetters = ("0123456789abcdefghijklmnopqrstuvwxyz" +
+                    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ").toCharArray();
         }
         char [] randBuffer = new char[length];
-        for (int i=0; i<randBuffer.length; i++) {
+        for (int i = 0; i < randBuffer.length; i++) {
             randBuffer[i] = numbersAndLetters[randGen.nextInt(71)];
         }
         return new String(randBuffer);

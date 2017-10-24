@@ -84,7 +84,7 @@ $(document).ready(function () {
     defaultSb = getParameter('defaultSb') || 10;
     defaultChips = getParameter('defaultChips') || 1000;
     reloadChance = getParameter('reloadChance') || 2;
-    commandTimeout = getParameter('commandTimeout') || 2;
+    commandTimeout = getParameter('commandTimeout') || 5;
     lostTimeout = getParameter('lostTimeout') || 10;
 
     if (playerNamePlain) {
@@ -173,7 +173,7 @@ function initWebsock() {
         }
     });
 
-    rtc.on('__left', function(data) {
+    rtc.on('__left', function (data) {
         console.log('legacy left : ' + JSON.stringify(data));
     });
 
@@ -481,22 +481,22 @@ function ccLoad() {
     // init bgm
     audio1 = new Audio('../res/audio/bgm.ogg');
     audio2 = new Audio('../res/audio/bgm.ogg');
-    audio1.addEventListener('timeupdate', function() {
+    audio1.addEventListener('timeupdate', function () {
         if (this.currentTime > 151.7) {
             audio2.play();
         }
     }, false);
-    audio1.addEventListener('ended', function() {
+    audio1.addEventListener('ended', function () {
         this.pause();
         this.currentTime = 0;
     }, false);
 
-    audio2.addEventListener('timeupdate', function() {
+    audio2.addEventListener('timeupdate', function () {
         if (this.currentTime > 151.7) {
             audio1.play();
         }
     }, false);
-    audio2.addEventListener('ended', function() {
+    audio2.addEventListener('ended', function () {
         this.pause();
         this.currentTime = 0;
     }, false);

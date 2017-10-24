@@ -41,7 +41,7 @@ function SkyRTC(tableNumber) {
     this.guests = {};
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
-    //this.playerAndTable = {};
+    // this.playerAndTable = {};
 
     this.on('__join', function (data, socket) {
         var that = this;
@@ -51,7 +51,6 @@ function SkyRTC(tableNumber) {
 
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
         if (playerName) {
-            socket.MD5Id = MD5Utils.MD5(playerName);
             socket.isHuman = isHuman;
         } else if (table) {
             socket.tableNumber = table;
@@ -62,8 +61,9 @@ function SkyRTC(tableNumber) {
         }
 
         if (playerName) {
-            if (that.players[socket.MD5Id]) {
-                logger.warn('player: ' + socket.id + ' already exist, reject');
+            var MD5Id = MD5Utils.MD5(playerName);
+            if (that.players[MD5Id]) {
+                logger.warn('player: ' + playerName + ' already exist, reject');
                 return;
             }
             playerLogic.getPlayerByName(playerName, function (getPlayerErr, player) {
@@ -72,6 +72,7 @@ function SkyRTC(tableNumber) {
                     if (!that.tableNumber || tableNumber === that.tableNumber) {
                         socket.id = playerName;
                         socket.displayName = player.displayName;
+                        socket.MD5Id = MD5Id;
                         var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
                         if (exitPlayerTableNum !== undefined) {
                             socket.tableNumber = exitPlayerTableNum;
@@ -140,9 +141,9 @@ function SkyRTC(tableNumber) {
                 if (player.reloadCount < currentTable.maxReloadCount) {
                     player.chips += currentTable.initChips;
                     player.reloadCount++;
-                    poker.logGame(tableNumber, 'player: ' + playerName + '  reload success');
+                    poker.logGame(tableNumber, 'player: ' + playerName + ', reload success');
                 } else {
-                    poker.logGame(tableNumber, 'player: ' + playerName + '  had used all reload chance');
+                    poker.logGame(tableNumber, 'player: ' + playerName + ',  had used all reload chance');
                 }
             }
         }
@@ -487,7 +488,7 @@ SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
     var rc = 2;
     var ci = 1;
     var ri = 10;
-    var ct = 2;
+    var ct = 5; // schedule to 5 seconds
     var lt = 10;
 
     if (undefined !== defaultSb && null !== defaultSb && defaultSb >= 10) {

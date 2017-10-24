@@ -787,7 +787,7 @@ function checkForWinner(table) {
     winners = [];
     maxRank = 0.000;
     for (k = 0; k < table.players.length; k += 1) {
-        if(table.players[k].isSurvive) {//must remove no survive player, otherwise dead player will relive
+        if (table.players[k].isSurvive) {//must remove no survive player, otherwise dead player will relive
             if (table.players[k].hand.rank === maxRank && table.players[k].folded === false) {
                 winners.push(k);
             }
@@ -2123,7 +2123,7 @@ function progress(table) {
                 table.game.bets.splice(0, table.game.bets.length);
                 // Evaluate each hand
                 for (j = 0; j < table.players.length; j += 1) {
-                    if(table.players[j].isSurvive) {
+                    if (table.players[j].isSurvive) {
                         cards = table.players[j].cards.concat(table.game.board);
                         hand = new Hand(cards);
                         table.players[j].hand = rankHand(hand);
@@ -2370,7 +2370,7 @@ function updateTable(table, status) {
         players: players,
         status: status
     };
-    tableLogic.updateTableWorkUnit(table.tableNumber, newTable, function(updateTableErr) {
+    tableLogic.updateTableWorkUnit(table.tableNumber, newTable, function (updateTableErr) {
         if (updateTableErr.code === errorCode.SUCCESS.code) {
         }
     })

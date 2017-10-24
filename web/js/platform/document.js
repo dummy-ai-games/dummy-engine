@@ -3,13 +3,12 @@
  * 2017-09-20
  */
 
-$(document).ready(function() {
+$(document).ready(function () {
     initUI();
 });
 
 function initUI() {
-    $('#server_types').select2({
-    });
+    $('#server_types').select2({});
 }
 
 function createDummy() {

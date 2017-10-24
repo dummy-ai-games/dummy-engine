@@ -85,7 +85,7 @@ var ScoreLayer = cc.LayerColor.extend({
         this.size = cc.size(this.validWidth, this.validHeight);
 
         // initialize title
-        this.titleLabel= new cc.LabelTTF('Round 1 Clear', this.titleFont, this.titleTextSize);
+        this.titleLabel = new cc.LabelTTF('Round 1 Clear', this.titleFont, this.titleTextSize);
         this.titleLabel.setColor(cc.color(255, 255, 0, 255));
         this.titleLabel.setAnchorPoint(0, 0);
         this.titleLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
@@ -96,7 +96,7 @@ var ScoreLayer = cc.LayerColor.extend({
         this.titleLabel
             .setPosition((this.validWidth -
                 this.titleLabel.getContentSize().width * this.gameScale) / 2,
-                    this.titleTextMarginBottom * this.gameScale);
+                this.titleTextMarginBottom * this.gameScale);
         this.addChild(this.titleLabel, 2);
 
         // initialize player score labels
@@ -124,7 +124,7 @@ var ScoreLayer = cc.LayerColor.extend({
                         (this.scoreTextsMarginBottom -
                             (this.scoreLabels[playerIndex].getContentSize().height + this.scoreTextMarginTop)
                             * (playerIndex - 5)) *
-                                this.gameScale);
+                        this.gameScale);
             }
             this.addChild(this.scoreLabels[playerIndex], 2);
         }
@@ -140,8 +140,8 @@ var ScoreLayer = cc.LayerColor.extend({
             this.medals[medalIndex].setPosition(this.scoreLabels[0].getPositionX() -
                 this.medals[medalIndex].getContentSize().width * this.medalScale -
                 this.medalMarginRight * this.gameScale,
-                    this.scoreLabels[medalIndex].getPositionY() -
-                    this.medals[medalIndex].getContentSize().height * this.medalScale);
+                this.scoreLabels[medalIndex].getPositionY() -
+                this.medals[medalIndex].getContentSize().height * this.medalScale);
 
             this.addChild(this.medals[medalIndex], 2);
         }
@@ -191,8 +191,8 @@ var ScoreLayer = cc.LayerColor.extend({
 
         if (playMode === MODE_PLAYER) {
             this.reloadButton = new ccui.Button(s_o_reload_button,
-                                                   s_o_reload_button_pressed,
-                                                   s_o_reload_button_disabled);
+                s_o_reload_button_pressed,
+                s_o_reload_button_disabled);
             this.reloadButton.setAnchorPoint(0, 0);
             this.reloadButton.setScale(this.gameScale * 0.8);
             this.reloadButton.setPosition((this.validWidth -
@@ -233,14 +233,14 @@ var ScoreLayer = cc.LayerColor.extend({
         this.doUpdate();
     },
 
-    reset: function() {
+    reset: function () {
     },
 
-    removeAll: function() {
+    removeAll: function () {
         this.reset();
     },
 
-    doUpdate: function() {
+    doUpdate: function () {
         // update round label
         this.titleLabel.setString('Round ' + currentRound + ' Clear');
 
@@ -350,7 +350,7 @@ var ScoreLayer = cc.LayerColor.extend({
         }
     },
 
-    setPlayers: function(_players) {
+    setPlayers: function (_players) {
         this.players = _players;
         if (this.players) {
             this.players.sort(compare);
@@ -358,7 +358,7 @@ var ScoreLayer = cc.LayerColor.extend({
     },
 
     // UI helpers
-    initializeAltFrames: function() {
+    initializeAltFrames: function () {
         var index;
         var cardSprite = this.playerHands[0][0];
         this.pokerBackFrame = new cc.SpriteFrame(s_p_back, cc.rect(0, 0,
@@ -376,7 +376,7 @@ var ScoreLayer = cc.LayerColor.extend({
         }
     },
 
-    changeSpriteImage: function(sprite, srcFrame) {
+    changeSpriteImage: function (sprite, srcFrame) {
         if (sprite && srcFrame) {
             sprite.setSpriteFrame(srcFrame);
         }

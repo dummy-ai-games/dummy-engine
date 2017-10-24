@@ -86,7 +86,7 @@ function initRTC() {
         }
     });
 
-    rtc.on('__deal', function(data) {
+    rtc.on('__deal', function (data) {
         writeToCommands('<<< deal: ' + JSON.stringify(data, null, 4));
     });
 
@@ -95,11 +95,11 @@ function initRTC() {
         reload();
     });
 
-    rtc.on('__round_end', function(data) {
+    rtc.on('__round_end', function (data) {
         writeToCommands('<<< round end: ' + JSON.stringify(data, null, 4));
     });
 
-    rtc.on('__game_over', function(data) {
+    rtc.on('__game_over', function (data) {
         writeToCommands('<<< game over: ' + JSON.stringify(data, null, 4));
     });
 }

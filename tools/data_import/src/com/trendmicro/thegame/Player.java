@@ -2,13 +2,15 @@ package com.trendmicro.thegame;
 
 public class Player {
     private String team;
+    private int group;
     private String author;
     private String displayName;
     private String playerName;
     private int tableNumber;
 
-    public Player(String team, String author, String displayName, String playerName, int tableNumber) {
+    public Player(String team, int group, String author, String displayName, String playerName, int tableNumber) {
         this.team = team;
+        this.group = group;
         this.author = author;
         this.displayName = displayName;
         this.playerName = playerName;
@@ -25,6 +27,14 @@ public class Player {
 
     public void setTeam(String team) {
         this.team = team;
+    }
+
+    public int getGroup() {
+        return group;
+    }
+
+    public void setGroup(int group) {
+        this.group = group;
     }
 
     public String getAuthor() {

@@ -5,7 +5,7 @@
 
 var tileStyles = ['tile-teal', 'tile-blue', 'tile-yellow', 'tile-red', 'tile-orange', 'tile-pink',
     'tile-purple', 'tile-lime', 'tile-carrot', 'tile-cloud'];
-$(document).ready(function() {
+$(document).ready(function () {
     initUI();
     initData();
 });
@@ -16,7 +16,7 @@ function initUI() {
 
 function initData() {
     traceTables();
-    setInterval(function() {
+    setInterval(function () {
         traceTables();
     }, 10 * 1000);
 }
@@ -32,7 +32,7 @@ function traceTables() {
         },
         timeout: 20000,
         success: function (response) {
-            if(response.status.code === 0) {
+            if (response.status.code === 0) {
                 console.log(response.entity);
                 onTableUpdated(response.entity);
             } else {
@@ -99,7 +99,7 @@ function onTableUpdated(tables) {
             }
             var tile = '<div class="col-sm-4 col-md-4">' +
                 '<div class="thumbnail tile tile-wide ' + tileStyle + '">' +
-                '<a href="#" style="text-decoration:none;" onclick="gotoLive('+tableNumber+')">' +
+                '<a href="#" style="text-decoration:none;" onclick="gotoLive(' + tableNumber + ')">' +
                 '<h1>' + tableNumber + '</h1>' +
                 '<h4 style="margin-top:5px;">' + tableStatus + '</h4>' +
                 '<h4 style="margin-top:5px;">' + tablePlayers + '</h4>' +
@@ -128,6 +128,6 @@ function countOnlinePlayers(players, total) {
 }
 
 function gotoLive(tableNumber) {
-    window.open('./game.html?table='+tableNumber,
+    window.open('./game.html?table=' + tableNumber,
         '_blank');
 }
