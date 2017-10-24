@@ -95,18 +95,13 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         // reset raise count and bet count
         that.raiseCount = 0;
         that.betCount = 0;
-
-        logGame(that.tableNumber, 'start get first player');
         getNextPlayer(that);
-
-        logGame(that.tableNumber, 'start get first player:' + that.currentPlayer + ' action ');
         takeAction(that, '__turn');
     });
 
     this.eventEmitter.on('showAction', function (data) {
         var myData = getBasicData(that);
         myData.action = data;
-        logGame(that.tableNumber, 'show action : ' + JSON.stringify(myData));
         that.eventEmitter.emit('__show_action', myData);
     });
 
@@ -163,7 +158,6 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
             var nextDealer = getNextDealer(that);
-            logGame(that.tableNumber, 'current dealer is : ' + that.dealer + ' next is:' + nextDealer);
             that.dealer = nextDealer;
             that.roundCount++;
             that.isReloadTime = true;
@@ -305,7 +299,6 @@ Table.prototype.removePlayer = function (playerName) {
 
 Table.prototype.NewRound = function () {
     // Add players in waiting list
-    logGame(this.tableNumber, 'newRound function, start init data');
     var removeIndex = 0;
     var i;
     for (i in this.playersToAdd) {
@@ -574,10 +567,10 @@ Player.prototype.Bet = function (bet) {
                 } else {
                     if (myBet + bet > maxBet)
                         logGame(this.table.tableNumber, 'betCount =' + this.table.betCount +
-                            ' can not bet again, auto call');
+                            ' can not bet again, default to CALL');
                     else
                         logGame(this.table.tableNumber, 'player : ' + this.playerName +
-                            ', bet amount(' + bet + ') < minbet(' + (maxBet - myBet) + '), default to CALL');
+                            ', bet amount(' + bet + ') < minBet(' + (maxBet - myBet) + '), default to CALL');
                     this.Call();
                 }
                 break;
@@ -789,7 +782,6 @@ function checkForAllInPlayer(table, winners) {
 }
 
 function checkForWinner(table) {
-    logGame(table.tableNumber, 'check for winner');
     var i, j, k, l, maxRank, winners, part, prize, allInPlayer, minBets, roundEnd;
     // Identify winner(s)
     winners = [];
@@ -845,10 +837,7 @@ function checkForWinner(table) {
 
     roundEnd = true;
     for (l = 0; l < table.game.roundBets.length; l += 1) {
-        logGame(table.tableNumber, 'table.game.roundBets[' + l + '] = ' + table.game.roundBets[l]);
-
         if (table.game.roundBets[l] !== 0) {
-            // logGame(table.tableNumber, 'roundBets[' + l + '] = ' + table.game.roundBets[l] + ' part = ' + part);
             roundEnd = false;
         }
     }
@@ -862,7 +851,6 @@ function checkForBankrupt(table) {
     for (i = 0; i < table.players.length; i += 1) {
         if (table.players[i].chips === 0) {
             table.gameLosers.push(table.players[i]);
-            logGame(table.tableNumber, 'player : ' + table.players[i].playerName + ' is going bankrupt');
             table.players.splice(i, 1);
         }
     }
@@ -950,7 +938,6 @@ function rankHandInt(hand) {
     handSuits = [];
 
     for (i = 0; i < hand.cards.length; i += 1) {
-        logger.info('hand.cards[' + i + '] = ' + hand.cards[i]);
         handRanks[i] = hand.cards[i].substr(0, 1);
         handSuits[i] = hand.cards[i].substr(1, 2);
     }
@@ -2128,7 +2115,6 @@ function progress(table) {
             // Move all bets to the pot
             for (i = 0; i < table.game.bets.length; i += 1) {
                 table.game.pot += parseInt(table.game.bets[i], 10);
-                logGame(table.tableNumber, 'bets[' + i + '] = ' + table.game.bets[i]);
                 table.game.roundBets[i] += table.game.bets[i];
 
             }
@@ -2294,12 +2280,10 @@ function getNextPlayer(table) {
         logger.error('table is destroyed');
     }
 
-    logGame(table.tableNumber, 'get next player');
     var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ?
             (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
-        logGame(table.tableNumber, 'traverse : ' + table.players[table.currentPlayer].playerName);
 
     } while (!table.players[table.currentPlayer].isSurvive ||
     table.players[table.currentPlayer].folded ||
@@ -2360,7 +2344,6 @@ function updateGame(table) {
     };
     gameLogic.updateGameWorkUnit(table.tableNumber, table.instID, newGame, function (updateGameErr) {
         if (updateGameErr.code === errorCode.SUCCESS.code) {
-            logger.info('update game ' + table.tableNumber + ' successfully');
         }
     });
 }
@@ -2387,10 +2370,8 @@ function updateTable(table, status) {
         players: players,
         status: status
     };
-    logger.info('update table in game');
     tableLogic.updateTableWorkUnit(table.tableNumber, newTable, function(updateTableErr) {
         if (updateTableErr.code === errorCode.SUCCESS.code) {
-            logger.info('update table ' + table.tableNumber + ' in game done');
         }
     })
 }
@@ -2483,3 +2464,4 @@ exports.getBasicData = getBasicData;
 exports.getPlayerReloadData = getPlayerReloadData;
 exports.getNextPlayer = getNextPlayer;
 exports.getNextDealer = getNextDealer;
+exports.logGame = logGame;

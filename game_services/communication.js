@@ -128,11 +128,11 @@ function SkyRTC(tableNumber) {
     });
 
     this.on('__reload', function (data, socket) {
-        logger.info('player: ' + socket.id + ', reload');
         var that = this;
         var playerName = socket.MD5Id;
         var tableNum = that.players[playerName].tableNumber;
         var currentTable = that.table[tableNum];
+        poker.logGame(tableNum, 'player: ' + socket.id + ', reload');
         if (currentTable && currentTable.isReloadTime && that.players[playerName]) {
             var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
             if (playerIndex !== -1) {
@@ -140,9 +140,9 @@ function SkyRTC(tableNumber) {
                 if (player.reloadCount < currentTable.maxReloadCount) {
                     player.chips += currentTable.initChips;
                     player.reloadCount++;
-                    logger.info('player: ' + playerName + '  reload success');
+                    poker.logGame(tableNumber, 'player: ' + playerName + '  reload success');
                 } else {
-                    logger.info('player: ' + playerName + '  had used all reload chance');
+                    poker.logGame(tableNumber, 'player: ' + playerName + '  had used all reload chance');
                 }
             }
         }
@@ -150,7 +150,6 @@ function SkyRTC(tableNumber) {
 
     this.on('__action', function (data, socket) {
         var timestamp = new Date().getTime();
-        logger.info('receive action,time is ' + timestamp);
         try {
             var that = this;
             var action = data.action;
@@ -160,7 +159,6 @@ function SkyRTC(tableNumber) {
                 var currentTable = that.table[tableNum];
                 if (currentTable) {
                     var playerIndex = parseInt(getPlayerIndex(playerName, currentTable.players));
-                    logger.info('table ' + currentTable.tableNumber + ' isActionTime is ' + currentTable.isActionTime);
                     if (playerIndex !== -1 && currentTable.checkPlayer(playerIndex) && currentTable.isActionTime) {
                         if (currentTable.timeout)
                             clearTimeout(currentTable.timeout);
@@ -288,9 +286,7 @@ SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers, status) {
         players: players,
         status: status
     };
-    logger.info('update table before game started : ' + JSON.stringify(newTable));
     tableLogic.updateTableWorkUnit(tableNumber, newTable, function (updateTableErr) {
-        logger.info('update table before game started done');
     });
 };
 
@@ -323,7 +319,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
     var tableAndPlayer = [];
     var playerData = {};
 
-    logger.info('notify join');
+    logger.info('notify join, tableNumber = ' + tableNumber);
     for (var playerName in that.players) {
         if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": true});
@@ -406,7 +402,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
     var tablePlayers = [];
     var tableAndPlayer = [];
 
-    logger.info('notify left');
+    logger.info('notify left, tableNumber = ' + tableNumber);
     for (var playerName in that.players) {
         if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": true});
@@ -614,12 +610,10 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
         logger.info('remove table ' + tableNumber + ' timeout');
     }
 
-
     message = {
         'eventName': '__game_stop',
         'data': {'msg': 'table ' + tableNumber + ' stopped successfully', 'tableNumber': tableNumber}
     };
-    logger.info('broadcast __game_stop');
 
     that.broadcastInGuests(message);
     that.broadcastInPlayers(message);
@@ -753,7 +747,6 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     }
 
     if (that.players[player]) {
-        logger.info('server request: ' + JSON.stringify(message));
         that.sendMessage(that.players[player], message);
         var timestamp = new Date().getTime();
         if (that.players[player] && that.players[player].isHuman) {
@@ -761,11 +754,11 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         } else {
             commandTimeout = currentTable.commandTimeout;
         }
-        logger.info('send player action, time is ' + timestamp);
+        poker.logGame(tableNumber, 'server request sent, time is ' + timestamp);
         currentTable.timeout = setTimeout(function () {
             currentTable.timeout = null;
             if (currentTable.status === enums.GAME_STATUS_RUNNING) {
-                logger.info('table ' + tableNumber + ' player ' + player + ' response timeout, auto FOLD');
+                poker.logGame(tableNumber, 'player :' + player + ', response timeout, auto FOLD');
                 currentTable.isActionTime = false;
                 currentTable.players[currentTable.currentPlayer].Fold();
             }
@@ -775,13 +768,13 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
             currentTable.timeout = null;
             if (currentTable.status === enums.GAME_STATUS_RUNNING) {
                 that.getPlayerAction(message, true);
-                logger.info('table ' + tableNumber + ' player ' + player + ' might be lost, resend message');
+                poker.logGame(tableNumber, 'player :' + player + ', might be lost');
             }
         }, currentTable.lostTimeout * 1000); // for BETA test, set to 10s
     } else {
         // bug fix - crash after players quit
         if (currentTable && currentTable.status === enums.GAME_STATUS_RUNNING) {
-            logger.info('table ' + tableNumber + ' player ' + player + ' quited, auto FOLD');
+            poker.logGame(tableNumber, 'player: ' + player + ', quited, auto FOLD');
             currentTable.isActionTime = false;
             currentTable.players[currentTable.currentPlayer].Fold();
         }
@@ -888,7 +881,7 @@ SkyRTC.prototype.exitHandle = function (socket) {
             that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             that.exitPlayers[socket.MD5Id] = socket.tableNumber;
             that.players[socket.MD5Id] = null;
-            logger.info('player : ' + socket.id + ' exit!!');
+            poker.logGame(tableNumber, 'player: ' + socket.id + ', exit!!');
         }
         that.removeSocket(socket);
     }
@@ -899,7 +892,6 @@ SkyRTC.prototype.init = function (socket) {
     socket.id = UUID.v4();
 
     socket.on('message', function (data) {
-            logger.info('message received from ' + socket.id + ' : ' + data);
             try {
                 var json = JSON.parse(data);
                 if (json.eventName) {
@@ -922,20 +914,6 @@ SkyRTC.prototype.init = function (socket) {
         //that.emit('remove_peer', socket.id);
         that.exitHandle(socket);
     });
-
-    /*playerLogic.listPlayersInternalWorkUnit(function (getPlayerErr, players) {
-     if (getPlayerErr.code === errorCode.SUCCESS.code) {
-     that.playerAndTable = {};
-     for (var i = 0; i < players.length; i++) {
-     var player = players[i];
-     that.playerAndTable[player.playerName] = player.tableNumber;
-     }
-     logger.info('players and tables : ' + JSON.stringify(that.playerAndTable));
-     } else {
-     logger.error('no players found');
-     }
-     that.emit('new_connect', socket);
-     });*/
 };
 
 /**
