@@ -371,10 +371,17 @@ function initWebsock() {
 
         console.log('find player by name ' + data.action.playerName);
         var playerIndex = findPlayerIndexByName(data.action.playerName);
+        var player = findTargetPlayer(data.action.playerName);
         console.log('players : ' + JSON.stringify(players) + ', index = ' + playerIndex);
 
         // play audio effect
-        var audioEffect = audioMap.get(roundAction.action);
+        var audioIndex;
+        if (ver === VER_ENGLISH) {
+            audioIndex = roundAction.action;
+        } else {
+            audioIndex = 'audio_' + roundAction.action + '_' + player.avatarId;
+        }
+        var audioEffect = audioMap.get(audioIndex);
         cc.audioEngine.playEffect(audioEffect);
 
         if (roundAction.action === 'check' ||

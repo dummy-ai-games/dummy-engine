@@ -29,7 +29,7 @@ function Map() {
         var bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
-                if (this.elements[i].key == _key) {
+                if (this.elements[i].key === _key) {
                     this.elements.splice(i, 1);
                     return true;
                 }
@@ -43,7 +43,7 @@ function Map() {
     this.get = function (_key) {
         try {
             for (i = 0; i < this.elements.length; i++) {
-                if (this.elements[i].key == _key) {
+                if (this.elements[i].key === _key) {
                     return this.elements[i].value;
                 }
             }
@@ -54,7 +54,7 @@ function Map() {
 
     this.set = function (_key, _value) {
         for (i = 0; i < this.elements.length; i++) {
-            if (this.elements[i].key == _key) {
+            if (this.elements[i].key === _key) {
                 this.elements[i].value = _value;
                 return;
             }
@@ -76,7 +76,7 @@ function Map() {
         var bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
-                if (this.elements[i].key == _key) {
+                if (this.elements[i].key === _key) {
                     bln = true;
                 }
             }
@@ -90,7 +90,7 @@ function Map() {
         var bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
-                if (this.elements[i].value == _value) {
+                if (this.elements[i].value === _value) {
                     bln = true;
                 }
             }
