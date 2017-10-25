@@ -27,6 +27,8 @@ public class PlayerImport {
     private final static int GROUP_COL = 1;
     private final static int NAME_COL = 2;
     private final static int AUTHOR_COL = 3;
+    private final static int KEY_COL = 4;
+    private final static int TABLE_COL = 5;
 
     private String poiFile;
 
@@ -62,6 +64,8 @@ public class PlayerImport {
             System.out.println("total teams = " + rowsTotal);
             String displayName = "";
             String authorName = "";
+            String playerName = null;
+            int tableNumber = 0;
             String team = "";
             String lastTeam = "";
             int group = 0;
@@ -95,6 +99,11 @@ public class PlayerImport {
                             case AUTHOR_COL:
                                 authorName = value.toString();
                                 break;
+                            case KEY_COL:
+                                playerName = value.toString();
+                                break;
+                            case TABLE_COL:
+                                tableNumber = Integer.parseInt(value.toString());
                             default:
                                 System.out.println("col error");
                                 break;
@@ -102,12 +111,15 @@ public class PlayerImport {
                     }
                 }
                 Player player =
-                        new Player(team, group, authorName, displayName, "", 0);
+                        new Player(team, group, authorName, displayName, playerName, tableNumber);
                 // set random names
-                player.setPlayerName(randomString(16).toUpperCase());
+                if (null == playerName) {
+                    player.setPlayerName(randomString(16).toUpperCase());
+                }
                 playerList.add(player);
             }
             // add 4 dummies
+            /*
             for (int d = 0; d < 4; d++) {
                 Player dummy =
                         new Player("D" + d, 0, "Dummy", "Dummy" + d,
@@ -116,10 +128,10 @@ public class PlayerImport {
                 playerList.add(dummy);
             }
             shufflePlayers();
+            */
             // create tables
             int playersInTable = 0;
             int targetTableNumber = 1;
-            int targetPort = 3001;
             List<Document> playerDocument = new ArrayList<>();
             List<Document> tableDocument = new ArrayList<>();
 
@@ -141,7 +153,6 @@ public class PlayerImport {
                     // insert into table collection
                     tableDocument.add(new Document("tableNumber", targetTableNumber));
                     targetTableNumber++;
-                    targetPort++;
                 }
             }
             MongoCollection<Document> collection = db.getCollection("tables");

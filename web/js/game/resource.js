@@ -243,6 +243,25 @@ var avatars = [s_a_avatar_0, s_a_avatar_1, s_a_avatar_2, s_a_avatar_3, s_a_avata
     s_a_avatar_6, s_a_avatar_7, s_a_avatar_8, s_a_avatar_9, s_a_avatar_a, s_a_avatar_b,
     s_a_avatar_c, s_a_avatar_d, s_a_avatar_e, s_a_avatar_f];
 
+// audio
+var audio_allin_boy = './res/audio/allin_boy.ogg';
+var audio_allin_girl = './res/audio/allin_girl.ogg';
+var audio_call = './res/audio/call.ogg';
+var audio_bet = './res/audio/bet.ogg';
+var audio_check = './res/audio/check.ogg';
+var audio_fold = './res/audio/fold.ogg';
+var audio_raise = './res/audio/raise.ogg';
+var audio_deal = './res/audio/deal.ogg';
+var audio_round_clear = './res/audio/round_clear.ogg';
+var audio_win = './res/audio/win.ogg';
+
+var audioMap = new Map();
+audioMap.set('allin', audio_allin_boy);
+audioMap.set('bet', audio_bet);
+audioMap.set('call', audio_call);
+audioMap.set('check', audio_check);
+audioMap.set('fold', audio_fold);
+audioMap.set('raise', audio_raise);
 
 // global resource list
 var resources = [
@@ -389,4 +408,16 @@ var resources = [
     action_sb_left,
     action_bb_left,
     action_sb_right,
-    action_bb_right];
+    action_bb_right,
+    // audio resources
+    audio_allin_boy,
+    audio_allin_girl,
+    audio_bet,
+    audio_call,
+    audio_fold,
+    audio_check,
+    audio_raise,
+    audio_deal,
+    audio_round_clear,
+    audio_win
+    ];

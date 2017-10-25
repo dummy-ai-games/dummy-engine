@@ -373,10 +373,15 @@ function initWebsock() {
         var playerIndex = findPlayerIndexByName(data.action.playerName);
         console.log('players : ' + JSON.stringify(players) + ', index = ' + playerIndex);
 
+        // play audio effect
+        var audioEffect = audioMap.get(roundAction.action);
+        cc.audioEngine.playEffect(audioEffect);
+
         if (roundAction.action === 'check' ||
             roundAction.action === 'fold' ||
             roundAction.action === 'raise' ||
             roundAction.action === 'call') {
+
             // update in game engine
             if (playerIndex !== -1) {
                 players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
