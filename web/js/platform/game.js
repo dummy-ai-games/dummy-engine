@@ -542,7 +542,7 @@ function playBgm() {
         audio1.play();
     }, false);
 
-    audio1.play();
+    // audio1.play();
 }
 
 function startGame() {
