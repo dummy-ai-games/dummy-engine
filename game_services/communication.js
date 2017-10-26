@@ -462,7 +462,6 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
 SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
                                          commandInterval, roundInterval, reloadChance, commandTimeout, lostTimeout) {
     var that = this;
-    var message;
     try {
         parseInt(tableNumber);
     } catch (e) {

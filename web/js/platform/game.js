@@ -8,7 +8,6 @@ var tableNumber = 0;
 var playerNamePlain = '';
 var playerName = '';
 var dbPlayers = [];
-var autoStart = 0;
 var gameBgm = 0;
 var commandInterval = 1;
 var roundInterval = 10;
@@ -22,7 +21,7 @@ var reloadChance = 2;
 var gameBoard;
 var winWidth, winHeight;
 var gameWidth, gameHeight;
-var audio1, audio2;
+var audio, audio2;
 
 // game model related
 var STATUS_GAME_STANDBY = 0;
@@ -250,8 +249,6 @@ function initWebsock() {
             setTimeout(function () {
                 startGame();
             }, 20 * 1000);
-        } else {
-            stopAudios();
         }
     });
 
@@ -265,18 +262,12 @@ function initWebsock() {
         // update in game engine
         console.log('game start : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
-        if (1 === parseInt(gameBgm)) {
-            stopAudios();
-            console.log('start play audio');
-            audio1.play();
-        }
     });
 
     rtc.on('__game_stop', function (data) {
         // update in game engine
         console.log('game stop : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_STANDBY;
-        stopAudios();
     });
 
     rtc.on('__deal', function (data) {
@@ -383,24 +374,26 @@ function initWebsock() {
         console.log('players : ' + JSON.stringify(players));
 
         // play audio effect
-        var audioIndex;
-        if (ver === VER_ENGLISH) {
-            audioIndex = roundAction.action;
-        } else {
-            if (roundAction.action === 'check') {
-                if (targetPlayer.gender === 0) {
-                    audioIndex = 'audio_check_boy';
-                } else {
-                    audioIndex = 'audio_check_girl';
-                }
-            } else if (roundAction.action === 'bet') {
-                audioIndex = 'audio_bet';
+        if (1 === parseInt(gameBgm)) {
+            var audioIndex;
+            if (ver === VER_ENGLISH) {
+                audioIndex = roundAction.action;
             } else {
-                audioIndex = 'audio_' + roundAction.action + '_' + targetPlayer.avatarId;
+                if (roundAction.action === 'check') {
+                    if (targetPlayer.gender === 0) {
+                        audioIndex = 'audio_check_boy';
+                    } else {
+                        audioIndex = 'audio_check_girl';
+                    }
+                } else if (roundAction.action === 'bet') {
+                    audioIndex = 'audio_bet';
+                } else {
+                    audioIndex = 'audio_' + roundAction.action + '_' + targetPlayer.avatarId;
+                }
             }
+            var audioEffect = audioMap.get(audioIndex);
+            cc.audioEngine.playEffect(audioEffect);
         }
-        var audioEffect = audioMap.get(audioIndex);
-        cc.audioEngine.playEffect(audioEffect);
 
         if (roundAction.action === 'check' ||
             roundAction.action === 'fold' ||
@@ -504,29 +497,6 @@ function ccLoad() {
         }, this);
     };
     cc.game.run('gameCanvas');
-
-    // init bgm
-    audio1 = new Audio('../res/audio/bgm.ogg');
-    audio2 = new Audio('../res/audio/bgm.ogg');
-    audio1.addEventListener('timeupdate', function () {
-        if (this.currentTime > 151.7) {
-            audio2.play();
-        }
-    }, false);
-    audio1.addEventListener('ended', function () {
-        this.pause();
-        this.currentTime = 0;
-    }, false);
-
-    audio2.addEventListener('timeupdate', function () {
-        if (this.currentTime > 151.7) {
-            audio1.play();
-        }
-    }, false);
-    audio2.addEventListener('ended', function () {
-        this.pause();
-        this.currentTime = 0;
-    }, false);
 }
 
 // game helper
@@ -706,13 +676,6 @@ function getElementTop(element) {
         current = current.offsetParent;
     }
     return actualTop;
-}
-
-function stopAudios() {
-    audio1.pause();
-    audio2.pause();
-    audio1.currentTime = 0;
-    audio2.currentTime = 0;
 }
 
 // Action helper
