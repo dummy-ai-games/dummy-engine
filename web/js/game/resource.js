@@ -274,39 +274,10 @@ if (ver === VER_ENGLISH) {
     var audio_allin_14 = './res/audio/chinese/avatar14_allin.ogg';
     var audio_allin_15 = './res/audio/chinese/avatar15_allin.ogg';
 
-    var audio_bet_0 = './res/audio/chinese/avatar0_bet.ogg';
-    var audio_bet_1 = './res/audio/chinese/avatar1_bet.ogg';
-    var audio_bet_2 = './res/audio/chinese/avatar2_bet.ogg';
-    var audio_bet_3 = './res/audio/chinese/avatar3_bet.ogg';
-    var audio_bet_4 = './res/audio/chinese/avatar4_bet.ogg';
-    var audio_bet_5 = './res/audio/chinese/avatar5_bet.ogg';
-    var audio_bet_6 = './res/audio/chinese/avatar6_bet.ogg';
-    var audio_bet_7 = './res/audio/chinese/avatar7_bet.ogg';
-    var audio_bet_8 = './res/audio/chinese/avatar8_bet.ogg';
-    var audio_bet_9 = './res/audio/chinese/avatar9_bet.ogg';
-    var audio_bet_10 = './res/audio/chinese/avatar10_bet.ogg';
-    var audio_bet_11 = './res/audio/chinese/avatar11_bet.ogg';
-    var audio_bet_12 = './res/audio/chinese/avatar12_bet.ogg';
-    var audio_bet_13 = './res/audio/chinese/avatar13_bet.ogg';
-    var audio_bet_14 = './res/audio/chinese/avatar14_bet.ogg';
-    var audio_bet_15 = './res/audio/chinese/avatar15_bet.ogg';
+    var audio_bet = './res/audio/chinese/bet.ogg';
 
-    var audio_check_0 = './res/audio/chinese/avatar0_check.ogg';
-    var audio_check_1 = './res/audio/chinese/avatar1_check.ogg';
-    var audio_check_2 = './res/audio/chinese/avatar2_check.ogg';
-    var audio_check_3 = './res/audio/chinese/avatar3_check.ogg';
-    var audio_check_4 = './res/audio/chinese/avatar4_check.ogg';
-    var audio_check_5 = './res/audio/chinese/avatar5_check.ogg';
-    var audio_check_6 = './res/audio/chinese/avatar6_check.ogg';
-    var audio_check_7 = './res/audio/chinese/avatar7_check.ogg';
-    var audio_check_8 = './res/audio/chinese/avatar8_check.ogg';
-    var audio_check_9 = './res/audio/chinese/avatar9_check.ogg';
-    var audio_check_10 = './res/audio/chinese/avatar10_check.ogg';
-    var audio_check_11 = './res/audio/chinese/avatar11_check.ogg';
-    var audio_check_12 = './res/audio/chinese/avatar12_check.ogg';
-    var audio_check_13 = './res/audio/chinese/avatar13_check.ogg';
-    var audio_check_14 = './res/audio/chinese/avatar14_check.ogg';
-    var audio_check_15 = './res/audio/chinese/avatar15_check.ogg';
+    var audio_check_boy = './res/audio/chinese/check_boy.ogg';
+    var audio_check_girl = './res/audio/chinese/check_girl.ogg';
 
     var audio_raise_0 = './res/audio/chinese/avatar0_raise.ogg';
     var audio_raise_1 = './res/audio/chinese/avatar1_raise.ogg';
@@ -390,24 +361,7 @@ if (ver === VER_ENGLISH) {
     audioMap.set('audio_allin_14', audio_allin_14);
     audioMap.set('audio_allin_15', audio_allin_15);
 
-    /*
-    audioMap.set('audio_bet_0', audio_bet_0);
-    audioMap.set('audio_bet_1', audio_bet_1);
-    audioMap.set('audio_bet_2', audio_bet_2);
-    audioMap.set('audio_bet_3', audio_bet_3);
-    audioMap.set('audio_bet_4', audio_bet_4);
-    audioMap.set('audio_bet_5', audio_bet_5);
-    audioMap.set('audio_bet_6', audio_bet_6);
-    audioMap.set('audio_bet_7', audio_bet_7);
-    audioMap.set('audio_bet_8', audio_bet_8);
-    audioMap.set('audio_bet_9', audio_bet_9);
-    audioMap.set('audio_bet_10', audio_bet_10);
-    audioMap.set('audio_bet_11', audio_bet_11);
-    audioMap.set('audio_bet_12', audio_bet_12);
-    audioMap.set('audio_bet_13', audio_bet_13);
-    audioMap.set('audio_bet_14', audio_bet_14);
-    audioMap.set('audio_bet_15', audio_bet_15);
-    */
+    audioMap.set('audio_bet', audio_bet);
 
     audioMap.set('audio_call_0', audio_call_0);
     audioMap.set('audio_call_1', audio_call_1);
@@ -426,24 +380,8 @@ if (ver === VER_ENGLISH) {
     audioMap.set('audio_call_14', audio_call_14);
     audioMap.set('audio_call_15', audio_call_15);
 
-    /*
-    audioMap.set('audio_check_0', audio_check_0);
-    audioMap.set('audio_check_1', audio_check_1);
-    audioMap.set('audio_check_2', audio_check_2);
-    audioMap.set('audio_check_3', audio_check_3);
-    audioMap.set('audio_check_4', audio_check_4);
-    audioMap.set('audio_check_5', audio_check_5);
-    audioMap.set('audio_check_6', audio_check_6);
-    audioMap.set('audio_check_7', audio_check_7);
-    audioMap.set('audio_check_8', audio_check_8);
-    audioMap.set('audio_check_9', audio_check_9);
-    audioMap.set('audio_check_10', audio_check_10);
-    audioMap.set('audio_check_11', audio_check_11);
-    audioMap.set('audio_check_12', audio_check_12);
-    audioMap.set('audio_check_13', audio_check_13);
-    audioMap.set('audio_check_14', audio_check_14);
-    audioMap.set('audio_check_15', audio_check_15);
-    */
+    audioMap.set('audio_check_boy', audio_check_boy);
+    audioMap.set('audio_check_girl', audio_check_girl);
 
     audioMap.set('audio_raise_0', audio_raise_0);
     audioMap.set('audio_raise_1', audio_raise_1);

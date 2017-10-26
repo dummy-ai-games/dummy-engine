@@ -36,6 +36,7 @@ var Player = function (_playerName, _displayName, _chips, _isSurvive, _reloadCou
     this.privateCards = [];
     var avatarId = Math.abs(hashCode(this.playerName) % 16);
     this.avatarId = avatarId || 0;
+    this.gender = getGender(this.avatarId);
     this.fold = false;
     this.allin = false;
     this.takeAction = false;
@@ -140,4 +141,14 @@ function hashCode(str) {
         hash = hash & hash;
     }
     return hash;
+}
+
+function getGender(avatarId) {
+    var intAvatarId = parseInt(avatarId);
+    var maleAvatars = [2, 3, 4, 5, 6, 7, 8, 9];
+    if (maleAvatars.indexOf(intAvatarId) !== -1) {
+        return 0;
+    } else {
+        return 1;
+    }
 }

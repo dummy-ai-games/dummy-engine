@@ -379,7 +379,17 @@ function initWebsock() {
         if (ver === VER_ENGLISH) {
             audioIndex = roundAction.action;
         } else {
-            audioIndex = 'audio_' + roundAction.action + '_' + player.avatarId;
+            if (roundAction.action === 'check') {
+                if (player.gender === 0) {
+                    audioIndex = 'audio_check_boy';
+                } else {
+                    audioIndex = 'audio_check_girl';
+                }
+            } else if (roundAction.action === 'bet') {
+                audioIndex = 'audio_bet';
+            } else {
+                audioIndex = 'audio_' + roundAction.action + '_' + player.avatarId;
+            }
         }
         var audioEffect = audioMap.get(audioIndex);
         cc.audioEngine.playEffect(audioEffect);
