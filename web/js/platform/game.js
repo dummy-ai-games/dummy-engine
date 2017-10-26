@@ -50,6 +50,7 @@ var yourTurn = false;
 var turnAnimationShowed = false;
 var playerMinBet = 0;
 var playerMaxBet = 0;
+var playerReloadCount = 0;
 
 var reloadTime = false;
 
@@ -332,6 +333,7 @@ function initWebsock() {
                 yourTurn = true;
                 playerMinBet = data.self.minBet;
                 playerMaxBet = data.self.chips;
+                playerReloadCount = data.self.reloadCount;
                 console.log('your turn, binBet = ' + playerMinBet + ', maxBet = ' + playerMaxBet);
             } else {
                 yourTurn = false;
@@ -361,6 +363,7 @@ function initWebsock() {
                 yourTurn = true;
                 playerMinBet = data.self.minBet;
                 playerMaxBet = data.self.chips;
+                playerReloadCount = data.self.reloadCount;
                 console.log('your turn, binBet = ' + playerMinBet + ', maxBet = ' + playerMaxBet);
             } else {
                 yourTurn = false;

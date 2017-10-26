@@ -41,6 +41,7 @@ var ScoreLayer = cc.LayerColor.extend({
     titleLabel: null,
     scoreLabels: [],
     cardsInfo: [],
+    reloadHint: null,
 
     // buttons
     reloadButton: null,
@@ -63,7 +64,9 @@ var ScoreLayer = cc.LayerColor.extend({
     cardHeight: 290,
     cardWidthSpec: 57,
     cardHeightSpec: 80,
-    reloadButtonMarginBottom: 10,
+    reloadButtonMarginBottom: 20,
+    reloadTextHeight: 20,
+    reloadHintMarginBottom: 4,
     medalMarginRight: 10,
 
     // event managers
@@ -197,16 +200,32 @@ var ScoreLayer = cc.LayerColor.extend({
             this.reloadButton.setScale(this.gameScale * 0.8);
             this.reloadButton.setPosition((this.validWidth -
                 this.reloadButton.getContentSize().width * this.gameScale) / 2,
-                this.reloadButtonMarginBottom);
+                this.reloadButtonMarginBottom * this.gameScale);
             this.addChild(this.reloadButton, 2);
             this.reloadButton.addTouchEventListener(function (sender, type) {
                 if (ccui.Widget.TOUCH_ENDED === type) {
                     if (STATUS_GAME_RUNNING === gameStatus) {
                         console.log('reload');
                         reload();
+                        playerReloadCount++;
                     }
                 }
             }, this);
+
+            // initialize title
+            this.reloadHint = new cc.LabelTTF('', this.cardsInfoFont, this.cardsInfoTextSize);
+            this.reloadHint.setColor(cc.color(255, 255, 0, 255));
+            this.reloadHint.setAnchorPoint(0, 0);
+            this.reloadHint.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.reloadHint.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.reloadHint.boundingWidth = this.titleTextWidth;
+            this.reloadHint.boundingHeight = this.reloadTextHeight;
+            this.reloadHint.setScale(this.gameScale);
+            this.reloadHint
+                .setPosition((this.validWidth -
+                    this.reloadHint.getContentSize().width * this.gameScale) / 2,
+                    0);
+            this.addChild(this.reloadHint, 2);
         }
 
         // event management
@@ -348,6 +367,26 @@ var ScoreLayer = cc.LayerColor.extend({
                 }
             }
         }
+
+        // update reload hint
+        if (playMode === MODE_PLAYER) {
+            var reloadChance = 2 - playerReloadCount;
+            var reloadText = '';
+            if (reloadChance === 0) {
+                reloadText = 'You have used up all reload chances';
+            } else if (reloadChance === 1) {
+                reloadText = reloadChance + ' Reload Chance Left';
+            } else if (reloadChance === 2) {
+                reloadText = reloadChance + ' Reload Chances Left';
+            }
+            this.reloadHint.setString(reloadText);
+
+            if (reloadChance === 0) {
+                this.enableButton(this.reloadButton, false);
+            } else {
+                this.enableButton(this.reloadButton, true);
+            }
+        }
     },
 
     setPlayers: function (_players) {
@@ -379,6 +418,13 @@ var ScoreLayer = cc.LayerColor.extend({
     changeSpriteImage: function (sprite, srcFrame) {
         if (sprite && srcFrame) {
             sprite.setSpriteFrame(srcFrame);
+        }
+    },
+
+    enableButton: function (button, enable) {
+        if (button && button.isEnabled() !== enable) {
+            button.setEnabled(enable);
+            button.setBright(enable);
         }
     }
 });
