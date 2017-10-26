@@ -18,6 +18,8 @@ var errorCode = new ErrorCode();
 var dateUtils = require('../poem/utils/date_utils.js');
 var MD5Utils = require('../poem/crypto/md5.js');
 
+var INNER_FLUSH = true;
+
 /**
  * Class Table
  * @param smallBlind
@@ -95,8 +97,8 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         // reset raise count and bet count
         that.raiseCount = 0;
         that.betCount = 0;
-        getNextPlayer(that);
-        takeAction(that, '__turn');
+        if (getNextPlayer(that))
+            takeAction(that, '__turn');
     });
 
     this.eventEmitter.on('showAction', function (data) {
@@ -114,10 +116,11 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
         } else {
             that.currentPlayer = that.smallBlindIndex - 1;
             that.isBet = true;
-            getNextPlayer(that);
-            that.raiseCount = 0;
-            that.betCount = 0;
-            takeAction(that, '__bet');
+            if (getNextPlayer(that)) {
+                that.raiseCount = 0;
+                that.betCount = 0;
+                takeAction(that, '__bet');
+            }
         }
     });
 
@@ -1676,7 +1679,25 @@ function rankHandInt(hand) {
             message = 'Straight Flush';
         }
         if (rank === 123) {
-            rank = rank + rankKickers(ranks, 5);
+            if (true === INNER_FLUSH) {
+                var basicColor = ["C", "D", "H", "S"];
+                for (var i = 0; i < basicColor.length; i++) {
+                    var data = "";
+                    for (var j = 0; j < 5; j++) {
+                        data += basicColor[i];
+                    }
+                    if (suits.indexOf(data) > -1 && rank === 123) {
+                        var flushCards = "";
+                        for (var k = 0; k < hand.cards.length; k++) {
+                            if (hand.cards[k][1] === basicColor[i])
+                                flushCards += hand.cards[k][0];
+                        }
+                        rank = rank + rankKickers(flushCards, 5);
+                    }
+                }
+            } else {
+                rank = rank + rankKickers(ranks, 5);
+            }
         }
 
     }
@@ -2182,15 +2203,16 @@ function progress(table) {
                 table.eventEmitter.emit('deal');
             }
         } else {
-            getNextPlayer(table);
-            if (table.surviveCount === 1 && table.game.bets[table.currentPlayer] >= maxBet) {
-                //fix bug: when allinValue < maxBet and other player all fold will cause money divide problem, at this
-                //situation the last player should not fold, so we have player default action call
-                table.players[table.currentPlayer].Call();
-            } else if (table.isBet)
-                takeAction(table, '__bet');
-            else
-                takeAction(table, '__turn');
+            if (getNextPlayer(table)) {
+                if (table.surviveCount === 1 && table.game.bets[table.currentPlayer] >= maxBet) {
+                    //fix bug: when allinValue < maxBet and other player all fold will cause money divide problem, at this
+                    //situation the last player should not fold, so we have player default action call
+                    table.players[table.currentPlayer].Call();
+                } else if (table.isBet)
+                    takeAction(table, '__bet');
+                else
+                    takeAction(table, '__turn');
+            }
         }
     }
 }
@@ -2280,16 +2302,40 @@ function getNextPlayer(table) {
         logger.error('table is destroyed');
     }
 
+    var result = true;
+    var count = 0;
     var maxBet = getMaxBet(table.game.bets);
     do {
         table.currentPlayer = (table.currentPlayer >= table.players.length - 1) ?
             (table.currentPlayer - table.players.length + 1) : (table.currentPlayer + 1 );
+        count++;
+        if (count > table.players.length)//fix bug for cpu 100%
+        {
+            result = false;
+            break;
+        }
 
     } while (!table.players[table.currentPlayer].isSurvive ||
     table.players[table.currentPlayer].folded ||
     table.players[table.currentPlayer].allIn ||
     (table.players[table.currentPlayer].talked === true &&
     table.game.bets[table.currentPlayer] === maxBet));
+
+    if (!result) {
+        var players = [];
+        for (var i = 0; i < table.players.length; i++) {
+            var player = {};
+            player.playerName = table.players[i].playerName;
+            player.isSurvive = table.players[i].isSurvive;
+            player.folded = table.players[i].folded;
+            player.allIn = table.players[i].allIn;
+            player.talked = table.players[i].talked;
+            player.bet = table.game.bets[i];
+            players.push(player);
+        }
+        logGame(table.tableNumber,"table players is:" + JSON.stringify(players));
+    }
+    return result;
 }
 
 function getNextDealer(table) {
