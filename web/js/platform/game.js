@@ -19,6 +19,7 @@ var defaultChips = 1000;
 var reloadChance = 2;
 
 // game board related
+var gameBoard;
 var winWidth, winHeight;
 var gameWidth, gameHeight;
 var audio1, audio2;
@@ -89,7 +90,7 @@ $(document).ready(function () {
 
     if (playerNamePlain) {
         playMode = MODE_PLAYER;
-        playerName = MD5(playerNamePlain);
+        playerName = md5(playerNamePlain);
         document.title = 'The Game';
     } else {
         playMode = MODE_LIVE;
@@ -136,11 +137,12 @@ function initWebsock() {
     rtc.on('__new_peer_2', function (data) {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
-        gameStatus = tableStatus;
+
         if (gameStatus === STATUS_GAME_FINISHED) {
             return;
         }
 
+        gameStatus = tableStatus;
         if (inPlayers) {
             console.log('player join : ' + JSON.stringify(data));
         } else {
@@ -160,6 +162,10 @@ function initWebsock() {
                     defaultInitChips, true, 0, inPlayers[i].isOnline);
                 if (undefined !== inPlayers[i].isOnline && null !== inPlayers[i].isOnline && inPlayers[i].isOnline) {
                     onLinePlayers++;
+                }
+
+                if (gameBoard) {
+                    gameBoard.resetPlayerLayers(players);
                 }
             }
         }
@@ -220,6 +226,9 @@ function initWebsock() {
                             defaultInitChips, true, 0, inPlayers[i].isOnline);
                         onLinePlayers++;
                     }
+                }
+                if (gameBoard) {
+                    gameBoard.resetPlayerLayers(players);
                 }
             }
         }
@@ -369,10 +378,9 @@ function initWebsock() {
         gameStatus = STATUS_GAME_RUNNING;
         var roundAction = data.action;
 
-        console.log('find player by name ' + data.action.playerName);
-        var playerIndex = findPlayerIndexByName(data.action.playerName);
-        var player = findTargetPlayer(data.action.playerName);
-        console.log('players : ' + JSON.stringify(players) + ', index = ' + playerIndex);
+        console.log('find targetPlayer by name ' + data.action.playerName);
+        var targetPlayer = findTargetPlayer(data.action.playerName);
+        console.log('players : ' + JSON.stringify(players));
 
         // play audio effect
         var audioIndex;
@@ -380,7 +388,7 @@ function initWebsock() {
             audioIndex = roundAction.action;
         } else {
             if (roundAction.action === 'check') {
-                if (player.gender === 0) {
+                if (targetPlayer.gender === 0) {
                     audioIndex = 'audio_check_boy';
                 } else {
                     audioIndex = 'audio_check_girl';
@@ -388,7 +396,7 @@ function initWebsock() {
             } else if (roundAction.action === 'bet') {
                 audioIndex = 'audio_bet';
             } else {
-                audioIndex = 'audio_' + roundAction.action + '_' + player.avatarId;
+                audioIndex = 'audio_' + roundAction.action + '_' + targetPlayer.avatarId;
             }
         }
         var audioEffect = audioMap.get(audioIndex);
@@ -400,22 +408,22 @@ function initWebsock() {
             roundAction.action === 'call') {
 
             // update in game engine
-            if (playerIndex !== -1) {
-                players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
-                players[playerIndex].setAction(roundAction.action);
-                console.log('set player ' + players[playerIndex].playerName + ' decided : ' +
-                    players[playerIndex].action);
+            if (targetPlayer) {
+                targetPlayer.setTakeAction(ACTION_STATUS_DECIDED);
+                targetPlayer.setAction(roundAction.action);
+                console.log('set targetPlayer ' + targetPlayer.playerName + ' decided : ' +
+                    targetPlayer.action);
                 if (roundAction.action === 'fold') {
-                    players[playerIndex].setBet(0);
+                    targetPlayer.setBet(0);
                 }
             }
         } else {
             // update in game engine
-            if (playerIndex !== -1) {
-                players[playerIndex].setTakeAction(ACTION_STATUS_DECIDED);
-                players[playerIndex].setAction(roundAction.action);
-                console.log('set player ' + players[playerIndex].playerName + ' decided : ' +
-                    players[playerIndex].action);
+            if (targetPlayer) {
+                targetPlayer.setTakeAction(ACTION_STATUS_DECIDED);
+                targetPlayer.setAction(roundAction.action);
+                console.log('set targetPlayer ' + targetPlayer.playerName + ' decided : ' +
+                    targetPlayer.action);
             }
         }
         // remove your turn
@@ -425,10 +433,10 @@ function initWebsock() {
         // set in turn
         for (var i = 0; i < currentPlayers; i++) {
             if (players[i]) {
-                if (playerIndex === i) {
-                    players[i].setInTurn(true);
+                if (targetPlayer.playerName === players[i].playerName) {
+                    targetPlayer.setInTurn(true);
                 } else {
-                    players[i].setInTurn(false);
+                    // targetPlayer.setInTurn(false);
                 }
             }
         }
@@ -442,9 +450,6 @@ function initGame() {
 
     // the reference proportion HEIGHT / WIDTH = 3 / 4 = 0.75;
     var refProportion = 0.75;
-
-    var marginLeft = getElementLeft(document.getElementById('gameContainer'));
-    var marginTop = getElementTop(document.getElementById('gameContainer'));
 
     winHeight = document.documentElement.clientHeight;
     winWidth = document.documentElement.clientWidth;
@@ -489,7 +494,7 @@ function ccLoad() {
             var LSScene = cc.Scene.extend({
                 onEnter: function () {
                     this._super();
-                    var gameBoard = new BoardLayer();
+                    gameBoard = new BoardLayer();
                     gameBoard.init();
                     this.addChild(gameBoard);
                     initPlayerInfo();
@@ -652,15 +657,6 @@ function findTargetPlayer(playerName) {
         }
     }
     return null;
-}
-
-function findPlayerIndexByName(playerName) {
-    for (var i = 0; i < players.length; i++) {
-        if (players[i] && players[i].playerName === playerName) {
-            return i;
-        }
-    }
-    return -1;
 }
 
 function playerOnline(playerName, playerList) {

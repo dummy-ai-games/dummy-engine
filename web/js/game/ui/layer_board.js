@@ -605,13 +605,30 @@ var BoardLayer = cc.Layer.extend({
         }
         var playerIndex;
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
-            if (players && players[playerIndex]) {
+            if (players[playerIndex]) {
                 var targetPlayerLayer = this.findPlayerLayerByName(players[playerIndex].playerName);
                 if (targetPlayerLayer) {
                     this.updatePlayer(targetPlayerLayer, players[playerIndex], true);
-                } else {
+                } /* else {
                     this.updatePlayer(this.playerLayers[playerIndex], players[playerIndex], true);
-                }
+                } */
+            } else {
+                this.updatePlayer(this.playerLayers[playerIndex], null, false);
+            }
+        }
+    },
+
+    // reset player layers
+    resetPlayerLayers: function(players) {
+        // reset this array using local parameter
+        if (!players || players.length === 0) {
+            // no players at all
+            return;
+        }
+        var playerIndex;
+        for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+            if (players[playerIndex]) {
+                this.updatePlayer(this.playerLayers[playerIndex], players[playerIndex], true);
             } else {
                 this.updatePlayer(this.playerLayers[playerIndex], null, false);
             }
