@@ -267,7 +267,7 @@ var DealerLayer = cc.LayerColor.extend({
     },
 
     resetCountDown: function () {
-        gameCountDown = 3;
+        gameCountDown = 5;
     },
 
     isPlayerIn: function (playerName) {

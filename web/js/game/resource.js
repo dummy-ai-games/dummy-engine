@@ -275,7 +275,7 @@ if (ver === VER_ENGLISH) {
     var audio_allin_15 = './res/audio/chinese/avatar15_allin.ogg';
 
     var audio_bet = './res/audio/chinese/bet.ogg';
-
+    var audio_tick = './res/audio/tick.ogg';
     var audio_check_boy = './res/audio/chinese/check_boy.ogg';
     var audio_check_girl = './res/audio/chinese/check_girl.ogg';
 
@@ -331,8 +331,8 @@ if (ver === VER_ENGLISH) {
     var audio_fold_15 = './res/audio/chinese/avatar15_fold.ogg';
 }
 
-var audio_deal = './res/audio/english/deal.ogg';
-var audio_round_clear = './res/audio/english/round_clear.ogg';
+var audio_deal = './res/audio/deal.ogg';
+var audio_round_clear = './res/audio/round_clear.ogg';
 var audio_win = './res/audio/win.ogg';
 
 var audioMap = new Map();
@@ -563,7 +563,11 @@ var resources = [
     action_sb_left,
     action_bb_left,
     action_sb_right,
-    action_bb_right
+    action_bb_right,
+    audio_deal,
+    audio_round_clear,
+    audio_win,
+    audio_tick
     ];
 
 // add audio resource to preload list

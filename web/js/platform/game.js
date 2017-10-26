@@ -9,6 +9,7 @@ var playerNamePlain = '';
 var playerName = '';
 var dbPlayers = [];
 var gameBgm = 0;
+var autoStart = 0;
 var commandInterval = 1;
 var roundInterval = 10;
 var commandTimeout = 2;
@@ -21,7 +22,7 @@ var reloadChance = 2;
 var gameBoard;
 var winWidth, winHeight;
 var gameWidth, gameHeight;
-var audio, audio2;
+var audio1, audio2, audio3;
 
 // game model related
 var STATUS_GAME_STANDBY = 0;
@@ -235,6 +236,9 @@ function initWebsock() {
 
     rtc.on('__game_over', function (data) {
         console.log('game over : ' + JSON.stringify(data));
+        if (1 === parseInt(gameBgm)) {
+            cc.audioEngine.playEffect(audio_win);
+        }
         // set winners
         winners = data.winners;
         for (var index = 0; index < winners.length; index++) {
@@ -254,6 +258,10 @@ function initWebsock() {
 
     rtc.on('__game_prepare', function (data) {
         console.log('game preparing : ' + JSON.stringify(data));
+        if (1 === parseInt(gameBgm)) {
+            cc.audioEngine.playEffect(audio_tick);
+        }
+
         gameStatus = STATUS_GAME_PREPARING;
         gameCountDown = data.countDown;
     });
@@ -272,6 +280,10 @@ function initWebsock() {
 
     rtc.on('__deal', function (data) {
         console.log('deal : ' + JSON.stringify(data));
+
+        if (1 === parseInt(gameBgm)) {
+            cc.audioEngine.playEffect(audio_deal);
+        }
         var board_card = data.table.board;
         var board = '';
         for (var index = 0; index < board_card.length; index++) {
@@ -300,6 +312,10 @@ function initWebsock() {
 
     rtc.on('__round_end', function (data) {
         console.log('round end : ' + JSON.stringify(data));
+        if (1 === parseInt(gameBgm)) {
+            cc.audioEngine.playEffect(audio_round_clear);
+        }
+
         gameStatus = STATUS_GAME_RUNNING;
         reloadTime = true;
         updateGame(data, false, true);
@@ -491,6 +507,9 @@ function ccLoad() {
                     gameBoard.init();
                     this.addChild(gameBoard);
                     initPlayerInfo();
+                    if (1 === parseInt(gameBgm)) {
+                        playBgm();
+                    }
                 }
             });
             cc.director.runScene(new LSScene());
@@ -500,6 +519,29 @@ function ccLoad() {
 }
 
 // game helper
+function playBgm() {
+    audio1 = new Audio('./res/audio/bgm_7.mp3');
+    audio1.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.pause();
+        audio2.play();
+    }, false);
+    audio2 = new Audio('./res/audio/bgm_6.mp3');
+    audio2.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.pause();
+        audio3.play();
+    }, false);
+    audio3 = new Audio('./res/audio/bgm_5.mp3');
+    audio3.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.pause();
+        audio1.play();
+    }, false);
+
+    audio1.play();
+}
+
 function startGame() {
     rtc.startGame(tableNumber, commandInterval, roundInterval,
         defaultSb, defaultChips, reloadChance, commandTimeout, lostTimeout);

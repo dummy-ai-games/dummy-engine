@@ -66,7 +66,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
     this.isActionTime = false;
-    this.countDown = 3;
+    this.countDown = 5;
     this.commandInterval = commandInterval || 1;
     this.roundInterval = roundInterval || 10;
     this.commandTimeout = commandTimeout || 2;
