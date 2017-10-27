@@ -141,7 +141,7 @@ function initWebsock() {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
 
-        if (gameStatus === STATUS_GAME_FINISHED) {
+        if (gameStatus === STATUS_GAME_FINISHED || gameStatus === STATUS_GAME_ENDED) {
             return;
         }
 
