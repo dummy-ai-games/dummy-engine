@@ -767,11 +767,13 @@ SkyRTC.prototype.addPlayerStatus = function (data) {
     var that = this;
     for (var i = 0; i < data.players.length; i++) {
         var playerName = data.players[i].playerName;
-        if (that.players[playerName])
+        if (that.players[playerName]) {
             data.players[i].isOnline = true;
-        else
+            data.players[i].isHuman = that.players[playerName].isHuman;
+        } else {
             data.players[i].isOnline = false;
-        data.players[i].isHuman = that.players[playerName].isHuman;
+            data.players[i].isHuman = false;
+        }
     }
 };
 
