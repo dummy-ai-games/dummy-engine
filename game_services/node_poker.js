@@ -148,7 +148,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             if (player.winMoney > 0)
                 player.folded = false;
         }
-        if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {           
+        if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
         that.eventEmitter.emit('__round_end', data);
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++) {
@@ -179,9 +179,11 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }, that.roundInterval * 1000);
         } else {
             logGame(that.tableNumber, 'game over, winners : ');
-            that.status = enums.GAME_STATUS_FINISHED;
+            that.status = enums.GAME_STATUS_ENDED;
             data.table.status = that.status;
             that.eventEmitter.emit('__round_end', data);
+
+            that.status = enums.GAME_STATUS_FINISHED;
             for (i = 0; i < that.players.length; i++) {
                 var player = that.players[i];
                 player.chips += (that.maxReloadCount - player.reloadCount) * that.initChips;

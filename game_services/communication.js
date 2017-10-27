@@ -27,7 +27,7 @@ var errorCb = function (rtc) {
     return function (error) {
         if (error) {
             logger.error('server internal error occurred: ' + error);
-            //rtc.emit('error', error);
+            // rtc.emit('error', error);
         }
     };
 };

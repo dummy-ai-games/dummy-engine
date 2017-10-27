@@ -13,6 +13,7 @@ function Enums() {
     this.GAME_STATUS_PREPARING = 1;
     this.GAME_STATUS_RUNNING = 2;
     this.GAME_STATUS_FINISHED = 3;
+    this.GAME_STATUS_ENDED = 4;
 }
 
 module.exports = Enums;

@@ -191,7 +191,7 @@ function initWebsock() {
         var inPlayers = data.players;
         var tableStatus = data.tableStatus;
 
-        if (gameStatus === STATUS_GAME_FINISHED) {
+        if (gameStatus === STATUS_GAME_FINISHED || gameStatus === STATUS_GAME_ENDED) {
             return;
         }
 
@@ -325,7 +325,7 @@ function initWebsock() {
             cc.audioEngine.playEffect(audio_round_clear);
         }
 
-        gameStatus = STATUS_GAME_RUNNING;
+        gameStatus = data.table.status;
         reloadTime = true;
         updateGame(data, false, true);
     });
@@ -574,6 +574,9 @@ function updateGame(data, isNewRound, roundClear) {
 
     // update round
     if (data.table) {
+        if (undefined !== data.table.status && null !== data.table.status) {
+            gameStatus = data.table.status;
+        }
         if (undefined !== data.table.roundCount && null !== data.table.roundCount) {
             currentRound = data.table.roundCount;
         }
@@ -618,6 +621,9 @@ function updateGame(data, isNewRound, roundClear) {
             updateBoardPlayers(data, isNewRound, roundClear);
         }
     } else if (data.game) {
+        if (undefined !== data.game.status && null !== data.game.status) {
+            gameStatus = data.game.status;
+        }
         if (undefined !== data.game.roundCount && null !== data.game.roundCount) {
             currentRound = data.game.roundCount;
         }
