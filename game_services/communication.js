@@ -697,6 +697,20 @@ SkyRTC.prototype.initTable = function (tableNumber) {
     });
 
     that.table[tableNumber].eventEmitter.on('__game_over', function (data) {
+        var tableNumber = data.table.tableNumber;
+        if (that.table[tableNumber] && that.table[tableNumber].timeout)
+           clearTimeout(that.table[tableNumber].timeout);
+
+        //delete offline player
+        for (var player in that.players) {
+           if (!that.players[player] && that.exitPlayers[player] === tableNumber) {
+              delete that.players[player];
+              delete that.exitPlayers[player];
+            }
+        }
+        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
+           delete that.table[tableNumber];
+        
         setTimeout(function () {
             that.addPlayerStatus(data);
             var message = {
@@ -705,19 +719,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             };
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
-            var tableNumber = data.table.tableNumber;
-            if (that.table[tableNumber] && that.table[tableNumber].timeout)
-                clearTimeout(that.table[tableNumber].timeout);
-
-            //delete offline player
-            for (var player in that.players) {
-                if (!that.players[player] && that.exitPlayers[player] === tableNumber) {
-                    delete that.players[player];
-                    delete that.exitPlayers[player];
-                }
-            }
-            if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
-                delete that.table[tableNumber];
+           
         }, DEFAULT_GAME_OVER_DELAY);
     });
 
