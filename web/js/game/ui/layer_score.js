@@ -8,6 +8,8 @@ var ScoreLayer = cc.LayerColor.extend({
     // constants
     titleFont: 'IMPACT',
     titleTextSize: 36,
+    winnerFont: 'Tw Cen MT',
+    winnerTextSize: 18,
     playerFont: 'Tw Cen MT',
     playerTextSize: 20,
     cardsInfoFont: 'Tw Cen MT',
@@ -32,19 +34,23 @@ var ScoreLayer = cc.LayerColor.extend({
     gameScale: 1.0,
     cardScale: 1.0,
     medalScale: 1.0,
+    winnerSignScale: 1.0,
 
     // sprites
     playerHands: [],
     medals: [],
+    winnerSigns: [],
 
     // labels
     titleLabel: null,
+    winnerLabel: null,
     scoreLabels: [],
     cardsInfo: [],
     reloadHint: null,
 
     // buttons
     reloadButton: null,
+    endButton: null,
 
     // menus
 
@@ -53,7 +59,8 @@ var ScoreLayer = cc.LayerColor.extend({
     // design specs
     titleTextWidth: 960,
     titleTextHeight: 64,
-    titleTextMarginBottom: 680,
+    titleTextMarginBottom: 700,
+    winnerTextMarginBottom: 660,
     scoreTextWidth: 400,
     scoreTextHeight: 24,
     scoreTextsMarginBottom: 640,
@@ -68,6 +75,8 @@ var ScoreLayer = cc.LayerColor.extend({
     reloadTextHeight: 20,
     reloadHintMarginBottom: 4,
     medalMarginRight: 10,
+    medalMarginTop: 20,
+    winnerSignMarginRight: 15,
 
     // event managers
     eventListener: null,
@@ -95,6 +104,8 @@ var ScoreLayer = cc.LayerColor.extend({
         this.titleLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
         this.titleLabel.boundingWidth = this.titleTextWidth;
         this.titleLabel.boundingHeight = this.titleTextHeight;
+        var shadowColor = cc.color(255, 0, 255);
+        this.titleLabel.enableShadow(shadowColor, cc.size(0, -3), 0);
         this.titleLabel.setScale(this.gameScale);
         this.titleLabel
             .setPosition((this.validWidth -
@@ -102,10 +113,27 @@ var ScoreLayer = cc.LayerColor.extend({
                 this.titleTextMarginBottom * this.gameScale);
         this.addChild(this.titleLabel, 2);
 
+        // initialize winners
+        this.winnerLabel = new cc.LabelTTF('Round Winners', this.winnerFont, this.winnerTextSize);
+        this.winnerLabel.setColor(cc.color(255, 255, 255, 255));
+        this.winnerLabel.setAnchorPoint(0, 0);
+        this.winnerLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+        this.winnerLabel.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+        this.winnerLabel.boundingWidth = this.titleTextWidth;
+        this.winnerLabel.boundingHeight = this.titleTextHeight;
+        this.winnerLabel.setScale(this.gameScale);
+        this.winnerLabel
+            .setPosition((this.validWidth -
+                this.winnerLabel.getContentSize().width * this.gameScale) / 2,
+                this.winnerTextMarginBottom * this.gameScale);
+        this.addChild(this.winnerLabel, 2);
+
         // initialize player score labels
         var playerIndex;
+        this.winnerSigns = [];
         this.scoreLabels = [];
         for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
+            // score label
             this.scoreLabels[playerIndex] = new cc.LabelTTF('player ' + playerIndex + ' $20000',
                 this.playerFont, this.playerTextSize);
             this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 255, 255));
@@ -119,17 +147,28 @@ var ScoreLayer = cc.LayerColor.extend({
                 this.scoreLabels[playerIndex]
                     .setPosition(this.validWidth / 10,
                         (this.scoreTextsMarginBottom -
-                            (this.scoreLabels[playerIndex].getContentSize().height + this.scoreTextMarginTop)
-                            * playerIndex) * this.gameScale);
+                            (this.scoreLabels[playerIndex].getContentSize().height * this.gameScale +
+                                this.scoreTextMarginTop) * playerIndex) * this.gameScale);
             } else {
                 this.scoreLabels[playerIndex]
                     .setPosition(this.validWidth / 10 * 6,
                         (this.scoreTextsMarginBottom -
-                            (this.scoreLabels[playerIndex].getContentSize().height + this.scoreTextMarginTop)
-                            * (playerIndex - 5)) *
-                        this.gameScale);
+                            (this.scoreLabels[playerIndex].getContentSize().height * this.gameScale +
+                                this.scoreTextMarginTop) * (playerIndex - 5)) * this.gameScale);
             }
             this.addChild(this.scoreLabels[playerIndex], 2);
+
+            // winner signs
+            this.winnerSigns[playerIndex] = new cc.Sprite(s_winner);
+            this.winnerSigns[playerIndex].setAnchorPoint(0, 0);
+            this.winnerSignScale = this.gameScale;
+            this.winnerSigns[playerIndex].setScale(this.winnerSignScale);
+            this.winnerSigns[playerIndex]
+                .setPosition(this.scoreLabels[playerIndex].getPositionX() -
+                    (this.winnerSigns[playerIndex].getContentSize().width + this.winnerSignMarginRight) * this.gameScale,
+                    this.scoreLabels[playerIndex].getPositionY());
+            this.winnerSigns[playerIndex].setVisible(false);
+            this.addChild(this.winnerSigns[playerIndex], 2);
         }
 
         // initialize medals
@@ -144,7 +183,7 @@ var ScoreLayer = cc.LayerColor.extend({
                 this.medals[medalIndex].getContentSize().width * this.medalScale -
                 this.medalMarginRight * this.gameScale,
                 this.scoreLabels[medalIndex].getPositionY() -
-                this.medals[medalIndex].getContentSize().height * this.medalScale);
+                (this.medals[medalIndex].getContentSize().height + this.medalMarginTop) * this.medalScale);
 
             this.addChild(this.medals[medalIndex], 2);
         }
@@ -192,14 +231,14 @@ var ScoreLayer = cc.LayerColor.extend({
             this.addChild(this.cardsInfo[playerIndex], 2);
         }
 
-        if (playMode === MODE_PLAYER) {
+        if (MODE_PLAYER === playMode) {
             this.reloadButton = new ccui.Button(s_o_reload_button,
                 s_o_reload_button_pressed,
                 s_o_reload_button_disabled);
             this.reloadButton.setAnchorPoint(0, 0);
             this.reloadButton.setScale(this.gameScale * 0.8);
             this.reloadButton.setPosition((this.validWidth -
-                this.reloadButton.getContentSize().width * this.gameScale) / 2,
+                this.reloadButton.getContentSize().width * this.gameScale * 0.8) / 2,
                 this.reloadButtonMarginBottom * this.gameScale);
             this.addChild(this.reloadButton, 2);
             this.reloadButton.addTouchEventListener(function (sender, type) {
@@ -207,6 +246,39 @@ var ScoreLayer = cc.LayerColor.extend({
                     if (STATUS_GAME_RUNNING === gameStatus) {
                         console.log('reload');
                         reload();
+                        playerReloadCount++;
+                    }
+                }
+            }, this);
+
+            // initialize title
+            this.reloadHint = new cc.LabelTTF('', this.cardsInfoFont, this.cardsInfoTextSize);
+            this.reloadHint.setColor(cc.color(255, 255, 0, 255));
+            this.reloadHint.setAnchorPoint(0, 0);
+            this.reloadHint.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
+            this.reloadHint.setVerticalAlignment(cc.VERTICAL_TEXT_ALIGNMENT_CENTER);
+            this.reloadHint.boundingWidth = this.titleTextWidth;
+            this.reloadHint.boundingHeight = this.reloadTextHeight;
+            this.reloadHint.setScale(this.gameScale);
+            this.reloadHint
+                .setPosition((this.validWidth -
+                    this.reloadHint.getContentSize().width * this.gameScale) / 2,
+                    0);
+            this.addChild(this.reloadHint, 2);
+        } else if (MODE_JUDGE === playMode) {
+            this.endButton = new ccui.Button(s_o_end_button,
+                s_o_end_button_pressed,
+                s_o_end_button_disabled);
+            this.endButton.setAnchorPoint(0.5, 0);
+            this.endButton.setScale(this.gameScale * 0.8);
+            this.endButton.setPosition(this.validWidth / 2,
+                this.reloadButtonMarginBottom * this.gameScale);
+            this.addChild(this.endButton, 2);
+            this.endButton.addTouchEventListener(function (sender, type) {
+                if (ccui.Widget.TOUCH_ENDED === type) {
+                    if (STATUS_GAME_RUNNING === gameStatus) {
+                        console.log('reload');
+                        endGame();
                         playerReloadCount++;
                     }
                 }
@@ -261,9 +333,15 @@ var ScoreLayer = cc.LayerColor.extend({
 
     doUpdate: function () {
         // update round label
-        this.titleLabel.setString('Round ' + currentRound + ' Clear');
+        if (STATUS_GAME_RUNNING === gameStatus) {
+            this.titleLabel.setString('Round ' + currentRound + ' Clear');
+        } else if (STATUS_GAME_ENDED === gameStatus) {
+            this.titleLabel.setString('GAME OVER');
+            this.enableButton(this.endButton, false);
+        }
 
         // update score label
+        var winnerTexts = '';
         var playerIndex;
         if (this.players) {
             for (playerIndex = 0; playerIndex < this.maxPlayerCount; playerIndex++) {
@@ -292,8 +370,11 @@ var ScoreLayer = cc.LayerColor.extend({
                         if (null !== this.players[playerIndex].prize) {
                             if (parseInt(this.players[playerIndex].prize) > 0) {
                                 this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 0, 255));
+                                this.winnerSigns[playerIndex].setVisible(true);
+                                winnerTexts += this.players[playerIndex].displayName + '  ';
                             } else {
                                 this.scoreLabels[playerIndex].setColor(cc.color(255, 255, 255, 255));
+                                this.winnerSigns[playerIndex].setVisible(false);
                             }
                             var unReloadedChips = parseInt((reloadChance - this.players[playerIndex].reloadCount)
                                 * defaultChips);
@@ -368,20 +449,23 @@ var ScoreLayer = cc.LayerColor.extend({
             }
         }
 
+        // update round winners
+        this.winnerLabel.setString('Round Winners : ' + winnerTexts);
+
         // update reload hint
-        if (playMode === MODE_PLAYER) {
-            var reloadChance = 2 - playerReloadCount;
+        if (MODE_PLAYER === playMode) {
+            var unReload = 2 - playerReloadCount;
             var reloadText = '';
-            if (reloadChance === 0) {
+            if (unReload === 0) {
                 reloadText = 'You have used up all reload chances';
-            } else if (reloadChance === 1) {
-                reloadText = reloadChance + ' Reload Chance Left';
-            } else if (reloadChance === 2) {
-                reloadText = reloadChance + ' Reload Chances Left';
+            } else if (unReload === 1) {
+                reloadText = unReload + ' Reload Chance Left';
+            } else if (unReload === 2) {
+                reloadText = unReload + ' Reload Chances Left';
             }
             this.reloadHint.setString(reloadText);
 
-            if (reloadChance === 0) {
+            if (unReload === 0) {
                 this.enableButton(this.reloadButton, false);
             } else {
                 this.enableButton(this.reloadButton, true);

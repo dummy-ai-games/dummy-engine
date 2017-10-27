@@ -11,7 +11,7 @@ var dbPlayers = [];
 var gameBgm = 0;
 var autoStart = 0;
 var commandInterval = 1;
-var roundInterval = 10;
+var roundInterval = 15;
 var commandTimeout = 2;
 var lostTimeout = 10;
 var defaultSb = 10;
@@ -29,6 +29,7 @@ var STATUS_GAME_STANDBY = 0;
 var STATUS_GAME_PREPARING = 1;
 var STATUS_GAME_RUNNING = 2;
 var STATUS_GAME_FINISHED = 3;
+var STATUS_GAME_ENDED = 4;
 
 var ACTION_STATUS_NONE = 0;
 var ACTION_STATUS_THINKING = 1;
@@ -36,10 +37,11 @@ var ACTION_STATUS_DECIDED = 2;
 
 var MODE_LIVE = 0;
 var MODE_PLAYER = 1;
+var MODE_JUDGE = 2;
 
 var gameStatus = STATUS_GAME_STANDBY;
 var gameCountDown = 0;
-var playMode = MODE_LIVE;
+var playMode = MODE_JUDGE;
 
 var currentRoundName = '';
 var currentRound = 1;
@@ -94,7 +96,7 @@ $(document).ready(function () {
         playerName = md5(playerNamePlain);
         document.title = 'The Game';
     } else {
-        playMode = MODE_LIVE;
+        playMode = MODE_JUDGE;
         document.title = 'THE Live';
     }
     initGame();
@@ -156,11 +158,12 @@ function initWebsock() {
             currentPlayers = inPlayers.length;
             onLinePlayers = 0;
             for (var i = 0; i < inPlayers.length; i++) {
-                var playerName = inPlayers[i].playerName;
-                var playerDisplayName = findDBPlayerNameByName(playerName);
-                console.log('create player ' + playerName);
-                players[i] = new Player(playerName, playerDisplayName,
-                    defaultInitChips, true, 0, inPlayers[i].isOnline);
+                var inPlayerName = inPlayers[i].playerName;
+                var isHuman = (inPlayerName === playerName);
+                var playerDisplayName = findDBPlayerNameByName(inPlayerName);
+                console.log('create player ' + inPlayerName);
+                players[i] = new Player(inPlayerName, playerDisplayName,
+                    defaultInitChips, true, isHuman, 0, inPlayers[i].isOnline);
                 if (undefined !== inPlayers[i].isOnline && null !== inPlayers[i].isOnline && inPlayers[i].isOnline) {
                     onLinePlayers++;
                 }
@@ -205,8 +208,7 @@ function initWebsock() {
                 currentPlayers = inPlayers.length;
                 onLinePlayers = 0;
                 for (i = 0; i < currentPlayers; i++) {
-                    var playerName = inPlayers[i].playerName;
-                    var targetPlayer = findTargetPlayer(playerName);
+                    var targetPlayer = findTargetPlayer(inPlayers[i].playerName);
                     targetPlayer.setOnline(inPlayers[i].isOnline);
                     if (inPlayers[i].isOnline) {
                         onLinePlayers++;
@@ -220,11 +222,12 @@ function initWebsock() {
                 for (i = 0; i < currentPlayers; i++) {
                     console.log(inPlayers[i].playerName + ', online = ' + inPlayers[i].isOnline);
                     if (inPlayers[i].isOnline && true === inPlayers[i].isOnline) {
-                        var playerName = inPlayers[i].playerName;
-                        var playerDisplayName = findDBPlayerNameByName(playerName);
+                        var inPlayerName = inPlayers[i].playerName;
+                        var isHuman = (inPlayerName === playerName);
+                        var playerDisplayName = findDBPlayerNameByName(inPlayerName);
                         console.log('create player : ' + playerDisplayName);
-                        players[i] = new Player(playerName, playerDisplayName,
-                            defaultInitChips, true, 0, inPlayers[i].isOnline);
+                        players[i] = new Player(inPlayerName, playerDisplayName,
+                            defaultInitChips, true, isHuman, 0, inPlayers[i].isOnline);
                         onLinePlayers++;
                     }
                 }
@@ -242,12 +245,17 @@ function initWebsock() {
         }
         // set winners
         winners = data.winners;
-        for (var index = 0; index < winners.length; index++) {
-            winners[index].displayName = findDBPlayerNameByName(winners[index].playerName);
+        if (winners) {
+            for (var index = 0; index < winners.length; index++) {
+                winners[index].displayName = findDBPlayerNameByName(winners[index].playerName);
+            }
+            updateGame(data, true);
+            gameStatus = STATUS_GAME_FINISHED;
+        } else {
+            // game ended by judge
+            gameStatus = STATUS_GAME_ENDED;
+            updateGame(data, true);
         }
-
-        updateGame(data, true);
-        gameStatus = STATUS_GAME_FINISHED;
 
         if (autoStart && parseInt(autoStart) === 1) {
             // auto start another game in 3s
@@ -326,7 +334,7 @@ function initWebsock() {
     rtc.on('__action', function (data) {
         console.log('server request action : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
-        if (playMode === MODE_PLAYER) {
+        if (MODE_PLAYER === playMode) {
             console.log('self.name = ' + data.self.playerName + ', player name = ' + playerName);
             if (data.self.playerName.toLowerCase() === playerName.toLowerCase()) {
                 turnAnimationShowed = false;
@@ -351,13 +359,14 @@ function initWebsock() {
                 }
             }
         }
+        updateGame(data);
     });
 
     rtc.on('__bet', function (data) {
         console.log('server request bet : ' + JSON.stringify(data));
         gameStatus = STATUS_GAME_RUNNING;
         // it's your turn !!
-        if (playMode === MODE_PLAYER) {
+        if (MODE_PLAYER === playMode) {
             if (data.self.playerName.toLowerCase() === playerName.toLowerCase()) {
                 turnAnimationShowed = false;
                 yourTurn = true;
@@ -380,6 +389,7 @@ function initWebsock() {
                 }
             }
         }
+        updateGame(data);
     });
 
     rtc.on('__show_action', function (data) {
@@ -542,7 +552,7 @@ function playBgm() {
         audio1.play();
     }, false);
 
-    // audio1.play();
+    audio1.play();
 }
 
 function startGame() {
@@ -555,27 +565,31 @@ function stopGame() {
     rtc.stopGame(tableNumber);
 }
 
+function endGame() {
+    rtc.endGame(tableNumber);
+}
+
 function updateGame(data, isNewRound, roundClear) {
     var i;
 
     // update round
     if (data.table) {
-        if (data.table.roundCount) {
+        if (undefined !== data.table.roundCount && null !== data.table.roundCount) {
             currentRound = data.table.roundCount;
         }
-        if (data.table.raiseCount) {
+        if (undefined !== data.table.raiseCount && null !== data.table.raiseCount) {
             currentRaiseCount = data.table.raiseCount;
         }
-        if (data.table.betCount) {
+        if (undefined !== data.table.betCount && null !== data.table.betCount) {
             currentBetCount = data.table.betCount;
         }
-        if (data.table.roundName) {
+        if (undefined !== data.table.roundName && null !== data.table.roundName) {
             currentRoundName = data.table.roundName;
         }
-        if (data.table.initChips) {
+        if (undefined !== data.table.initChips && null !== data.table.initChips) {
             defaultChips = data.table.initChips;
         }
-        if (data.table.maxReloadCount) {
+        if (undefined !== data.table.maxReloadCount && null !== data.table.maxReloadCount) {
             reloadChance = data.table.maxReloadCount;
         }
         if (data.table.currentPlayer) {
@@ -593,74 +607,96 @@ function updateGame(data, isNewRound, roundClear) {
                 }
             }
         }
-    }
-
-    // update table
-    if (data.table) {
         publicCards = [null, null, null, null, null];
         for (i = 0; i < data.table.board.length; i++) {
             publicCards[i] = data.table.board[i];
         }
         currentSmallBlind = data.table.smallBlind.amount;
         currentBigBlind = data.table.bigBlind.amount;
-    } else {
-        console.log('data.table is null');
+        // update players
+        if (data.players) {
+            updateBoardPlayers(data, isNewRound, roundClear);
+        }
+    } else if (data.game) {
+        if (undefined !== data.game.roundCount && null !== data.game.roundCount) {
+            currentRound = data.game.roundCount;
+        }
+        if (undefined !== data.game.raiseCount && null !== data.game.raiseCount) {
+            currentRaiseCount = data.game.raiseCount;
+        }
+        if (undefined !== data.game.betCount && null !== data.game.betCount) {
+            currentBetCount = data.game.betCount;
+        }
+        if (undefined !== data.game.roundName && null !== data.game.roundName) {
+            currentRoundName = data.game.roundName;
+        }
+        publicCards = [null, null, null, null, null];
+        for (i = 0; i < data.game.board.length; i++) {
+            publicCards[i] = data.game.board[i];
+        }
+        currentSmallBlind = data.game.smallBlind.amount;
+        currentBigBlind = data.game.bigBlind.amount;
+        if (data.game.players) {
+            updateBoardPlayers(data.game, isNewRound, roundClear);
+        }
     }
+}
 
-    // update players
-    if (data.players) {
-        currentPlayers = data.players.length;
-        for (i = 0; i < data.players.length; i++) {
-            var targetPlayer = findTargetPlayer(data.players[i].playerName);
-            if (null === targetPlayer) {
-                continue;
-            }
-            targetPlayer.setDisplayName(findDBPlayerNameByName(data.players[i].playerName));
-            targetPlayer.setOnline(data.players[i].isOnline);
+function updateBoardPlayers(data, isNewRound, roundClear) {
+    currentPlayers = data.players.length;
+    for (var i = 0; i < data.players.length; i++) {
+        var targetPlayer = findTargetPlayer(data.players[i].playerName);
+        if (null === targetPlayer) {
+            continue;
+        }
+        targetPlayer.setDisplayName(findDBPlayerNameByName(data.players[i].playerName));
+        targetPlayer.setOnline(data.players[i].isOnline);
+        targetPlayer.setIsHuman(data.players[i].isHuman);
+        if (undefined !== data.players[i].reloadCount && null !== data.players[i].reloadCount) {
+            targetPlayer.setReloadCount(data.players[i].reloadCount);
+        }
 
-            if (undefined !== data.players[i].reloadCount && null !== data.players[i].reloadCount) {
-                targetPlayer.setReloadCount(data.players[i].reloadCount);
+        if (isNewRound) {
+            targetPlayer.setAction('');
+            targetPlayer.setPrivateCards(null, null);
+            targetPlayer.setAccumulate(0);
+            targetPlayer.setBet(0);
+            targetPlayer.setRoundBet(0);
+            targetPlayer.setTakeAction(ACTION_STATUS_NONE);
+            targetPlayer.setFolded(false);
+            targetPlayer.setAllin(false);
+        } else {
+            if (data.players[i].cards && data.players[i].cards.length === 2) {
+                targetPlayer.setPrivateCards(data.players[i].cards[0], data.players[i].cards[1]);
             }
+            targetPlayer.setBet(data.players[i].bet);
+            targetPlayer.setRoundBet(data.players[i].roundBet);
+            targetPlayer.setChips(data.players[i].chips);
+            targetPlayer.setTotalChips(defaultChips, reloadChance);
+            targetPlayer.setSurvive(data.players[i].isSurvive);
+            targetPlayer.setFolded(data.players[i].folded);
+            targetPlayer.setAllin(data.players[i].allIn);
+            targetPlayer.setReloadCount(data.players[i].reloadCount);
+        }
 
-            if (isNewRound) {
-                targetPlayer.setAction('');
-                targetPlayer.setPrivateCards(null, null);
-                targetPlayer.setAccumulate(0);
-                targetPlayer.setBet(0);
-                targetPlayer.setRoundBet(0);
-                targetPlayer.setTakeAction(ACTION_STATUS_NONE);
-                targetPlayer.setFolded(false);
-                targetPlayer.setAllin(false);
-            } else {
-                if (data.players[i].cards && data.players[i].cards.length === 2) {
-                    targetPlayer.setPrivateCards(data.players[i].cards[0], data.players[i].cards[1]);
-                }
-                targetPlayer.setBet(data.players[i].bet);
-                targetPlayer.setRoundBet(data.players[i].roundBet);
-                targetPlayer.setChips(data.players[i].chips);
-                targetPlayer.setTotalChips(defaultChips, reloadChance);
-                targetPlayer.setSurvive(data.players[i].isSurvive);
-                targetPlayer.setFolded(data.players[i].folded);
-                targetPlayer.setAllin(data.players[i].allIn);
-                targetPlayer.setReloadCount(data.players[i].reloadCount);
+        if (roundClear) {
+            if (undefined !== data.players[i].hand && null !== data.players[i].hand) {
+                targetPlayer.setHand(data.players[i].hand);
             }
+            if (undefined !== data.players[i].winMoney && null !== data.players[i].winMoney) {
+                targetPlayer.setPrize(data.players[i].winMoney);
+            }
+        } else {
+            targetPlayer.setHand(null);
+            targetPlayer.setPrize(null);
+        }
 
-            if (roundClear) {
-                if (undefined !== data.players[i].hand && null !== data.players[i].hand) {
-                    targetPlayer.setHand(data.players[i].hand);
-                }
-                if (undefined !== data.players[i].winMoney && null !== data.players[i].winMoney) {
-                    targetPlayer.setPrize(data.players[i].winMoney);
-                }
-            } else {
-                targetPlayer.setHand(null);
-                targetPlayer.setPrize(null);
-            }
-
-            if (data.table) {
-                targetPlayer.setSmallBlind(targetPlayer.playerName === data.table.smallBlind.playerName);
-                targetPlayer.setBigBlind(targetPlayer.playerName === data.table.bigBlind.playerName);
-            }
+        if (data.table) {
+            targetPlayer.setSmallBlind(targetPlayer.playerName === data.table.smallBlind.playerName);
+            targetPlayer.setBigBlind(targetPlayer.playerName === data.table.bigBlind.playerName);
+        } else if (data.game) {
+            targetPlayer.setSmallBlind(targetPlayer.playerName === data.game.smallBlind.playerName);
+            targetPlayer.setBigBlind(targetPlayer.playerName === data.game.bigBlind.playerName);
         }
     }
 }

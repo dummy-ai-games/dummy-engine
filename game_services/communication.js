@@ -11,6 +11,8 @@ var poker = require('./node_poker.js');
 var playerLogic = require('../work_units/player_logic.js');
 var tableLogic = require('../work_units/table_logic.js');
 
+var DEFAULT_GAME_OVER_DELAY = 60000;
+
 var logger = require('../poem/logging/logger4js').helper;
 
 var Enums = require('../constants/enums.js');
@@ -128,6 +130,10 @@ function SkyRTC(tableNumber) {
         this.stopGame(data.tableNumber);
     });
 
+    this.on('__end_game', function (data) {
+        this.endGame(data.tableNumber);
+    });
+
     this.on('__reload', function (data, socket) {
         var that = this;
         var playerName = socket.MD5Id;
@@ -240,18 +246,20 @@ SkyRTC.prototype.initGuestData = function (guest) {
 SkyRTC.prototype.initPlayerData = function (player) {
     logger.info('initPlayerData');
     var that = this;
-    var tableNumber = that.players[player].tableNumber;
-    if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
-        var data = that.getBasicData(that.players[player].tableNumber);
-        for (var i in data.players) {
-            if (data.players[i].playerName !== that.players[player].id)
-                delete data.players[i].cards;
+    if (that.players[player]) {
+        var tableNumber = that.players[player].tableNumber;
+        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
+            var data = that.getBasicData(that.players[player].tableNumber);
+            for (var i in data.players) {
+                if (data.players[i].playerName !== that.players[player].id)
+                    delete data.players[i].cards;
+            }
+            var message = {
+                'eventName': '_join',
+                'data': data
+            };
+            that.sendMessage(that.players[player], message);
         }
-        var message = {
-            'eventName': '_join',
-            'data': data
-        };
-        that.sendMessage(that.players[player], message);
     }
 };
 
@@ -486,7 +494,7 @@ SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
     var initChips = 1000;
     var rc = 2;
     var ci = 1;
-    var ri = 10;
+    var ri = 15;
     var ct = 5; // schedule to 5 seconds
     var lt = 10;
 
@@ -619,6 +627,37 @@ SkyRTC.prototype.stopGame = function (tableNumber) {
     that.broadcastInPlayers(message);
 };
 
+SkyRTC.prototype.endGame = function (tableNumber) {
+    var that = this;
+    var message;
+    try {
+        parseInt(tableNumber);
+    } catch (e) {
+        logger.error('table : ' + tableNumber + ' end game failed, type is not correct');
+        return;
+    }
+
+    logger.info('game end for table: ' + tableNumber);
+    if (that.table[tableNumber]) {
+        if (that.table[tableNumber].timeout)
+            clearTimeout(that.table[tableNumber].timeout);
+
+        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+
+        delete that.table[tableNumber];
+        logger.info('remove table ' + tableNumber + ' timeout');
+    }
+
+    // TODO: send game over to frontend, broadcast __game_over to Players and Lives
+    message = {
+        'eventName': '__game_over',
+        'data': {'msg': 'table ' + tableNumber + ' ended successfully', 'tableNumber': tableNumber}
+    };
+
+    that.broadcastInGuests(message);
+    that.broadcastInPlayers(message);
+};
+
 SkyRTC.prototype.initTable = function (tableNumber) {
     var that = this;
 
@@ -627,6 +666,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             'eventName': '__action',
             'data': data
         };
+        that.addPlayerStatus(data.game);
         that.broadcastInGuests(message);
         that.broadcastInHumanPlayers(message);
         that.getPlayerAction(message);
@@ -637,6 +677,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             'eventName': '__bet',
             'data': data
         };
+        that.addPlayerStatus(data.game);
         that.broadcastInGuests(message);
         that.broadcastInHumanPlayers(message);
         that.getPlayerAction(message);
@@ -674,7 +715,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             }
             if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
                 delete that.table[tableNumber];
-        }, 1000);
+        }, DEFAULT_GAME_OVER_DELAY);
     });
 
     that.table[tableNumber].eventEmitter.on('__new_round', function (data) {
@@ -727,6 +768,7 @@ SkyRTC.prototype.addPlayerStatus = function (data) {
             data.players[i].isOnline = true;
         else
             data.players[i].isOnline = false;
+        data.players[i].isHuman = that.players[playerName].isHuman;
     }
 };
 
@@ -836,7 +878,7 @@ SkyRTC.prototype.broadcastInHumanPlayers = function (message) {
         }
     }
     message.data.self.cards = cards[message.data.self.playerName];//recover for getPlayerAction
-}
+};
 
 SkyRTC.prototype.broadcastInPlayers = function (message) {
     var that = this;

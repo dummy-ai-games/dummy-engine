@@ -172,6 +172,16 @@ var SkyRTC = function () {
         }));
     };
 
+    skyrtc.prototype.endGame = function(tableNumber) {
+        var that = this;
+        that.socket.send(JSON.stringify({
+            "eventName": "__end_game",
+            "data": {
+                "tableNumber": tableNumber
+            }
+        }));
+    };
+
     skyrtc.prototype.Reload = function () {
         var that = this;
         that.socket.send(JSON.stringify({

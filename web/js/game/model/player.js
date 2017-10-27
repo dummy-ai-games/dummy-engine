@@ -13,11 +13,12 @@
  * @param _online
  * @constructor
  */
-var Player = function (_playerName, _displayName, _chips, _isSurvive, _reloadCount, _online) {
+var Player = function (_playerName, _displayName, _chips, _isSurvive, _isHuman, _reloadCount, _online) {
     this.id = 0;
     this.playerName = _playerName;
     this.displayName = _displayName;
     this.isSurvive = _isSurvive;
+    this.isHuman = _isHuman;
     if (undefined !== _online && null !== _online) {
         this.online = _online;
     } else {
@@ -128,6 +129,10 @@ Player.prototype.setHand = function (_hand) {
 
 Player.prototype.setPrize = function (_prize) {
     this.prize = _prize;
+};
+
+Player.prototype.setIsHuman = function (_isHuman) {
+    this.isHuman = _isHuman;
 };
 
 // avatar hash helper

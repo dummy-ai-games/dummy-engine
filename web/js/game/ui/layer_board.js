@@ -153,7 +153,7 @@ var BoardLayer = cc.Layer.extend({
         this.bgSprite.setPosition(0, 0);
         this.addChild(this.bgSprite, 0);
 
-        if (MODE_LIVE === playMode) {
+        if (MODE_LIVE === playMode || MODE_JUDGE === playMode) {
             // initialize bottom decoration
             this.decoBottom = new cc.Sprite(s_dec_bottom);
             this.decoBottom.setAnchorPoint(0, 0);
@@ -272,9 +272,9 @@ var BoardLayer = cc.Layer.extend({
             this.betSpinnerUp = new ccui.Button(s_o_arrow_up, s_o_arrow_up_pressed, s_o_arrow_up_disabled);
             this.betSpinnerUp.setAnchorPoint(0, 0.5);
             this.betSpinnerUp.setScale(this.operationButtonScale);
-            this.betSpinnerUp.setPosition(this.bgBet.getPositionX(),
-                this.bgBet.getPositionY() + (this.bgBet.getContentSize().height - this.betSpinnerGap)
-                * this.operationButtonScale);
+            this.betSpinnerUp.setPosition(this.bgBet.getPositionX() + (this.bgBet.getContentSize().width -
+                this.betSpinnerUp.getContentSize().width - this.betSpinnerGap) * this.operationButtonScale,
+                this.bgBet.getPositionY() + (this.bgBet.getContentSize().height * this.operationButtonScale / 2));
             this.enableButton(this.betSpinnerUp, false);
             this.addChild(this.betSpinnerUp, 3);
             this.betSpinnerUp.addTouchEventListener(function (sender, type) {
@@ -287,8 +287,8 @@ var BoardLayer = cc.Layer.extend({
             this.betSpinnerDown = new ccui.Button(s_o_arrow_down, s_o_arrow_down_pressed, s_o_arrow_down_disabled);
             this.betSpinnerDown.setAnchorPoint(0, 0.5);
             this.betSpinnerDown.setScale(this.operationButtonScale);
-            this.betSpinnerDown.setPosition(this.bgBet.getPositionX(),
-                this.bgBet.getPositionY() + this.betSpinnerGap * this.operationButtonScale);
+            this.betSpinnerDown.setPosition(this.bgBet.getPositionX() + this.betSpinnerGap * this.operationButtonScale,
+                this.bgBet.getPositionY() + (this.bgBet.getContentSize().height * this.operationButtonScale / 2));
             this.enableButton(this.betSpinnerDown, false);
             this.addChild(this.betSpinnerDown, 3);
             this.betSpinnerDown.addTouchEventListener(function (sender, type) {
@@ -298,7 +298,7 @@ var BoardLayer = cc.Layer.extend({
                 }
             }, this);
 
-            this.amountLabel = new cc.LabelTTF('$' + this.currentBet, this.amountTextFont, this.amountTextSize);
+            this.amountLabel = new cc.LabelTTF(this.currentBet, this.amountTextFont, this.amountTextSize);
             this.amountLabel.setColor(cc.color(255, 255, 255, 255));
             this.amountLabel.setAnchorPoint(0.5, 0.5);
             this.amountLabel.setHorizontalAlignment(cc.TEXT_ALIGNMENT_CENTER);
@@ -430,7 +430,7 @@ var BoardLayer = cc.Layer.extend({
         this.addChild(this.betLabel, 2);
 
         // initialize author text
-        if (playMode === MODE_LIVE) {
+        if (MODE_LIVE === playMode || MODE_JUDGE === playMode) {
             this.authorLabel = new cc.LabelTTF('Engineering Camp 2017 Task Force & CDC Mobile Club',
                 this.authorTextFont, this.authorTextSize);
             this.authorLabel.setColor(cc.color(255, 255, 255, 255));
@@ -461,7 +461,7 @@ var BoardLayer = cc.Layer.extend({
         // add start and stop button
         this.controlMenuScale = this.gameScale * 0.6;
 
-        if (playMode === MODE_LIVE) {
+        if (MODE_JUDGE === playMode) {
             this.startButton = new ccui.Button(s_start_button, s_start_button_pressed, s_start_button_disabled);
             this.startButton.setAnchorPoint(0, 0);
             this.startButton.setScale(this.controlMenuScale);
@@ -528,14 +528,14 @@ var BoardLayer = cc.Layer.extend({
     betPlus: function () {
         if (this.currentBet * 2 <= playerMaxBet) {
             this.currentBet *= 2;
-            this.amountLabel.setString('$' + this.currentBet);
+            this.amountLabel.setString(this.currentBet);
         }
     },
 
     betMinus: function () {
         if (this.currentBet / 2 >= playerMinBet) {
             this.currentBet /= 2;
-            this.amountLabel.setString('$' + this.currentBet);
+            this.amountLabel.setString(this.currentBet);
         }
     },
 
@@ -572,6 +572,14 @@ var BoardLayer = cc.Layer.extend({
                 this.showLayer(this.scoreLayer, false);
                 this.winnerLayer.setWinners(winners);
                 this.updateWinnerLayer();
+                break;
+
+            case STATUS_GAME_ENDED:
+                this.showLayer(this.dealerLayer, false);
+                this.showLayer(this.winnerLayer, false);
+                this.showLayer(this.scoreLayer, reloadTime);
+                this.updateBoardLayer();
+                this.updateScoreLayer();
                 break;
 
             default:
@@ -654,7 +662,7 @@ var BoardLayer = cc.Layer.extend({
                         betTotal += players[i].accumulate;
                     }
                 }
-                this.betLabel.setString('TOTAL BET: $' + betTotal);
+                this.betLabel.setString('TOTAL BET: ' + betTotal);
 
                 // update public cards
                 this.updatePublicCardsModel();
@@ -671,14 +679,17 @@ var BoardLayer = cc.Layer.extend({
                 }
 
                 // update your turn
-                if (playMode === MODE_PLAYER) {
+                if (MODE_PLAYER === playMode) {
                     this.yourTurnDest = new cc.p(this.turnDestX * this.gameScale,
                         this.turnDestY * this.gameScale);
                     if (turnAnimationShowed === false && yourTurn === true) {
                         // play animation
                         this.setYourTurn(true);
                         this.currentBet = currentBigBlind;
-                        this.amountLabel.setString('$' + playerMinBet);
+                        if (!playerMinBet) {
+                            playerMinBet = parseInt(currentBigBlind);
+                        }
+                        this.amountLabel.setString(playerMinBet);
                         this.yourTurnAnimation(this.yourTurn,
                             this.gameScale * 4,
                             this.gameScale * 0.8,

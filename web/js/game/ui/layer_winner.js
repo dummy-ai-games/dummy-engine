@@ -64,7 +64,7 @@ var WinnerLayer = cc.LayerColor.extend({
         this.size = cc.size(this.validWidth, this.validHeight);
 
         // initialize background
-        this.bgSprite = cc.Sprite.create(s_winner_bg);
+        this.bgSprite = new cc.Sprite(s_winner_bg);
         this.bgSprite.setAnchorPoint(0, 0);
         this.bgScaleY = this.validHeight / this.bgSprite.getContentSize().height;
         this.bgScaleX = this.validWidth / this.bgSprite.getContentSize().width;
@@ -111,7 +111,7 @@ var WinnerLayer = cc.LayerColor.extend({
         }
 
         // event management
-        this.eventListener = cc.EventListener.create({
+        this.eventListener = new cc.EventListener({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
             onTouchBegan: function (/*touch, event*/) {

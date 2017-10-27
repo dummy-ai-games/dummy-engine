@@ -1106,6 +1106,17 @@
                 </div>
                 <div class="tab-pane" id="release_note">
                     <div>
+                        <h4>V1.4.0 (2017-10-27)</h4>
+                        区分人类和AI玩家<br>
+                        游戏背景更新<br>
+                        允许在游戏过程中结束游戏(不是停止)<br>
+                        修复人类玩家一开始看不到手牌的bug<br>
+                        修复raise和bet次数统计不正确的bug<br>
+                        修复reload次数显示不正确bug<br>
+                        其它UI和流程微调
+                    </div>
+                    <br>
+                    <div>
                         <h4>V1.3.3 (2017-10-26)</h4>
                         试图解决CPU耗尽的偶现问题<br>
                         试图解决玩家位置显示错乱的偶现问题<br>
@@ -1294,7 +1305,7 @@
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-addon">回合间隔&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="在每回合清算的时候将展示玩家手牌, 得分和牌面组合, 以及让客户端请求reload 的这个时间间隔"></span></span>
-                                    <input type="number" min="5" max="30" step="5" class="form-control" placeholder="回合间隔" id="game_round_interval" value="10" onkeydown="return false">
+                                    <input type="number" min="5" max="30" step="5" class="form-control" placeholder="回合间隔" id="game_round_interval" value="15" onkeydown="return false">
                                     <span class="input-group-addon">秒</span>
                                 </div>
                             </div>

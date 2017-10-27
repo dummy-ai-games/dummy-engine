@@ -71,7 +71,7 @@ var DealerLayer = cc.LayerColor.extend({
         this.size = cc.size(this.validWidth, this.validHeight);
 
         // initialize start and stop button
-        if (MODE_LIVE === playMode) {
+        if (MODE_JUDGE === playMode) {
             this.buttonScale = this.gameScale * 0.7;
             this.startButton = new ccui.Button(s_start_button, s_start_button_pressed, s_start_button_disabled);
             this.startButton.setAnchorPoint(0, 0);
@@ -197,7 +197,7 @@ var DealerLayer = cc.LayerColor.extend({
     },
 
     doUpdate: function () {
-        if (playMode === MODE_LIVE) {
+        if (MODE_JUDGE === playMode) {
             this.updateControl();
         }
         this.updateCountDown();

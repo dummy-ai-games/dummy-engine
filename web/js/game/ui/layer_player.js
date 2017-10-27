@@ -7,9 +7,9 @@ var PlayerLayer = cc.Layer.extend({
 
     // constants
     nameFont: '微软雅黑',
-    nameTextSize: 14,
+    nameTextSize: 15,
     chipsFont: 'Tw Cen MT',
-    chipsTextSize: 18,
+    chipsTextSize: 20,
     blindFont: 'IMPACT',
     blindTextSize: 18,
     reloadFont: 'Arial',
@@ -129,14 +129,14 @@ var PlayerLayer = cc.Layer.extend({
         if (this.playerType === PLAYER_AT_RIGHT) {
 
             // add avatar panel
-            this.avatarPanel = cc.Sprite.create(s_avatar_panel_right);
+            this.avatarPanel = new cc.Sprite(s_avatar_panel_right);
             this.avatarPanel.setAnchorPoint(0, 0);
             this.avatarPanel.setPosition(0, 0);
             this.addChild(this.avatarPanel, 4);
 
             // add avatar
             avatarIndex = 0;
-            this.avatar = cc.Sprite.create(avatars[avatarIndex]);
+            this.avatar = new cc.Sprite(avatars[avatarIndex]);
             this.avatar.setAnchorPoint(0, 0);
             this.avatarScale = this.avatarWidth / this.avatar.getContentSize().width;
             avatarGap = (this.avatarPanelWidth - this.avatarWidth) / 2;
@@ -148,14 +148,14 @@ var PlayerLayer = cc.Layer.extend({
             this.addChild(this.avatar, 5);
 
             // add avatar mask
-            this.avatarMask = cc.Sprite.create(s_avatar_mask_right);
+            this.avatarMask = new cc.Sprite(s_avatar_mask_right);
             this.avatarMask.setAnchorPoint(0, 0);
             this.avatarMask.setPosition(0, 0);
             this.avatarMask.setVisible(false);
             this.addChild(this.avatarMask, 6);
 
             // add name panel
-            this.namePanel = cc.Sprite.create(s_name_panel_right);
+            this.namePanel = new cc.Sprite(s_name_panel_right);
             this.namePanel.setAnchorPoint(0, 0);
             this.namePanel.setPosition(this.avatarPanel.getContentSize().width + this.avatarNameGap, 0);
             this.addChild(this.namePanel, 4);
@@ -187,7 +187,7 @@ var PlayerLayer = cc.Layer.extend({
             this.addChild(this.chipsLabel, 5);
 
             // add name mask
-            this.nameMask = cc.Sprite.create(s_name_mask_right);
+            this.nameMask = new cc.Sprite(s_name_mask_right);
             this.nameMask.setAnchorPoint(0, 0);
             this.nameMask.setPosition(this.avatarPanel.getContentSize().width + this.avatarNameGap, 0);
             this.nameMask.setVisible(false);
@@ -196,7 +196,7 @@ var PlayerLayer = cc.Layer.extend({
             // add bet chips sprite
             this.betChips = [];
             for (betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
-                this.betChips[betChipIndex] = cc.Sprite.create(s_chips);
+                this.betChips[betChipIndex] = new cc.Sprite(s_chips);
                 this.betChips[betChipIndex].setAnchorPoint(0, 0);
                 this.betChips[betChipIndex].setPosition(this.avatarPanel.getPositionX() -
                     (this.betChips[betChipIndex].getContentSize().width + this.chipsHorizontalGap) + this.chipsXFix,
@@ -248,7 +248,7 @@ var PlayerLayer = cc.Layer.extend({
             this.avatarNormal = s_avatar_panel_right;
             this.avatarHighLight = s_avatar_panel_right_hl;
 
-            this.actionPanel = cc.Sprite.create(action_allin);
+            this.actionPanel = new cc.Sprite(action_allin);
             this.actionPanel.setAnchorPoint(0, 0);
             this.actionPanel.setPosition(this.avatarPanel.getPositionX() - this.actionPanel.getContentSize().width / 2,
                 this.avatarPanel.getPositionY() +
@@ -268,8 +268,8 @@ var PlayerLayer = cc.Layer.extend({
             this.addChild(this.betChipsLabel, 20);
 
             // add private cards
-            this.privateCard0 = cc.Sprite.create(s_p_back);
-            this.privateCardMask0 = cc.Sprite.create(s_p_mask);
+            this.privateCard0 = new cc.Sprite(s_p_back);
+            this.privateCardMask0 = new cc.Sprite(s_p_mask);
             this.privateCard0.setAnchorPoint(0, 0);
             this.privateCardMask0.setAnchorPoint(0, 0);
             this.cardsScale =
@@ -289,8 +289,8 @@ var PlayerLayer = cc.Layer.extend({
             this.privateCardMask0.setVisible(false);
             this.addChild(this.privateCardMask0, 1);
 
-            this.privateCard1 = cc.Sprite.create(s_p_back);
-            this.privateCardMask1 = cc.Sprite.create(s_p_mask);
+            this.privateCard1 = new cc.Sprite(s_p_back);
+            this.privateCardMask1 = new cc.Sprite(s_p_mask);
             this.privateCard1.setAnchorPoint(0, 0);
             this.privateCardMask1.setAnchorPoint(0, 0);
             this.cardsScale =
@@ -314,7 +314,7 @@ var PlayerLayer = cc.Layer.extend({
         } else if (this.playerType === PLAYER_AT_LEFT) {
 
             // add name panel
-            this.namePanel = cc.Sprite.create(s_name_panel_left);
+            this.namePanel = new cc.Sprite(s_name_panel_left);
             this.namePanel.setAnchorPoint(0, 0);
             this.namePanel.setPosition(0, 0);
             this.addChild(this.namePanel, 4);
@@ -346,21 +346,21 @@ var PlayerLayer = cc.Layer.extend({
             this.addChild(this.chipsLabel, 5);
 
             // add name mask
-            this.nameMask = cc.Sprite.create(s_name_mask_left);
+            this.nameMask = new cc.Sprite(s_name_mask_left);
             this.nameMask.setAnchorPoint(0, 0);
             this.nameMask.setPosition(0, 0);
             this.nameMask.setVisible(false);
             this.addChild(this.nameMask, 6);
 
             // add avatar panel
-            this.avatarPanel = cc.Sprite.create(s_avatar_panel_left);
+            this.avatarPanel = new cc.Sprite(s_avatar_panel_left);
             this.avatarPanel.setAnchorPoint(0, 0);
             this.avatarPanel.setPosition(this.namePanel.getContentSize().width + this.avatarNameGap, 0);
             this.addChild(this.avatarPanel, 4);
 
             // add avatar
             avatarIndex = 0;
-            this.avatar = cc.Sprite.create(avatars[avatarIndex]);
+            this.avatar = new cc.Sprite(avatars[avatarIndex]);
             this.avatar.setAnchorPoint(0, 0);
             this.avatarScale = this.avatarWidth / this.avatar.getContentSize().width;
             avatarGap = (this.avatarPanelWidth - this.avatarWidth) / 2;
@@ -371,7 +371,7 @@ var PlayerLayer = cc.Layer.extend({
             this.addChild(this.avatar, 5);
 
             // add avatar mask
-            this.avatarMask = cc.Sprite.create(s_avatar_mask_left);
+            this.avatarMask = new cc.Sprite(s_avatar_mask_left);
             this.avatarMask.setAnchorPoint(0, 0);
             this.avatarMask.setPosition(this.namePanel.getContentSize().width + this.avatarNameGap, 0);
             this.avatarMask.setVisible(false);
@@ -380,7 +380,7 @@ var PlayerLayer = cc.Layer.extend({
             // add bet chips sprite
             this.betChips = [];
             for (betChipIndex = 0; betChipIndex < this.maxChipLevel; betChipIndex++) {
-                this.betChips[betChipIndex] = cc.Sprite.create(s_chips);
+                this.betChips[betChipIndex] = new cc.Sprite(s_chips);
                 this.betChips[betChipIndex].setAnchorPoint(0, 0);
                 this.betChips[betChipIndex].setPosition(this.avatarPanel.getPositionX() +
                     this.avatarPanel.getContentSize().width + this.chipsHorizontalGap + this.chipsXFix,
@@ -432,7 +432,7 @@ var PlayerLayer = cc.Layer.extend({
             this.avatarNormal = s_avatar_panel_left;
             this.avatarHighLight = s_avatar_panel_left_hl;
 
-            this.actionPanel = cc.Sprite.create(action_raise_left);
+            this.actionPanel = new cc.Sprite(action_raise_left);
             this.actionPanel.setAnchorPoint(0, 0);
             this.actionPanel.setPosition(this.avatarPanel.getPositionX() + this.avatarPanel.getContentSize().width / 2,
                 this.avatarPanel.getPositionY() +
@@ -452,8 +452,8 @@ var PlayerLayer = cc.Layer.extend({
             this.addChild(this.betChipsLabel, 20);
 
             // add private cards
-            this.privateCard0 = cc.Sprite.create(s_p_back);
-            this.privateCardMask0 = cc.Sprite.create(s_p_mask);
+            this.privateCard0 = new cc.Sprite(s_p_back);
+            this.privateCardMask0 = new cc.Sprite(s_p_mask);
             this.privateCard0.setAnchorPoint(0, 0);
             this.privateCardMask0.setAnchorPoint(0, 0);
             this.cardsScale =
@@ -473,8 +473,8 @@ var PlayerLayer = cc.Layer.extend({
             this.privateCardMask0.setVisible(false);
             this.addChild(this.privateCardMask0, 1);
 
-            this.privateCard1 = cc.Sprite.create(s_p_back);
-            this.privateCardMask1 = cc.Sprite.create(s_p_mask);
+            this.privateCard1 = new cc.Sprite(s_p_back);
+            this.privateCardMask1 = new cc.Sprite(s_p_mask);
             this.privateCard1.setAnchorPoint(0, 0);
             this.privateCardMask1.setAnchorPoint(0, 0);
             this.cardsScale =
@@ -526,17 +526,21 @@ var PlayerLayer = cc.Layer.extend({
 
         // update player offline
         if (true === this.player.online) {
-            this.nameLabel.setColor(cc.color(255, 255, 255, 255));
+            if (false === this.player.isHuman) {
+                this.nameLabel.setColor(cc.color(255, 255, 255, 255));
+            } else {
+                this.nameLabel.setColor(cc.color(0, 255, 255, 255));
+            }
         } else {
             this.nameLabel.setColor(cc.color(127, 127, 127, 255));
         }
 
         // update chips
-        this.chipsLabel.setString('$' + this.player.chips);
+        this.chipsLabel.setString(this.player.chips);
 
         // update accumulate
         if (this.player.accumulate > 0 && this.player.isSurvive) {
-            var accString = '$' + this.player.accumulate;
+            var accString = this.player.accumulate;
             this.accChipsLabel.setString(accString);
         } else {
             this.accChipsLabel.setString('');
@@ -620,7 +624,7 @@ var PlayerLayer = cc.Layer.extend({
 
             this.privateCard0.setVisible(true);
         } else {
-            if (playMode === MODE_LIVE) {
+            if (MODE_LIVE === playMode || MODE_JUDGE === playMode) {
                 this.changeSpriteImage(this.privateCard0, this.pokerEmptyFrame);
                 this.privateCard0.setVisible(false);
             } else {
@@ -643,7 +647,7 @@ var PlayerLayer = cc.Layer.extend({
             }
             this.privateCard1.setVisible(true);
         } else {
-            if (playMode === MODE_LIVE) {
+            if (MODE_LIVE === playMode || MODE_JUDGE === playMode) {
                 this.changeSpriteImage(this.privateCard1, this.pokerEmptyFrame);
                 this.privateCard1.setVisible(false);
             } else {
@@ -680,54 +684,54 @@ var PlayerLayer = cc.Layer.extend({
 
     // UI helpers
     initializeAltFrames: function () {
-        this.nameHighLightFrame = cc.SpriteFrame.create(this.nameHighLight, cc.rect(0, 0,
+        this.nameHighLightFrame = new cc.SpriteFrame(this.nameHighLight, cc.rect(0, 0,
             this.namePanel.getContentSize().width, this.namePanel.getContentSize().height));
 
-        this.avatarHighLightFrame = cc.SpriteFrame.create(this.avatarHighLight, cc.rect(0, 0,
+        this.avatarHighLightFrame = new cc.SpriteFrame(this.avatarHighLight, cc.rect(0, 0,
             this.avatarPanel.getContentSize().width, this.avatarPanel.getContentSize().height));
 
-        this.nameNormalFrame = cc.SpriteFrame.create(this.nameNormal, cc.rect(0, 0,
+        this.nameNormalFrame = new cc.SpriteFrame(this.nameNormal, cc.rect(0, 0,
             this.namePanel.getContentSize().width, this.namePanel.getContentSize().height));
 
-        this.avatarNormalFrame = cc.SpriteFrame.create(this.avatarNormal, cc.rect(0, 0,
+        this.avatarNormalFrame = new cc.SpriteFrame(this.avatarNormal, cc.rect(0, 0,
             this.avatarPanel.getContentSize().width, this.avatarPanel.getContentSize().height));
 
         var index;
         for (index = 0; index < avatars.length; index++) {
-            this.avatarFrames[index] = cc.SpriteFrame.create(avatars[index], cc.rect(0, 0,
+            this.avatarFrames[index] = new cc.SpriteFrame(avatars[index], cc.rect(0, 0,
                 this.avatar.getContentSize().width, this.avatar.getContentSize().height));
         }
 
-        this.pokerBackFrame = cc.SpriteFrame.create(s_p_back, cc.rect(0, 0,
+        this.pokerBackFrame = new cc.SpriteFrame(s_p_back, cc.rect(0, 0,
             this.privateCard0.getContentSize().width, this.privateCard0.getContentSize().height));
 
-        this.pokerEmptyFrame = cc.SpriteFrame.create(s_p_empty, cc.rect(0, 0,
+        this.pokerEmptyFrame = new cc.SpriteFrame(s_p_empty, cc.rect(0, 0,
             this.privateCard0.getContentSize().width, this.privateCard0.getContentSize().height));
 
         var pokerKeys = pokerMap.keys();
         this.pokerFrames = new Map();
         for (index = 0; index < pokerKeys.length; index++) {
-            var pokerFrame = cc.SpriteFrame.create(pokerMap.get(pokerKeys[index]), cc.rect(0, 0,
+            var pokerFrame = new cc.SpriteFrame(pokerMap.get(pokerKeys[index]), cc.rect(0, 0,
                 this.privateCard0.getContentSize().width, this.privateCard0.getContentSize().height));
             this.pokerFrames.set(pokerKeys[index], pokerFrame);
         }
 
-        this.actionEmptyFrame = cc.SpriteFrame.create(action_empty, cc.rect(0, 0,
+        this.actionEmptyFrame = new cc.SpriteFrame(action_empty, cc.rect(0, 0,
             this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
 
-        this.actionSBFrame = cc.SpriteFrame.create(this.actionSB, cc.rect(0, 0,
+        this.actionSBFrame = new cc.SpriteFrame(this.actionSB, cc.rect(0, 0,
             this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
 
-        this.actionBBFrame = cc.SpriteFrame.create(this.actionBB, cc.rect(0, 0,
+        this.actionBBFrame = new cc.SpriteFrame(this.actionBB, cc.rect(0, 0,
             this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
 
-        this.actionWaitFrame = cc.SpriteFrame.create(this.actionWait, cc.rect(0, 0,
+        this.actionWaitFrame = new cc.SpriteFrame(this.actionWait, cc.rect(0, 0,
             this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
 
         var actionKeys = this.actionMap.keys();
         this.actionFrames = new Map();
         for (index = 0; index < actionKeys.length; index++) {
-            var actionFrame = cc.SpriteFrame.create(this.actionMap.get(actionKeys[index]), cc.rect(0, 0,
+            var actionFrame = new cc.SpriteFrame(this.actionMap.get(actionKeys[index]), cc.rect(0, 0,
                 this.actionPanel.getContentSize().width, this.actionPanel.getContentSize().height));
             this.actionFrames.set(actionKeys[index], actionFrame);
         }

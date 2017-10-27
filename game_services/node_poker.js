@@ -140,16 +140,17 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             }
         }
 
+        data = getBasicData(that);
+        for (i = 0; i < data.players.length; i++) {
+            var player = data.players[i];
+            player.hand = that.players[i].hand;
+            player.winMoney = that.players[i].winMoney;
+            if (player.winMoney > 0)
+                player.folded = false;
+        }
+        that.eventEmitter.emit('__round_end', data);
+
         if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
-            data = getBasicData(that);
-            for (i = 0; i < data.players.length; i++) {
-                var player = data.players[i];
-                player.hand = that.players[i].hand;
-                player.winMoney = that.players[i].winMoney;
-                if (player.winMoney > 0)
-                    player.folded = false;
-            }
-            that.eventEmitter.emit('__round_end', data);
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++) {
                 var isSurvive = true;
@@ -2428,7 +2429,7 @@ function takeAction(table, action) {
         if (table.status === enums.GAME_STATUS_RUNNING) {
             if (action === "__bet" && table.isDeal) {
                 table.eventEmitter.emit('__deal', getBasicData(table));
-                table.isDeal = false;//only first __bet need deal
+                table.isDeal = false; //only first __bet need deal
             }
             var players = [];
             var destPlayer = {};

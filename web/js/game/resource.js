@@ -38,6 +38,7 @@ var s_chips = './res/images/game_board/chips.png';
 var s_m_1st = './res/images/game_board/first.png';
 var s_m_2nd = './res/images/game_board/second.png';
 var s_m_3rd = './res/images/game_board/third.png';
+var s_winner = './res/images/game_board/star.png';
 var medalArray = [s_m_1st, s_m_2nd, s_m_3rd];
 
 // dealer images
@@ -68,6 +69,9 @@ var s_o_bet_button = './res/images/game_board/btn_bet.png';
 var s_o_bet_button_pressed = './res/images/game_board/btn_bet_pressed.png';
 var s_o_bet_button_disabled = './res/images/game_board/btn_bet_disabled.png';
 var s_o_reload_button = './res/images/game_board/btn_reload.png';
+var s_o_end_button = './res/images/game_board/btn_end.png';
+var s_o_end_button_pressed = './res/images/game_board/btn_end_pressed.png';
+var s_o_end_button_disabled = './res/images/game_board/btn_end_disabled.png';
 var s_o_reload_button_pressed = './res/images/game_board/btn_reload_pressed.png';
 var s_o_reload_button_disabled = './res/images/game_board/btn_reload_disabled.png';
 var s_o_spinner = './res/images/game_board/bg_spinner.png';
@@ -244,6 +248,7 @@ var s_a_avatar_c = './res/images/avatars/avatar_c.png';
 var s_a_avatar_d = './res/images/avatars/avatar_d.png';
 var s_a_avatar_e = './res/images/avatars/avatar_e.png';
 var s_a_avatar_f = './res/images/avatars/avatar_f.png';
+
 var avatars = [s_a_avatar_0, s_a_avatar_1, s_a_avatar_2, s_a_avatar_3, s_a_avatar_4, s_a_avatar_5,
     s_a_avatar_6, s_a_avatar_7, s_a_avatar_8, s_a_avatar_9, s_a_avatar_a, s_a_avatar_b,
     s_a_avatar_c, s_a_avatar_d, s_a_avatar_e, s_a_avatar_f];
@@ -441,6 +446,7 @@ var resources = [
     s_m_1st,
     s_m_2nd,
     s_m_3rd,
+    s_winner,
     s_tm_logo,
     s_your_turn,
     s_start_button,
