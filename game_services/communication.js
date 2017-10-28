@@ -11,7 +11,7 @@ var poker = require('./node_poker.js');
 var playerLogic = require('../work_units/player_logic.js');
 var tableLogic = require('../work_units/table_logic.js');
 
-var DEFAULT_GAME_OVER_DELAY = 60000;
+var DEFAULT_GAME_OVER_DELAY = 1000;
 
 var logger = require('../poem/logging/logger4js').helper;
 
