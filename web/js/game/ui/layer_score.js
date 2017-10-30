@@ -454,7 +454,7 @@ var ScoreLayer = cc.LayerColor.extend({
 
         // update reload hint
         if (MODE_PLAYER === playMode) {
-            var unReload = 2 - playerReloadCount;
+            var unReload = reloadChance - playerReloadCount;
             var reloadText = '';
             if (unReload === 0) {
                 reloadText = 'You have used up all reload chances';

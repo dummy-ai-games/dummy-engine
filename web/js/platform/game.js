@@ -64,7 +64,6 @@ var currentPlayers = 0;
 var onLinePlayers = 0;
 var winners = [];
 
-var defaultInitChips = 1000;
 var publicCards = [];
 
 var currentSmallBlind = 0;
@@ -100,6 +99,7 @@ $(document).ready(function () {
         document.title = 'THE Live';
     }
     initGame();
+
 });
 
 // fetch player display name
@@ -163,7 +163,7 @@ function initWebsock() {
                 var playerDisplayName = findDBPlayerNameByName(inPlayerName);
                 console.log('create player ' + inPlayerName);
                 players[i] = new Player(inPlayerName, playerDisplayName,
-                    defaultInitChips, true, isHuman, 0, inPlayers[i].isOnline);
+                    defaultChips, true, isHuman, 0, inPlayers[i].isOnline);
                 if (undefined !== inPlayers[i].isOnline && null !== inPlayers[i].isOnline && inPlayers[i].isOnline) {
                     onLinePlayers++;
                 }
@@ -227,7 +227,7 @@ function initWebsock() {
                         var playerDisplayName = findDBPlayerNameByName(inPlayerName);
                         console.log('create player : ' + playerDisplayName);
                         players[i] = new Player(inPlayerName, playerDisplayName,
-                            defaultInitChips, true, isHuman, 0, inPlayers[i].isOnline);
+                            defaultChips, true, isHuman, 0, inPlayers[i].isOnline);
                         onLinePlayers++;
                     }
                 }

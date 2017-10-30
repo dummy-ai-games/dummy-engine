@@ -16,7 +16,6 @@ var PlayerLayer = cc.Layer.extend({
     reloadTextSize: '24',
     debug: true,
     maxChipLevel: 10,
-    maxReloadCount: 2,
 
     // game model variables
     size: null,
@@ -573,7 +572,7 @@ var PlayerLayer = cc.Layer.extend({
 
         // update reload count flag
         var reloadIndex;
-        var reloadCountLeft = this.maxReloadCount - this.player.reloadCount;
+        var reloadCountLeft = reloadChance - this.player.reloadCount;
         var reloadString = '';
         for (reloadIndex = 0; reloadIndex < reloadCountLeft; reloadIndex++) {
             reloadString += '■';
