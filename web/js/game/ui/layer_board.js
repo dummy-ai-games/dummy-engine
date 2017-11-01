@@ -679,7 +679,7 @@ var BoardLayer = cc.Layer.extend({
                         betTotal += players[i].accumulate;
                     }
                 }
-                this.betLabel.setString('TOTAL BET: ' + betTotal);
+                this.betLabel.setString('POT: ' + betTotal);
 
                 // update public cards
                 this.updatePublicCardsModel();
