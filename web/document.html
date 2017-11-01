@@ -15,7 +15,7 @@
 </head>
 <body>
     <div class="container">
-        <img src="./res/images/ec2017_logo_rev.png" style="max-height: 80px; float: left; margin-bottom: 10px; margin-top: 10px; margin-right: 20px;">
+        <!-- <img src="./res/images/ec2017_logo_rev.png" style="max-height: 80px; float: left; margin-bottom: 10px; margin-top: 10px; margin-right: 20px;"> -->
         <h3 class="masthead-brand" style="float: left; margin-top: 40px;">Texas Hold'em AI Game</h3>
         <div class="cover-container">
             <div class="masthead clearfix">
@@ -56,9 +56,8 @@
         <hr>
         <div>
             <ul class="nav nav-tabs" id="main_tab">
-                <li style="cursor: pointer;"><a data-target="#competition_rules" data-toggle="tab">比赛规则</a></li>
-                <li style="cursor: pointer;"><a data-target="#game_rules" data-toggle="tab">游戏规则</a></li>
-                <li class="active" style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
+                <li class="active" style="cursor: pointer;"><a data-target="#game_rules" data-toggle="tab">游戏规则</a></li>
+                <li style="cursor: pointer;"><a data-target="#api_doc" data-toggle="tab">开发规范</a></li>
                 <li style="cursor: pointer;"><a data-target="#example" data-toggle="tab">实用工具</a></li>
                 <li style="cursor: pointer;"><a data-target="#faq" data-toggle="tab">FAQ</a></li>
                 <li style="cursor: pointer;"><a data-target="#release_note" data-toggle="tab">更新日志</a></li>
@@ -66,34 +65,7 @@
             </ul>
 
             <div class="tab-content" style="margin-top: 40px; margin-bottom: 80px;">
-                <div class="tab-pane" id="competition_rules">
-                    <a style="text-decoration: none;"><h4><strong>日程安排</strong></h4></a>
-                    <p>1.  每个Camp桌开发两个AI程序(可以采用相同AI或全面不同的AI)</p>
-                    <p>2.  组委会于九月中旬提供测试服务器供测试</p>
-                    <p>3.  10月18日 check 每个组的进展, 应该已经完成基本AI程序</p>
-                    <p>4.  10月23日 -- 10月27日 安排 drill, 虚拟排名(不影响正式比赛)</p>
-                    <p>5.  10月30日 14:10 宣布比赛最终规则, 各参赛队根据规则调整AI程序</p>
-                    <p>6.  10月30日 15:30 发放各组的比赛登录代码(玩家接入名)</p>
-                    <p>7.  10月30日 15:45 预赛正式开始, 期望 16:45 公示初赛结果, 不多于 <b><u>30</u></b> 队晋级(按照比赛结束时的筹码排名), 同时发放复赛登录代码</p>
-                    <p>8.  10月30日 17:00 复赛正式开始, 18:00 公示复赛结果, 不多于 <b><u>8</u></b> 队晋级</p>
-                    <p>9.  组委会为决赛队伍搭建8个比赛, 将晋级的选手都分别部署到服务器上, 每个决赛选手都可以调整自己的程序同时对抗测试另7个复赛晋级时的AI程序(不可获得他人的代码但是可以机器学习)</p>
-                    <p>10. 10月31日 上午决赛, 8个AI程序+2个VIP(真人)决出前两名</p>
-                    <hr>
-                    <a style="text-decoration: none;"><h4><strong>比赛规则</strong></h4></a>
-                    <p>1.  本次比赛采用每桌最多10人制方式(不低于3人), 分桌信息由 Engineer Camp 2017  Task Force确定</p>
-                    <p>2.  比赛分预赛、复赛和决赛3个阶段, 均采用淘汰制</p>
-                    <p>3.  预赛阶段, 只设置一局比赛,每桌游戏一直进行到只剩下不超过 <u><b>半数</b></u> 玩家 (floor(playerCount/2)) 存活, 或者结束 <b><u>10圈</u></b> 为止,然后在所有参加 AI 比赛的玩家当中选出筹码最多的 <b><u>至多30名</u></b> 进入复赛</p>
-                    <p>4.  复赛阶段, 由预赛阶段胜出的 <b><u>30</u></b> 名玩家组队,进行复赛,预赛和复赛之间有时间重新调整 AI 程序,复赛时筹码复位,规则和预赛相同,最终决出 <b><u>8</u></b> 人进入第二天决赛</p>
-                    <p>5.  决赛阶段 <b><u>10</u></b> 名玩家(可能有VIP player参与), 凑成一桌, 不限比赛轮数, 最终决出前 <b><u>3名</u></b></p>
-                    <p>6.  dealer 在一局游戏开始时将随机出现在玩家座位中,每一轮之后 dealer 自动后移一位,每一圈之后小盲注和大盲注会 X2, 小盲注的初始值为 <b><u>10</u></b>, 大盲注的初始值为 <b><u>20</u></b></p>
-                    <p>7.  每名玩家的初始筹码为 <b><u>1000</u></b>, 在一局比赛中有 <b><u>2次</u></b> 机会索取额外筹码(reload), 玩家可以在每一轮比赛结束之后索取筹码(也可以不索取), 如果玩家筹码在某一轮输光, 那么下一轮开始时系统会自动为他索取筹码(一局中不超过2次)</p>
-                    <p>8.  为了确保比赛时使用其它队玩家名作弊干扰比赛, 比赛前组委会会将一个随机生成的私有玩家名通过线下方式告知各组组长, 比赛时使用私有名接入游戏, 游戏面板中则显示昵称(游戏名)</p>
-                    <p>9.  请玩家仔细阅读文档,文档在每个版本更新时会用<span class="new_content"> 橙色 </span>字体标识出修改部分,修改的部分保留1个版本 </span>
-                        ; <b><u>加黑的下划线内容</u></b> 表示待定参数,这些参数将在比赛前夕敲定下来</p>
-                    <br>
-                </div>
-
-                <div class="tab-pane" id="game_rules">
+                <div class="tab-pane active" id="game_rules">
                     <a style="text-decoration: none;"><h4><strong>约定术语</strong></h4></a>
                     <p>约定游戏过程中会有如下概念:</p>
                     <ul>
@@ -136,11 +108,11 @@
                     </ul>
                     <br>
                     <p><b>下注限制：</b></p>
-                    <p>每轮下注过程中, 最高下注额有一定限制. 本次比赛中规定每回合 Raise 最多只有 4 次, Bet 最多也是 4 次 (各 4 次) </p>
+                    <p>每轮下注过程中, 最高下注额有一定限制. 本次比赛中规定每回合 Raise 最多只有 4 次, Bet 最多也是 4 次 (各 4 次)</p>
                     <br>
                     <p>更详细的规则请参考 <a href="https://baike.baidu.com/item/%E5%BE%B7%E5%85%8B%E8%90%A8%E6%96%AF%E6%89%91%E5%85%8B/83440?fr=aladdin">百度百科</a></p>
                 </div>
-                <div class="tab-pane active" id="api_doc">
+                <div class="tab-pane" id="api_doc">
                     <div id="bs-example-navbar-collapse-2" class="navbar" style="margin-top: -20px; margin-bottom: -20px;">
                         <ul class="nav navbar-nav" style="float: left;">
                             <li class="dropdown">
@@ -1106,6 +1078,12 @@
                 </div>
                 <div class="tab-pane" id="release_note">
                     <div>
+                        <h4>V1.4.1 (2017-11-01)</h4>
+                        合并了一些为EC2017添加的功能<br>
+                        其它UI和流程微调
+                    </div>
+                    <br>
+                    <div>
                         <h4>V1.4.0 (2017-10-27)</h4>
                         区分人类和AI玩家<br>
                         游戏背景更新<br>
@@ -1350,12 +1328,17 @@
                                     <input type="number" min="0" max="5" step="1" class="form-control" placeholder="重载次数" id="game_reload_chance" value="2" onkeydown="return false">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="input-group" style="padding-top: 6px;">
-                                    <input type="checkbox" id="game_bgm" checked/> 背景音效&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="无限洗脑循环"></span>
+                                    <input type="checkbox" id="game_sound" checked/> 音效&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="就是音效呗"></span>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
+                                <div class="input-group" style="padding-top: 6px;">
+                                    <input type="checkbox" id="game_bgm" checked/> 音乐&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="无限洗脑循环"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="input-group" style="padding-top: 6px;">
                                     <input type="checkbox" id="auto_restart"/> 自动重启&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="自动重新开始下一局比赛"></span>
                                 </div>

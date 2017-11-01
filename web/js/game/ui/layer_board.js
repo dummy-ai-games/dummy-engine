@@ -432,7 +432,7 @@ var BoardLayer = cc.Layer.extend({
 
         // initialize author text
         if (MODE_LIVE === playMode || MODE_JUDGE === playMode) {
-            this.authorLabel = new cc.LabelTTF('Engineering Camp 2017 Task Force & CDC Mobile Club',
+            this.authorLabel = new cc.LabelTTF('Trend Micro Mobile Club',
                 this.authorTextFont, this.authorTextSize);
             this.authorLabel.setColor(cc.color(255, 255, 255, 255));
             this.authorLabel.setAnchorPoint(0, 0);
@@ -457,6 +457,7 @@ var BoardLayer = cc.Layer.extend({
             this.tmLogo.getContentSize().width - this.logoMarginRight) * this.gameScale,
             (this.bgSprite.getContentSize().height -
                 this.tmLogo.getContentSize().height - this.logoMarginTop) * this.gameScale);
+        this.tmLogo.setVisible(false);
         this.addChild(this.tmLogo, 2);
 
         // add start and stop button
