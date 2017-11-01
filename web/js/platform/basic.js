@@ -22,15 +22,13 @@ function gotoGame() {
     var defaultLostTimeout = $('#game_lost_timeout').val();
     var reloadChance = $('#game_reload_chance').val();
     var bgm = $('#game_bgm').is(':checked') ? 1 : 0;
+    var sound = $('#game_sound').is(':checked') ? 1 : 0;
     var autoRestart = $('#auto_restart').is(':checked') ? 1 : 0;
-
-    console.log('parameters : ' + tableNumber + ', ' + defaultChips + ', ' + defaultSb + ', ' + defaultRoundInterval +
-        ', ' + defaultCommandInterval + ', ' + bgm + ', ' + autoRestart + ', ' + reloadChance);
 
     if (null === tableNumber || isNaN(tableNumber)) {
         return;
     }
-    window.open('./game.html?table='+tableNumber+'&bgm='+bgm+'&auto='+autoRestart+'&defaultChips='+defaultChips+
+    window.open('./game.html?table='+tableNumber+'&bgm='+bgm+'&sound='+sound+'&auto='+autoRestart+'&defaultChips='+defaultChips+
         '&defaultSb='+defaultSb+'&roundInterval='+defaultRoundInterval+'&commandInterval='+defaultCommandInterval+
         '&reloadChance='+reloadChance+'&commandTimeout='+defaultCommandTimeout+'&lostTimeout='+defaultLostTimeout,
         '_blank');
