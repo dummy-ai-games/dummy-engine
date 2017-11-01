@@ -4,6 +4,7 @@
  */
 
 var WebSocketServer = require('ws').Server;
+const WebSocket = require('ws');
 var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
@@ -12,6 +13,8 @@ var playerLogic = require('../work_units/player_logic.js');
 var tableLogic = require('../work_units/table_logic.js');
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
+var IP_CONSTRAINT = false;
+var DANMU_SERVER = 'ws://irext.net:3000';
 
 var logger = require('../poem/logging/logger4js').helper;
 
@@ -43,13 +46,50 @@ function SkyRTC(tableNumber) {
     this.guests = {};
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
+    this.ipArray = {};
     // this.playerAndTable = {};
+
+    // danmu relay
+    var skyRTC = this;
+
+    try {
+        var danmuRelayWs = new WebSocket(DANMU_SERVER, {
+            perMessageDeflate: false
+        });
+    } catch(error) {
+        logger.error('danmu server connecting error : ' + error);
+    }
+
+    var wsStatus = enums.DANMU_RELAY_CLOSED;
+
+    danmuRelayWs.on('open', function open() {
+        wsStatus = enums.DANMU_RELAY_OPENED;
+        danmuRelayWs.send(JSON.stringify({
+            "eventName": "__join",
+            "data": {
+                "isGame": true
+            }
+        }));
+    });
+
+    danmuRelayWs.on('close', function() {
+        logger.error('remote socket closed');
+    });
+
+    danmuRelayWs.on('error', function(error) {
+        logger.error('socket error : ' + error);
+    });
+
+    danmuRelayWs.on('message', function incoming(message) {
+        skyRTC.broadcastInDanmuGuest(JSON.parse(message));
+    });
 
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
         var table = data.tableNumber;
         var isHuman = data.isHuman || false;
+        var danmu = data.danmu || 0;
 
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
         if (playerName) {
@@ -75,12 +115,19 @@ function SkyRTC(tableNumber) {
                         socket.id = playerName;
                         socket.displayName = player.displayName;
                         socket.MD5Id = MD5Id;
+                        if (that.players[MD5Id]) {
+                            that.players[MD5Id].isReplace = true;
+                            that.players[MD5Id].close();
+                        }
                         var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
                         if (exitPlayerTableNum !== undefined) {
                             socket.tableNumber = exitPlayerTableNum;
                             delete that.exitPlayers[socket.MD5Id];
                             logger.info('player rejoin, accept join');
-                        } else if (!(that.table[tableNumber] &&
+                        } else if (that.players[MD5Id]){
+                            socket.tableNumber = tableNumber;
+                            logger.info('exist player replace, accept join');
+                        } else if(!(that.table[tableNumber] &&
                                 that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                             socket.tableNumber = tableNumber;
                             logger.info('game not started, accept join');
@@ -91,9 +138,16 @@ function SkyRTC(tableNumber) {
                             var tablePlayers = that.notifyJoin(socket.tableNumber);
                             that.initPlayerData(socket.MD5Id);
 
+                            if (true === IP_CONSTRAINT) {
+                                if (socket.ip && !that.ipArray[socket.ip]) {
+                                    that.ipArray[socket.ip] = true;
+                                    that.removeAllGuestByIP(socket.ip);
+                                }
+                            }
                             // update game
                             that.updateTable(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
                         } else {
+                            socket.close();
                             logger.info('player : ' + data.playerName + ' can not join because game has started');
                         }
                     } else {
@@ -105,13 +159,16 @@ function SkyRTC(tableNumber) {
                     socket.close();
                 }
             });
-        } else {
-            logger.info('guest join!!');
+        } else if ((true === IP_CONSTRAINT && !that.ipArray[socket.ip]) || false === IP_CONSTRAINT) {
+            logger.info('guest join, danmu = ' + danmu);
             socket.isGuest = true;
             that.guests[socket.id] = socket;
-            that.initGuestData(socket.id);
+            that.initGuestData(socket.id, danmu);
             // updated by strawmanbobi - the Live UI need this command to show joined players
             that.notifyJoin(socket.tableNumber);
+        } else {
+            socket.close();
+            logger.info(" ip -> " + socket.ip + " already has player join, so reject guest join");
         }
     });
 
@@ -146,9 +203,9 @@ function SkyRTC(tableNumber) {
                 if (player.reloadCount < currentTable.maxReloadCount) {
                     player.chips += currentTable.initChips;
                     player.reloadCount++;
-                    poker.logGame(tableNumber, 'player: ' + playerName + ', reload success');
+                    poker.logGame(tableNum, 'player: ' + playerName + ', reload success');
                 } else {
-                    poker.logGame(tableNumber, 'player: ' + playerName + ',  had used all reload chance');
+                    poker.logGame(tableNum, 'player: ' + playerName + ',  had used all reload chance');
                 }
             }
         }
@@ -225,12 +282,13 @@ function SkyRTC(tableNumber) {
 
 util.inherits(SkyRTC, events.EventEmitter);
 
-SkyRTC.prototype.initGuestData = function (guest) {
+SkyRTC.prototype.initGuestData = function (guest, danmu) {
     var that = this;
     if (that.guests[guest]) {
-        logger.info('initGuestData');
         var tableNumber = that.guests[guest].tableNumber;
-        if (that.table[tableNumber] && that.table[tableNumber].status == enums.GAME_STATUS_RUNNING) {
+        that.guests[guest].danmu = danmu;
+        logger.info('initGuestData, tableNumber = ' + tableNumber + ', danmu = ' + that.guests[guest].danmu);
+        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             var data = that.getBasicData(that.guests[guest].tableNumber);
             var message = {
                 'eventName': '_join',
@@ -241,8 +299,9 @@ SkyRTC.prototype.initGuestData = function (guest) {
             }
             that.sendMessage(that.guests[guest], message);
         }
-    } else
+    } else {
         logger.info('guest ' + guest + 'already exit');
+    }
 };
 
 SkyRTC.prototype.initPlayerData = function (player) {
@@ -264,6 +323,16 @@ SkyRTC.prototype.initPlayerData = function (player) {
         }
     } else
         logger.info('player ' + player + 'already exit');
+};
+
+SkyRTC.prototype.removeAllGuestByIP = function (ip) {
+    var that = this;
+    logger.info("start remove guest of ip -> " + ip);
+    for (var guest in that.guests) {
+        if (that.guests[guest] && that.guests[guest].ip === ip) {
+            delete that.guests[guest];
+        }
+    }
 };
 
 SkyRTC.prototype.getBasicData = function (tableNumber) {
@@ -566,7 +635,7 @@ SkyRTC.prototype.startGame = function (tableNumber) {
     var message;
     for (var player in that.players) {
         if (that.players[player] && that.players[player].tableNumber === tableNumber)
-            that.table[tableNumber].AddPlayer(player, that.players[player].id, that.players[player].displayName);
+            that.table[tableNumber].AddPlayer(player, that.players[player].displayName);
     }
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
@@ -661,6 +730,11 @@ SkyRTC.prototype.endGame = function (tableNumber) {
     that.broadcastInPlayers(message);
 };
 
+SkyRTC.prototype.relayDanmu = function (message) {
+    var that = this;
+    that.broadcastInGuests(message);
+};
+
 SkyRTC.prototype.initTable = function (tableNumber) {
     var that = this;
 
@@ -710,7 +784,7 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         }
         if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
            delete that.table[tableNumber];
-        
+
         setTimeout(function () {
             that.addPlayerStatus(data);
             var message = {
@@ -719,7 +793,6 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             };
             that.broadcastInGuests(message);
             that.broadcastInPlayers(message);
-           
         }, DEFAULT_GAME_OVER_DELAY);
     });
 
@@ -861,8 +934,23 @@ SkyRTC.prototype.broadcastInGuests = function (message) {
     var that = this;
     var tableNumber = message.data.tableNumber || message.data.table.tableNumber;
     for (var guest in that.guests) {
-        if (that.guests[guest].tableNumber === tableNumber)
+        if (that.guests[guest].tableNumber === tableNumber) {
             that.sendMessage(that.guests[guest], message);
+        }
+    }
+};
+
+SkyRTC.prototype.broadcastInDanmuGuest = function (message) {
+    var that = this;
+    if (message && message.data) {
+        console.log('relay danmu : ' + JSON.stringify(message));
+        var tableNumber = message.data.tableNumber;
+        for (var guest in that.guests) {
+            if (that.guests[guest].tableNumber === tableNumber &&
+                1 === parseInt(that.guests[guest].danmu)) {
+                that.sendMessage(that.guests[guest], message);
+            }
+        }
     }
 };
 
@@ -889,9 +977,7 @@ SkyRTC.prototype.broadcastInHumanPlayers = function (message) {
 
 SkyRTC.prototype.broadcastInPlayers = function (message) {
     var that = this;
-    if (message.eventName === '__game_start' ||
-        message.eventName === '__game_prepare' ||
-        message.eventName === '__game_stop') {
+    if (!message.data.players && !message.data.table) {
         var tableNumber = message.data.tableNumber;
         for (var player in this.players) {
             if (this.players[player] && this.players[player].tableNumber === tableNumber) {
@@ -924,7 +1010,7 @@ SkyRTC.prototype.broadcastInPlayers = function (message) {
 
 SkyRTC.prototype.exitHandle = function (socket) {
     var that = this;
-    if (socket) {
+    if (socket && !socket.isReplace) {
         var tableNumber = socket.tableNumber;
         if (that.players[socket.MD5Id] && tableNumber && that.table[tableNumber] &&
             that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
@@ -995,8 +1081,11 @@ exports.listen = function (server, tableNumber, tablePort) {
 
     SkyRTCServer.rtc = new SkyRTC(tableNumber);
     errorCb = errorCb(SkyRTCServer.rtc);
-    SkyRTCServer.on('connection', function (socket) {
+    SkyRTCServer.on('connection', function (socket, req) {
+        var ip = req.connection.remoteAddress || req.socket.remoteAddress || socket._socket.remoteAddress;
+        socket.ip = ip;
         this.rtc.init(socket);
+        logger.info("receive connection request from -> " + ip);
     });
 
     return SkyRTCServer;

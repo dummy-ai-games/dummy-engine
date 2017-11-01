@@ -9,6 +9,7 @@ var playerNamePlain = '';
 var playerName = '';
 var dbPlayers = [];
 var gameBgm = 0;
+var soundEffect = 0;
 var autoStart = 0;
 var commandInterval = 1;
 var roundInterval = 15;
@@ -17,6 +18,8 @@ var lostTimeout = 10;
 var defaultSb = 10;
 var defaultChips = 1000;
 var reloadChance = 2;
+var danmu = 0;
+var danmuWidth = 0;
 
 // game board related
 var gameBoard;
@@ -38,6 +41,8 @@ var ACTION_STATUS_DECIDED = 2;
 var MODE_LIVE = 0;
 var MODE_PLAYER = 1;
 var MODE_JUDGE = 2;
+
+var DANMU_CLIENT = 'http://irext.net:3000?table=';
 
 var gameStatus = STATUS_GAME_STANDBY;
 var gameCountDown = 0;
@@ -82,6 +87,7 @@ $(document).ready(function () {
     playerNamePlain = getParameter('name');
     autoStart = getParameter('auto') || 0;
     gameBgm = getParameter('bgm') || 0;
+    soundEffect = getParameter('sound') || 0;
     commandInterval = getParameter('commandInterval') || 0.5;
     roundInterval = getParameter('roundInterval') || 10;
     defaultSb = getParameter('defaultSb') || 10;
@@ -89,6 +95,7 @@ $(document).ready(function () {
     reloadChance = getParameter('reloadChance') || 2;
     commandTimeout = getParameter('commandTimeout') || 5;
     lostTimeout = getParameter('lostTimeout') || 10;
+    danmu = getParameter('danmu') || 0;
 
     if (playerNamePlain) {
         playMode = MODE_PLAYER;
@@ -131,7 +138,22 @@ function initPlayerInfo() {
 function initWebsock() {
     // initialize web communication
     rtc.connect('ws:' + window.location.href.substring(window.location.protocol.length).split('#')[0],
-        playerNamePlain, tableNumber, true);
+        playerNamePlain, tableNumber, true, danmu);
+
+    /*
+    // use danmu relay instead
+    if (tableNumber) {
+        rtc.connectDanmu('ws://localhost:3000', tableNumber);
+        rtc.on('__message', function (message) {
+
+        });
+    }
+    */
+
+    rtc.on('__message', function (data) {
+        console.log('receive danmu message : ' + JSON.stringify(data));
+        gameBoard.spawnDanmu(data.content);
+    });
 
     rtc.on('__new_peer', function (data) {
         console.log('legacy join : ' + JSON.stringify(data));
@@ -161,7 +183,7 @@ function initWebsock() {
                 var inPlayerName = inPlayers[i].playerName;
                 var isHuman = (inPlayerName === playerName);
                 var playerDisplayName = findDBPlayerNameByName(inPlayerName);
-                console.log('create player ' + inPlayerName);
+                console.log('create player ' + inPlayerName + ', displayName = ' + playerDisplayName);
                 players[i] = new Player(inPlayerName, playerDisplayName,
                     defaultChips, true, isHuman, 0, inPlayers[i].isOnline);
                 if (undefined !== inPlayers[i].isOnline && null !== inPlayers[i].isOnline && inPlayers[i].isOnline) {
@@ -225,7 +247,7 @@ function initWebsock() {
                         var inPlayerName = inPlayers[i].playerName;
                         var isHuman = (inPlayerName === playerName);
                         var playerDisplayName = findDBPlayerNameByName(inPlayerName);
-                        console.log('create player : ' + playerDisplayName);
+                        console.log('create player ' + inPlayerName + ', displayName = ' + playerDisplayName);
                         players[i] = new Player(inPlayerName, playerDisplayName,
                             defaultChips, true, isHuman, 0, inPlayers[i].isOnline);
                         onLinePlayers++;
@@ -240,7 +262,7 @@ function initWebsock() {
 
     rtc.on('__game_over', function (data) {
         console.log('game over : ' + JSON.stringify(data));
-        if (1 === parseInt(gameBgm)) {
+        if (1 === parseInt(soundEffect)) {
             cc.audioEngine.playEffect(audio_win);
         }
         // set winners
@@ -267,7 +289,7 @@ function initWebsock() {
 
     rtc.on('__game_prepare', function (data) {
         console.log('game preparing : ' + JSON.stringify(data));
-        if (1 === parseInt(gameBgm)) {
+        if (1 === parseInt(soundEffect)) {
             cc.audioEngine.playEffect(audio_tick);
         }
 
@@ -290,7 +312,7 @@ function initWebsock() {
     rtc.on('__deal', function (data) {
         console.log('deal : ' + JSON.stringify(data));
 
-        if (1 === parseInt(gameBgm)) {
+        if (1 === parseInt(soundEffect)) {
             cc.audioEngine.playEffect(audio_deal);
         }
         var board_card = data.table.board;
@@ -321,9 +343,6 @@ function initWebsock() {
 
     rtc.on('__round_end', function (data) {
         console.log('round end : ' + JSON.stringify(data));
-        if (1 === parseInt(gameBgm)) {
-            cc.audioEngine.playEffect(audio_round_clear);
-        }
 
         gameStatus = data.table.status;
         reloadTime = true;
@@ -403,7 +422,7 @@ function initWebsock() {
         console.log('players : ' + JSON.stringify(players));
 
         // play audio effect
-        if (1 === parseInt(gameBgm)) {
+        if (1 === parseInt(soundEffect)) {
             var audioIndex;
             if (ver === VER_ENGLISH) {
                 audioIndex = roundAction.action;
@@ -488,6 +507,12 @@ function initGame() {
         gameWidth = winHeight / refProportion;
     }
 
+    var canvasContent = '';
+    /*
+    if (1 === parseInt(danmu)) {
+        $('#gameContainer').css('margin-left', '200px');
+    }
+    */
     container.innerHTML = '<canvas id="gameCanvas" width="' + gameWidth + '" height="' + gameHeight + '"></canvas>';
     if (!d.createElement('canvas').getContext) {
         var s = d.createElement('div');
@@ -506,6 +531,17 @@ function initGame() {
     }
     window.addEventListener('DOMContentLoaded', function () {
         ccLoad();
+    });
+}
+
+function initDanmuQR(danmuSize) {
+    var qrcode = new QRCode(document.getElementById("danmuqr"), {
+        text: DANMU_CLIENT + tableNumber,
+        width: danmuSize - 40,
+        height: danmuSize - 40,
+        colorDark : "#2F2F2F",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
     });
 }
 
@@ -705,6 +741,25 @@ function updateBoardPlayers(data, isNewRound, roundClear) {
             targetPlayer.setBigBlind(targetPlayer.playerName === data.game.bigBlind.playerName);
         }
     }
+
+    // play round clear sound
+    if (1 === parseInt(soundEffect)) {
+        if (roundClear) {
+            for (var i = 0; i < data.players.length; i++) {
+                var targetPlayer = findTargetPlayer(data.players[i].playerName);
+                if (targetPlayer.prize > 0) {
+                    var audioIndex;
+                    if (ver === VER_ENGLISH) {
+                    } else {
+                        audioIndex = 'audio_round_clear_' + targetPlayer.avatarId;
+                    }
+                    var audioEffect = audioMap.get(audioIndex);
+                    cc.audioEngine.playEffect(audioEffect);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 function findTargetPlayer(playerName) {
@@ -739,6 +794,7 @@ function findDBPlayerNameByName(playerName) {
                 }
             }
         }
+        return playerName;
     } else {
         return playerName;
     }

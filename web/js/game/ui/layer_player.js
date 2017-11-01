@@ -7,7 +7,7 @@ var PlayerLayer = cc.Layer.extend({
 
     // constants
     nameFont: '微软雅黑',
-    nameTextSize: 15,
+    nameTextSize: 14,
     chipsFont: 'Tw Cen MT',
     chipsTextSize: 20,
     blindFont: 'IMPACT',

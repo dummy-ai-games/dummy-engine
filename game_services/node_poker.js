@@ -156,8 +156,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
                 if (that.players[j].chips <= 0)
                     isSurvive = false;
                 that.players[j] = new Player(that.players[j].playerName, that.players[j].chips,
-                    that, isSurvive, that.players[j].reloadCount,
-                    that.players[j].plainName, that.players[j].displayName);
+                    that, isSurvive, that.players[j].reloadCount, that.players[j].displayName);
             }
             that.game = new Game(that.smallBlind, that.bigBlind);
             var nextDealer = getNextDealer(that);
@@ -283,9 +282,9 @@ Table.prototype.StopGame = function () {
     }
 };
 
-Table.prototype.AddPlayer = function (playerName, plainName, displayName) {
+Table.prototype.AddPlayer = function (playerName, displayName) {
     var that = this;
-    var player = new Player(playerName, that.initChips, this, true, 0, plainName, displayName);
+    var player = new Player(playerName, that.initChips, this, true, 0, displayName);
     this.playersToAdd.push(player);
     this.surviveCount++;
 };
@@ -410,7 +409,7 @@ Table.prototype.findBigBlind = function (smallBindIndex) {
  * @param displayName
  * @constructor
  */
-function Player(playerName, chips, table, isSurvive, reloadCount, plainName, displayName) {
+function Player(playerName, chips, table, isSurvive, reloadCount, displayName) {
     this.playerName = playerName;
     this.chips = chips;
     this.folded = false;
@@ -420,7 +419,6 @@ function Player(playerName, chips, table, isSurvive, reloadCount, plainName, dis
     this.cards = [];
     this.isSurvive = isSurvive;
     this.reloadCount = reloadCount;
-    this.plainName = plainName;
     this.displayName = displayName;
 }
 
@@ -2236,7 +2234,7 @@ function getBasicData(table) {
         player['cards'] = table.players[i]['cards'];
         player['isSurvive'] = table.players[i]['isSurvive'];
         player['reloadCount'] = table.players[i]['reloadCount'];
-        player['plainName'] = table.players[i]['plainName'];
+        // player['plainName'] = table.players[i]['plainName'];
         // include bets info
         if (!table.game.roundBets[i]) {
             table.game.roundBets[i] = 0;
@@ -2337,7 +2335,7 @@ function getNextPlayer(table) {
             player.bet = table.game.bets[i];
             players.push(player);
         }
-        logGame(table.tableNumber,"table players is:" + JSON.stringify(players));
+        logGame(table.tableNumber, "table players is:" + JSON.stringify(players));
     }
     return result;
 }
@@ -2446,7 +2444,7 @@ function takeAction(table, action) {
                 player['reloadCount'] = table.players[i]['reloadCount'];
                 player['roundBet'] = table.game.roundBets[i];
                 player['bet'] = table.game.bets[i];
-                player['plainName'] = table.players[i]['plainName'];
+                // player['plainName'] = table.players[i]['plainName'];
                 player['cards'] = table.players[i]['cards'];
                 if (i === table.currentPlayer) {
                     if (action === '__bet') {

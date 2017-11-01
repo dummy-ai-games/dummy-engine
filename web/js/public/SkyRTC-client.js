@@ -29,11 +29,12 @@ var SkyRTC = function () {
 
     function skyrtc() {
         this.socket = null;
+        this.socket_danmu = null;
     }
 
     skyrtc.prototype = new EventEmitter();
 
-    skyrtc.prototype.connect = function (server, playerName, tableNumber, isHuman) {
+    skyrtc.prototype.connect = function (server, playerName, tableNumber, isHuman, danmu) {
         var socket,
             that = this;
 
@@ -44,7 +45,8 @@ var SkyRTC = function () {
                 "data": {
                     "playerName": playerName,
                     "tableNumber": tableNumber,
-                    "isHuman": isHuman
+                    "isHuman": isHuman,
+                    "danmu": danmu
                 }
             }));
             that.emit("socket_opened", socket);
@@ -77,6 +79,44 @@ var SkyRTC = function () {
             that.emit("remove_peer", data.socketId);
         });
     };
+
+    /*
+    // use danmu replay instead
+    skyrtc.prototype.connectDanmu = function (server, tableNumber) {
+        var socket,
+            that = this;
+
+        socket = this.socket_danmu = new WebSocket(server);
+        socket.onopen = function () {
+            socket.send(JSON.stringify({
+                "eventName": "__join",
+                "data": {
+                    "tableNumber": tableNumber,
+                    "isGame": true
+                }
+            }));
+            that.emit("socket_opened", socket);
+        };
+
+        socket.onmessage = function (message) {
+            var json = JSON.parse(message.data);
+            if (json.eventName) {
+                that.emit(json.eventName, json.data);
+            } else {
+                that.emit("socket_receive_message", socket, json);
+            }
+        };
+
+        socket.onerror = function (error) {
+            that.emit("socket_error", error, socket);
+        };
+
+        socket.onclose = function (data) {
+            that.emit('socket_closed', socket);
+        };
+    };
+    */
+
     skyrtc.prototype.Bet = function (amount) {
         var that = this;
         that.socket.send(JSON.stringify({

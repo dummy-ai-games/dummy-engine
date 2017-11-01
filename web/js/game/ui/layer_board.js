@@ -76,6 +76,7 @@ var BoardLayer = cc.Layer.extend({
     dealerLayer: null,
     winnerLayer: null,
     scoreLayer: null,
+    danmuLayer: null,
 
     // design specs
     refWidth: 1024,
@@ -517,6 +518,14 @@ var BoardLayer = cc.Layer.extend({
         this.winnerLayer.setVisible(false);
         this.addChild(this.winnerLayer, 100);
 
+        // add danmu layer on the very top
+        this.danmuLayer = new DanmuLayer(this.gameScale);
+        this.danmuLayer.init();
+        this.danmuLayer.setAnchorPoint(0, 0);
+        this.danmuLayer.setPosition(0, 0);
+        this.danmuLayer.setVisible(true);
+        this.addChild(this.danmuLayer, 120);
+
         this.scheduleUpdate();
     },
 
@@ -539,15 +548,15 @@ var BoardLayer = cc.Layer.extend({
         }
     },
 
-    update: function () {
-        this.doUpdate();
+    update: function (delta) {
+        this.doUpdate(delta);
     },
 
-    doUpdate: function () {
-        this.updateLayers();
+    doUpdate: function (delta) {
+        this.updateLayers(delta);
     },
 
-    updateLayers: function () {
+    updateLayers: function (delta) {
         switch (gameStatus) {
             case STATUS_GAME_STANDBY:
             case STATUS_GAME_PREPARING:
@@ -585,6 +594,9 @@ var BoardLayer = cc.Layer.extend({
             default:
                 break;
         }
+
+        // in any case, update danmu layer
+        this.updateDanmuLayer(delta);
     },
 
     updateBoardLayer: function () {
@@ -603,6 +615,10 @@ var BoardLayer = cc.Layer.extend({
 
     updateWinnerLayer: function () {
         this.winnerLayer.update();
+    },
+
+    updateDanmuLayer: function(delta) {
+        this.danmuLayer.update(delta);
     },
 
     // update sub layers
@@ -732,6 +748,10 @@ var BoardLayer = cc.Layer.extend({
                 playerLayer.update();
             }
         }
+    },
+
+    spawnDanmu: function (text) {
+        this.danmuLayer.spawnDanmu(text);
     },
 
     yourTurnAnimation: function (sprite, fromScale, toScale, toPos, callback) {

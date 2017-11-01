@@ -26,11 +26,8 @@ var tableNumber;
 if (process.argv.length > 3) {
     tableNumber = process.argv[3] + "";
 }
-console.log("cmd parameter are as follows:");
-for (var i = 0; i < process.argv.length; i++) {
-    console.log(process.argv[i] + "   ");
-}
-var SkyRTC = require('./game_services/communication').listen(httpServer, tableNumber);
+
+var SkyRTC = require('./game_services/communication.js').listen(httpServer, tableNumber);
 
 function normalizePort(val) {
     var port = parseInt(val, 10);
@@ -50,10 +47,12 @@ db.open(function (err, db) {
     });
 });
 
-
 app.use(flash());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded(
+    {
+        extended: true
+    }));
 
 app.use(cookieParser());
 app.use(session({

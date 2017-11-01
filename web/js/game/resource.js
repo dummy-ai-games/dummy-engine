@@ -262,6 +262,23 @@ if (ver === VER_ENGLISH) {
     var audio_fold = './res/audio/english/fold.ogg';
     var audio_raise = './res/audio/english/raise.ogg';
 } else {
+    var audio_round_clear_0 = './res/audio/chinese/avatar0.ogg';
+    var audio_round_clear_1 = './res/audio/chinese/avatar1.ogg';
+    var audio_round_clear_2 = './res/audio/chinese/avatar2.ogg';
+    var audio_round_clear_3 = './res/audio/chinese/avatar3.ogg';
+    var audio_round_clear_4 = './res/audio/chinese/avatar4.ogg';
+    var audio_round_clear_5 = './res/audio/chinese/avatar5.ogg';
+    var audio_round_clear_6 = './res/audio/chinese/avatar6.ogg';
+    var audio_round_clear_7 = './res/audio/chinese/avatar7.ogg';
+    var audio_round_clear_8 = './res/audio/chinese/avatar8.ogg';
+    var audio_round_clear_9 = './res/audio/chinese/avatar9.ogg';
+    var audio_round_clear_10 = './res/audio/chinese/avatar10.ogg';
+    var audio_round_clear_11 = './res/audio/chinese/avatar11.ogg';
+    var audio_round_clear_12 = './res/audio/chinese/avatar12.ogg';
+    var audio_round_clear_13 = './res/audio/chinese/avatar13.ogg';
+    var audio_round_clear_14 = './res/audio/chinese/avatar14.ogg';
+    var audio_round_clear_15 = './res/audio/chinese/avatar15.ogg';
+
     var audio_allin_0 = './res/audio/chinese/avatar0_allin.ogg';
     var audio_allin_1 = './res/audio/chinese/avatar1_allin.ogg';
     var audio_allin_2 = './res/audio/chinese/avatar2_allin.ogg';
@@ -421,6 +438,23 @@ if (ver === VER_ENGLISH) {
     audioMap.set('audio_fold_13', audio_fold_13);
     audioMap.set('audio_fold_14', audio_fold_14);
     audioMap.set('audio_fold_15', audio_fold_15);
+
+    audioMap.set('audio_round_clear_0', audio_round_clear_0);
+    audioMap.set('audio_round_clear_1', audio_round_clear_1);
+    audioMap.set('audio_round_clear_2', audio_round_clear_2);
+    audioMap.set('audio_round_clear_3', audio_round_clear_3);
+    audioMap.set('audio_round_clear_4', audio_round_clear_4);
+    audioMap.set('audio_round_clear_5', audio_round_clear_5);
+    audioMap.set('audio_round_clear_6', audio_round_clear_6);
+    audioMap.set('audio_round_clear_7', audio_round_clear_7);
+    audioMap.set('audio_round_clear_8', audio_round_clear_8);
+    audioMap.set('audio_round_clear_9', audio_round_clear_9);
+    audioMap.set('audio_round_clear_10', audio_round_clear_10);
+    audioMap.set('audio_round_clear_11', audio_round_clear_11);
+    audioMap.set('audio_round_clear_12', audio_round_clear_12);
+    audioMap.set('audio_round_clear_13', audio_round_clear_13);
+    audioMap.set('audio_round_clear_14', audio_round_clear_14);
+    audioMap.set('audio_round_clear_15', audio_round_clear_15);
 }
 
 // global resource list
