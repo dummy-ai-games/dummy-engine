@@ -3,7 +3,7 @@
  * 2017-09-08
  */
 
-var app = require('../the-engine.js');
+var app = require('../dummy.js');
 var playerService = require('../rest_services/player_service.js');
 
 app.get("/player/get_players", playerService.getPlayers);

@@ -3,7 +3,7 @@
  * 2017-09-01
  */
 
-var server = require('../the-engine.js');
+var server = require('../dummy.js');
 
 require('./player_routes.js');
 require('./table_routes.js');

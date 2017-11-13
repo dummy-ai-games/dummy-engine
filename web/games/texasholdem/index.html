@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="description" content="the-engine">
+    <meta name="author" content="the-engine team">
+    <title>THE</title>
+    <link rel="stylesheet" href="../../js/public/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./style/index.css">
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?0506ffafb810f2d8dab03ec838bb0e05";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- <img src="./res/images/logo.png" style="max-height: 80px; float: left; margin-bottom: 10px; margin-top: 10px; margin-right: 20px;"> -->
+        <h3 class="masthead-brand" style="float: left; margin-top: 40px;">Texas Hold'em AI Game</h3>
+        <div class="inner">
+            <nav>
+                <ul class="nav masthead-nav">
+                    <li class="active"><a href="./index.html">主页</a></li>
+                    <li><a href="./document.html">文档</a></li>
+                    <li><a href="#" onclick="setGame();">直播</a></li>
+                    <li><a href="#" onclick="setPlayer();">游戏</a></li>
+                    <li><a href="./players.html">玩家管理</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="site-wrapper">
+        <div class="site-wrapper-inner">
+            <div class="cover-container">
+                <div class="inner cover">
+                    <h1 class="cover-heading" style="margin-top: 24px;">Trend Micro Mobile Club</h1>
+                    <h2 style="margin-top: 32px;">德州扑克AI对战平台 V1.5.0</h2>
+                    <p style="margin-top: 20px;">更新日期: 2017-11-01</p>
+
+                    <p class="lead" style="margin-top: 40px;">
+                        <a href="document.html" class="btn btn-lg btn-default">开发文档</a>
+                    </p>
+                </div>
+                <div class="mastfoot" style="color: #FFFFFF;">
+                    <div class="inner">
+                        <a data-toggle="tooltip" data-placement="right" style="text-decoration: none;" href="#">Trend Micro Mobile Club </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- game settings dialog -->
+    <div class="modal fade dialog" id="goto_game_dialog" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+                    <span class="modal-title">加入直播</span>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="input-group">
+                            <span class="input-group-addon">游戏桌号</span>
+                            <input type="number" min="1" class="form-control" placeholder="游戏桌号" id="game_table_number" value="1">
+                        </div>
+                        <hr>
+                        <p><strong>参数设置</strong></p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">指令间隔&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="为了让您看清楚 Live 上玩家的出牌顺序, 服务器上可以在连续两条 action 请求之间加上一定时间间隔"></span></span>
+                                    <input type="number" min="0" max="2" step="0.2" class="form-control" placeholder="指令间隔" id="game_command_interval" value="1" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">回合间隔&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="在每回合清算的时候将展示玩家手牌, 得分和牌面组合, 以及让客户端请求reload 的这个时间间隔"></span></span>
+                                    <input type="number" min="5" max="30" step="5" class="form-control" placeholder="回合间隔" id="game_round_interval" value="15" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">指令超时&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="服务器等待客户端决策指令的超时时间, 正式比赛为 2 秒"></span></span>
+                                    <input type="number" min="1" max="10" step="1" class="form-control" placeholder="指令超时" id="game_command_timeout" value="5" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">掉线超时&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="客户端因为各种原因掉线之后服务器的等待时间, 正式比赛为 10 秒"></span></span>
+                                    <input type="number" min="10" max="15" step="1" class="form-control" placeholder="回合间隔" id="game_lost_timeout" value="10" onkeydown="return false">
+                                    <span class="input-group-addon">秒</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">默认小盲&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="默认初始小盲注, 正式比赛为 10"></span></span>
+                                    <input type="number" min="10" max="100" step="10" class="form-control" placeholder="默认小盲" id="game_default_sb" value="10" onkeydown="return false">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">默认筹码&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="默认玩家初始以及每次reload可获得的筹码, 正式比赛为 1000"></span></span>
+                                    <input type="number" min="1000" max="2000" step="100" class="form-control" placeholder="默认筹码" id="game_default_chips" value="1000" onkeydown="return false">
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">重载次数&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="玩家可申请的reload的机会, 正式比赛为 2 次"></span></span>
+                                    <input type="number" min="0" max="5" step="1" class="form-control" placeholder="重载次数" id="game_reload_chance" value="2" onkeydown="return false">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="input-group" style="padding-top: 6px;">
+                                    <input type="checkbox" id="game_sound" checked/> 音效&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="就是音效呗"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="input-group" style="padding-top: 6px;">
+                                    <input type="checkbox" id="game_bgm" checked/> 音乐&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="无限洗脑循环"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="input-group" style="padding-top: 6px;">
+                                    <input type="checkbox" id="auto_restart"/> 循环&nbsp;<span class="glyphicon glyphicon-question-sign tool_tip" data-toggle="tooltip" title="自动重新开始下一局比赛"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="gotoGame();">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- player settings dialog -->
+    <div class="modal fade dialog" id="goto_play_dialog" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-hidden="true" data-dismiss="modal">&times;</button>
+                    <span class="modal-title">加入游戏</span>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="input-group">
+                            <span class="input-group-addon">玩家名称</span>
+                            <input type="text" class="form-control" placeholder="玩家名称" id="play_player_name">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="gotoPlay();">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../js/public/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../../js/public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../../js/public/bower_components/bootstrap/js/tooltip.js"></script>
+<script src="../../js/public/bower_components/bootstrap/js/modal.js"></script>
+<script src="./js/platform/basic.js"></script>
+<script src="./js/platform/index.js"></script>
+</html>
