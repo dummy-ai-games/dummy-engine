@@ -46,7 +46,8 @@ var SkyRTC = function () {
                     "playerName": playerName,
                     "tableNumber": tableNumber,
                     "isHuman": isHuman,
-                    "danmu": danmu
+                    "danmu": danmu,
+                    "gameType":"dezhou"
                 }
             }));
             that.emit("socket_opened", socket);
