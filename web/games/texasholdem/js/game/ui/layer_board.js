@@ -432,7 +432,7 @@ var BoardLayer = cc.Layer.extend({
 
         // initialize author text
         if (MODE_LIVE === playMode || MODE_JUDGE === playMode) {
-            this.authorLabel = new cc.LabelTTF('Trend Micro Mobile Club',
+            this.authorLabel = new cc.LabelTTF('Dummy Team',
                 this.authorTextFont, this.authorTextSize);
             this.authorLabel.setColor(cc.color(255, 255, 255, 255));
             this.authorLabel.setAnchorPoint(0, 0);
@@ -448,7 +448,7 @@ var BoardLayer = cc.Layer.extend({
             this.addChild(this.authorLabel, 2);
         }
 
-        // initialize TrendMicro logo
+        // initialize Dummy logo
         this.tmLogo = new cc.Sprite(s_tm_logo);
         this.tmLogo.setAnchorPoint(0, 0);
         this.logoScale = this.gameScale * 0.8;
@@ -458,7 +458,7 @@ var BoardLayer = cc.Layer.extend({
             (this.bgSprite.getContentSize().height -
                 this.tmLogo.getContentSize().height - this.logoMarginTop) * this.gameScale);
         this.tmLogo.setVisible(false);
-        this.addChild(this.tmLogo, 2);
+        // this.addChild(this.tmLogo, 2);
 
         // add start and stop button
         this.controlMenuScale = this.gameScale * 0.6;
