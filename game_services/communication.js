@@ -5,7 +5,7 @@
 
 var WebSocketServer = require('ws').Server;
 var logger = require('../poem/logging/logger4js').helper;
-var PokerGame = require("./texas_holdem/poker_communicate.js");
+var PokerGame = require("./texasholdem/poker_communicate.js");
 var games = {};
 
 /**
@@ -19,7 +19,7 @@ function init(socket) {
                 if (json.eventName === "__join") {
                     var gameType = json.data.gameType;
                     switch (gameType) {
-                        case "texas_holdem":
+                        case "texasholdem":
                             var pokerGame = games[gameType];
                             if (!pokerGame)
                                 pokerGame = games[gameType] = new PokerGame.SkyRTC();

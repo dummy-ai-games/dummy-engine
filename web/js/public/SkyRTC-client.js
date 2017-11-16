@@ -47,7 +47,7 @@ var SkyRTC = function () {
                     "tableNumber": tableNumber,
                     "isHuman": isHuman,
                     "danmu": danmu,
-                    "gameType":"texas_holdem"
+                    "gameType":"texasholdem"
                 }
             }));
             that.emit("socket_opened", socket);
