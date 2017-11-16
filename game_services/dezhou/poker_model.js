@@ -5,18 +5,18 @@
 
 var events = require('events');
 
-var gameLogic = require('../work_units/game_logic.js');
-var tableLogic = require('../work_units/table_logic.js');
+var gameLogic = require('../../work_units/game_logic.js');
+var tableLogic = require('../../work_units/table_logic.js');
 
-var logger = require('../poem/logging/logger4js').helper;
+var logger = require('../../poem/logging/logger4js').helper;
 
-var Enums = require('../constants/enums.js');
+var Enums = require('../../constants/enums.js');
 var enums = new Enums();
-var ErrorCode = require('../constants/error_code.js');
+var ErrorCode = require('../../constants/error_code.js');
 var errorCode = new ErrorCode();
 
-var dateUtils = require('../poem/utils/date_utils.js');
-var MD5Utils = require('../poem/crypto/md5.js');
+var dateUtils = require('../../poem/utils/date_utils.js');
+var MD5Utils = require('../../poem/crypto/md5.js');
 
 var INNER_FLUSH = true;
 
