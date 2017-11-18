@@ -501,10 +501,7 @@ Player.prototype.back = function (flys, step) {
     for (var i = 1; i <= step; i++) {
         var tempGlobal = startGlobal - i;
         var tempLocal = startLocal - i;
-        if (tempLocal <= 0) {
-            tempLocal = 1;
-            tempGlobal = tempLocal + that.position * (that.table.game.SumGridsPublicTotal / that.table.maxPlayers);
-        }
+
         var isFinalStep = i === step ? true : false;
         var arrFliesConflict = that.testConflictOtherFly(tempLocal, tempGlobal, flys.length, isFinalStep);
         if (arrFliesConflict === -1) {
