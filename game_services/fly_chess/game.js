@@ -567,9 +567,9 @@ Player.prototype.testConflictOtherFly = function (local, global, count, isFinalS
         user = arrUsers[i];
         if (!user || that == user)   continue;
         arrFly = user.arrFly;
+        var num = [];
         for (var j = arrFly.length - 1; j > -1; j--) {
             fly = arrFly[j];
-            var num = [];
             if (fly.nIndGridLocal > 0 && fly.nIndGridGlobal === global) {
                 num.push(j);
             }
