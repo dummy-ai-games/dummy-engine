@@ -229,7 +229,7 @@ function Game(SumFly) {
 
     this.SumGridsPublicTotal = 52;//公共棋道总数
 
-    this.SumGridsSelf = 6;// 进入自己城堡后的棋道步数
+    this.SumGridsuser = 6;// 进入自己城堡后的棋道步数
 
     this.ArrGridsOriginal = [//地图
         0, 0, 4, 0, 0, 0, 4, 0, 0, 0,
@@ -279,7 +279,7 @@ function getBasicData(table) {
 
             "SumGridsPublicTotal": table.game.SumGridsPublicTotal,
 
-            "SumGridsSelf": table.game.SumGridsSelf,// 进入自己城堡后的棋道步数
+            "SumGridsuser": table.game.SumGridsuser,// 进入自己城堡后的棋道步数
 
             "ArrGridsOriginal": table.game.ArrGridsOriginal//地图
         }
@@ -293,18 +293,18 @@ var Fly = function (table) {
     this.nIndGridLocal = -1;// -1表示未起飞， 0表示已经起飞，>0表示在航道上，conf.SumGridsFinshed表示到达终点
     this.nIndGridGlobal = -1;
 
-    this.moveOperate = function (self, step) {
+    this.moveOperate = function (user, step) {
         if (this.nIndGridLocal == -1) {// 起飞
             this.nIndGridLocal = 0;
-            self.nSumFlying++;
-            this.adjustLocalAndGlobal(self);
+            user.nSumFlying++;
+            this.adjustLocalAndGlobal(user);
             return [];
         }
-        this.computeIndLocalGlobal(self, step);
+        this.computeIndLocalGlobal(user, step);
     };
 
 
-    this.computeIndLocalGlobal = function (self, step) {
+    this.computeIndLocalGlobal = function (user, step) {
         var isFly = this.nIndGridLocal > 0 ? true : false;
         this.nIndGridLocal += step;
         if (this.nIndGridLocal <= 0) {
@@ -313,28 +313,28 @@ var Fly = function (table) {
             else
                 this.nIndGridLocal = 0;
         }
-        this.adjustLocalAndGlobal(self);
+        this.adjustLocalAndGlobal(user);
     };
 
     this.beBroken = function () {
         this.nIndGridLocal = this.nIndGridGlobal = -1;
     };
-    this.adjustLocalAndGlobal = function (self) {
-        if (this.nIndGridLocal === self.table.game.SumGridsFinshed) {// succeed
-            self.succeedFlyOne();
-        } else if (this.nIndGridLocal > self.table.game.SumGridsFinshed) {// 超过了目标点
-            this.nIndGridLocal = self.table.game.SumGridsFinshed - (this.nIndGridLocal - self.table.game.SumGridsFinshed);
+    this.adjustLocalAndGlobal = function (user) {
+        if (this.nIndGridLocal === user.table.game.SumGridsFinshed) {// succeed
+            user.succeedFlyOne();
+        } else if (this.nIndGridLocal > user.table.game.SumGridsFinshed) {// 超过了目标点
+            this.nIndGridLocal = user.table.game.SumGridsFinshed - (this.nIndGridLocal - user.table.game.SumGridsFinshed);
         }
-        this.nIndGridGlobal = this.gridLocalToGlobal(self, this);
+        this.nIndGridGlobal = this.gridLocalToGlobal(user, this);
     };
 
-    this.gridLocalToGlobal = function (self, fly) {
+    this.gridLocalToGlobal = function (user, fly) {
         var nGlobal = fly.nIndGridLocal;
-        if (fly.nIndGridLocal <= self.table.game.SumGridsPublic) {// on public road
-            nGlobal = nGlobal + self.position * (self.table.game.SumGridsPublicTotal / self.table.maxPlayers);
-            if (nGlobal > self.table.game.SumGridsPublic)     nGlobal -= self.table.game.SumGridsPublic;
+        if (fly.nIndGridLocal <= user.table.game.SumGridsPublic) {// on public road
+            nGlobal = nGlobal + user.position * (user.table.game.SumGridsPublicTotal / user.table.maxPlayers);
+            if (nGlobal > user.table.game.SumGridsPublic)     nGlobal -= user.table.game.SumGridsPublic;
             console.log('************************************************************');
-            console.log('nPos/nLocal/nGlobal', self.position, fly.nIndGridLocal, nGlobal);
+            console.log('nPos/nLocal/nGlobal', user.position, fly.nIndGridLocal, nGlobal);
             console.log('************************************************************');
         }
         return nGlobal;
