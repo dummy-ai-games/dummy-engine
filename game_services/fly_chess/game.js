@@ -363,32 +363,27 @@ Player.prototype.succeedFlyOne = function () {
 
 Player.prototype.Move = function (flys) {
     var that = this;
-    if (!flys || flys.length <= 0) {
-        that.defaultAction();
-    } else {
+    if (flys && flys.length > 0) {
         var step = parseInt(that.randNumber / flys.length);
         logGame(that.tableNumber, "start forward " + step);
         var beforMove = that.arrFly[flys[0]].nIndGridLocal;
         that.forward(flys, step);
         var afterMove = that.arrFly[flys[0]].nIndGridLocal;
-
         var finalStep = afterMove - beforMove;
         that.turnBet = {action: 'move', playerName: this.playerName, flys: flys, step: finalStep};
         that.table.eventEmitter.emit('showAction', this.turnBet);
         progress(that.table);
+    } else {
+        that.defaultAction();
     }
-
 };
 
 Player.prototype.flyOne = function (index) {
     var that = this;
-    var isMove = false;
-    var flys = [];
     logGame(that.tableNumber, "start get a new fly");
-    if (index < 0 || index > that.arrFly.length) {
-        logGame(that.tableNumber, "index is illegal, default choose one fly to move");
-        that.defaultAction();
-    } else {
+    if (index > 0 && index < that.arrFly.length) {
+        var isMove = false;
+        var flys = [];
         flys.push(index);
         var flyLocal = that.arrFly[index].nIndGridLocal;
         if (flyLocal > 0)
@@ -407,6 +402,9 @@ Player.prototype.flyOne = function (index) {
             that.arrFly[index].moveOperate(that, 0);
         }
         progress(that.table);
+    } else {
+        logGame(that.tableNumber, "index is illegal, default choose one fly to move");
+        that.defaultAction();
     }
 };
 
@@ -506,7 +504,7 @@ Player.prototype.back = function (flys, step) {
             tempLocal = 1;
             tempGlobal = tempLocal + that.position * (that.table.game.SumGridsPublicTotal / that.table.maxPlayers);
         }
-        var isFinalStep = i == step ? true : false;
+        var isFinalStep = i === step ? true : false;
         var arrFliesConflict = that.testConflictOtherFly(tempLocal, tempGlobal, flys.length, isFinalStep);
         if (arrFliesConflict === -1) {
             logGame(that.table.tableNumber, "is blocked, can't continue back,start forward");
@@ -619,7 +617,7 @@ function getNextPlayer(table) {
             break;
         }
 
-    } while (!table.players[table.currentPlayer].isFinished);
+    } while (table.players[table.currentPlayer].isFinished);
 
     return result;
 }
