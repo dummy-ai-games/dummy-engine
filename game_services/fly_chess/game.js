@@ -303,18 +303,15 @@ var Fly = function (table) {
             user.nSumFlying++;
             return [];
         }
-        this.computeIndLocalGlobal(user, step);
+        if (step !== 0)
+            this.computeIndLocalGlobal(user, step);
     };
 
 
     this.computeIndLocalGlobal = function (user, step) {
-        var isFly = this.nIndGridLocal > 0 ? true : false;
         this.nIndGridLocal += step;
         if (this.nIndGridLocal <= 0) {
-            if (isFly)
-                this.nIndGridLocal = 1;
-            else
-                this.nIndGridLocal = 0;
+            this.nIndGridLocal = 1;
         }
         this.adjustLocalAndGlobal(user);
     };
@@ -500,6 +497,7 @@ Player.prototype.back = function (flys, step) {
     var startGlobal = that.arrFly[flys[0]].nIndGridGlobal;
     var that = this;
     var result = -step;
+
     for (var i = 1; i <= step; i++) {
         var tempGlobal = startGlobal - i;
         var tempLocal = startLocal - i;
@@ -561,6 +559,10 @@ Player.prototype.testConflictOtherFly = function (local, global, count, isFinalS
     var that = this;
     if (local > that.table.game.SumGridsPublic)
         return 0;
+
+    if (local <= 0) {
+        return -1;
+    }
 
     var arrUsers = that.table.players;
     var arrFly;
