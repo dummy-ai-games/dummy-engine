@@ -565,7 +565,8 @@ Player.prototype.testConflictOtherFly = function (local, global, count, isFinalS
     var user;
     for (var i = arrUsers.length - 1; i > -1; i--) {
         user = arrUsers[i];
-        if (!user || that == user)   continue;
+        if (!user || that === user)
+            continue;
         arrFly = user.arrFly;
         var num = [];
         for (var j = arrFly.length - 1; j > -1; j--) {
