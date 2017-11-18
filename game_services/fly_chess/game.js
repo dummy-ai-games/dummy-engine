@@ -177,9 +177,13 @@ Table.prototype.StopGame = function () {
 
 Table.prototype.AddPlayer = function (playerName, displayName) {
     var that = this;
-    var player = new Player(playerName, displayName, this);
-    this.playersToAdd.push(player);
-    this.playingCount++;
+    if (that.playersToAdd.length >= that.maxPlayers) {
+        logGame(that.tableNumber, "already arrive max players,can't continue join");
+        return;
+    }
+    var player = new Player(playerName, displayName, that);
+    that.playersToAdd.push(player);
+    that.playingCount++;
 };
 
 
