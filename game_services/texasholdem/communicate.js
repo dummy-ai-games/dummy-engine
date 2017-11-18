@@ -8,7 +8,7 @@ const WebSocket = require('ws');
 var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
-var poker = require('./poker_model.js');
+var poker = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
 var tableLogic = require('../../work_units/table_logic.js');
 
