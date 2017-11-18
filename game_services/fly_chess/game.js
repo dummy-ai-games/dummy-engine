@@ -100,13 +100,16 @@ function Table(minPlayers, maxPlayers, sumFly, commandTimeout, commandInterval, 
         if (that.playingCount <= 1) {
             that.eventEmitter.emit("gameEnd");
         } else {
-            var rand = parseInt(Math.random() * (6)) + 1;
-            if (that.randNumber === 6) {
-                that.randNumber = rand;
+            var lastRandNumber = that.randNumber;
+            that.randNumber = parseInt(Math.random() * (6)) + 1;
+            var myData = getBasicData(that);
+            that.eventEmitter.emit('__dice', myData);
+            if (lastRandNumber === 6) {
                 takeAction(that, '__turn');
             } else if (getNextPlayer(that)) {
-                that.randNumber = rand;
                 takeAction(that, '__turn');
+            } else {
+                logGame(that.tableNumber, "get next player error");
             }
             logGame(that.tableNumber, "__turn, current player is " + that.players[that.currentPlayer].playerName);
         }
@@ -274,7 +277,7 @@ function getBasicData(table) {
 
             "SumGridsPublic": table.game.SumGridsPublic,// 公共棋道步数
 
-            "SumGridsPublicTotal":table.game.SumGridsPublicTotal,
+            "SumGridsPublicTotal": table.game.SumGridsPublicTotal,
 
             "SumGridsSelf": table.game.SumGridsSelf,// 进入自己城堡后的棋道步数
 

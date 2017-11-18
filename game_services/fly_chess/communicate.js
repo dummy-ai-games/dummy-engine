@@ -628,6 +628,17 @@ SkyRTC.prototype.initTable = function (tableNumber) {
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
     });
+
+    that.table[tableNumber].eventEmitter.on('__dice', function (data) {
+        that.addPlayerStatus(data);
+        var message = {
+            'eventName': '__dice',
+            'data': data
+        };
+
+        that.broadcastInGuests(message);
+        that.broadcastInPlayers(message);
+    });
 };
 
 SkyRTC.prototype.addPlayerStatus = function (data) {
