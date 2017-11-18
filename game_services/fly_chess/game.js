@@ -222,7 +222,9 @@ function Game(SumFly) {
 
     this.SumGridsFinshed = 56;// 一个棋子在地图上需要行走的总数
 
-    this.SumGridsPublic = 50;// 公共棋道步数
+    this.SumGridsPublic = 50;// 每个棋子公共棋道步数
+
+    this.SumGridsPublicTotal = 52;//公共棋道总数
 
     this.SumGridsSelf = 6;// 进入自己城堡后的棋道步数
 
@@ -271,6 +273,8 @@ function getBasicData(table) {
             "SumGridsFinshed": table.game.SumGridsFinshed,// 一个棋子在地图上需要行走的总数
 
             "SumGridsPublic": table.game.SumGridsPublic,// 公共棋道步数
+
+            "SumGridsPublicTotal":table.game.SumGridsPublicTotal,
 
             "SumGridsSelf": table.game.SumGridsSelf,// 进入自己城堡后的棋道步数
 
@@ -324,7 +328,7 @@ var Fly = function (table) {
     this.gridLocalToGlobal = function (self, fly) {
         var nGlobal = fly.nIndGridLocal;
         if (fly.nIndGridLocal <= self.table.game.SumGridsPublic) {// on public road
-            nGlobal = nGlobal + self.position * (self.table.game.SumGridsPublic / self.table.players.length());
+            nGlobal = nGlobal + self.position * (self.table.game.SumGridsPublicTotal / self.table.maxPlayers);
             if (nGlobal > self.table.game.SumGridsPublic)     nGlobal -= self.table.game.SumGridsPublic;
             console.log('************************************************************');
             console.log('nPos/nLocal/nGlobal', self.position, fly.nIndGridLocal, nGlobal);
@@ -401,7 +405,6 @@ Player.prototype.flyOne = function (index) {
         }
         progress(that.table);
     }
-
 };
 
 Player.prototype.defaultAction = function () {
@@ -428,8 +431,8 @@ Player.prototype.defaultAction = function () {
 Player.prototype.forward = function (flys, step) {
     var that = this;
     var legalFlys = that.testLegal(flys);
-    var startLocal = legalFlys[0].nIndGridLocal;
-    var startGlobal = legalFlys[0].nIndGridGlobal;
+    var startLocal = that.arrFly[legalFlys[0]].nIndGridLocal;
+    var startGlobal = that.arrFly[legalFlys[0]].nIndGridGlobal;
     var isPrize = false;
     var prize = 0;
     var isFly = false;
@@ -489,8 +492,8 @@ Player.prototype.forward = function (flys, step) {
 };
 
 Player.prototype.back = function (flys, step) {
-    var startLocal = flys[0].nIndGridLocal;
-    var startGlobal = flys[0].nIndGridGlobal;
+    var startLocal = that.arrFly[flys[0]].nIndGridLocal;
+    var startGlobal = that.arrFly[flys[0]].nIndGridGlobal;
     var that = this;
     var result = -step;
     for (var i = 1; i <= step; i++) {
@@ -498,7 +501,7 @@ Player.prototype.back = function (flys, step) {
         var tempLocal = startLocal - i;
         if (tempLocal <= 0) {
             tempLocal = 1;
-            tempGlobal++;
+            tempGlobal = tempLocal + that.position * (that.table.game.SumGridsPublicTotal / that.table.maxPlayers);
         }
         var isFinalStep = i == step ? true : false;
         var arrFliesConflict = that.testConflictOtherFly(tempLocal, tempGlobal, flys.length, isFinalStep);
@@ -509,7 +512,7 @@ Player.prototype.back = function (flys, step) {
         }
     }
     return result;
-}
+};
 
 Player.prototype.testLegal = function (flys) {
     var isLegal = true;
