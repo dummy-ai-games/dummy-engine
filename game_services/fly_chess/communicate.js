@@ -653,7 +653,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
         currentTable.timeout = setTimeout(function () {
             currentTable.timeout = null;
             if (currentTable.status === enums.GAME_STATUS_RUNNING) {
-                flyChess.logGame(tableNumber, 'player :' + player + ', response timeout, auto FOLD');
+                flyChess.logGame(tableNumber, 'player :' + player + ', response timeout, execute default action');
                 currentTable.isActionTime = false;
                 currentTable.players[currentTable.currentPlayer].defaultAction();
             }
@@ -669,7 +669,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
     } else {
         // bug fix - crash after players quit
         if (currentTable && currentTable.status === enums.GAME_STATUS_RUNNING) {
-            flyChess.logGame(tableNumber, 'player: ' + player + ', quited, auto FOLD');
+            flyChess.logGame(tableNumber, 'player: ' + player + ', quited, execute default action');
             currentTable.isActionTime = false;
             currentTable.players[currentTable.currentPlayer].defaultAction();
         }
