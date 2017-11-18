@@ -9,7 +9,7 @@ install node.js (version above 6.0)
     
     cd to web/js/public
     bower install
-    
+
 install mongo DB (version above 3.4)
 
 #### to start
