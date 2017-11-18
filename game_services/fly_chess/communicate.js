@@ -13,7 +13,7 @@ var playerLogic = require('../../work_units/player_logic.js');
 var tableLogic = require('../../work_units/table_logic.js');
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
-var IP_CONSTRAINT = false;
+
 
 
 var logger = require('../../poem/logging/logger4js').helper;
@@ -26,15 +26,6 @@ var errorCode = new ErrorCode();
 
 var MD5Utils = require('../../poem/crypto/md5.js');
 
-var errorCb = function (rtc) {
-    return function (error) {
-        if (error) {
-            logger.error('server internal error occurred: ' + error);
-            // rtc.emit('error', error);
-        }
-    };
-};
-
 /**
  * Class SkyRTC
  * @constructor
@@ -46,7 +37,6 @@ function SkyRTC(tableNumber) {
     this.guests = {};
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
-    this.ipArray = {};
 
 
     this.on('__join', function (data, socket) {
@@ -98,13 +88,6 @@ function SkyRTC(tableNumber) {
                             that.players[socket.MD5Id] = socket;
                             var tablePlayers = that.notifyJoin(socket.tableNumber);
                             that.initPlayerData(socket.MD5Id);
-
-                            if (true === IP_CONSTRAINT) {
-                                if (socket.ip && !that.ipArray[socket.ip]) {
-                                    that.ipArray[socket.ip] = true;
-                                    that.removeAllGuestByIP(socket.ip);
-                                }
-                            }
                             // update game
                             that.updateTable(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
                         } else {
@@ -120,16 +103,12 @@ function SkyRTC(tableNumber) {
                     socket.close();
                 }
             });
-        } else if ((true === IP_CONSTRAINT && !that.ipArray[socket.ip]) || false === IP_CONSTRAINT) {
-
+        } else{
             socket.isGuest = true;
             that.guests[socket.id] = socket;
             that.initGuestData(socket.id);
             // updated by strawmanbobi - the Live UI need this command to show joined players
             that.notifyJoin(socket.tableNumber);
-        } else {
-            socket.close();
-            logger.info(" ip -> " + socket.ip + " already has player join, so reject guest join");
         }
     });
 
