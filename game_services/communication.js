@@ -6,6 +6,7 @@
 var WebSocketServer = require('ws').Server;
 var logger = require('../poem/logging/logger4js').helper;
 var PokerGame = require("./texasholdem/communicate.js");
+var FlyChess = require("./fly_chess/communicate.js");
 var games = {};
 
 /**
@@ -25,6 +26,13 @@ function init(socket) {
                                 pokerGame = games[gameType] = new PokerGame.SkyRTC();
                             pokerGame.socketJoin(socket);
                             pokerGame.emit(json.eventName, json.data, socket);
+                            break;
+                        case "fly_chess":
+                            var flyChess = games[gameType];
+                            if (!flyChess)
+                                flyChess = games[gameType] = new FlyChess.SkyRTC();
+                            flyChess.socketJoin(socket);
+                            flyChess.emit(json.eventName, json.data, socket);
                             break;
                         default:
                             break;
