@@ -240,7 +240,7 @@ function Game(SumFly) {
         4, 0, 0, 0, 4, 0, 0, 0, 12, 0,
         0, 0, 4, 0, 0, 0, 4, 0, 0, 0,
         4, 0, 0, 0, 4, 0, 0, 0, 4, 0,
-        0, 0, 4, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0 // 6个入城堡的格子
     ];
 }
@@ -301,7 +301,6 @@ var Fly = function (table) {
         if (this.nIndGridLocal == -1) {// 起飞
             this.nIndGridLocal = 0;
             user.nSumFlying++;
-            this.adjustLocalAndGlobal(user);
             return [];
         }
         this.computeIndLocalGlobal(user, step);
