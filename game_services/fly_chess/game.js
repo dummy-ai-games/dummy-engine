@@ -451,12 +451,12 @@ Player.prototype.forward = function (flys, step) {
         if (arrFliesConflict === -1) {
             logGame(that.table.tableNumber, "is blocked,can't continue forward,start back");
             var isEnd = true;
-            if (!isPrize)
-                result = step - i > 0 ? 2 * i - step : i - 1;
-            else if (!isFly)
-                result = step - prize;
-            else if (isFly)
+            if (isFly)
                 result = step - fly;
+            else if (isPrize)
+                result = step - prize;
+            else
+                result = step - i > 0 ? 2 * i - step : i - 1;
             if (result < 0) {
                 result = that.back(legalFlys, -result);
                 if (result > 0) {
