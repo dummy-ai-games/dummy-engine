@@ -552,7 +552,7 @@ Player.prototype.testPrizeGrid = function (local) {
 };
 
 Player.prototype.testConflictOtherFly = function (local, global, count, isFinalStep) {
-    var arrFliesConflict = [];
+    var arrFliesConflict = 0;
     var that = this;
     if (local > that.table.game.SumGridsPublic)
         return 0;
