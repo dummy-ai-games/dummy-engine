@@ -561,6 +561,10 @@ Player.prototype.testConflictOtherFly = function (local, global, count, isFinalS
         return -1;
     }
 
+    if (!isFinalStep && that.table.randNumber === 6) {//掷出6可以跳过其他棋子
+        return 0;
+    }
+
     var arrUsers = that.table.players;
     var arrFly;
     var fly;
