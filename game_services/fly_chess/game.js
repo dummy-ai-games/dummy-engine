@@ -363,16 +363,23 @@ Player.prototype.succeedFlyOne = function () {
 
 Player.prototype.Move = function (flys) {
     var that = this;
-    if (flys && flys.length > 0) {
-        var step = parseInt(that.randNumber / flys.length);
-        logGame(that.tableNumber, "start forward " + step);
-        var beforMove = that.arrFly[flys[0]].nIndGridLocal;
-        that.forward(flys, step);
-        var afterMove = that.arrFly[flys[0]].nIndGridLocal;
-        var finalStep = afterMove - beforMove;
-        that.turnBet = {action: 'move', playerName: this.playerName, flys: flys, step: finalStep};
-        that.table.eventEmitter.emit('showAction', this.turnBet);
-        progress(that.table);
+    var legalFlys = that.testLegal(flys);
+    if (legalFlys && legalFlys.length > 0) {
+        var flyLocal = that.arrFly[legalFlys[0]].nIndGridLocal;
+        if (flyLocal === -1) {
+            logGame(that.tableNumber, "flys that chosen can't move, turn to default action ");
+            that.defaultAction();
+        } else {
+            var step = parseInt(that.randNumber / legalFlys.length);
+            logGame(that.tableNumber, "start forward " + step);
+            var beforMove = that.arrFly[legalFlys[0]].nIndGridLocal;
+            that.forward(legalFlys, step);
+            var afterMove = that.arrFly[legalFlys[0]].nIndGridLocal;
+            var finalStep = afterMove - beforMove;
+            that.turnBet = {action: 'move', playerName: this.playerName, flys: legalFlys, step: finalStep};
+            that.table.eventEmitter.emit('showAction', this.turnBet);
+            progress(that.table);
+        }
     } else {
         that.defaultAction();
     }
@@ -381,27 +388,22 @@ Player.prototype.Move = function (flys) {
 Player.prototype.flyOne = function (index) {
     var that = this;
     logGame(that.tableNumber, "start get a new fly");
-    if (index > 0 && index < that.arrFly.length) {
+    if (index >= 0 && index < that.arrFly.length) {
         var isMove = false;
         var flys = [];
         flys.push(index);
         var flyLocal = that.arrFly[index].nIndGridLocal;
-        if (flyLocal > 0)
+        if (flyLocal >= 0 || that.table.randNumber < 6)
             isMove = true;
         if (isMove) {
-            var step = parseInt(that.randNumber);
-            var beforMove = that.arrFly[flys[0]].nIndGridLocal;
-            that.forward(flys, step);
-            var afterMove = that.arrFly[flys[0]].nIndGridLocal;
-            var finalStep = afterMove - beforMove;
-            that.turnBet = {action: 'move', playerName: this.playerName, flys: flys, step: finalStep};
-            that.table.eventEmitter.emit('showAction', this.turnBet);
+            logGame(that.tableNumber, "fly action is invalid, turn to default action");
+            that.defaultAction();
         } else {
             that.turnBet = {action: 'flyone', playerName: this.playerName, flyIndex: index};
             that.table.eventEmitter.emit('showAction', this.turnBet);
             that.arrFly[index].moveOperate(that, 0);
+            progress(that.table);
         }
-        progress(that.table);
     } else {
         logGame(that.tableNumber, "index is illegal, default choose one fly to move");
         that.defaultAction();
@@ -419,21 +421,24 @@ Player.prototype.defaultAction = function () {
             break;
         }
     }
-    var step = parseInt(that.randNumber);
-    var beforMove = that.arrFly[flys[0]].nIndGridLocal;
-    that.forward(flys, step);
-    var afterMove = that.arrFly[flys[0]].nIndGridLocal;
-    var finalStep = afterMove - beforMove;
-    that.turnBet = {action: 'move', playerName: that.playerName, flys: flys, step: finalStep};
-    that.table.eventEmitter.emit('showAction', this.turnBet);
+    if (flys.length > 0) {
+        var step = parseInt(that.randNumber);
+        var beforMove = that.arrFly[flys[0]].nIndGridLocal;
+        that.forward(flys, step);
+        var afterMove = that.arrFly[flys[0]].nIndGridLocal;
+        var finalStep = afterMove - beforMove;
+        that.turnBet = {action: 'move', playerName: that.playerName, flys: flys, step: finalStep};
+        that.table.eventEmitter.emit('showAction', this.turnBet);
+    } else {
+        logGame(that.tableNumber, "no fly can move, wait for next time");
+    }
     progress(that.table);
 }
 
 Player.prototype.forward = function (flys, step) {
     var that = this;
-    var legalFlys = that.testLegal(flys);
-    var startLocal = that.arrFly[legalFlys[0]].nIndGridLocal;
-    var startGlobal = that.arrFly[legalFlys[0]].nIndGridGlobal;
+    var startLocal = that.arrFly[flys[0]].nIndGridLocal;
+    var startGlobal = that.arrFly[flys[0]].nIndGridGlobal;
     var isPrize = false;
     var prize = 0;
     var isFly = false;
@@ -443,7 +448,7 @@ Player.prototype.forward = function (flys, step) {
         var tempLocal = startLocal + i;
         var isFinalStep = i == step ? true : false;
         var result = 0;
-        var arrFliesConflict = that.testConflictOtherFly(tempLocal, tempGlobal, legalFlys.length, isFinalStep);
+        var arrFliesConflict = that.testConflictOtherFly(tempLocal, tempGlobal, flys.length, isFinalStep);
         if (arrFliesConflict === -1) {
             logGame(that.table.tableNumber, "is blocked,can't continue forward,start back");
             var isEnd = true;
@@ -454,15 +459,15 @@ Player.prototype.forward = function (flys, step) {
             else
                 result = step - i > 0 ? 2 * i - step : i - 1;
             if (result < 0) {
-                result = that.back(legalFlys, -result);
+                result = that.back(flys, -result);
                 if (result > 0) {
                     step += result;
                     isEnd = false;
                 }
             }
             if (isEnd) {
-                for (var j = 0; j < legalFlys.length; j++) {
-                    that.arrFly[legalFlys[j]].moveOperate(that, result);
+                for (var j = 0; j < flys.length; j++) {
+                    that.arrFly[flys[j]].moveOperate(that, result);
                 }
                 break;
             }
@@ -484,8 +489,8 @@ Player.prototype.forward = function (flys, step) {
                 }
             } else {
                 result = step;
-                for (var j = 0; j < legalFlys.length; j++) {
-                    that.arrFly[legalFlys[j]].moveOperate(that, result);
+                for (var j = 0; j < flys.length; j++) {
+                    that.arrFly[flys[j]].moveOperate(that, result);
                 }
             }
         }
@@ -519,7 +524,7 @@ Player.prototype.testLegal = function (flys) {
     for (var i = 0; i < flys.length - 1; i++) {
         var fly = that.arrFly[flys[i]];
         var fly2 = that.arrFly[fly[i + 1]];
-        if (fly.nIndGridGlobal != fly2.nIndGridGlobal) {
+        if (fly.nIndGridGlobal !== fly2.nIndGridGlobal) {
             isLegal = false;
             break
         }
