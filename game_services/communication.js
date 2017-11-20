@@ -47,6 +47,7 @@ function init(socket) {
         }
     );
 };
+
 exports.listen = function (server, tableNumber, tablePort) {
     var SkyRTCServer;
     if (typeof server === 'number') {
