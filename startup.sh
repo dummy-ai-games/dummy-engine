@@ -1,2 +1,2 @@
-nohup node the-engine 3000 &
-
+#!/usr/bin/env bash
+nohup node dummy.js &

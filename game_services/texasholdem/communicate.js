@@ -14,7 +14,6 @@ var tableLogic = require('../../work_units/table_logic.js');
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
 var IP_CONSTRAINT = false;
-var DANMU_SERVER = 'ws://irext.net:3000';
 
 var logger = require('../../poem/logging/logger4js').helper;
 
@@ -49,47 +48,13 @@ function SkyRTC(tableNumber) {
     this.ipArray = {};
     // this.playerAndTable = {};
 
-    // danmu relay
     var skyRTC = this;
-
-    try {
-        var danmuRelayWs = new WebSocket(DANMU_SERVER, {
-            perMessageDeflate: false
-        });
-    } catch(error) {
-        logger.error('danmu server connecting error : ' + error);
-    }
-
-    var wsStatus = enums.DANMU_RELAY_CLOSED;
-
-    danmuRelayWs.on('open', function open() {
-        wsStatus = enums.DANMU_RELAY_OPENED;
-        danmuRelayWs.send(JSON.stringify({
-            "eventName": "__join",
-            "data": {
-                "isGame": true
-            }
-        }));
-    });
-
-    danmuRelayWs.on('close', function() {
-        logger.error('remote socket closed');
-    });
-
-    danmuRelayWs.on('error', function(error) {
-        logger.error('socket error : ' + error);
-    });
-
-    danmuRelayWs.on('message', function incoming(message) {
-        skyRTC.broadcastInDanmuGuest(JSON.parse(message));
-    });
 
     this.on('__join', function (data, socket) {
         var that = this;
         var playerName = data.playerName;
         var table = data.tableNumber;
         var isHuman = data.isHuman || false;
-        var danmu = data.danmu || 0;
 
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
         if (playerName) {
@@ -160,10 +125,9 @@ function SkyRTC(tableNumber) {
                 }
             });
         } else if ((true === IP_CONSTRAINT && !that.ipArray[socket.ip]) || false === IP_CONSTRAINT) {
-            logger.info('guest join, danmu = ' + danmu);
             socket.isGuest = true;
             that.guests[socket.id] = socket;
-            that.initGuestData(socket.id, danmu);
+            that.initGuestData(socket.id);
             // updated by strawmanbobi - the Live UI need this command to show joined players
             that.notifyJoin(socket.tableNumber);
         } else {
@@ -282,12 +246,11 @@ function SkyRTC(tableNumber) {
 
 util.inherits(SkyRTC, events.EventEmitter);
 
-SkyRTC.prototype.initGuestData = function (guest, danmu) {
+SkyRTC.prototype.initGuestData = function (guest) {
     var that = this;
     if (that.guests[guest]) {
         var tableNumber = that.guests[guest].tableNumber;
-        that.guests[guest].danmu = danmu;
-        logger.info('initGuestData, tableNumber = ' + tableNumber + ', danmu = ' + that.guests[guest].danmu);
+        logger.info('initGuestData, tableNumber = ' + tableNumber);
         if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
             var data = that.getBasicData(that.guests[guest].tableNumber);
             var message = {
@@ -730,11 +693,6 @@ SkyRTC.prototype.endGame = function (tableNumber) {
     that.broadcastInPlayers(message);
 };
 
-SkyRTC.prototype.relayDanmu = function (message) {
-    var that = this;
-    that.broadcastInGuests(message);
-};
-
 SkyRTC.prototype.initTable = function (tableNumber) {
     var that = this;
 
@@ -936,20 +894,6 @@ SkyRTC.prototype.broadcastInGuests = function (message) {
     for (var guest in that.guests) {
         if (that.guests[guest].tableNumber === tableNumber) {
             that.sendMessage(that.guests[guest], message);
-        }
-    }
-};
-
-SkyRTC.prototype.broadcastInDanmuGuest = function (message) {
-    var that = this;
-    if (message && message.data) {
-        console.log('relay danmu : ' + JSON.stringify(message));
-        var tableNumber = message.data.tableNumber;
-        for (var guest in that.guests) {
-            if (that.guests[guest].tableNumber === tableNumber &&
-                1 === parseInt(that.guests[guest].danmu)) {
-                that.sendMessage(that.guests[guest], message);
-            }
         }
     }
 };
