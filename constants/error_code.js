@@ -21,6 +21,10 @@ function ErrorCode() {
         code: 1,
         cause: "Player existed"
     };
+    this.USER_EXIST = {
+        code: 1,
+        cause: "User existed"
+    };
 }
 
 module.exports = ErrorCode;
