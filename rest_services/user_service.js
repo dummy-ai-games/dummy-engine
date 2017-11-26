@@ -9,7 +9,7 @@ var userLogic = require('../work_units/user_logic');
 
 exports.register = function (req,res){
     var phoneNumber = req.body.phoneNumber;
-    var pwd = req.body.password;
+    var pwd = req.body.password; //need to consider encrypt password
     var name = req.body.username;
     var avatar = req.body.avatar;
     var user = {
@@ -17,7 +17,7 @@ exports.register = function (req,res){
         phoneNumber: phoneNumber,
         password: pwd,
         avatar:avatar,
-        role:0,
+        role:0, // need to consider different roles
         status:0
     };
 
@@ -33,7 +33,7 @@ exports.register = function (req,res){
 
 exports.login = function(req, res){
     var phoneNumber = req.body.phoneNumber;
-    var pwd = req.body.password;
+    var pwd = req.body.password; //need to consider encrypt password
     var user = {
         phoneNumber: phoneNumber,
         password: pwd
