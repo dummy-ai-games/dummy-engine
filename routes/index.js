@@ -8,3 +8,4 @@ var server = require('../dummy.js');
 require('./player_routes.js');
 require('./table_routes.js');
 require('./game_routes.js');
+require('./user_routes.js');
