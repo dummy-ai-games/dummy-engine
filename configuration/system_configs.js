@@ -11,7 +11,7 @@ exports.setupEnvironment = function () {
     var env = process.env.NODE_ENV || 'development';
     ENV = env;
     if (undefined === typeof env || null === env || "" === env || enums.APP_DEVELOPMENT_MODE === env) {
-        LISTEN_PORT = "3001";
+        LISTEN_PORT = "8080";
         MONGO_DB_URI = "mongodb://127.0.0.1:27017/the_game";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
         MONGO_DB_NAME = "the_game";
@@ -21,7 +21,7 @@ exports.setupEnvironment = function () {
         DANMU_SERVER_PORT = "80";
         DANMU_RELAY_PORT = "8080";
     } else if (enums.APP_PRODUCTION_MODE === env) {
-        LISTEN_PORT = "80";
+        LISTEN_PORT = "8080";
         MONGO_DB_URI = "mongodb://127.0.0.1:27017/the_game";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
         MONGO_DB_NAME = "the_game";
@@ -31,7 +31,7 @@ exports.setupEnvironment = function () {
         DANMU_SERVER_PORT = "80";
         DANMU_RELAY_PORT = "8080";
     } else if (enums.APP_USERDEBUG_MODE === env) {
-        LISTEN_PORT = "80";
+        LISTEN_PORT = "8080";
         MONGO_DB_URI = "mongodb://127.0.0.1:27017/the_game";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
         MONGO_DB_NAME = "the_game";
