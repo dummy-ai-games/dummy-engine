@@ -1,5 +1,5 @@
 /**
- * Created by the-engine team
+ * Created by dummy team
  * 2017-09-08
  */
 
