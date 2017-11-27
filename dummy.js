@@ -78,3 +78,5 @@ app.use(function (req, res, next) {
     delete req.session.err;
     next();
 });
+
+console.log('dummy engine is running, listening on port ' + httpPort);
