@@ -10,7 +10,6 @@ var events = require('events');
 var util = require('util');
 var poker = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
-var tableLogic = require('../../work_units/table_logic.js');
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
 var IP_CONSTRAINT = false;
@@ -330,8 +329,6 @@ SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers, status) {
         players: players,
         status: status
     };
-    tableLogic.updateTableWorkUnit(tableNumber, newTable, function (updateTableErr) {
-    });
 };
 
 SkyRTC.prototype.sendMessage = function (socket, message) {
