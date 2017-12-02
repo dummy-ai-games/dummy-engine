@@ -74,7 +74,10 @@ function SkyRTC(tableNumber) {
                 password: password
             }, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    playerLogic.getBoardWorkUnit({ticket: table}, function (getBoardErr, board) {
+                    playerLogic.getBoardWorkUnit({
+                        gameName: that.gameName,
+                        ticket: table
+                    }, function (getBoardErr, board) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var tableNumber = table;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
@@ -524,7 +527,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
 SkyRTC.prototype.prepareGame = function (ticket) {
     var that = this;
 
-    playerLogic.getBoardWorkUnit({ticket: ticket}, function (getBoardErr, board) {
+    playerLogic.getBoardWorkUnit({gameName: that.gameName, ticket: ticket}, function (getBoardErr, board) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var tableNumber = ticket;
             logger.info('game preparing start for table: ' + tableNumber);
