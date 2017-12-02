@@ -45,7 +45,7 @@ function SkyRTC(tableNumber) {
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
     this.ipArray = {};
-    this.gameName = "texasholdem";
+    this.gameName = Enums.GAME_TEXASHOLDEM;
     // this.playerAndTable = {};
 
     var skyRTC = this;
