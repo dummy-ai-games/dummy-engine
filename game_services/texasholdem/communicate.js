@@ -77,7 +77,7 @@ function SkyRTC(tableNumber) {
                             var board = boards[0];
                             var tableNumber = table;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
-                                var playerName = player.playerName;
+                                var playerName = player.name;
                                 if (that.players[playerName]) {
                                     that.players[playerName].isReplace = true;
                                     that.players[playerName].close();
