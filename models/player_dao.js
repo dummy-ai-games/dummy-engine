@@ -30,15 +30,15 @@ exports.createUser = function (player, callback) {
     db.collection('player', function (err, player_collection) {
         if (err) {
             logger.error("connect to player table failed. " + err);
-            callback(errorCode.FAILED);
+            callback(errorCode.FAILED, null);
         } else {
             player_collection.insert(player, function (err, result) {
                 if (err) {
                     logger.error("insert player failed: " + err);
-                    callback(errorCode.FAILED);
+                    callback(errorCode.FAILED, null);
                 } else {
                     logger.info("insert player succeed");
-                    callback(errorCode.SUCCESS);
+                    callback(errorCode.SUCCESS, result);
                 }
             });
         }

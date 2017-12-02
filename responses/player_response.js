@@ -4,9 +4,9 @@
  */
 
 ServiceResponse = require("./service_response");
-function UserResponse(status, entity) {
+function PlayerResponse(status, entity) {
     this.entity = entity;
     ServiceResponse.call(this, status);
 }
 
-module.exports = UserResponse;
+module.exports = PlayerResponse;

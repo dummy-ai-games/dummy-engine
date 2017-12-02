@@ -4,7 +4,8 @@
  */
 
 var app = require('../dummy.js');
-var userService = require('../rest_services/player_service.js');
+var playerService = require('../rest_services/player_service.js');
 
-app.post("/users/register", userService.register);
-app.post("/users/login", userService.login);
+
+app.post("/players/signup", playerService.signup);
+app.post("/players/login", playerService.login);

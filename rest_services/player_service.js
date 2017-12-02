@@ -3,13 +3,13 @@
  */
 
 var logger = require('../poem/logging/logger4js').helper;
-var UserResponse = require('../responses/user_response');
-var userLogic = require('../work_units/player_logic');
+var PlayerResponse = require('../responses/player_response');
+var playerLogic = require('../work_units/player_logic');
 
 
-exports.register = function (req,res){
+exports.signup = function (req,res){
     var phoneNumber = req.body.phoneNumber;
-    var pwd = req.body.password; //need to consider encrypt password
+    var pwd = req.body.password;
     var name = req.body.username;
     var avatar = req.body.avatar;
     var user = {
@@ -20,12 +20,12 @@ exports.register = function (req,res){
         role:0, // need to consider different roles
         status:0
     };
-
-    var userResponse = new UserResponse();
-    userLogic.registerWorkUnit(user, function(registerErr){
-        userResponse.status = registerErr;
-        //userResponse.entity = null;
-        res.send(userResponse);
+    logger.info(phoneNumber);
+    var playerResponse = new PlayerResponse();
+    playerLogic.registerWorkUnit(user, function(registerErr,user){
+        playerResponse.status = registerErr;
+        playerResponse.entity = user;
+        res.send(playerResponse);
         res.end();
     });
 };
@@ -33,16 +33,16 @@ exports.register = function (req,res){
 
 exports.login = function(req, res){
     var phoneNumber = req.body.phoneNumber;
-    var pwd = req.body.password; //need to consider encrypt password
+    var pwd = req.body.password;
     var user = {
         phoneNumber: phoneNumber,
         password: pwd
     };
-    var userResponse = new UserResponse();
-    userLogic.getUserWorkUnit(user, function(getUserErr, user){
-        userResponse.entity = user;
-        userResponse.status = getUserErr;
-        res.send(userResponse);
+    var playerResponse = new PlayerResponse();
+    playerLogic.getUserWorkUnit(user, function(getUserErr, user){
+        playerResponse.entity = user;
+        playerResponse.status = getUserErr;
+        res.send(playerResponse);
         res.end();
     });
 };
