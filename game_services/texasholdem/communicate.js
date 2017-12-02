@@ -22,7 +22,7 @@ var ErrorCode = require('../../constants/error_code.js');
 var enums = new Enums();
 var errorCode = new ErrorCode();
 
-var MD5Utils = require('../../poem/crypto/md5.js');
+
 
 var errorCb = function (rtc) {
     return function (error) {
@@ -45,7 +45,7 @@ function SkyRTC(tableNumber) {
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
     this.ipArray = {};
-    this.gameName = Enums.GAME_TEXASHOLDEM;
+    this.gameName = enums.GAME_TEXASHOLDEM;
     // this.playerAndTable = {};
 
     var skyRTC = this;
