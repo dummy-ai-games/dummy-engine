@@ -70,14 +70,14 @@ function SkyRTC(tableNumber) {
             playerLogic.getUserWorkUnit({
                 phoneNumber: phoneNumber,
                 password: password
-            }, function (getPlayerErr, player) {
+            }, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
                     boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, boards) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var board = boards[0];
                             var tableNumber = table;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
-                                var playerName = player.name;
+                                var playerName = players[0].name;
                                 if (that.players[playerName]) {
                                     that.players[playerName].isReplace = true;
                                     that.players[playerName].close();
