@@ -10,7 +10,7 @@ var errorCode = new ErrorCode();
 
 
 /**
- * tb_user
+ * player
  * Fields:
  *      name(string)
  *      phoneNumber(string)(primary key)
@@ -22,23 +22,23 @@ var errorCode = new ErrorCode();
 
 
 /**
- * create a new user to tb_user
- * @param user:{user object}
+ * create a new player to player table
+ * @param player:{player object}
  * @param callback: succeed, failed
  */
-exports.createUser = function (user, callback) {
-    db.collection('tb_user', function (err, user_collection) {
+exports.createPlayer = function (player, callback) {
+    db.collection('player', function (err, player_collection) {
         if (err) {
-            logger.error("connect to user table failed. " + err);
-            callback(errorCode.FAILED);
+            logger.error("connect to player table failed. " + err);
+            callback(errorCode.FAILED, null);
         } else {
-            user_collection.insert(user, function (err, result) {
+            player_collection.insert(player, function (err, result) {
                 if (err) {
-                    logger.error("insert user failed: " + err);
-                    callback(errorCode.FAILED);
+                    logger.error("insert player failed: " + err);
+                    callback(errorCode.FAILED, null);
                 } else {
-                    logger.info("insert user succeed");
-                    callback(errorCode.SUCCESS);
+                    logger.info("insert player succeed");
+                    callback(errorCode.SUCCESS, result);
                 }
             });
         }
@@ -46,24 +46,24 @@ exports.createUser = function (user, callback) {
 };
 
 /**
- * query user in tb_user
+ * query player in player table
  * @param condition: {phoneNumber:'123', password:'*****'}
  * @param callback: succeed, failed
  */
-exports.getUser = function (conditions, callback) {
-    db.collection('tb_user', function (err, user_collection) {
+exports.getPlayer = function (player, callback) {
+    db.collection('player', function (err, player_collection) {
         if (!err) {
-            user_collection.find(conditions).toArray(function (err, result) {
+            player_collection.find(player).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("get user succeed.");
+                    logger.info("get player succeed.");
                     callback(errorCode.SUCCESS, result);
                 } else {
-                    logger.error("get user error: " + err);
+                    logger.error("get player error: " + err);
                     callback(errorCode.FAILED, null);
                 }
             });
         } else {
-            logger.error("get user collection error. " + err);
+            logger.error("get player collection error. " + err);
             callback(errorCode.FAILED, null);
         }
     });

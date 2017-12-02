@@ -1,12 +1,12 @@
 /**
  * Created by Elsie
- * 2017-11-26
+ * 2017-12-02
  */
 
 ServiceResponse = require("./service_response");
-function UserResponse(status, entity) {
+function BoardResponse(status, entity) {
     this.entity = entity;
     ServiceResponse.call(this, status);
 }
 
-module.exports = UserResponse;
+module.exports = BoardResponse;
