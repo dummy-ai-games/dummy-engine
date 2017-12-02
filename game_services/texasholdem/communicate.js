@@ -10,6 +10,7 @@ var events = require('events');
 var util = require('util');
 var poker = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
+var boardLogic = require('../../work_units/board_logic.js');
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
 var IP_CONSTRAINT = false;
@@ -21,7 +22,6 @@ var ErrorCode = require('../../constants/error_code.js');
 
 var enums = new Enums();
 var errorCode = new ErrorCode();
-
 
 
 var errorCb = function (rtc) {
@@ -72,10 +72,7 @@ function SkyRTC(tableNumber) {
                 password: password
             }, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    playerLogic.getBoardWorkUnit({
-                        gameName: that.gameName,
-                        ticket: table
-                    }, function (getBoardErr, board) {
+                    boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, board) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var tableNumber = table;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
@@ -341,7 +338,7 @@ SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
         players: players,
         status: status
     };
-    playerLogic.updateBoardWorkUnit({gameName: that.gameName, board: newBoard}, function (updateBoardErr, board) {
+    boardLogic.updateBoardWorkUnit(ticket, that.gameName, newBoard, function (updateBoardErr, board) {
         if (errorCode.SUCCESS.code === updateBoardErr.code) {
             logger.info("update board success");
         }
@@ -525,7 +522,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
 SkyRTC.prototype.prepareGame = function (ticket) {
     var that = this;
 
-    playerLogic.getBoardWorkUnit({gameName: that.gameName, ticket: ticket}, function (getBoardErr, board) {
+    boardLogic.getBoardByTicketWorkUnit(ticket, that.gameName, function (getBoardErr, board) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var tableNumber = ticket;
             logger.info('game preparing start for table: ' + tableNumber);
@@ -538,6 +535,9 @@ SkyRTC.prototype.prepareGame = function (ticket) {
             }
 
             // initialize game parameters
+            var minPlayer = 3;
+            var maxPlayer = 10;
+            var maxReloadCount = 100;
             var sb = 10;
             var bb = 20;
             var initChips = 1000;
@@ -546,6 +546,18 @@ SkyRTC.prototype.prepareGame = function (ticket) {
             var ri = 15;
             var ct = 5; // schedule to 5 seconds
             var lt = 10;
+
+            if (board.minPlayer && board.minPlayer >= 3) {
+                minPlayer = parseInt(board.minPlayer);
+            }
+
+            if (board.maxPlayer && board.maxPlayer >= 3 && board.maxPlayer <= 10) {
+                maxPlayer = parseInt(board.maxPlayer);
+            }
+
+            if (board.maxReloadCount && board.maxReloadCount > 0) {
+                maxReloadCount = parseInt(board.maxReloadCount);
+            }
 
             if (undefined !== board.defaultSb && null !== board.defaultSb && board.defaultSb >= 10) {
                 sb = parseInt(board.defaultSb);
@@ -576,7 +588,7 @@ SkyRTC.prototype.prepareGame = function (ticket) {
                 lt = parseInt(board.lostTimeout);
             }
 
-            that.table[tableNumber] = new poker.Table(sb, bb, 3, 10, initChips, rc, 100, ci, ri, ct, lt);
+            that.table[tableNumber] = new poker.Table(sb, bb, minPlayer, maxPlayer, initChips, rc, maxReloadCount, ci, ri, ct, lt);
             that.table[tableNumber].tableNumber = tableNumber;
             that.initTable(tableNumber);
             logger.info('init table done');

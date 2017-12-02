@@ -10,6 +10,7 @@ var events = require('events');
 var util = require('util');
 var flyChess = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
+var boardLogic = require('../../work_units/board_logic.js');
 
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
@@ -59,10 +60,7 @@ function SkyRTC(tableNumber) {
                 password: password
             }, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    playerLogic.getBoardWorkUnit({
-                        gameName: that.gameName,
-                        ticket: table
-                    }, function (getBoardErr, board) {
+                    boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, board) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var tableNumber = table;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
@@ -251,7 +249,7 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     return data;
 };
 
-SkyRTC.prototype.updateBoard = function (tableNumber, tablePlayers, status) {
+SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
     var that = this;
     var players = [];
     var playerLength;
@@ -273,7 +271,7 @@ SkyRTC.prototype.updateBoard = function (tableNumber, tablePlayers, status) {
         players: players,
         status: status
     };
-    playerLogic.updateBoardWorkUnit({gameName: that.gameName, board: newBoard}, function (updateBoardErr, board) {
+    boardLogic.updateBoardWorkUnit(ticket, that.gameName, newBoard, function (updateBoardErr, board) {
         if (errorCode.SUCCESS.code === updateBoardErr.code) {
             logger.info("update board success");
         }
@@ -428,7 +426,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
 SkyRTC.prototype.prepareGame = function (tableNumber) {
     var that = this;
 
-    playerLogic.getBoardWorkUnit({gameName: that.gameName, ticket: ticket}, function (getBoardErr, board) {
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, board) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             logger.info('game preparing start for table: ' + tableNumber);
             if (that.table[tableNumber]) {
