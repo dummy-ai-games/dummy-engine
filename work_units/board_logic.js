@@ -5,7 +5,7 @@
 
 var logger = require('../poem/logging/logger4js').helper;
 var boardDao = require('../models/board_dao');
-var gameDao =require('../models/game_dao');
+var gameDao = require('../models/game_dao');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var stringUtil = require('../poem/utils/string_utils');
@@ -17,10 +17,10 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     var ticket = stringUtil.randomChar(30);
 
     // 该游戏存在于 tb_game 时, create一个board实例
-    gameDao.getGameInfo({name: gameName}, function(getGameErr, game){
+    gameDao.getGameInfo({name: gameName}, function (getGameErr, game) {
         logger.info(getGameErr.code);
         logger.info(game);
-        if(getGameErr.code == errorCode.SUCCESS.code && game != null && game.length > 0){
+        if (getGameErr.code == errorCode.SUCCESS.code && game != null && game.length > 0) {
             var board = {
                 gameName: gameName,
                 minPlayer: game[0].minPlayer,
@@ -42,7 +42,7 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                     callback(errorCode.FAILED, null);
                 }
             });
-        }else{
+        } else {
             logger.info('get game info failed.');
             callback(errorCode.FAILED, null);
         }
@@ -50,13 +50,33 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
 };
 
 
+exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
+    var condition = {
+        ticket: ticket,
+        gameName: gameName
+    };
+    var newBoard = {
+        currentPlayer: newBoard.currentPlayer,
+        status: parseInt(newBoard.status),
+        updateTime: newBoard.updateTime,
+        type: parseInt(newBoard.type)
+    };
+    logger.info(newBoard.currentPlayer);
+    logger.info(newBoard.status);
+    logger.info(newBoard.updateTime);
+    logger.info(newBoard.type);
 
-exports.updateBoardWorkUnit = function (ticket, newBoard, callback){
-    boardDao.update
+    boardDao.updateBoard(condition, newBoard, function(updateBoardErr, board){
+        if(updateBoardErr.code == errorCode.SUCCESS.code){
+            logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" succeed.");
+            callback(updateBoardErr, board);
+        }else{
+            logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" failed.");
+            callback(errorCode.FAILED, null);
+        }
+    });
 
 };
-
-
 
 
 /**
@@ -68,7 +88,7 @@ exports.updateBoardWorkUnit = function (ticket, newBoard, callback){
 exports.getBoardByTicketWorkUnit = function (ticket, gameName, callback) {
     var condition = {
         ticket: ticket,
-        gameName:gameName
+        gameName: gameName
     };
     boardDao.getBoard(condition, function (getBoardErr, board) {
         if (getBoardErr.code === errorCode.SUCCESS.code && board != null && board.length > 0) {
@@ -91,11 +111,11 @@ exports.getBoardByTicketWorkUnit = function (ticket, gameName, callback) {
  */
 exports.listBoardsWorkUnit = function (status, gameName, callback) {
     var condition = {
-        status: status,
+        status: parseInt(status),
         gameName: gameName
     };
     boardDao.getBoard(condition, function (getBoardErr, boards) {
-        if (getBoardErr === errorCode.SUCCESS.code && boards != null && boards.length > 0) {
+        if (getBoardErr.code === errorCode.SUCCESS.code && boards != null && boards.length > 0) {
             logger.info("query board list: " + condition + " succeed");
             callback(getBoardErr, boards); //
         } else {

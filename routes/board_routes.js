@@ -9,6 +9,6 @@ var boardService = require('../rest_services/board_service');
 
 app.post("/board/create_board", boardService.createBoard);
 app.post("/board/update_board", boardService.updateBoard);
-app.post("/board/list_board", boardService.listBoards);
+app.post("/board/list_boards", boardService.listBoards);
 
-app.post("/board/get_board_by_ticket",boardService.getBoardByTicket); //for testing
+//app.post("/board/get_board_by_ticket",boardService.getBoardByTicket); //for testing

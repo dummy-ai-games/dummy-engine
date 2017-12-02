@@ -49,6 +49,23 @@ exports.createBoard = function (board, callback) {
  * @param callback
  */
 exports.updateBoard = function (condition, newBoard, callback) {
+    db.collection('board', function (err, board_collection) {
+        if (!err) {
+            board_collection.update(condition, {$set: newBoard},{safe:true}, function (err, result) {
+                if (!err) {
+                    logger.info("update board by condition " + condition + " succeed.");
+                    callback(errorCode.SUCCESS, result);
+                } else {
+                    logger.error("update board by condition: " + condition + " occur error." + err);
+                    callback(errorCode.FAILED, null);
+                }
+            });
+        } else {
+            logger.error("get board collection error. " + err);
+            callback(errorCode.FAILED, null);
+        }
+    });
+
 };
 
 /**

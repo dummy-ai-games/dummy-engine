@@ -27,16 +27,20 @@ exports.createBoard = function (req, res) {
 
 
 /**
- * update a board by ticket and new board value
+ * update a board by ticket,gameName and new board value
  * @param req
  * @param res
  */
 exports.updateBoard = function (req, res) {
-    var ticket = res.body.ticket;
-    var newBoard = res.body.new_board;
+    var ticket = req.body.ticket;
+    var gameName = req.body.game_name;
+    var newBoard = req.body.new_board;
+    logger.info(ticket);
+    logger.info(gameName);
+    logger.info(newBoard);
 
     var boardResponse = new BoardResponse();
-    boardLogic.updateBoardWorkUnit(ticket, newBoard, function (updateBoardErr, board) {
+    boardLogic.updateBoardWorkUnit(ticket, gameName, newBoard, function (updateBoardErr, board) {
         boardResponse.status = updateBoardErr;
         boardResponse.entity = board;
         res.send(boardResponse);
