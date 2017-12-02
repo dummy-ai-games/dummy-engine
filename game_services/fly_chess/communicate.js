@@ -45,10 +45,10 @@ function SkyRTC(tableNumber) {
         var password = data.password;
         var table = data.ticket;
 
-        logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
-        if (table) {
+        logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + table);
+        if (!phoneNumber && table) {
             socket.tableNumber = table;
-        } else if (!playerName) {
+        } else if (!phoneNumber) {
             logger.info('player is invalid, close its socket');
             socket.close();
             return;
@@ -421,7 +421,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
         }
     }
 
-    that.updateTable(tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
+    that.updateBoard(tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
 };
 
 SkyRTC.prototype.prepareGame = function (tableNumber) {

@@ -55,7 +55,7 @@ function SkyRTC(tableNumber) {
         var table = data.ticket;
         var isHuman = data.isHuman || false;
 
-        logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
+        logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + table);
         if (phoneNumber) {
             socket.isHuman = isHuman;
         } else if (table) {
