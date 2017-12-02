@@ -60,9 +60,10 @@ function SkyRTC(tableNumber) {
                 password: password
             }, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, board) {
+                    boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, boards) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var tableNumber = table;
+                            var board = boards[0];
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
                                 var playerName = player.playerName;
                                 if (that.players[playerName]) {
@@ -426,8 +427,9 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
 SkyRTC.prototype.prepareGame = function (tableNumber) {
     var that = this;
 
-    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, board) {
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
+            var board = boards[0];
             logger.info('game preparing start for table: ' + tableNumber);
             if (that.table[tableNumber]) {
                 if (that.table[tableNumber].timeout)
