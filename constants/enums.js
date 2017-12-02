@@ -18,7 +18,7 @@ function Enums() {
     this.DANMU_RELAY_CLOSED = 0;
     this.DANMU_RELAY_OPENED = 1;
 
-    this.GAME_TEXASHOLDEM = "texasholdem";
+    this.GAME_TEXAS_HOLDEM = "texas_holdem";
     this.GAME_FLY_CHESS = "fly_chess";
 }
 

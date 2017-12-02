@@ -22,7 +22,7 @@ function init(socket) {
                 if (json.eventName === "__join") {
                     var gameType = json.data.gameType;
                     switch (gameType) {
-                        case enums.GAME_TEXASHOLDEM:
+                        case enums.GAME_TEXAS_HOLDEM:
                             var pokerGame = games[gameType];
                             if (!pokerGame)
                                 pokerGame = games[gameType] = new PokerGame.SkyRTC();

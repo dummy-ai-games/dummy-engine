@@ -45,7 +45,7 @@ function SkyRTC(tableNumber) {
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
     this.ipArray = {};
-    this.gameName = enums.GAME_TEXASHOLDEM;
+    this.gameName = enums.GAME_TEXAS_HOLDEM;
 
 
     this.on('__join', function (data, socket) {
