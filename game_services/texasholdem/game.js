@@ -4,10 +4,6 @@
  */
 
 var events = require('events');
-
-var gameLogic = require('../../work_units/game_logic.js');
-var tableLogic = require('../../work_units/table_logic.js');
-
 var logger = require('../../poem/logging/logger4js').helper;
 
 var Enums = require('../../constants/enums.js');
@@ -2390,10 +2386,7 @@ function updateGame(table) {
         startTime: table.startTime,
         instID: table.instID
     };
-    gameLogic.updateGameWorkUnit(table.tableNumber, table.instID, newGame, function (updateGameErr) {
-        if (updateGameErr.code === errorCode.SUCCESS.code) {
-        }
-    });
+
 }
 
 function updateTable(table, status) {
@@ -2418,10 +2411,7 @@ function updateTable(table, status) {
         players: players,
         status: status
     };
-    tableLogic.updateTableWorkUnit(table.tableNumber, newTable, function (updateTableErr) {
-        if (updateTableErr.code === errorCode.SUCCESS.code) {
-        }
-    })
+
 }
 
 function takeAction(table, action) {

@@ -8,6 +8,8 @@ var logger = require('../poem/logging/logger4js').helper;
 var PokerGame = require("./texasholdem/communicate.js");
 var FlyChess = require("./fly_chess/communicate.js");
 var games = {};
+var Enums = require('../constants/enums.js');
+var enums = new Enums();
 
 /**
  * Exported functions
@@ -18,16 +20,16 @@ function init(socket) {
             try {
                 var json = JSON.parse(data);
                 if (json.eventName === "__join") {
-                    var gameType = json.data.gameType;
+                    var gameType = json.data.gameName;
                     switch (gameType) {
-                        case "texasholdem":
+                        case enums.GAME_TEXAS_HOLDEM:
                             var pokerGame = games[gameType];
                             if (!pokerGame)
                                 pokerGame = games[gameType] = new PokerGame.SkyRTC();
                             pokerGame.socketJoin(socket);
                             pokerGame.emit(json.eventName, json.data, socket);
                             break;
-                        case "fly_chess":
+                        case enums.GAME_FLY_CHESS:
                             var flyChess = games[gameType];
                             if (!flyChess)
                                 flyChess = games[gameType] = new FlyChess.SkyRTC();

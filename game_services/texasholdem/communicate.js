@@ -22,7 +22,7 @@ var ErrorCode = require('../../constants/error_code.js');
 var enums = new Enums();
 var errorCode = new ErrorCode();
 
-var MD5Utils = require('../../poem/crypto/md5.js');
+
 
 var errorCb = function (rtc) {
     return function (error) {
@@ -45,18 +45,18 @@ function SkyRTC(tableNumber) {
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
     this.ipArray = {};
-    // this.playerAndTable = {};
+    this.gameName = enums.GAME_TEXAS_HOLDEM;
 
-    var skyRTC = this;
 
     this.on('__join', function (data, socket) {
         var that = this;
-        var playerName = data.playerName;
-        var table = data.tableNumber;
+        var phoneNumber = data.phoneNumber;
+        var password = data.password;
+        var table = data.ticket;
         var isHuman = data.isHuman || false;
 
         logger.info('on __join, playerName = ' + playerName + ', table = ' + table);
-        if (playerName) {
+        if (phoneNumber) {
             socket.isHuman = isHuman;
         } else if (table) {
             socket.tableNumber = table;
@@ -66,60 +66,73 @@ function SkyRTC(tableNumber) {
             return;
         }
 
-        if (playerName) {
-            var MD5Id = MD5Utils.MD5(playerName);
-            if (that.players[MD5Id]) {
-                logger.warn('player: ' + playerName + ' already exist, reject');
-                return;
-            }
-            playerLogic.getPlayerByName(playerName, function (getPlayerErr, player) {
+        if (phoneNumber) {
+            playerLogic.getUserWorkUnit({
+                phoneNumber: phoneNumber,
+                password: password
+            }, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    var tableNumber = player.tableNumber + "";
-                    if (!that.tableNumber || tableNumber === that.tableNumber) {
-                        socket.id = playerName;
-                        socket.displayName = player.displayName;
-                        socket.MD5Id = MD5Id;
-                        if (that.players[MD5Id]) {
-                            that.players[MD5Id].isReplace = true;
-                            that.players[MD5Id].close();
-                        }
-                        var exitPlayerTableNum = that.exitPlayers[socket.MD5Id];
-                        if (exitPlayerTableNum !== undefined) {
-                            socket.tableNumber = exitPlayerTableNum;
-                            delete that.exitPlayers[socket.MD5Id];
-                            logger.info('player rejoin, accept join');
-                        } else if (that.players[MD5Id]){
-                            socket.tableNumber = tableNumber;
-                            logger.info('exist player replace, accept join');
-                        } else if(!(that.table[tableNumber] &&
-                            that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
-                            socket.tableNumber = tableNumber;
-                            logger.info('game not started, accept join');
-                        }
-                        if (socket.tableNumber) {
-                            logger.info('player : ' + data.playerName + ' join!!');
-                            that.players[socket.MD5Id] = socket;
-                            var tablePlayers = that.notifyJoin(socket.tableNumber);
-                            that.initPlayerData(socket.MD5Id);
-
-                            if (true === IP_CONSTRAINT) {
-                                if (socket.ip && !that.ipArray[socket.ip]) {
-                                    that.ipArray[socket.ip] = true;
-                                    that.removeAllGuestByIP(socket.ip);
+                    playerLogic.getBoardWorkUnit({
+                        gameName: that.gameName,
+                        ticket: table
+                    }, function (getBoardErr, board) {
+                        if (errorCode.SUCCESS.code === getBoardErr.code) {
+                            var tableNumber = table;
+                            if (!that.tableNumber || tableNumber === that.tableNumber) {
+                                var playerName = player.playerName;
+                                if (that.players[playerName]) {
+                                    that.players[playerName].isReplace = true;
+                                    that.players[playerName].close();
                                 }
+                                var exitPlayerTableNum = that.exitPlayers[playerName];
+                                if (exitPlayerTableNum !== undefined) {
+                                    socket.tableNumber = exitPlayerTableNum;
+                                    delete that.exitPlayers[playerName];
+                                    logger.info('player rejoin, accept join');
+                                } else if (that.players[playerName]) {
+                                    socket.tableNumber = tableNumber;
+                                    logger.info('exist player replace, accept join');
+                                } else if (!(that.table[tableNumber] &&
+                                    that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                                    socket.tableNumber = tableNumber;
+                                    logger.info('game not started, accept join');
+                                }
+                                if (socket.tableNumber) {
+                                    logger.info('player : ' + playerName + ' join!!');
+                                    socket.id = playerName;
+                                    socket.displayName = playerName;
+                                    that.players[socket.id] = socket;
+                                    var tablePlayers = that.notifyJoin(socket.tableNumber, board.maxPlayers);
+                                    if (tablePlayers.length <= board.maxPlayers) {
+                                        that.initPlayerData(socket.id);
+                                        if (true === IP_CONSTRAINT) {
+                                            if (socket.ip && !that.ipArray[socket.ip]) {
+                                                that.ipArray[socket.ip] = true;
+                                                that.removeAllGuestByIP(socket.ip);
+                                            }
+                                        }
+                                        // update game
+                                        that.updateBoard(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
+                                    } else {
+                                        socket.close();
+                                        logger.info('player : ' + playerName + ' can not join because no empty place');
+                                    }
+                                } else {
+                                    socket.close();
+                                    logger.info('player : ' + playerName + ' can not join because game has started');
+                                }
+
+                            } else {
+                                logger.info('ticket : ' + table + ' is wrong');
                             }
-                            // update game
-                            that.updateTable(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
+
                         } else {
+                            logger.info('ticket ' + table + ' not exist');
                             socket.close();
-                            logger.info('player : ' + data.playerName + ' can not join because game has started');
                         }
-                    } else {
-                        logger.info('player ' + playerName + ' tableNumber is wrong, connection should be dropped');
-                        socket.close();
-                    }
+                    });
                 } else {
-                    logger.info('player ' + playerName + ' is not valid, connection should be dropped');
+                    logger.info('phoneNumber ' + phoneNumber + ' is not valid, connection should be dropped');
                     socket.close();
                 }
             });
@@ -136,9 +149,7 @@ function SkyRTC(tableNumber) {
     });
 
     this.on('__prepare_game', function (data) {
-        this.prepareGame(data.tableNumber, data.defaultChips, data.defaultSb,
-            data.commandInterval, data.roundInterval, data.reloadChance,
-            data.commandTimeout, data.lostTimeout);
+        this.prepareGame(data.ticket);
     });
 
     this.on('__start_game', function (data) {
@@ -155,7 +166,7 @@ function SkyRTC(tableNumber) {
 
     this.on('__reload', function (data, socket) {
         var that = this;
-        var playerName = socket.MD5Id;
+        var playerName = socket.id;
         var tableNum = that.players[playerName].tableNumber;
         var currentTable = that.table[tableNum];
         poker.logGame(tableNum, 'player: ' + socket.id + ', reload');
@@ -179,7 +190,7 @@ function SkyRTC(tableNumber) {
         try {
             var that = this;
             var action = data.action;
-            var playerName = socket.MD5Id;
+            var playerName = socket.id;
             if (that.players[playerName]) {
                 var tableNum = that.players[playerName].tableNumber;
                 var currentTable = that.table[tableNum];
@@ -308,7 +319,8 @@ SkyRTC.prototype.getBasicData = function (tableNumber) {
     return data;
 };
 
-SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers, status) {
+SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
+    var that = this;
     var players = [];
     var playerLength;
     if (tablePlayers) {
@@ -324,11 +336,16 @@ SkyRTC.prototype.updateTable = function (tableNumber, tablePlayers, status) {
         };
         players.push(player);
     }
-    var newTable = {
-        tableNumber: tableNumber,
+    var newBoard = {
+        ticket: ticket,
         players: players,
         status: status
     };
+    playerLogic.updateBoardWorkUnit({gameName: that.gameName, board: newBoard}, function (updateBoardErr, board) {
+        if (errorCode.SUCCESS.code === updateBoardErr.code) {
+            logger.info("update board success");
+        }
+    });
 };
 
 SkyRTC.prototype.sendMessage = function (socket, message) {
@@ -352,22 +369,28 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
     }
 };
 
-SkyRTC.prototype.notifyJoin = function (tableNumber) {
+SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayers) {
     var that = this;
     var tablePlayers = [];
     var tableDatas;
     var cards = {};
     var tableAndPlayer = [];
     var playerData = {};
+    var onlinePlayers = [];
 
     logger.info('notify join, tableNumber = ' + tableNumber);
     for (var playerName in that.players) {
         if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": true});
             tableAndPlayer.push(playerName);
+            onlinePlayers.push(playerName);
         } else if (that.exitPlayers[playerName] === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": false});
         }
+    }
+
+    if (tablePlayers.length > maxPlayers) {
+        return tablePlayers;
     }
 
     if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
@@ -435,7 +458,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber) {
                 playerData[player].cards = [];//remove cards
         }
     }
-    return tablePlayers;
+    return onlinePlayers;
 };
 
 SkyRTC.prototype.notifyLeft = function (tableNumber) {
@@ -496,74 +519,72 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
         }
     }
 
-    that.updateTable(tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
+    that.updateBoard(tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
 };
 
-SkyRTC.prototype.prepareGame = function (tableNumber, defaultChips, defaultSb,
-                                         commandInterval, roundInterval, reloadChance, commandTimeout, lostTimeout) {
+SkyRTC.prototype.prepareGame = function (ticket) {
     var that = this;
-    try {
-        parseInt(tableNumber);
-    } catch (e) {
-        logger.error('table : ' + tableNumber + ' start game failed, type is not correct');
-        return;
-    }
 
-    tableNumber += "";
+    playerLogic.getBoardWorkUnit({gameName: that.gameName, ticket: ticket}, function (getBoardErr, board) {
+        if (errorCode.SUCCESS.code === getBoardErr.code) {
+            var tableNumber = ticket;
+            logger.info('game preparing start for table: ' + tableNumber);
+            if (that.table[tableNumber]) {
+                if (that.table[tableNumber].timeout)
+                    clearTimeout(that.table[tableNumber].timeout);
+                that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
+                delete that.table[tableNumber];
+                logger.info('remove table ' + tableNumber + ' timeout');
+            }
 
-    logger.info('game preparing start for table: ' + tableNumber);
-    if (that.table[tableNumber]) {
-        if (that.table[tableNumber].timeout)
-            clearTimeout(that.table[tableNumber].timeout);
-        that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
-        delete that.table[tableNumber];
-        logger.info('remove table ' + tableNumber + ' timeout');
-    }
+            // initialize game parameters
+            var sb = 10;
+            var bb = 20;
+            var initChips = 1000;
+            var rc = 2;
+            var ci = 1;
+            var ri = 15;
+            var ct = 5; // schedule to 5 seconds
+            var lt = 10;
 
-    // initialize game parameters
-    var sb = 10;
-    var bb = 20;
-    var initChips = 1000;
-    var rc = 2;
-    var ci = 1;
-    var ri = 15;
-    var ct = 5; // schedule to 5 seconds
-    var lt = 10;
+            if (undefined !== board.defaultSb && null !== board.defaultSb && board.defaultSb >= 10) {
+                sb = parseInt(board.defaultSb);
+                bb = parseInt(sb * 2);
+            }
 
-    if (undefined !== defaultSb && null !== defaultSb && defaultSb >= 10) {
-        sb = parseInt(defaultSb);
-        bb = parseInt(sb * 2);
-    }
+            if (undefined !== board.defaultChips && null !== board.defaultChips && board.defaultChips >= 1000) {
+                initChips = parseInt(board.defaultChips);
+            }
 
-    if (undefined !== defaultChips && null !== defaultChips && defaultChips >= 1000) {
-        initChips = parseInt(defaultChips);
-    }
+            if (undefined !== board.reloadChance && null !== board.reloadChance && board.reloadChance >= 0) {
+                rc = parseInt(board.reloadChance);
+            }
 
-    if (undefined !== reloadChance && null !== reloadChance && reloadChance >= 0) {
-        rc = parseInt(reloadChance);
-    }
+            if (undefined !== board.commandInterval && null !== board.commandInterval && board.commandInterval >= 0) {
+                ci = parseInt(board.commandInterval);
+            }
 
-    if (undefined !== commandInterval && null !== commandInterval && commandInterval >= 0) {
-        ci = parseInt(commandInterval);
-    }
+            if (undefined !== board.roundInterval && null !== board.roundInterval && board.roundInterval >= 0) {
+                ri = parseInt(board.roundInterval);
+            }
 
-    if (undefined !== roundInterval && null !== roundInterval && roundInterval >= 0) {
-        ri = parseInt(roundInterval);
-    }
+            if (undefined !== board.commandTimeout && null !== board.commandTimeout && board.commandTimeout >= 0) {
+                ct = parseFloat(board.commandTimeout);
+            }
 
-    if (undefined !== commandTimeout && null !== commandTimeout && commandTimeout >= 0) {
-        ct = parseFloat(commandTimeout);
-    }
+            if (undefined !== board.lostTimeout && null !== board.lostTimeout && board.lostTimeout >= 0) {
+                lt = parseInt(board.lostTimeout);
+            }
 
-    if (undefined !== lostTimeout && null !== lostTimeout && lostTimeout >= 0) {
-        lt = parseInt(lostTimeout);
-    }
-
-    that.table[tableNumber] = new poker.Table(sb, bb, 3, 10, initChips, rc, 100, ci, ri, ct, lt);
-    that.table[tableNumber].tableNumber = tableNumber;
-    that.initTable(tableNumber);
-    logger.info('init table done');
-    that.sendCountDown(tableNumber);
+            that.table[tableNumber] = new poker.Table(sb, bb, 3, 10, initChips, rc, 100, ci, ri, ct, lt);
+            that.table[tableNumber].tableNumber = tableNumber;
+            that.initTable(tableNumber);
+            logger.info('init table done');
+            that.sendCountDown(tableNumber);
+        } else {
+            logger.error('table : ' + ticket + ' start game failed, the ticket not valid');
+        }
+    });
 };
 
 SkyRTC.prototype.sendCountDown = function (tableNumber) {
@@ -593,9 +614,11 @@ SkyRTC.prototype.sendCountDown = function (tableNumber) {
 SkyRTC.prototype.startGame = function (tableNumber) {
     var that = this;
     var message;
+
     for (var player in that.players) {
-        if (that.players[player] && that.players[player].tableNumber === tableNumber)
+        if (that.players[player] && that.players[player].tableNumber === tableNumber) {
             that.table[tableNumber].AddPlayer(player, that.players[player].displayName);
+        }
     }
 
     if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
@@ -859,7 +882,7 @@ SkyRTC.prototype.getPlayerAction = function (message, isSecond) {
 };
 
 SkyRTC.prototype.removeSocket = function (socket) {
-    var id = socket.MD5Id;
+    var id = socket.id;
     var that = this;
 
 
@@ -953,10 +976,10 @@ SkyRTC.prototype.exitHandle = function (socket) {
     var that = this;
     if (socket && !socket.isReplace) {
         var tableNumber = socket.tableNumber;
-        if (that.players[socket.MD5Id] && tableNumber && that.table[tableNumber] &&
+        if (that.players[socket.id] && tableNumber && that.table[tableNumber] &&
             that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
-            that.exitPlayers[socket.MD5Id] = socket.tableNumber;
-            that.players[socket.MD5Id] = null;
+            that.exitPlayers[socket.id] = socket.tableNumber;
+            that.players[socket.id] = null;
             poker.logGame(tableNumber, 'player: ' + socket.id + ', exit!!');
         }
         that.removeSocket(socket);
