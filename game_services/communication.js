@@ -20,7 +20,7 @@ function init(socket) {
             try {
                 var json = JSON.parse(data);
                 if (json.eventName === "__join") {
-                    var gameType = json.data.gameType;
+                    var gameType = json.data.gameName;
                     switch (gameType) {
                         case enums.GAME_TEXAS_HOLDEM:
                             var pokerGame = games[gameType];
