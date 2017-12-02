@@ -39,7 +39,7 @@ exports.login = function(req, res){
         password: pwd
     };
     var playerResponse = new PlayerResponse();
-    playerLogic.getUserWorkUnit(user, function(getUserErr, user){
+    playerLogic.getPlayerWorkUnit(user, function(getUserErr, user){
         playerResponse.entity = user;
         playerResponse.status = getUserErr;
         res.send(playerResponse);

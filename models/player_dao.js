@@ -23,10 +23,10 @@ var errorCode = new ErrorCode();
 
 /**
  * create a new player to player table
- * @param user:{player object}
+ * @param player:{player object}
  * @param callback: succeed, failed
  */
-exports.createUser = function (player, callback) {
+exports.createPlayer = function (player, callback) {
     db.collection('player', function (err, player_collection) {
         if (err) {
             logger.error("connect to player table failed. " + err);
@@ -50,7 +50,7 @@ exports.createUser = function (player, callback) {
  * @param condition: {phoneNumber:'123', password:'*****'}
  * @param callback: succeed, failed
  */
-exports.getUser = function (player, callback) {
+exports.getPlayer = function (player, callback) {
     db.collection('player', function (err, player_collection) {
         if (!err) {
             player_collection.find(player).toArray(function (err, result) {

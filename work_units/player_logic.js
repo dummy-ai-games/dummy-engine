@@ -14,26 +14,26 @@ var errorCode = new ErrorCode();
  * @param callback: {errorCode.PLAYER_EXIST, errorCode.SUCCESS, errorCode.FAILED}
  */
 exports.registerWorkUnit = function (user, callback) {
-    var userKey = {
+    var playerKey = {
         phoneNumber: user.phoneNumber
     };
-    playerDao.getUser(userKey, function (getUserErr, res) {
+    playerDao.getPlayer(playerKey, function (getUserErr, res) {
         //user already existed with this phoneNumber
         if (getUserErr === errorCode.SUCCESS.code && res != null && res.length > 0) {
             logger.info("user: " + res[0] + " already exist.");
             callback(errorCode.PLAYER_EXIST,null);
         } else {
             //user not exist, create one
-            logger.info("user not exist ,create one.");
-            playerDao.createUser(user, function (createUserErr,res) {
+            logger.info("player not exist ,create one.");
+            playerDao.createPlayer(user, function (createUserErr,res) {
                 callback(createUserErr,res);
             });
         }
     });
 };
 
-exports.getUserWorkUnit = function (user, callback) {
-    playerDao.getUser(user, function (getUserErr, players) {
+exports.getPlayerWorkUnit = function (user, callback) {
+    playerDao.getPlayer(user, function (getUserErr, players) {
         // user exist
         if (getUserErr === errorCode.SUCCESS.code && players != null && players.length > 0) {
             logger.info("this player: " + user + " exist in db");
