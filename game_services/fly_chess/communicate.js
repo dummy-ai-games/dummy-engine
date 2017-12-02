@@ -10,7 +10,7 @@ var events = require('events');
 var util = require('util');
 var flyChess = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
-var tableLogic = require('../../work_units/table_logic.js');
+// var tableLogic = require('../../work_units/table_logic.js');
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
 

@@ -65,7 +65,8 @@ app.use(session({
         db: db
     })
 }));
-
+// jwt
+app.use(require('./middlewares/jwt'));
 app.use('/', express.static(__dirname + '/web/'));
 require('./routes');
 

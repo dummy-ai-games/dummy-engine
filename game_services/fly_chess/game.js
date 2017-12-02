@@ -5,8 +5,8 @@
 
 var events = require('events');
 
-var gameLogic = require('../../work_units/game_logic.js');
-var tableLogic = require('../../work_units/table_logic.js');
+//var gameLogic = require('../../work_units/game_logic.js');
+//var tableLogic = require('../../work_units/table_logic.js');
 
 var logger = require('../../poem/logging/logger4js').helper;
 

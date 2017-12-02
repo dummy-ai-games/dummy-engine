@@ -8,6 +8,10 @@ function ErrorCode() {
         code: 0,
         cause: "Success"
     };
+    this.SESSION_TIMEOUT = {
+        code: 2,
+        cause: 'Session timeout or token unlegal'
+    };
     this.FAILED = {
         code: -1,
         cause: "Generic error"
