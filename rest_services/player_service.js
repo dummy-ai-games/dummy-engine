@@ -53,7 +53,7 @@ exports.login = function(req, res){
         password: pwd
     };
     var playerResponse = new PlayerResponse();
-    playerLogic.getUserWorkUnit(user, function(getUserErr, users){
+    playerLogic.getPlayerWorkUnit(user, function(getUserErr, users){
         playerResponse.status = getUserErr;
         if(getUserErr !== errorCode.SUCCESS.code){
             // 登录失败

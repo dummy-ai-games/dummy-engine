@@ -4,7 +4,7 @@ var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 
 module.exports = function(req, res, next) {
-  if(req.path === '/users/login' || req.path === '/users/register') return next();
+  if(req.path === '/players/login' || req.path === '/players/signup') return next();
   const token = (req.cookies && req.cookies.token) || req.get('Token');
   var strResponse = new StringResponse(errorCode.SESSION_TIMEOUT.code, '用户认证信息不合法，请重新登录');
   if (!token) return res.send(strResponse);
