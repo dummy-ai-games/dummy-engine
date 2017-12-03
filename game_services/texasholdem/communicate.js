@@ -3,8 +3,6 @@
  * 2017-07-22
  */
 
-
-const WebSocket = require('ws');
 var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
@@ -67,7 +65,7 @@ function SkyRTC(tableNumber) {
         }
 
         if (phoneNumber) {
-            playerLogic.getUserWorkUnit({
+            playerLogic.getPlayerWorkUnit({
                 phoneNumber: phoneNumber,
                 password: password
             }, function (getPlayerErr, players) {
