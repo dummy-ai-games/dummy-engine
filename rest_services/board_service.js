@@ -56,7 +56,7 @@ exports.updateBoard = function (req, res) {
  */
 exports.listBoards = function (req, res) {
     var status = req.body.status;
-    var gameName = req.body.game_name;
+    var gameName = req.body.gameName;
 
     var boardResponse = new BoardResponse();
     boardLogic.listBoardsWorkUnit(status, gameName, function (listBoardsErr, boards) {
