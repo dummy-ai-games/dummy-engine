@@ -5,9 +5,10 @@
 
 var db = require('../database/msession');
 var logger = require('../poem/logging/logger4js').helper;
-var ErrorCode = require('../poem/configuration/error_code');
-var errorCode = new ErrorCode();
 
+// pls. use local error code
+var ErrorCode = require('../constants/error_code');
+var errorCode = new ErrorCode();
 
 /**
  * player
@@ -37,7 +38,7 @@ exports.createPlayer = function (player, callback) {
                     logger.error("insert player failed: " + err);
                     callback(errorCode.FAILED, null);
                 } else {
-                    logger.info("insert player succeed");
+                    logger.info("insert player succeeded");
                     callback(errorCode.SUCCESS, result);
                 }
             });
@@ -55,19 +56,16 @@ exports.getPlayer = function (conditions, callback) {
         if (!err) {
             player_collection.find(conditions).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("get player succeed.");
+                    logger.info("get player succeeded");
                     callback(errorCode.SUCCESS, result);
                 } else {
-                    logger.error("get player error: " + err);
+                    logger.error("get player error : " + err);
                     callback(errorCode.FAILED, null);
                 }
             });
         } else {
-            logger.error("get player collection error. " + err);
+            logger.error("get player collection error : " + err);
             callback(errorCode.FAILED, null);
         }
     });
 };
-
-
-
