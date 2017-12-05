@@ -26,7 +26,7 @@ exports.registerWorkUnit = function (player, callback) {
         // itself, eg. 'if(getPlayerErr === errorCode.SUCCESS.code)' is NOT correct, however,
         // 'if(getPlayerErr.code === errorCode.SUCCESS.code)' is OK
         logger.info("get players : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
-        if (getPlayerErr.code === errorCode.SUCCESS.code && players != null && players.length > 0) {
+        if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
             logger.info("player : " + players[0].phoneNumber + " already exist");
             callback(errorCode.PLAYER_EXIST, null);
         } else {
@@ -60,7 +60,7 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
     // the conditions should be { phoneNumber: <some phone number> }
     playerDao.getPlayer(conditions, function (getPlayerErr, players) {
         logger.info("get players result : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
-        if (getPlayerErr.code === errorCode.SUCCESS.code && players != null && players.length > 0) {
+        if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
             logger.info("player: " + phoneNumber + "exist");
             callback(errorCode.SUCCESS, players);
         } else {
@@ -77,7 +77,7 @@ exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
     };
     playerDao.getPlayer(conditions, function (getPlayerErr, players) {
         logger.info("get players result : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
-        if (getPlayerErr.code === errorCode.SUCCESS.code && players != null && players.length > 0) {
+        if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
             logger.info("player: " + phoneNumber + "exist");
             callback(errorCode.SUCCESS, players);
         } else {
