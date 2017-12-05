@@ -61,8 +61,8 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
     playerDao.getPlayer(conditions, function (getPlayerErr, players) {
         logger.info("get players result : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
         if (getPlayerErr.code === errorCode.SUCCESS.code && players != null && players.length > 0) {
-            logger.info("player: "+phoneNumber+"exist");
-            callback(errorCode.SUCCESS,players);
+            logger.info("player: " + phoneNumber + "exist");
+            callback(errorCode.SUCCESS, players);
         } else {
             // user not exist
             logger.info("player: " + phoneNumber + " not exist");
@@ -70,6 +70,25 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
         }
     });
 };
+
+exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
+    var conditions = {
+        phoneNumber: phoneNumber
+    };
+    playerDao.getPlayer(conditions, function (getPlayerErr, players) {
+        logger.info("get players result : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
+        if (getPlayerErr.code === errorCode.SUCCESS.code && players != null && players.length > 0) {
+            logger.info("player: " + phoneNumber + "exist");
+            callback(errorCode.SUCCESS, players);
+        } else {
+            // user not exist
+            logger.info("player: " + phoneNumber + " not exist");
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
+
 
 exports.verifyTokenWorkUnit = function (id, token, callback) {
     var key = "player_" + id;

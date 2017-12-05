@@ -100,3 +100,29 @@ exports.login = function (req, res) {
         }
     });
 };
+
+exports.validateUserToken = function (req, res) {
+    var phoneNumber = req.body.phoneNumber;
+    var token = req.body.token;
+
+    var playerResponse = new PlayerResponse();
+    playerLogic.verifyTokenWorkUnit(phoneNumber, token, function (validateTokenErr, token) {
+        if (errorCode.SUCCESS.code !== validateTokenErr.code) { //不存在该token，
+            logger.info("invalid id and token.");
+            playerResponse.status=validateTokenErr;
+            playerResponse.entity=null;
+            res.send(playerResponse);
+            res.end();
+        } else { //存在该id,token, 返回用户信息
+            playerLogic.getPlayerByPhoneNumberWorkUnit(phoneNumber,function(getPlayerErr,players){
+                var player = players[0];
+                player.token = token;
+                delete player.password;
+                playerResponse.status = errorCode.SUCCESS;
+                playerResponse.entity = player;
+                res.send(playerResponse);
+                res.end();
+            })
+        }
+    });
+};
