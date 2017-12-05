@@ -9,25 +9,52 @@ var encrypt = require('../poem/crypto/encrypt');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 
+var PlayerAuth = require('../authority/player_auth.js');
+var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
+
+var MD5 = require('../poem/crypto/md5.js');
+
 
 exports.signup = function (req, res) {
     var player = req.body;
 
     var playerResponse = new PlayerResponse();
-    playerLogic.registerWorkUnit(player, function (registerErr, player) {
+    playerLogic.registerWorkUnit(player, function (registerErr, result) {
         playerResponse.status = registerErr;
-        if (registerErr.code === errorCode.SUCCESS.code && null != player) {
-            delete player.password;
-            playerResponse.status = errorCode.SUCCESS;
-            playerResponse.entity = player;
-            res.send(playerResponse);
-            res.end();
+        if (registerErr.code === errorCode.SUCCESS.code && null != result && result.ops.length > 0) {
+            // generate token and save to cache
+            var token,
+                key,
+                ttl = 24 * 60 * 60 * 14,
+                timeStamp,
+                player;
+
+            player = result.ops[0];
+            timeStamp = new Date().getTime();
+            token = MD5.MD5(player.password + timeStamp);
+            key = "player_" + player.phoneNumber;
+            playerAuth.setAuthInfo(key, token, ttl, function (setPlayerAuthErr) {
+                if(setPlayerAuthErr.code === errorCode.SUCCESS.code){
+                    player.token = token;
+                    delete player.password;
+                    playerResponse.status = errorCode.SUCCESS;
+                    playerResponse.entity = player;
+                    res.send(playerResponse);
+                    res.end();
+                }else{
+                    playerResponse.status = errorCode.FAILED;
+                    playerResponse.entity = null;
+                    res.send(playerResponse);
+                    res.end();
+                }
+            });
         } else {
             playerResponse.status = errorCode.FAILED;
             playerResponse.entity = null;
             res.send(playerResponse);
             res.end();
         }
+
     });
 };
 
@@ -37,13 +64,34 @@ exports.login = function (req, res) {
     var password = req.body.password;
 
     var playerResponse = new PlayerResponse();
-    playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getUserErr, player) {
-        if (getUserErr.code === errorCode.SUCCESS.code && null != player) {
-            delete player.password;
-            playerResponse.status = errorCode.SUCCESS;
-            playerResponse.entity = player;
-            res.send(playerResponse);
-            res.end();
+    playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getUserErr, players) {
+        if (getUserErr.code === errorCode.SUCCESS.code && null != players) {
+            // generate token and save to cache
+            var token,
+                key,
+                ttl = 24 * 60 * 60 * 14,
+                timeStamp,
+                player;
+
+            player = players[0];
+            timeStamp = new Date().getTime();
+            token = MD5.MD5(password + timeStamp);
+            key = "player_" + player.phoneNumber;
+            playerAuth.setAuthInfo(key, token, ttl, function (setPlayerAuthErr) {
+                if(setPlayerAuthErr.code === errorCode.SUCCESS.code){
+                    player.token = token;
+                    delete player.password;
+                    playerResponse.status = errorCode.SUCCESS;
+                    playerResponse.entity = player;
+                    res.send(playerResponse);
+                    res.end();
+                }else{
+                    playerResponse.status = errorCode.FAILED;
+                    playerResponse.entity = null;
+                    res.send(playerResponse);
+                    res.end();
+                }
+            });
         } else {
             playerResponse.status = errorCode.FAILED;
             playerResponse.entity = null;
