@@ -5,7 +5,6 @@
 var logger = require('../poem/logging/logger4js').helper;
 var PlayerResponse = require('../responses/player_response');
 var playerLogic = require('../work_units/player_logic');
-var jwt = require('jsonwebtoken');
 var encrypt = require('../poem/crypto/encrypt');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
@@ -49,25 +48,21 @@ exports.signup = function (req, res) {
 
 exports.login = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
-    var pwd = req.body.password;
-    var user = {
-        phoneNumber: phoneNumber,
-        password: encrypt.encryptStr(pwd)
-    };
+    var password = req.body.password;
+
     var playerResponse = new PlayerResponse();
-    playerLogic.getPlayerWorkUnit(user, function (getUserErr, users) {
-        playerResponse.status = getUserErr;
-        if (getUserErr !== errorCode.SUCCESS.code) {
-            // 登录失败
+    playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getUserErr, player) {
+        if (getUserErr.code === errorCode.SUCCESS.code && null != player) {
+            delete player.password;
+            playerResponse.status = errorCode.SUCCESS;
+            playerResponse.entity = player;
+            res.send(playerResponse);
+            res.end();
+        } else {
+            playerResponse.status = errorCode.FAILED;
             playerResponse.entity = null;
             res.send(playerResponse);
-            return res.end();
+            res.end();
         }
-        user = users[0];
-        delete user.password;
-        var token = jwt.sign(user, JWT_SECRET);
-        playerResponse.entity = {token, user};
-        res.send(playerResponse);
-        res.end();
     });
 };

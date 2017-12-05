@@ -76,8 +76,3 @@ global.SOCKET_0_ADDRESS = "http://localhost";
 global.REDIS_HOST = "127.0.0.1";
 global.REDIS_PORT = "6379";
 global.REDIS_PASSWORD = "";
-
-// danmu relay
-global.DANMU_SERVER = "127.0.0.1";
-global.DANMU_SERVER_PORT = "80";
-global.DANMU_RELAY_PORT = "8080";

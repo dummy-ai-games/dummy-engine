@@ -8,6 +8,10 @@ var constants = require('./poem/configuration/constants');
 var systemConfig = require('./configuration/system_configs');
 systemConfig.setupEnvironment();
 
+var playerLogic = require("./work_units/player_logic.js");
+var ErrorCode = require("./constants/error_code");
+var errorCode = new ErrorCode();
+
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
@@ -65,8 +69,8 @@ app.use(session({
         db: db
     })
 }));
-// jwt
-app.use(require('./middlewares/jwt'));
+
+app.use(tokenValidation);
 app.use('/', express.static(__dirname + '/web/'));
 require('./routes');
 
@@ -81,3 +85,45 @@ app.use(function (req, res, next) {
 });
 
 console.log('dummy engine is running, listening on port ' + httpPort);
+
+// token validation helper
+var authenticationURLList = [
+    '/board/create_board',
+    '/board/update_board',
+    '/game/create_game'
+];
+
+function tokenValidation (req, res, next) {
+    if (isReqNeedAuthentication(req.url)) {
+        var phoneNumber = req.headers.phoneNumber;
+        var token = req.headers.token;
+
+        playerLogic.verifyTokenWorkUnit(phoneNumber, token, function(validateTokenErr, token) {
+            var fakeResponse;
+
+            if(errorCode.SUCCESS.code !== validateTokenErr.code) {
+                fakeResponse = {
+                    status: errorCode.AUTHENTICATION_FAILURE,
+                    entity: null
+                };
+                console.log("!! " + req.url + " is a dangerous request, but validation is not passed");
+                res.send(fakeResponse);
+                res.end();
+            } else {
+                next();
+            }
+        });
+
+    } else {
+        next();
+    }
+}
+
+function isReqNeedAuthentication(url) {
+    for (var i = 0; i < authenticationURLList.length; i++) {
+        if (-1 !== url.indexOf(authenticationURLList[i])) {
+            return true;
+        }
+    }
+    return false;
+}

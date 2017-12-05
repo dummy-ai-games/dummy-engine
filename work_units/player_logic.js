@@ -6,7 +6,11 @@ var logger = require('../poem/logging/logger4js').helper;
 var playerDao = require('../models/player_dao');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
-//var MD5Utils = require('../poem/crypto/md5');
+
+var PlayerAuth = require('../authority/player_auth.js');
+var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
+
+var MD5 = require('../poem/crypto/md5.js');
 
 /**
  * register function
@@ -32,16 +36,48 @@ exports.registerWorkUnit = function (user, callback) {
     });
 };
 
-exports.getPlayerWorkUnit = function (user, callback) {
-    playerDao.getPlayer(user, function (getUserErr, players) {
+exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
+    var conditions = {
+        phoneNumber: phoneNumber,
+        password: password
+    };
+
+    // the DB query condition statement is described using conditions variable,
+    // in some cases, the variable does not cover all the fields of the DB
+    // table data-structure, eg. if you only want to filter player by phoneNumber
+    // the conditions should be { phoneNumber: <some phone number> }
+    playerDao.getPlayer(conditions, function (getUserErr, players) {
         // user exist
         if (getUserErr === errorCode.SUCCESS.code && players != null && players.length > 0) {
-            logger.info("this player: " + user + " exist in db");
-            callback(getUserErr, players);
+            // generate token and save to cache
+            var token,
+                key,
+                ttl = 24 * 60 * 60 * 14,
+                timeStamp,
+                player;
+
+            player = players[0];
+            timeStamp = new Date().getTime();
+            token = MD5.MD5(password  + timeStamp);
+            key = "player_" + player.phoneNumber;
+            playerAuth.setAuthInfo(key, token, ttl, function(setPlayerAuthErr) {
+                player.token = token;
+                callback(setPlayerAuthErr, player);
+            });
         } else {
             // user not exist
-            logger.info("player: " + user + " not exist in db.");
+            logger.info("player: " + phoneNumber + " not exist");
             callback(errorCode.FAILED, null);
         }
+    });
+};
+
+exports.verifyTokenWorkUnit = function (id, token, callback) {
+    var key = "player_" + id;
+    playerAuth.validateAuthInfo(key, token, function(validatePlayerAuthErr, result) {
+        if (validatePlayerAuthErr.code !== errorCode.SUCCESS.code) {
+            logger.info("token validation failed");
+        }
+        callback(validatePlayerAuthErr, result);
     });
 };

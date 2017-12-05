@@ -50,10 +50,10 @@ exports.createPlayer = function (player, callback) {
  * @param condition: {phoneNumber:'123', password:'*****'}
  * @param callback: succeed, failed
  */
-exports.getPlayer = function (player, callback) {
+exports.getPlayer = function (conditions, callback) {
     db.collection('player', function (err, player_collection) {
         if (!err) {
-            player_collection.find(player).toArray(function (err, result) {
+            player_collection.find(conditions).toArray(function (err, result) {
                 if (!err) {
                     logger.info("get player succeed.");
                     callback(errorCode.SUCCESS, result);
