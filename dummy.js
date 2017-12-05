@@ -95,7 +95,8 @@ var authenticationURLList = [
 
 function tokenValidation (req, res, next) {
     if (isReqNeedAuthentication(req.url)) {
-        var phoneNumber = req.headers.phoneNumber;
+        console.log("headers : " + JSON.stringify(req.headers));
+        var phoneNumber = req.headers.phone-number;
         var token = req.headers.token;
 
         playerLogic.verifyTokenWorkUnit(phoneNumber, token, function(validateTokenErr, token) {
