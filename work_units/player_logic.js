@@ -10,7 +10,6 @@ var errorCode = new ErrorCode();
 var PlayerAuth = require('../authority/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
-var MD5 = require('../poem/crypto/md5.js');
 
 /**
  * register function
@@ -38,24 +37,11 @@ exports.registerWorkUnit = function (player, callback) {
                 if (errorCode.SUCCESS.code === createPlayerErr.code && null !== result.ops &&
                     result.ops.length > 0) {
                     // generate token and save to cache
-                    var token,
-                        key,
-                        ttl = 24 * 60 * 60 * 14,
-                        timeStamp,
-                        player;
-
-                    player = result.ops[0];
-                    timeStamp = new Date().getTime();
-                    token = MD5.MD5(player.password + timeStamp);
-                    key = "player_" + player.phoneNumber;
-                    playerAuth.setAuthInfo(key, token, ttl, function (setPlayerAuthErr) {
-                        player.token = token;
-                        logger.info("save player to cache : " + JSON.stringify(setPlayerAuthErr) + ", " +
-                            player);
-                        callback(setPlayerAuthErr, player);
-                    });
+                    logger.info("create a user successful.");
+                    callback(errorCode.SUCCESS, result);
                 } else {
-                    callback(createPlayerErr, player);
+                    logger.info("create a user failed.");
+                    callback(errorCode.FAILED, null);
                 }
             });
         }
@@ -75,21 +61,8 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
     playerDao.getPlayer(conditions, function (getPlayerErr, players) {
         logger.info("get players result : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
         if (getPlayerErr.code === errorCode.SUCCESS.code && players != null && players.length > 0) {
-            // generate token and save to cache
-            var token,
-                key,
-                ttl = 24 * 60 * 60 * 14,
-                timeStamp,
-                player;
-
-            player = players[0];
-            timeStamp = new Date().getTime();
-            token = MD5.MD5(password + timeStamp);
-            key = "player_" + player.phoneNumber;
-            playerAuth.setAuthInfo(key, token, ttl, function (setPlayerAuthErr) {
-                player.token = token;
-                callback(setPlayerAuthErr, player);
-            });
+            logger.info("player: "+phoneNumber+"exist");
+            callback(errorCode.SUCCESS,players);
         } else {
             // user not exist
             logger.info("player: " + phoneNumber + " not exist");
