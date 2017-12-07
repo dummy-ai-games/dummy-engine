@@ -47,8 +47,16 @@ function normalizePort(val) {
 }
 
 db.open(function (err, db) {
-    db.authenticate(MONGO_DB_USER, MONGO_DB_PASSWORD, function () {
-    });
+    app.use(session({
+        cookie: {maxAge: 600000},
+        secret: 'the-engine',
+        store: new MongoStore({
+            username: MONGO_DB_USER,
+            password: MONGO_DB_PASSWORD,
+            url: MONGO_DB_URI,
+            db: db
+        })
+    }));
 });
 
 app.use(flash());
@@ -59,16 +67,7 @@ app.use(bodyParser.urlencoded(
     }));
 
 app.use(cookieParser());
-app.use(session({
-    cookie: {maxAge: 600000},
-    secret: 'the-engine',
-    store: new MongoStore({
-        username: MONGO_DB_USER,
-        password: MONGO_DB_PASSWORD,
-        url: MONGO_DB_URI,
-        db: db
-    })
-}));
+
 
 app.use(tokenValidation);
 app.use('/', express.static(__dirname + '/web/'));
