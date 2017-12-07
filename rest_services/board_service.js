@@ -14,7 +14,7 @@ var boardLogic = require('../work_units/board_logic');
  */
 exports.createBoard = function (req, res) {
     var creator = req.body.phoneNumber;
-    var gameName = req.body.game_name;
+    var gameName = req.body.gameName;
 
     var boardResponse = new BoardResponse();
     boardLogic.createBoardWorkUnit(creator, gameName, function (createBoardErr, board) {
@@ -33,8 +33,8 @@ exports.createBoard = function (req, res) {
  */
 exports.updateBoard = function (req, res) {
     var ticket = req.body.ticket;
-    var gameName = req.body.game_name;
-    var newBoard = req.body.new_board;
+    var gameName = req.body.gameName;
+    var newBoard = req.body.newBoard;
     logger.info(ticket);
     logger.info(gameName);
     logger.info(newBoard);
