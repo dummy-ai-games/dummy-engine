@@ -16,16 +16,15 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     var currentTime = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
     var ticket = stringUtil.randomChar(30);
 
-    // 该游戏存在于 tb_game 时, create一个board实例
     gameDao.getGameInfo({name: gameName}, function (getGameErr, game) {
         logger.info(getGameErr.code);
         logger.info(game);
-        if (getGameErr.code == errorCode.SUCCESS.code && game != null && game.length > 0) {
+        if (getGameErr.code === errorCode.SUCCESS.code && game !== null && game.length > 0) {
             var board = {
                 gameName: gameName,
                 minPlayer: game[0].minPlayer,
                 maxPlayer: game[0].maxPlayer,
-                currentPlayer: [creator],
+                currentPlayer: [],
                 status: 0,
                 creator: creator,
                 createTime: currentTime,
@@ -33,12 +32,13 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                 ticket: ticket,
                 type: 0
             };
-            boardDao.createBoard(board, function (createBoardErr, board) {
-                if (createBoardErr.code == errorCode.SUCCESS.code) {
-                    logger.info("create board succeed.")
+            boardDao.createBoard(board, function (createBoardErr, result) {
+                if (createBoardErr.code === errorCode.SUCCESS.code && null !== result.ops &&
+                    result.ops.length > 0) {
+                    logger.info("create board succeed.");
                     callback(createBoardErr, board);
                 } else {
-                    logger.info("create board failed.")
+                    logger.info("create board failed.");
                     callback(errorCode.FAILED, null);
                 }
             });
@@ -67,9 +67,9 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
     logger.info(newBoard.type);
 
     boardDao.updateBoard(condition, newBoard, function(updateBoardErr, board){
-        if(updateBoardErr.code == errorCode.SUCCESS.code){
+        if(updateBoardErr.code === errorCode.SUCCESS.code){
             logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" succeed.");
-            callback(updateBoardErr, board);
+            callback(updateBoardErr, newBoard);
         }else{
             logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" failed.");
             callback(errorCode.FAILED, null);
