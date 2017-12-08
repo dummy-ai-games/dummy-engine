@@ -59,7 +59,7 @@ app.use(bodyParser.urlencoded(
     }));
 
 app.use(cookieParser());
-app.use(session({
+/*app.use(session({
     cookie: {maxAge: 600000},
     secret: 'the-engine',
     store: new MongoStore({
@@ -68,7 +68,7 @@ app.use(session({
         url: MONGO_DB_URI,
         db: db
     })
-}));
+}));*/
 
 app.use(tokenValidation);
 app.use('/', express.static(__dirname + '/web/'));
