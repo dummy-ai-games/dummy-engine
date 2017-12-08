@@ -20,7 +20,7 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     gameDao.getGameInfo({name: gameName}, function (getGameErr, game) {
         logger.info(getGameErr.code);
         logger.info(game);
-        if (getGameErr.code == errorCode.SUCCESS.code && game != null && game.length > 0) {
+        if (getGameErr.code === errorCode.SUCCESS.code && game != null && game.length > 0) {
             var board = {
                 gameName: gameName,
                 minPlayer: game[0].minPlayer,
@@ -34,7 +34,7 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                 type: 0
             };
             boardDao.createBoard(board, function (createBoardErr, board) {
-                if (createBoardErr.code == errorCode.SUCCESS.code) {
+                if (createBoardErr.code === errorCode.SUCCESS.code) {
                     logger.info("create board succeed.")
                     callback(createBoardErr, board);
                 } else {
@@ -66,12 +66,12 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
     logger.info(newBoard.updateTime);
     logger.info(newBoard.type);
 
-    boardDao.updateBoard(condition, newBoard, function(updateBoardErr, board){
-        if(updateBoardErr.code == errorCode.SUCCESS.code){
-            logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" succeed.");
+    boardDao.updateBoard(condition, newBoard, function (updateBoardErr, board) {
+        if (updateBoardErr.code === errorCode.SUCCESS.code) {
+            logger.info("update board by ticket:" + ticket + ",gameName:" + gameName + " succeed.");
             callback(updateBoardErr, board);
-        }else{
-            logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" failed.");
+        } else {
+            logger.info("update board by ticket:" + ticket + ",gameName:" + gameName + " failed.");
             callback(errorCode.FAILED, null);
         }
     });
@@ -91,7 +91,7 @@ exports.getBoardByTicketWorkUnit = function (ticket, gameName, callback) {
         gameName: gameName
     };
     boardDao.getBoard(condition, function (getBoardErr, board) {
-        if (getBoardErr.code === errorCode.SUCCESS.code && board != null && board.length > 0) {
+        if (getBoardErr.code === errorCode.SUCCESS.code && null != board && board.length > 0) {
             logger.info("the board that ticket = " + ticket + " exist in db");
             callback(getBoardErr, board);
         } else {
