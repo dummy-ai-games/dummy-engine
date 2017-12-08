@@ -65,14 +65,14 @@ function SkyRTC(tableNumber) {
         }
 
         if (phoneNumber) {
-            playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, player) {
+            playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
                     boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, boards) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var board = boards[0];
                             var tableNumber = table;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
-                                var playerName = player.name;
+                                var playerName = players[0].username;
                                 if (that.players[playerName]) {
                                     that.players[playerName].isReplace = true;
                                     that.players[playerName].close();
@@ -86,7 +86,7 @@ function SkyRTC(tableNumber) {
                                     socket.tableNumber = tableNumber;
                                     logger.info('exist player replace, accept join');
                                 } else if (!(that.table[tableNumber] &&
-                                    that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                                        that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                                     socket.tableNumber = tableNumber;
                                     logger.info('game not started, accept join');
                                 }
@@ -95,8 +95,8 @@ function SkyRTC(tableNumber) {
                                     socket.id = playerName;
                                     socket.displayName = playerName;
                                     that.players[socket.id] = socket;
-                                    var tablePlayers = that.notifyJoin(socket.tableNumber, board.maxPlayers);
-                                    if (tablePlayers.length <= board.maxPlayers) {
+                                    var tablePlayers = that.notifyJoin(socket.tableNumber, board.maxPlayer);
+                                    if (tablePlayers.length <= board.maxPlayer) {
                                         that.initPlayerData(socket.id);
                                         if (true === IP_CONSTRAINT) {
                                             if (socket.ip && !that.ipArray[socket.ip]) {
@@ -330,9 +330,9 @@ SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
         players.push(player);
     }
     var newBoard = {
-        ticket: ticket,
-        players: players,
-        status: status
+        currentPlayer: players,
+        status: status,
+        updateTime: new Date().getTime()
     };
     boardLogic.updateBoardWorkUnit(ticket, that.gameName, newBoard, function (updateBoardErr, board) {
         if (errorCode.SUCCESS.code === updateBoardErr.code) {
@@ -362,27 +362,26 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
     }
 };
 
-SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayers) {
+SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
     var that = this;
     var tablePlayers = [];
     var tableDatas;
     var cards = {};
     var tableAndPlayer = [];
     var playerData = {};
-    var onlinePlayers = [];
+
 
     logger.info('notify join, tableNumber = ' + tableNumber);
     for (var playerName in that.players) {
         if (that.players[playerName] && that.players[playerName].tableNumber === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": true});
             tableAndPlayer.push(playerName);
-            onlinePlayers.push(playerName);
         } else if (that.exitPlayers[playerName] === tableNumber) {
             tablePlayers.push({"playerName": playerName, "isOnline": false});
         }
     }
 
-    if (tablePlayers.length > maxPlayers) {
+    if (tablePlayers.length > maxPlayer) {
         return tablePlayers;
     }
 
@@ -451,7 +450,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayers) {
                 playerData[player].cards = [];//remove cards
         }
     }
-    return onlinePlayers;
+    return tablePlayers;
 };
 
 SkyRTC.prototype.notifyLeft = function (tableNumber) {
@@ -630,14 +629,14 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         }
     }
 
-    if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
+    if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayer) {
         logger.info('table ' + tableNumber + ' start fail, it need at least ' +
-            that.table[tableNumber].minPlayers + ' users to attend');
+            that.table[tableNumber].minPlayer + ' users to attend');
         message = {
             'eventName': '__game_start',
             'data': {
                 'msg': 'table ' + tableNumber + ' need at least ' +
-                that.table[tableNumber].minPlayers + ' users to attend',
+                that.table[tableNumber].minPlayer + ' users to attend',
                 'tableNumber': tableNumber,
                 'error_code': 0
             }

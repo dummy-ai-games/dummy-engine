@@ -61,17 +61,18 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
         updateTime: newBoard.updateTime,
         type: parseInt(newBoard.type)
     };
-    logger.info(newBoard.currentPlayer);
-    logger.info(newBoard.status);
-    logger.info(newBoard.updateTime);
-    logger.info(newBoard.type);
 
-    boardDao.updateBoard(condition, newBoard, function(updateBoardErr, board){
-        if(updateBoardErr.code === errorCode.SUCCESS.code){
-            logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" succeed.");
+    logger.info("board currentPlayer:" + JSON.stringify(newBoard.currentPlayer));
+    logger.info("board status:" + newBoard.status);
+    logger.info("board update time:" + newBoard.updateTime);
+    logger.info("board type:" + newBoard.type);
+
+    boardDao.updateBoard(condition, newBoard, function (updateBoardErr, board) {
+        if (updateBoardErr.code === errorCode.SUCCESS.code) {
+            logger.info("update board by ticket:" + ticket + ",gameName:" + gameName + " succeed.");
             callback(updateBoardErr, newBoard);
-        }else{
-            logger.info("update board by ticket:"+ticket+",gameName:"+gameName+" failed.");
+        } else {
+            logger.info("update board by ticket:" + ticket + ",gameName:" + gameName + " failed.");
             callback(errorCode.FAILED, null);
         }
     });
