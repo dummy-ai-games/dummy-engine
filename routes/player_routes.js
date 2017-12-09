@@ -7,6 +7,6 @@ var app = require('../dummy.js');
 var playerService = require('../rest_services/player_service.js');
 
 
-app.post("/players/signup", playerService.signup);
-app.post("/players/login", playerService.login);
-app.post("/players/isLogin", playerService.validateUserToken);
+app.post("/api/players/signup", playerService.signup);
+app.post("/api/players/login", playerService.login);
+app.post("/api/players/isLogin", playerService.validateUserToken);

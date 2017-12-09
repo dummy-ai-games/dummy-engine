@@ -332,7 +332,8 @@ SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
     var newBoard = {
         currentPlayer: players,
         status: status,
-        updateTime: new Date().getTime()
+        updateTime: new Date().getTime(),
+        type: 0
     };
     boardLogic.updateBoardWorkUnit(ticket, that.gameName, newBoard, function (updateBoardErr, board) {
         if (errorCode.SUCCESS.code === updateBoardErr.code) {
@@ -408,6 +409,8 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
                 message.data.tableStatus = that.table[tableNumber].status;
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
+
+            logger.info('send message ' + message + ' to guest ' + JSON.stringify(guest));
             that.sendMessage(that.guests[guest], message);
         }
     }
@@ -426,6 +429,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
                 'eventName': '__new_peer',
                 'data': tableAndPlayer
             };
+            logger.info('send message ' + message + ' to player ' + JSON.stringify(player));
             that.sendMessage(that.players[player], message);
             // for backward compatibility, send another command to Live and Player UI
             // TODO: hide players' private cards from this message
