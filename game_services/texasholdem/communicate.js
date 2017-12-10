@@ -65,6 +65,7 @@ function SkyRTC(tableNumber) {
         }
 
         if (phoneNumber) {
+            logger.info('try getting player ' + phoneNumber + ', ' + password);
             playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
                     boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, boards) {
@@ -410,7 +411,6 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
             else
                 message.data.tableStatus = enums.GAME_STATUS_STANDBY;
 
-            logger.info('send message ' + message + ' to guest ' + JSON.stringify(guest));
             that.sendMessage(that.guests[guest], message);
         }
     }
@@ -429,7 +429,6 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
                 'eventName': '__new_peer',
                 'data': tableAndPlayer
             };
-            logger.info('send message ' + message + ' to player ' + JSON.stringify(player));
             that.sendMessage(that.players[player], message);
             // for backward compatibility, send another command to Live and Player UI
             // TODO: hide players' private cards from this message
