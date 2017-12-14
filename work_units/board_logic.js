@@ -20,10 +20,9 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     // query create name from tb: players
     var playerCon = {phoneNumber: creator};
     playerDao.getPlayer(playerCon, function (getPlayerErr, player) {
-        logger.info(getPlayerErr.code);
-        logger.info(JSON.stringify(player));
-        if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
 
+        if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
+            logger.info("queried player is : " + JSON.stringify(player));
             gameDao.getGameInfo({name: gameName}, function (getGameErr, game) {
                 logger.info(getGameErr.code);
                 logger.info(game);
@@ -32,7 +31,7 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                         gameName: gameName,
                         minPlayer: game[0].minPlayer,
                         maxPlayer: game[0].maxPlayer,
-                        currentPlayer: [creator],
+                        currentPlayer: [creator], //?
                         status: 0,
                         creator: creator,
                         creatorName: player[0].name, // add createName
@@ -75,10 +74,11 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
         updateTime: newBoard.updateTime,
         type: parseInt(newBoard.type)
     };
-    logger.info(newBoard.currentPlayer);
-    logger.info(newBoard.status);
-    logger.info(newBoard.updateTime);
-    logger.info(newBoard.type);
+
+    logger.info("board currentPlayer:" + JSON.stringify(newBoard.currentPlayer));
+    logger.info("board status:" + newBoard.status);
+    logger.info("board update time:" + newBoard.updateTime);
+    logger.info("board type:" + newBoard.type);
 
     boardDao.updateBoard(condition, newBoard, function (updateBoardErr, board) {
         if (updateBoardErr.code === errorCode.SUCCESS.code) {
@@ -105,7 +105,7 @@ exports.getBoardByTicketWorkUnit = function (ticket, gameName, callback) {
         gameName: gameName
     };
     boardDao.getBoard(condition, function (getBoardErr, board) {
-        if (getBoardErr.code === errorCode.SUCCESS.code && null != board && board.length > 0) {
+        if (getBoardErr.code === errorCode.SUCCESS.code && board !== null && board.length > 0) {
             logger.info("the board that ticket = " + ticket + " exist in db");
             callback(getBoardErr, board);
         } else {
@@ -129,7 +129,7 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
         gameName: gameName
     };
     boardDao.getBoard(condition, function (getBoardErr, boards) {
-        if (getBoardErr.code === errorCode.SUCCESS.code && boards != null && boards.length > 0) {
+        if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null && boards.length > 0) {
             logger.info("query board list: " + condition + " succeed");
             callback(getBoardErr, boards); //
         } else {
