@@ -17,6 +17,7 @@ var errorCode = new ErrorCode();
  *      currentPlayer (array): 一个数组，当前已经加入的玩家
  *      status (int): 0-准备中，1-进行中，2-结束
  *      creator (string): 创建者的手机号
+ *      creatorName (string): 创建者的名字  // newly add
  *      createTime (string): 该board实例创建时间
  *      updateTime (string): 更新时间
  *      ticket (string) (primary key): 供程序加入的私密串号
