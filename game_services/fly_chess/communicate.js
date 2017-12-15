@@ -35,6 +35,7 @@ function SkyRTC(tableNumber) {
     this.exitPlayers = {};
     this.tableNumber = tableNumber;
     this.gameName = enums.GAME_FLY_CHESS;
+    var token = data.token;
 
 
     this.on('__join', function (data, socket) {
@@ -42,6 +43,7 @@ function SkyRTC(tableNumber) {
         var phoneNumber = data.phoneNumber;
         var password = data.password;
         var table = data.ticket;
+        var token = data.token;
 
         logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + table);
         if (!phoneNumber && table) {
@@ -74,7 +76,7 @@ function SkyRTC(tableNumber) {
                                     socket.tableNumber = tableNumber;
                                     logger.info('exist player replace, accept join');
                                 } else if (!(that.table[tableNumber] &&
-                                    that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
+                                        that.table[tableNumber].status === enums.GAME_STATUS_RUNNING)) {
                                     socket.tableNumber = tableNumber;
                                     logger.info('game not started, accept join');
                                 }
@@ -113,6 +115,7 @@ function SkyRTC(tableNumber) {
             });
         } else {
             socket.isGuest = true;
+            socket.token = token;
             that.guests[socket.id] = socket;
             that.initGuestData(socket.id);
             // updated by strawmanbobi - the Live UI need this command to show joined players
@@ -120,22 +123,21 @@ function SkyRTC(tableNumber) {
         }
     });
 
-    this.on('__prepare_game', function (data) {
-        this.prepareGame(data.tableNumber);
+    this.on('__prepare_game', function (data, socket) {
+        this.prepareGame(data.tableNumber, socket.token);
     });
 
     this.on('__start_game', function (data) {
         // TODO: do something with this command
     });
 
-    this.on('__stop_game', function (data) {
-        this.stopGame(data.tableNumber);
+    this.on('__stop_game', function (data, socket) {
+        this.stopGame(data.tableNumber, socket.token);
     });
 
-    this.on('__end_game', function (data) {
-        this.endGame(data.tableNumber);
+    this.on('__end_game', function (data, socket) {
+        this.endGame(data.tableNumber, socket.token);
     });
-
 
     this.on('__action', function (data, socket) {
         var timestamp = new Date().getTime();
@@ -419,12 +421,18 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
     that.updateBoard(tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
 };
 
-SkyRTC.prototype.prepareGame = function (tableNumber) {
+SkyRTC.prototype.prepareGame = function (tableNumber, token) {
     var that = this;
 
     boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
+            var phoneNumber = playerLogic.getPhoneNumberByToken(token);
+            if (board.creator !== phoneNumber) {
+                logger.info('socket is not the creator, reject start game command');
+                return;
+            }
+
             logger.info('game preparing start for table: ' + tableNumber);
             if (that.table[tableNumber]) {
                 if (that.table[tableNumber].timeout)
@@ -537,68 +545,94 @@ SkyRTC.prototype.startGame = function (tableNumber) {
         that.broadcastInPlayers(message);
         that.table[tableNumber].StartGame();
         that.table[tableNumber].resetCountDown();
+        that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_RUNNING);
     }
 };
 
-SkyRTC.prototype.stopGame = function (tableNumber) {
+SkyRTC.prototype.getTablePlayer = function (tableNumber) {
+    var players = [];
     var that = this;
-    var message;
-    try {
-        parseInt(tableNumber);
-    } catch (e) {
-        logger.error('table : ' + tableNumber + ' stop game failed, type is not correct');
-        return;
+    for (var i = 0; i < that.table[tableNumber].players.length; i++) {
+        var player = {};
+        var playerName = that.table[tableNumber].players[i].playerName;
+        player.playerName = playerName;
+        player.isOnline = that.players[playerName] ? true : false;
+        players.push(player);
     }
-
-    logger.info('game stop for table: ' + tableNumber);
-    if (that.table[tableNumber]) {
-        if (that.table[tableNumber].timeout)
-            clearTimeout(that.table[tableNumber].timeout);
-
-        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
-
-        delete that.table[tableNumber];
-        logger.info('remove table ' + tableNumber + ' timeout');
-    }
-
-    message = {
-        'eventName': '__game_stop',
-        'data': {'msg': 'table ' + tableNumber + ' stopped successfully', 'tableNumber': tableNumber}
-    };
-
-    that.broadcastInGuests(message);
-    that.broadcastInPlayers(message);
+    return players;
 };
 
-SkyRTC.prototype.endGame = function (tableNumber) {
+SkyRTC.prototype.stopGame = function (tableNumber, token) {
     var that = this;
     var message;
-    try {
-        parseInt(tableNumber);
-    } catch (e) {
-        logger.error('table : ' + tableNumber + ' end game failed, type is not correct');
-        return;
-    }
 
-    logger.info('game end for table: ' + tableNumber);
-    if (that.table[tableNumber]) {
-        if (that.table[tableNumber].timeout)
-            clearTimeout(that.table[tableNumber].timeout);
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
+        if (errorCode.SUCCESS.code === getBoardErr.code) {
+            var board = boards[0];
+            var phoneNumber = playerLogic.getPhoneNumberByToken(token);
+            if (board.creator !== phoneNumber) {
+                logger.info('socket is not the creator, reject stop game command');
+                return;
+            }
 
-        that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+            logger.info('game stop for table: ' + tableNumber);
+            if (that.table[tableNumber]) {
+                if (that.table[tableNumber].timeout)
+                    clearTimeout(that.table[tableNumber].timeout);
 
-        delete that.table[tableNumber];
-        logger.info('remove table ' + tableNumber + ' timeout');
-    }
+                that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
 
-    // TODO: send game over to frontend, broadcast __game_over to Players and Lives
-    message = {
-        'eventName': '__game_over',
-        'data': {'msg': 'table ' + tableNumber + ' ended successfully', 'tableNumber': tableNumber}
-    };
+                delete that.table[tableNumber];
+                logger.info('remove table ' + tableNumber + ' timeout');
+                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
+            }
 
-    that.broadcastInGuests(message);
-    that.broadcastInPlayers(message);
+            message = {
+                'eventName': '__game_stop',
+                'data': {'msg': 'table ' + tableNumber + ' stopped successfully', 'tableNumber': tableNumber}
+            };
+
+            that.broadcastInGuests(message);
+            that.broadcastInPlayers(message);
+        }
+    });
+};
+
+SkyRTC.prototype.endGame = function (tableNumber, token) {
+    var that = this;
+    var message;
+
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
+        if (errorCode.SUCCESS.code === getBoardErr.code) {
+            var board = boards[0];
+            var phoneNumber = playerLogic.getPhoneNumberByToken(token);
+            if (board.creator !== phoneNumber) {
+                logger.info('socket is not the creator, reject stop game command');
+                return;
+            }
+
+            logger.info('game end for table: ' + tableNumber);
+            if (that.table[tableNumber]) {
+                if (that.table[tableNumber].timeout)
+                    clearTimeout(that.table[tableNumber].timeout);
+
+                that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+
+                delete that.table[tableNumber];
+                logger.info('remove table ' + tableNumber + ' timeout');
+                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_ENDED);
+            }
+
+            // TODO: send game over to frontend, broadcast __game_over to Players and Lives
+            message = {
+                'eventName': '__game_over',
+                'data': {'msg': 'table ' + tableNumber + ' ended successfully', 'tableNumber': tableNumber}
+            };
+
+            that.broadcastInGuests(message);
+            that.broadcastInPlayers(message);
+        }
+    });
 };
 
 
