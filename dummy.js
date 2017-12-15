@@ -74,7 +74,7 @@ app.use(tokenValidation);
 app.use('/', express.static(__dirname + '/web/'));
 require('./routes');
 
-app.use(function (req, res, next) {
+/*app.use(function (req, res, next) {
     if (req.session.user)
         res.locals.user = req.session.user;
     else
@@ -82,7 +82,7 @@ app.use(function (req, res, next) {
     var err = req.session.err;
     delete req.session.err;
     next();
-});
+});*/
 
 console.log('dummy engine is running, listening on port ' + httpPort);
 
