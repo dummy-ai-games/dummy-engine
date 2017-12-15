@@ -98,8 +98,8 @@ function tokenValidation (req, res, next) {
         console.log("headers : " + JSON.stringify(req.headers));
         var phoneNumber = req.headers["phone-number"];
         var token = req.headers["token"];
-
-        playerLogic.verifyTokenWorkUnit(phoneNumber, token, function(validateTokenErr, token) {
+        // key: token, value:phoneNumber
+        playerLogic.verifyTokenWorkUnit(token, phoneNumber, function(validateTokenErr, token) {
             var fakeResponse;
 
             if(errorCode.SUCCESS.code !== validateTokenErr.code) {

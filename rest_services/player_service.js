@@ -8,6 +8,7 @@ var playerLogic = require('../work_units/player_logic');
 var encrypt = require('../poem/crypto/encrypt');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
+var StringResponse = require('../responses/string_response');
 
 var PlayerAuth = require('../authority/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
@@ -32,10 +33,14 @@ exports.signup = function (req, res) {
             player = result.ops[0];
             timeStamp = new Date().getTime();
             token = MD5.MD5(player.password + timeStamp);
-            key = "player_" + player.phoneNumber;
-            playerAuth.setAuthInfo(key, token, ttl, function (setPlayerAuthErr) {
+            key = player.phoneNumber;
+
+            var key_token = token;
+            var value_phone = key;
+            // 将(token, phoneNumber)作为键值对
+            playerAuth.setAuthInfo(key_token, value_phone, ttl, function (setPlayerAuthErr) {
                 if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-                    player.token = token;
+                    player.token = key_token;
                     delete player.password;
                     playerResponse.status = errorCode.SUCCESS;
                     playerResponse.entity = player;
@@ -76,10 +81,14 @@ exports.login = function (req, res) {
             player = players[0];
             timeStamp = new Date().getTime();
             token = MD5.MD5(password + timeStamp);
-            key = "player_" + player.phoneNumber;
-            playerAuth.setAuthInfo(key, token, ttl, function (setPlayerAuthErr) {
+            key = player.phoneNumber;
+
+            var key_token = token;
+            var value_phone = key;
+            //将(token, phoneNumber) 作为键值对，存入redis
+            playerAuth.setAuthInfo(key_token, value_phone, ttl, function (setPlayerAuthErr) {
                 if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-                    player.token = token;
+                    player.token = key_token;
                     delete player.password;
                     playerResponse.status = errorCode.SUCCESS;
                     playerResponse.entity = player;
@@ -103,10 +112,11 @@ exports.login = function (req, res) {
 
 exports.validateUserToken = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
-    var token = req.body.token;
+    var key_token = req.body.token;
+
 
     var playerResponse = new PlayerResponse();
-    playerLogic.verifyTokenWorkUnit(phoneNumber, token, function (validateTokenErr, token) {
+    playerLogic.verifyTokenWorkUnit(key_token, phoneNumber, function (validateTokenErr, res) {
         if (errorCode.SUCCESS.code !== validateTokenErr.code) { //不存在该token，
             logger.info("invalid id and token.");
             playerResponse.status = validateTokenErr;
@@ -117,7 +127,7 @@ exports.validateUserToken = function (req, res) {
             playerLogic.getPlayerByPhoneNumberWorkUnit(phoneNumber, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code && null !== players) {
                     var player = players[0];
-                    player.token = token;
+                    player.token = key_token;
                     delete player.password;
                     playerResponse.status = errorCode.SUCCESS;
                     playerResponse.entity = player;
@@ -131,5 +141,28 @@ exports.validateUserToken = function (req, res) {
                 }
             });
         }
+    });
+};
+
+/**
+ * get phoneNumber by token
+ * @param req
+ * @param res
+ */
+exports.getPhoneNumberByToken = function (req, res) {
+    var token = req.body.token;
+
+    var stringResponse = new StringResponse();
+    playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getPhoneErr, phone) {
+        stringResponse.status = getPhoneErr;
+        if (getPhoneErr.code !== errorCode.SUCCESS.code) {
+            logger.info("get phoneNumber by token err" + getPhoneErr);
+            stringResponse.entity = null;
+        } else {
+            logger.info("get phoneNumber by token succeed: " + phone);
+            stringResponse.entity = phone;
+        }
+        res.send(stringResponse);
+        res.end();
     });
 };

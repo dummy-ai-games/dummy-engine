@@ -90,12 +90,27 @@ exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
 
 
 
-exports.verifyTokenWorkUnit = function (id, token, callback) {
-    var key = "player_" + id;
-    playerAuth.validateAuthInfo(key, token, function (validatePlayerAuthErr, result) {
+exports.verifyTokenWorkUnit = function (key, value, callback) {
+    playerAuth.validateAuthInfo(key, value, function (validatePlayerAuthErr, result) {
         if (validatePlayerAuthErr.code !== errorCode.SUCCESS.code) {
             logger.info("token validation failed");
         }
         callback(validatePlayerAuthErr, result);
+    });
+};
+
+/**
+ * get phoneNumber by token
+ * @param token
+ * @param callback
+ */
+exports.getPhoneNumberByTokenWorkUnit = function(token, callback){
+    playerAuth.getAuthInfo(token,function(getValueErr, value ){
+        if(getValueErr.code !== errorCode.SUCCESS.code){
+            logger.info("no this key: " + "token");
+            callback(getValueErr, null);
+        }else{
+            callback(getValueErr, value);
+        }
     });
 };
