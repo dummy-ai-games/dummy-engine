@@ -581,10 +581,11 @@ SkyRTC.prototype.stopGame = function (tableNumber, token) {
                     clearTimeout(that.table[tableNumber].timeout);
 
                 that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
 
                 delete that.table[tableNumber];
                 logger.info('remove table ' + tableNumber + ' timeout');
-                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
+
             }
 
             message = {
@@ -607,7 +608,7 @@ SkyRTC.prototype.endGame = function (tableNumber, token) {
             var board = boards[0];
             var phoneNumber = playerLogic.getPhoneNumberByToken(token);
             if (board.creator !== phoneNumber) {
-                logger.info('socket is not the creator, reject stop game command');
+                logger.info('socket is not the creator, reject end game command');
                 return;
             }
 
@@ -617,10 +618,10 @@ SkyRTC.prototype.endGame = function (tableNumber, token) {
                     clearTimeout(that.table[tableNumber].timeout);
 
                 that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
-
+                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_ENDED);
                 delete that.table[tableNumber];
                 logger.info('remove table ' + tableNumber + ' timeout');
-                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_ENDED);
+
             }
 
             // TODO: send game over to frontend, broadcast __game_over to Players and Lives
@@ -662,10 +663,10 @@ SkyRTC.prototype.initTable = function (tableNumber) {
                 delete that.exitPlayers[player];
             }
         }
-        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
-            delete that.table[tableNumber];
 
         that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
+        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
+            delete that.table[tableNumber];
 
         setTimeout(function () {
             that.addPlayerStatus(data);
