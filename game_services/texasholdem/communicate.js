@@ -803,9 +803,11 @@ SkyRTC.prototype.initTable = function (tableNumber) {
                 delete that.exitPlayers[player];
             }
         }
-        that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
-        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
+
+        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED) {
+            that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
             delete that.table[tableNumber];
+        }
 
         setTimeout(function () {
             that.addPlayerStatus(data);
