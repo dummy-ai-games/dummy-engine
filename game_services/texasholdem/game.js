@@ -20,8 +20,8 @@ var INNER_FLUSH = true;
  * Class Table
  * @param smallBlind
  * @param bigBlind
- * @param minPlayers
- * @param maxPlayers
+ * @param minPlayer
+ * @param maxPlayer
  * @param initChips
  * @param maxReloadCount
  * @param maxRoundCount
@@ -32,12 +32,12 @@ var INNER_FLUSH = true;
  * @returns {*}
  * @constructor
  */
-function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloadCount, maxRoundCount,
+function Table(smallBlind, bigBlind, minPlayer, maxPlayer, initChips, maxReloadCount, maxRoundCount,
                commandInterval, roundInterval, commandTimeout, lostTimeout) {
     this.smallBlind = smallBlind || 10;
     this.bigBlind = bigBlind || this.smallBlind * 2;
-    this.minPlayers = minPlayers || 3;
-    this.maxPlayers = maxPlayers || 10;
+    this.minPlayer = minPlayer || 3;
+    this.maxPlayer = maxPlayer || 10;
     this.players = [];
     this.timeout = null;
     this.dealer = 0; // Track the dealer position between games
@@ -62,7 +62,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
     this.smallBlindIndex = 0;
     this.bigBlindIndex = 0;
     this.isActionTime = false;
-    this.countDown = 5;
+    this.countDown = 3;
     this.commandInterval = commandInterval || 1;
     this.roundInterval = roundInterval || 10;
     this.commandTimeout = commandTimeout || 2;
@@ -75,12 +75,12 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
 
     // Validate acceptable value ranges.
     var err;
-    if (minPlayers < 3) { // Require at least 3 players to start a game.
-        err = new Error(101, 'Parameter [minPlayers] must be a positive integer of a minimum value of 2.');
-    } else if (maxPlayers > 10) { // Hard limit of 10 players at a table.
-        err = new Error(102, 'Parameter [maxPlayers] must be a positive integer less than or equal to 10.');
-    } else if (minPlayers > maxPlayers) { // Without this we can never start a game!
-        err = new Error(103, 'Parameter [minPlayers] must be less than or equal to [maxPlayers].');
+    if (minPlayer < 3) { // Require at least 3 players to start a game.
+        err = new Error(101, 'Parameter [minPlayer] must be a positive integer of a minimum value of 2.');
+    } else if (maxPlayer > 10) { // Hard limit of 10 players at a table.
+        err = new Error(102, 'Parameter [maxPlayer] must be a positive integer less than or equal to 10.');
+    } else if (minPlayer > maxPlayer) { // Without this we can never start a game!
+        err = new Error(103, 'Parameter [minPlayer] must be less than or equal to [maxPlayer].');
     }
     var that = this;
     if (err) {
@@ -144,7 +144,7 @@ function Table(smallBlind, bigBlind, minPlayers, maxPlayers, initChips, maxReloa
             if (player.winMoney > 0)
                 player.folded = false;
         }
-        if (count > that.players.length / 2 && count >= that.minPlayers && that.roundCount < that.maxRoundCount) {
+        if (count > that.players.length / 2 && count >= that.minPlayer && that.roundCount < that.maxRoundCount) {
         that.eventEmitter.emit('__round_end', data);
             that.surviveCount = count;
             for (var j = 0; j < that.players.length; j++) {

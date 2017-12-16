@@ -23,8 +23,8 @@ var conf = require("./conf.js");
  * Class Table
  * @param smallBlind
  * @param bigBlind
- * @param minPlayers
- * @param maxPlayers
+ * @param minPlayer
+ * @param maxPlayer
  * @param initChips
  * @param maxReloadCount
  * @param maxRoundCount
@@ -35,10 +35,10 @@ var conf = require("./conf.js");
  * @returns {*}
  * @constructor
  */
-function Table(minPlayers, maxPlayers, sumFly, commandTimeout, commandInterval, lostTimeout) {
+function Table(minPlayer, maxPlayer, sumFly, commandTimeout, commandInterval, lostTimeout) {
 
-    this.minPlayers = minPlayers || 2;
-    this.maxPlayers = maxPlayers || 4;
+    this.minPlayer = minPlayer || 2;
+    this.maxPlayer = maxPlayer || 4;
     this.sumFly = sumFly || 3;
     this.players = [];
     this.timeout = null;
@@ -54,7 +54,7 @@ function Table(minPlayers, maxPlayers, sumFly, commandTimeout, commandInterval, 
 
     this.status = enums.GAME_STATUS_STANDBY;
     this.isActionTime = false;
-    this.countDown = 5;
+    this.countDown = 3;
 
     this.commandTimeout = commandTimeout || 2;
     this.commandInterval = commandInterval || 1;
@@ -67,12 +67,12 @@ function Table(minPlayers, maxPlayers, sumFly, commandTimeout, commandInterval, 
 
     // Validate acceptable value ranges.
     var err;
-    if (minPlayers < 2) { // Require at least 3 players to start a game.
-        err = new Error(101, 'Parameter [minPlayers] must be a positive integer of a minimum value of 2.');
-    } else if (maxPlayers > 4) { // Hard limit of 10 players at a table.
-        err = new Error(102, 'Parameter [maxPlayers] must be a positive integer less than or equal to 10.');
-    } else if (minPlayers > maxPlayers) { // Without this we can never start a game!
-        err = new Error(103, 'Parameter [minPlayers] must be less than or equal to [maxPlayers].');
+    if (minPlayer < 2) { // Require at least 3 players to start a game.
+        err = new Error(101, 'Parameter [minPlayer] must be a positive integer of a minimum value of 2.');
+    } else if (maxPlayer > 4) { // Hard limit of 10 players at a table.
+        err = new Error(102, 'Parameter [maxPlayer] must be a positive integer less than or equal to 10.');
+    } else if (minPlayer > maxPlayer) { // Without this we can never start a game!
+        err = new Error(103, 'Parameter [minPlayer] must be less than or equal to [maxPlayer].');
     }
     var that = this;
     if (err) {
@@ -174,7 +174,7 @@ Table.prototype.StopGame = function () {
 
 Table.prototype.AddPlayer = function (playerName, displayName) {
     var that = this;
-    if (that.playersToAdd.length >= that.maxPlayers) {
+    if (that.playersToAdd.length >= that.maxPlayer) {
         logGame(that.tableNumber, "already arrive max players,can't continue join");
         return;
     }
@@ -328,7 +328,7 @@ var Fly = function (table) {
     this.gridLocalToGlobal = function (user, fly) {
         var nGlobal = fly.nIndGridLocal;
         if (fly.nIndGridLocal <= user.table.game.SumGridsPublic) {// on public road
-            nGlobal = nGlobal + user.position * (user.table.game.SumGridsPublicTotal / user.table.maxPlayers);
+            nGlobal = nGlobal + user.position * (user.table.game.SumGridsPublicTotal / user.table.maxPlayer);
             if (nGlobal > user.table.game.SumGridsPublic)     nGlobal -= user.table.game.SumGridsPublic;
             console.log('************************************************************');
             console.log('nPos/nLocal/nGlobal', user.position, fly.nIndGridLocal, nGlobal);
