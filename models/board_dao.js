@@ -78,9 +78,9 @@ exports.updateBoard = function (condition, newBoard, callback) {
 exports.getBoard = function (condition, callback) {
     db.collection('board', function (err, board_collection) {
         if (!err) {
-            board_collection.find(condition).toArray(function (err, result) {
+            board_collection.find(condition,{safe:true}).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("get board by condition " + JSON.stringify(condition) + " succeed.");
+                    logger.info("get board by condition " + JSON.stringify(condition) + " succeed." + JSON.stringify(result));
                     callback(errorCode.SUCCESS, result); //return board array
                 } else {
                     logger.error("get board by condition: " + JSON.stringify(condition) + " occur error." + err);
