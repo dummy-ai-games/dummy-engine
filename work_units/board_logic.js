@@ -11,6 +11,7 @@ var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var stringUtil = require('../poem/utils/string_utils');
 var dateUtil = require('../poem/utils/date_utils');
+var commonUtil = require('../poem/utils/common_utils');
 
 
 exports.createBoardWorkUnit = function (creator, gameName, callback) {
@@ -23,35 +24,49 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
             logger.info("queried player is : " + JSON.stringify(player));
-            gameDao.getGameInfo({name: gameName}, function (getGameErr, game) {
-                logger.info(getGameErr.code);
-                logger.info(game);
+            gameDao.getGameInfo({name: gameName}, function (getGameErr, game) { // game != nulls
                 if (getGameErr.code === errorCode.SUCCESS.code && game !== null && game.length > 0) {
-                    var board = {
-                        gameName: gameName,
-                        minPlayer: game[0].minPlayer,
-                        maxPlayer: game[0].maxPlayer,
-                        currentPlayer: [creator], //?
-                        status: 0,
-                        creator: creator,
-                        creatorName: player[0].name, // add createName
-                        createTime: currentTime,
-                        updateTime: currentTime,
-                        ticket: ticket,
-                        type: 0
-                    };
-                    boardDao.createBoard(board, function (createBoardErr, result) {
-                        if (createBoardErr.code === errorCode.SUCCESS.code && null !== result.ops &&
-                            result.ops.length > 0) {
-                            logger.info("create board succeed.");
-                            callback(createBoardErr, board);
-                        } else {
-                            logger.info("create board failed.");
+                    logger.info("queried game is :" + JSON.stringify(game));
+                    boardDao.getBoard({creator:creator,gameName: gameName}, function(getBoardErr, board){ // get board info by {creator, gameName}
+                        if(errorCode.SUCCESS.code === getBoardErr.code){ // get board succeed
+
+                            if(board === null || true === commonUtil.JudgeEleInArray(board, "status", 2)){
+                                // create board
+                                var board = {
+                                    gameName: gameName,
+                                    minPlayer: game[0].minPlayer,
+                                    maxPlayer: game[0].maxPlayer,
+                                    currentPlayer: [creator], //?
+                                    status: 0,
+                                    creator: creator,
+                                    creatorName: player[0].name, // add createName
+                                    createTime: currentTime,
+                                    updateTime: currentTime,
+                                    ticket: ticket,
+                                    type: 0
+                                };
+                                boardDao.createBoard(board, function (createBoardErr, result) {
+                                    if (createBoardErr.code === errorCode.SUCCESS.code && null !== result.ops &&
+                                        result.ops.length > 0) {
+                                        logger.info("create board succeed.");
+                                        callback(createBoardErr, board);
+                                    } else {
+                                        logger.info("create board failed.");
+                                        callback(errorCode.FAILED, null);
+                                    }
+                                });
+                            }else{
+                                // creator cannot create multiple board that status is preparing(0) or active(1)
+                                logger.info("a creator can't create multiple active boards")
+                                callback(errorCode.MULTI_ACTIVE_BOARD_CREATED,null);
+                            }
+                        }else{ // get board failed
+                            logger.info('get board failed.');
                             callback(errorCode.FAILED, null);
                         }
                     });
-                } else {
-                    logger.info('get game info failed.');
+                } else { // get game failed
+                    logger.info('get game failed.');
                     callback(errorCode.FAILED, null);
                 }
             });

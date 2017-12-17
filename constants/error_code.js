@@ -30,6 +30,11 @@ function ErrorCode() {
         code: 1,
         cause: "Player existed"
     };
+
+    this.MULTI_ACTIVE_BOARD_CREATED = {
+        code: 1,
+        cause: "multi active boards in a game are created by a player "
+    }
 }
 
 module.exports = ErrorCode;

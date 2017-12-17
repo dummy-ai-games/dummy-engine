@@ -54,9 +54,9 @@ exports.createPlayer = function (player, callback) {
 exports.getPlayer = function (conditions, callback) {
     db.collection('player', function (err, player_collection) {
         if (!err) {
-            player_collection.find(conditions).toArray(function (err, result) {
+            player_collection.find(conditions,{safe:true}).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("get player succeeded");
+                    logger.info("get player succeeded. " + JSON.stringify(result));
                     callback(errorCode.SUCCESS, result);
                 } else {
                     logger.error("get player error : " + err);
