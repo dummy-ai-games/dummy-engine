@@ -28,16 +28,25 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     var ticket = stringUtil.randomChar(30);
 
     // query create name from tb: players
-    var playerCon = { phoneNumber: creator };
+    var playerCon = {phoneNumber: creator};
     playerDao.getPlayer(playerCon, function (getPlayerErr, player) {
 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
             gameDao.getGameInfo({name: gameName}, function (getGameErr, game) { // game != nulls
                 if (getGameErr.code === errorCode.SUCCESS.code && game !== null && game.length > 0) {
-                    boardDao.getBoard({creator:creator,gameName: gameName}, function(getBoardErr, board){ // get board info by {creator, gameName}
-                        if(errorCode.SUCCESS.code === getBoardErr.code){ // get board succeed
-
-                            if(board === null || true === commonUtil.JudgeEleInArray(board, "status", 2)){
+                    var getBoardConditions = {
+                        creator: creator,
+                        gameName: gameName,
+                        $or: [
+                            {status: enums.GAME_STATUS_STANDBY},
+                            {status: enums.GAME_STATUS_PREPARING},
+                            {status: enums.GAME_STATUS_RUNNING}
+                        ]
+                    };
+                    boardDao.getBoard(getBoardConditions, function (getBoardErr, board) {
+                        // get board info by {creator, gameName}
+                        if (errorCode.SUCCESS.code === getBoardErr.code) { // get board succeed
+                            if (board === null || board.length === 0) {
                                 // create board
                                 var board = {
                                     gameName: gameName,
@@ -62,12 +71,12 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                                         callback(errorCode.FAILED, null);
                                     }
                                 });
-                            }else{
+                            } else {
                                 // creator cannot create multiple board that status is preparing(0) or active(1)
-                                logger.info("a creator can't create multiple active boards")
-                                callback(errorCode.MULTI_ACTIVE_BOARD_CREATED,null);
+                                logger.info("a creator can't create multiple active boards");
+                                callback(errorCode.MULTI_ACTIVE_BOARD_CREATED, null);
                             }
-                        }else{ // get board failed
+                        } else { // get board failed
                             logger.info('get board failed.');
                             callback(errorCode.FAILED, null);
                         }
@@ -160,21 +169,48 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
     });
 };
 
-exports.isCreatorBoardWorkUnit = function(token, ticket, callback) {
-    playerAuth.getAuthInfo(token, function(getValueErr, value) {
-        if(getValueErr.code !== errorCode.SUCCESS.code) {
+/**
+ * list active boards by gameName
+ * @param gameName: game name
+ * @param callback: callback(errorCode.SUCCEED, board)
+ *                  callback(errorCode.FAILED, null);
+ */
+exports.listActiveBoardsWorkUnit = function (gameName, callback) {
+    var condition = {
+        gameName: gameName,
+        $or: [
+            {status: enums.GAME_STATUS_STANDBY},
+            {status: enums.GAME_STATUS_PREPARING},
+            {status: enums.GAME_STATUS_RUNNING}
+        ]
+    };
+    boardDao.getBoard(condition, function (getBoardErr, boards) {
+        if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null && boards.length > 0) {
+            logger.info("query board list: " + JSON.stringify(condition) + " succeed");
+            callback(getBoardErr, boards); //
+        } else {
+            // board not exist
+            logger.error("query board list:" + JSON.stringify(condition) + " failed.");
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
+exports.isCreatorBoardWorkUnit = function (token, ticket, callback) {
+    playerAuth.getAuthInfo(token, function (getValueErr, value) {
+        if (getValueErr.code !== errorCode.SUCCESS.code) {
             callback(getValueErr, null);
         } else {
             var conditions = {
                 creator: value,
                 ticket: ticket,
-                $or:[
-                    {status : enums.GAME_STATUS_STANDBY},
-                    {status : enums.GAME_STATUS_PREPARING},
-                    {status : enums.GAME_STATUS_RUNNING}
+                $or: [
+                    {status: enums.GAME_STATUS_STANDBY},
+                    {status: enums.GAME_STATUS_PREPARING},
+                    {status: enums.GAME_STATUS_RUNNING}
                 ]
             };
-            boardDao.getBoard(conditions, function(getBoardErr, boards) {
+            boardDao.getBoard(conditions, function (getBoardErr, boards) {
                 logger.info("getBoardErr = " + JSON.stringify(getBoardErr) + ", boards = " + JSON.stringify(boards));
                 if (errorCode.SUCCESS.code === getBoardErr.code && null !== boards && boards.length > 0) {
                     var board = boards[0];

@@ -70,6 +70,24 @@ exports.listBoards = function (req, res) {
 
 
 /**
+ * list boards by status, gameName
+ * @param req
+ * @param res
+ */
+exports.listActiveBoards = function (req, res) {
+    var gameName = req.body.gameName;
+
+    var boardResponse = new BoardResponse();
+    boardLogic.listActiveBoardsWorkUnit(gameName, function (listBoardsErr, boards) {
+        boardResponse.status = listBoardsErr;
+        boardResponse.entity = boards;
+        res.send(boardResponse);
+        res.end();
+    });
+};
+
+
+/**
  * to confirm it is a creator board
  * @param req
  * @param res
