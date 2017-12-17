@@ -46,10 +46,12 @@ function SkyRTC(tableNumber) {
         var token = data.token;
 
         logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + table);
-        if (!phoneNumber && table) {
+        if (phoneNumber && password) {
+
+        } else if (table) {
             socket.tableNumber = table;
-        } else if (!phoneNumber) {
-            logger.info('player is invalid, close its socket');
+        } else {
+            logger.info('user is invalid, close its socket');
             socket.close();
             return;
         }
