@@ -28,12 +28,12 @@ var errorCode = new ErrorCode();
  * @param callback: succeed, failed
  */
 exports.createPlayer = function (player, callback) {
-    db.collection('player', function (err, player_collection) {
+    db.collection('player', function (err, playerCollection) {
         if (err) {
             logger.error("connect to player table failed. " + err);
             callback(errorCode.FAILED, null);
         } else {
-            player_collection.insert(player, function (err, result) {
+            playerCollection.insert(player, function (err, result) {
                 if (err) {
                     logger.error("insert player failed: " + err);
                     callback(errorCode.FAILED, null);
@@ -52,11 +52,10 @@ exports.createPlayer = function (player, callback) {
  * @param callback: succeed, failed
  */
 exports.getPlayer = function (conditions, callback) {
-    db.collection('player', function (err, player_collection) {
+    db.collection('player', function (err, playerCollection) {
         if (!err) {
-            player_collection.find(conditions,{safe:true}).toArray(function (err, result) {
+            playerCollection.find(conditions).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("get player succeeded. " + JSON.stringify(result));
                     callback(errorCode.SUCCESS, result);
                 } else {
                     logger.error("get player error : " + err);

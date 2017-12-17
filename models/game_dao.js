@@ -16,9 +16,9 @@ var errorCode = new ErrorCode();
  *      maxPlayer (int): 最大容纳玩家数
  */
 exports.getGameInfo = function (gameName, callback) {
-    db.collection('game', function (err, game_collection) {
+    db.collection('game', function (err, gameCollection) {
         if (!err) {
-            game_collection.find(gameName).toArray(function (err, result) {
+            gameCollection.find(gameName).toArray(function (err, result) {
                 if (!err) {
                     logger.info("get game info by gameName: " + gameName.name + " succeed.");
                     callback(errorCode.SUCCESS, result); //return board array
@@ -40,12 +40,12 @@ exports.getGameInfo = function (gameName, callback) {
  * @param callback
  */
 exports.createGame = function (game, callback) {
-    db.collection('game', function (err, game_collection) {
+    db.collection('game', function (err, gameCollection) {
         if (err) {
             logger.error("connect to game table failed. " + err);
             callback(errorCode.FAILED, null);
         } else {
-            game_collection.insert(game, function (err, result) {
+            gameCollection.insert(game, function (err, result) {
                 if (err) {
                     logger.error("insert new game failed: " + err);
                     callback(errorCode.FAILED, null);
@@ -56,4 +56,4 @@ exports.createGame = function (game, callback) {
             });
         }
     });
-}
+};

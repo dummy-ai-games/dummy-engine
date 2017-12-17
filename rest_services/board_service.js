@@ -78,6 +78,7 @@ exports.isCreatorBoard = function (req, res) {
     var token = req.body.token;
     var ticket = req.body.ticket;
 
+    logger.info("isCreatorBoard call, token = " + token + ", ticket = " + ticket);
     var boolResponse = new BoolResponse();
     boardLogic.isCreatorBoardWorkUnit(token, ticket, function (getBoardErr, result) {
         boolResponse.status = getBoardErr;

@@ -32,11 +32,8 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     playerDao.getPlayer(playerCon, function (getPlayerErr, player) {
 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
-            logger.info("queried player is : " + JSON.stringify(player));
-
             gameDao.getGameInfo({name: gameName}, function (getGameErr, game) { // game != nulls
                 if (getGameErr.code === errorCode.SUCCESS.code && game !== null && game.length > 0) {
-                    logger.info("queried game is :" + JSON.stringify(game));
                     boardDao.getBoard({creator:creator,gameName: gameName}, function(getBoardErr, board){ // get board info by {creator, gameName}
                         if(errorCode.SUCCESS.code === getBoardErr.code){ // get board succeed
 
@@ -178,7 +175,8 @@ exports.isCreatorBoardWorkUnit = function(token, ticket, callback) {
                 ]
             };
             boardDao.getBoard(conditions, function(getBoardErr, boards) {
-                if (errorCode.SUCCESS.code === getBoardErr.code && null != boards && boards.length > 0) {
+                logger.info("getBoardErr = " + JSON.stringify(getBoardErr) + ", boards = " + JSON.stringify(boards));
+                if (errorCode.SUCCESS.code === getBoardErr.code && null !== boards && boards.length > 0) {
                     var board = boards[0];
                     callback(errorCode.SUCCESS, true);
                 } else {

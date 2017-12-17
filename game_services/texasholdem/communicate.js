@@ -336,7 +336,8 @@ SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
         ticket: ticket,
         currentPlayer: players,
         status: status,
-        updateTime:new Date().getTime()
+        updateTime:new Date().getTime(),
+        type: 0
     };
     boardLogic.updateBoardWorkUnit(ticket, that.gameName, newBoard, function (updateBoardErr, board) {
         if (errorCode.SUCCESS.code === updateBoardErr.code) {

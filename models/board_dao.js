@@ -25,12 +25,12 @@ var errorCode = new ErrorCode();
  */
 
 exports.createBoard = function (board, callback) {
-    db.collection('board', function (err, board_collection) {
+    db.collection('board', function (err, boardCollection) {
         if (err) {
             logger.error("connect to board table failed. " + err);
             callback(errorCode.FAILED, null);
         } else {
-            board_collection.insert(board, function (err, result) {
+            boardCollection.insert(board, function (err, result) {
                 if (err) {
                     logger.error("insert board failed: " + err);
                     callback(errorCode.FAILED, null);
@@ -50,9 +50,9 @@ exports.createBoard = function (board, callback) {
  * @param callback
  */
 exports.updateBoard = function (condition, newBoard, callback) {
-    db.collection('board', function (err, board_collection) {
+    db.collection('board', function (err, boardCollection) {
         if (!err) {
-            board_collection.update(condition, {$set: newBoard},{safe:true}, function (err, result) {
+            boardCollection.update(condition, {$set: newBoard}, function (err, result) {
                 if (!err) {
                     logger.info("update board by condition " + condition + " succeed.");
                     callback(errorCode.SUCCESS, result);
@@ -76,9 +76,9 @@ exports.updateBoard = function (condition, newBoard, callback) {
  *                  callback(errorCode.FAILED, nulls)
  */
 exports.getBoard = function (condition, callback) {
-    db.collection('board', function (err, board_collection) {
+    db.collection('board', function (err, boardCollection) {
         if (!err) {
-            board_collection.find(condition,{safe:true}).toArray(function (err, result) {
+            boardCollection.find(condition).toArray(function (err, result) {
                 if (!err) {
                     logger.info("get board by condition " + JSON.stringify(condition) + " succeed." + JSON.stringify(result));
                     callback(errorCode.SUCCESS, result); //return board array
