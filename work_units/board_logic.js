@@ -163,9 +163,9 @@ exports.isCreatorBoardWorkUnit = function(token, ticket, callback) {
             boardDao.getBoard(conditions, function(getBoardErr, boards) {
                 if (errorCode.SUCCESS.code === getBoardErr.code && null != boards && boards.length > 0) {
                     var board = boards[0];
-                    callback(errorCode.SUCCESS, board);
+                    callback(errorCode.SUCCESS, true);
                 } else {
-                    callback(errorCode.FAILED, null);
+                    callback(errorCode.SUCCESS, false);
                 }
             });
         }
