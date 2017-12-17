@@ -116,7 +116,7 @@ exports.validateUserToken = function (req, res) {
 
 
     var playerResponse = new PlayerResponse();
-    playerLogic.verifyTokenWorkUnit(key_token, phoneNumber, function (validateTokenErr, res) {
+    playerLogic.verifyTokenWorkUnit(key_token, phoneNumber, function (validateTokenErr, result) {
         if (errorCode.SUCCESS.code !== validateTokenErr.code) { //不存在该token，
             logger.info("invalid id and token.");
             playerResponse.status = validateTokenErr;

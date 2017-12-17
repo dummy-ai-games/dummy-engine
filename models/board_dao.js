@@ -83,7 +83,7 @@ exports.getBoard = function (condition, callback) {
                     logger.info("get board by condition " + JSON.stringify(condition) + " succeed." + JSON.stringify(result));
                     callback(errorCode.SUCCESS, result); //return board array
                 } else {
-                    logger.error("get board by condition: " + condition + " occur error." + err);
+                    logger.error("get board by condition: " + JSON.stringify(condition) + " occur error." + err);
                     callback(errorCode.FAILED, null);
                 }
             });

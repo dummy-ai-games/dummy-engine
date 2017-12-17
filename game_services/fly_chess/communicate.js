@@ -54,15 +54,16 @@ function SkyRTC(tableNumber) {
             return;
         }
 
-        if (phoneNumber) {
-            playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, player) {
+        socket.token = token;
+        if (phoneNumber && password) {
+            playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
                     boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, boards) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var tableNumber = table;
                             var board = boards[0];
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
-                                var playerName = player.name;
+                                var playerName = players[0].name;
                                 if (that.players[playerName]) {
                                     that.players[playerName].isReplace = true;
                                     that.players[playerName].close();
@@ -85,8 +86,8 @@ function SkyRTC(tableNumber) {
                                     socket.id = playerName;
                                     socket.displayName = playerName;
                                     that.players[socket.id] = socket;
-                                    var tablePlayers = that.notifyJoin(socket.tableNumber, board.maxPlayers);
-                                    if (tablePlayers.length <= board.maxPlayers) {
+                                    var tablePlayers = that.notifyJoin(socket.tableNumber, board.maxPlayer);
+                                    if (tablePlayers.length <= board.maxPlayer) {
                                         that.initPlayerData(socket.id);
                                         // update game
                                         that.updateBoard(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
@@ -115,7 +116,6 @@ function SkyRTC(tableNumber) {
             });
         } else {
             socket.isGuest = true;
-            socket.token = token;
             that.guests[socket.id] = socket;
             that.initGuestData(socket.id);
             // updated by strawmanbobi - the Live UI need this command to show joined players
@@ -266,8 +266,9 @@ SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
     }
     var newBoard = {
         ticket: ticket,
-        players: players,
-        status: status
+        currentPlayer: players,
+        status: status,
+        updateTime:new Date().getTime()
     };
     boardLogic.updateBoardWorkUnit(ticket, that.gameName, newBoard, function (updateBoardErr, board) {
         if (errorCode.SUCCESS.code === updateBoardErr.code) {
@@ -297,7 +298,7 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
     }
 };
 
-SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayers) {
+SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
     var that = this;
     var tablePlayers = [];
     var tableDatas;
@@ -314,7 +315,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayers) {
         }
     }
 
-    if (tablePlayers.length > maxPlayers) {
+    if (tablePlayers.length > maxPlayer) {
         return tablePlayers;
     }
 
@@ -423,61 +424,66 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
 
 SkyRTC.prototype.prepareGame = function (tableNumber, token) {
     var that = this;
+    if (that.table[tableNumber] && that.table[tableNumber].countDown !== 3) {
+        return;
+    }
 
     boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
-            var phoneNumber = playerLogic.getPhoneNumberByToken(token);
-            if (board.creator !== phoneNumber) {
-                logger.info('socket is not the creator, reject start game command');
-                return;
-            }
+            playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
+                if (board.creator !== phoneNumber) {
+                    logger.info('socket is not the creator, reject start game command');
+                    return;
+                }
 
-            logger.info('game preparing start for table: ' + tableNumber);
-            if (that.table[tableNumber]) {
-                if (that.table[tableNumber].timeout)
-                    clearTimeout(that.table[tableNumber].timeout);
-                that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
-                delete that.table[tableNumber];
-                logger.info('remove table ' + tableNumber + ' timeout');
-            }
+                logger.info('game preparing start for table: ' + tableNumber);
+                if (that.table[tableNumber]) {
+                    if (that.table[tableNumber].timeout)
+                        clearTimeout(that.table[tableNumber].timeout);
+                    that.table[tableNumber].status = enums.GAME_STATUS_STANDBY;
+                    delete that.table[tableNumber];
+                    logger.info('remove table ' + tableNumber + ' timeout');
+                }
 
-            var minPlayers = 2;
-            var maxPlayers = 4;
-            var sumFly = 4;
-            var commandTimeout = 1;
-            var commandInterval = 2;
-            var lostTimeout = 5;
+                var minPlayer = 2;
+                var maxPlayer = 4;
+                var sumFly = 4;
+                var commandTimeout = 1;
+                var commandInterval = 2;
+                var lostTimeout = 5;
 
-            if (board.minPlayers && board.minPlayers >= 2) {
-                minPlayers = parseInt(board.minPlayers);
-            }
+                if (board.minPlayer && board.minPlayer >= 2) {
+                    minPlayer = parseInt(board.minPlayer);
+                }
 
-            if (board.maxPlayers && board.maxPlayers >= 2 && board.maxPlayers <= 4) {
-                maxPlayers = parseInt(board.maxPlayers);
-            }
+                if (board.maxPlayer && board.maxPlayer >= 2 && board.maxPlayer <= 4) {
+                    maxPlayer = parseInt(board.maxPlayer);
+                }
 
-            if (board.sumFly && board.sumFly >= 0) {
-                sumFly = parseInt(board.sumFly);
-            }
+                if (board.sumFly && board.sumFly >= 0) {
+                    sumFly = parseInt(board.sumFly);
+                }
 
-            if (board.commandInterval && board.commandInterval >= 0) {
-                commandInterval = parseInt(board.commandInterval);
-            }
+                if (board.commandInterval && board.commandInterval >= 0) {
+                    commandInterval = parseInt(board.commandInterval);
+                }
 
-            if (board.commandTimeout && board.commandTimeout >= 0) {
-                commandTimeout = parseFloat(board.commandTimeout);
-            }
+                if (board.commandTimeout && board.commandTimeout >= 0) {
+                    commandTimeout = parseFloat(board.commandTimeout);
+                }
 
-            if (board.lostTimeout && board.lostTimeout >= 0) {
-                lostTimeout = parseInt(board.lostTimeout);
-            }
+                if (board.lostTimeout && board.lostTimeout >= 0) {
+                    lostTimeout = parseInt(board.lostTimeout);
+                }
 
-            that.table[tableNumber] = new flyChess.Table(minPlayers, maxPlayers, sumFly, commandTimeout, commandInterval, lostTimeout);
-            that.table[tableNumber].tableNumber = tableNumber;
-            that.initTable(tableNumber);
-            logger.info('init table done');
-            that.sendCountDown(tableNumber);
+                that.table[tableNumber] = new flyChess.Table(minPlayer, maxPlayer, sumFly, commandTimeout, commandInterval, lostTimeout);
+                that.table[tableNumber].tableNumber = tableNumber;
+                that.initTable(tableNumber);
+                logger.info('init table done');
+                that.sendCountDown(tableNumber);
+            });
+
         } else {
             logger.error('table : ' + tableNumber + ' start game failed, the ticket not valid');
         }
@@ -517,14 +523,14 @@ SkyRTC.prototype.startGame = function (tableNumber) {
             that.table[tableNumber].AddPlayer(player, that.players[player].displayName);
     }
 
-    if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayers) {
+    if (that.table[tableNumber].playersToAdd.length < that.table[tableNumber].minPlayer) {
         logger.info('table ' + tableNumber + ' start fail, it need at least ' +
-            that.table[tableNumber].minPlayers + ' users to attend');
+            that.table[tableNumber].minPlayer + ' users to attend');
         message = {
             'eventName': '__game_start',
             'data': {
                 'msg': 'table ' + tableNumber + ' need at least ' +
-                that.table[tableNumber].minPlayers + ' users to attend',
+                that.table[tableNumber].minPlayer + ' users to attend',
                 'tableNumber': tableNumber,
                 'error_code': 0
             }
@@ -565,36 +571,41 @@ SkyRTC.prototype.getTablePlayer = function (tableNumber) {
 SkyRTC.prototype.stopGame = function (tableNumber, token) {
     var that = this;
     var message;
+    if (that.table[tableNumber] && that.table[tableNumber].countDown !== 3) {
+        return;
+    }
 
     boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
-            var phoneNumber = playerLogic.getPhoneNumberByToken(token);
-            if (board.creator !== phoneNumber) {
-                logger.info('socket is not the creator, reject stop game command');
-                return;
-            }
+            playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
+                if (board.creator !== phoneNumber) {
+                    logger.info('socket is not the creator, reject stop game command');
+                    return;
+                }
 
-            logger.info('game stop for table: ' + tableNumber);
-            if (that.table[tableNumber]) {
-                if (that.table[tableNumber].timeout)
-                    clearTimeout(that.table[tableNumber].timeout);
+                logger.info('game stop for table: ' + tableNumber);
+                if (that.table[tableNumber]) {
+                    if (that.table[tableNumber].timeout)
+                        clearTimeout(that.table[tableNumber].timeout);
 
-                that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
-                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
+                    that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+                    that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
 
-                delete that.table[tableNumber];
-                logger.info('remove table ' + tableNumber + ' timeout');
+                    delete that.table[tableNumber];
+                    logger.info('remove table ' + tableNumber + ' timeout');
 
-            }
+                }
 
-            message = {
-                'eventName': '__game_stop',
-                'data': {'msg': 'table ' + tableNumber + ' stopped successfully', 'tableNumber': tableNumber}
-            };
+                message = {
+                    'eventName': '__game_stop',
+                    'data': {'msg': 'table ' + tableNumber + ' stopped successfully', 'tableNumber': tableNumber}
+                };
 
-            that.broadcastInGuests(message);
-            that.broadcastInPlayers(message);
+                that.broadcastInGuests(message);
+                that.broadcastInPlayers(message);
+            });
+
         }
     });
 };
@@ -602,36 +613,41 @@ SkyRTC.prototype.stopGame = function (tableNumber, token) {
 SkyRTC.prototype.endGame = function (tableNumber, token) {
     var that = this;
     var message;
+    if (that.table[tableNumber] && that.table[tableNumber].countDown !== 3) {
+        return;
+    }
 
     boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
-            var phoneNumber = playerLogic.getPhoneNumberByToken(token);
-            if (board.creator !== phoneNumber) {
-                logger.info('socket is not the creator, reject end game command');
-                return;
-            }
+            playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
+                if (board.creator !== phoneNumber) {
+                    logger.info('socket is not the creator, reject end game command');
+                    return;
+                }
 
-            logger.info('game end for table: ' + tableNumber);
-            if (that.table[tableNumber]) {
-                if (that.table[tableNumber].timeout)
-                    clearTimeout(that.table[tableNumber].timeout);
+                logger.info('game end for table: ' + tableNumber);
+                if (that.table[tableNumber]) {
+                    if (that.table[tableNumber].timeout)
+                        clearTimeout(that.table[tableNumber].timeout);
 
-                that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
-                that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_ENDED);
-                delete that.table[tableNumber];
-                logger.info('remove table ' + tableNumber + ' timeout');
+                    that.table[tableNumber].status = enums.GAME_STATUS_FINISHED;
+                    that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_ENDED);
+                    delete that.table[tableNumber];
+                    logger.info('remove table ' + tableNumber + ' timeout');
 
-            }
+                }
 
-            // TODO: send game over to frontend, broadcast __game_over to Players and Lives
-            message = {
-                'eventName': '__game_over',
-                'data': {'msg': 'table ' + tableNumber + ' ended successfully', 'tableNumber': tableNumber}
-            };
+                // TODO: send game over to frontend, broadcast __game_over to Players and Lives
+                message = {
+                    'eventName': '__game_over',
+                    'data': {'msg': 'table ' + tableNumber + ' ended successfully', 'tableNumber': tableNumber}
+                };
 
-            that.broadcastInGuests(message);
-            that.broadcastInPlayers(message);
+                that.broadcastInGuests(message);
+                that.broadcastInPlayers(message);
+            });
+
         }
     });
 };
@@ -664,9 +680,11 @@ SkyRTC.prototype.initTable = function (tableNumber) {
             }
         }
 
-        that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
-        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED)
+
+        if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_FINISHED) {
+            that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
             delete that.table[tableNumber];
+        }
 
         setTimeout(function () {
             that.addPlayerStatus(data);

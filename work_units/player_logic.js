@@ -1,7 +1,9 @@
 /**
- * created by Elsie on 2017-11-26
+ * created by Elsie
+ * 2017-11-26
  */
 
+require('../poem/configuration/constants');
 var logger = require('../poem/logging/logger4js').helper;
 var playerDao = require('../models/player_dao');
 var ErrorCode = require('../constants/error_code.js');
@@ -61,7 +63,7 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
     playerDao.getPlayer(conditions, function (getPlayerErr, players) {
         logger.info("get players result : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
         if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
-            logger.info("player: " + phoneNumber + "exist");
+            logger.info("player: " + phoneNumber + " exist");
             callback(errorCode.SUCCESS, players);
         } else {
             // user not exist
@@ -89,7 +91,6 @@ exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
 };
 
 
-
 exports.verifyTokenWorkUnit = function (key, value, callback) {
     playerAuth.validateAuthInfo(key, value, function (validatePlayerAuthErr, result) {
         if (validatePlayerAuthErr.code !== errorCode.SUCCESS.code) {
@@ -104,12 +105,11 @@ exports.verifyTokenWorkUnit = function (key, value, callback) {
  * @param token
  * @param callback
  */
-exports.getPhoneNumberByTokenWorkUnit = function(token, callback){
-    playerAuth.getAuthInfo(token,function(getValueErr, value ){
-        if(getValueErr.code !== errorCode.SUCCESS.code){
-            logger.info("no this key: " + "token");
+exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
+    playerAuth.getAuthInfo(token, function (getValueErr, value) {
+        if (getValueErr.code !== errorCode.SUCCESS.code) {
             callback(getValueErr, null);
-        }else{
+        } else {
             callback(getValueErr, value);
         }
     });

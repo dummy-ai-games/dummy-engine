@@ -5,6 +5,7 @@
 
 var logger = require('../poem/logging/logger4js').helper;
 var BoardResponse = require('../responses/board_response');
+var BoolResponse = require('../responses/bool_response');
 var boardLogic = require('../work_units/board_logic');
 
 /**
@@ -63,6 +64,25 @@ exports.listBoards = function (req, res) {
         boardResponse.status = listBoardsErr;
         boardResponse.entity = boards;
         res.send(boardResponse);
+        res.end();
+    });
+};
+
+
+/**
+ * to confirm it is a creator board
+ * @param req
+ * @param res
+ */
+exports.isCreatorBoard = function (req, res) {
+    var token = req.body.token;
+    var ticket = req.body.ticket;
+
+    var boolResponse = new BoolResponse();
+    boardLogic.isCreatorBoardWorkUnit(token, ticket, function (getBoardErr, result) {
+        boolResponse.status = getBoardErr;
+        boolResponse.entity = result;
+        res.send(boolResponse);
         res.end();
     });
 };

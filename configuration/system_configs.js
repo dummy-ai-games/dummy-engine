@@ -19,7 +19,7 @@ exports.setupEnvironment = function () {
         MONGO_DB_PASSWORD = '123456';
         REDIS_HOST = "127.0.0.1";
         REDIS_PORT = "6379";
-        REDIS_PASSWORD = "";
+        REDIS_PASSWORD = null;
     } else if (enums.APP_PRODUCTION_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_URI = "mongodb://127.0.0.1:27017/the_game";
@@ -29,7 +29,7 @@ exports.setupEnvironment = function () {
         MONGO_DB_PASSWORD = '123456';
         REDIS_HOST = "127.0.0.1";
         REDIS_PORT = "6379";
-        REDIS_PASSWORD = "";
+        REDIS_PASSWORD = null;
     } else if (enums.APP_USERDEBUG_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_URI = "mongodb://127.0.0.1:27017/the_game";
@@ -39,6 +39,6 @@ exports.setupEnvironment = function () {
         MONGO_DB_PASSWORD = '123456';
         REDIS_HOST = "127.0.0.1";
         REDIS_PORT = "6379";
-        REDIS_PASSWORD = "";
+        REDIS_PASSWORD = null;
     }
 };

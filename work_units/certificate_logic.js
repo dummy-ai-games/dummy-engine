@@ -3,7 +3,7 @@
  * 2017-12-05
  */
 
-var Constants = require('../poem/configuration/constants');
+require('../poem/configuration/constants');
 
 var Admin = require('../models/admin_dao.js');
 var AdminAuth = require('../authority/player_auth.js');
