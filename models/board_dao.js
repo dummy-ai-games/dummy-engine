@@ -80,10 +80,10 @@ exports.getBoard = function (condition, callback) {
         if (!err) {
             board_collection.find(condition).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("get board by condition " + condition + " succeed.");
+                    logger.info("get board by condition " + JSON.stringify(condition) + " succeed.");
                     callback(errorCode.SUCCESS, result); //return board array
                 } else {
-                    logger.error("get board by condition: " + condition + " occur error." + err);
+                    logger.error("get board by condition: " + JSON.stringify(condition) + " occur error." + err);
                     callback(errorCode.FAILED, null);
                 }
             });

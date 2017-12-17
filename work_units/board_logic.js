@@ -18,15 +18,14 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     var ticket = stringUtil.randomChar(30);
 
     // query create name from tb: players
-    var playerCon = {phoneNumber: creator};
+    var playerCon = { phoneNumber: creator };
     playerDao.getPlayer(playerCon, function (getPlayerErr, player) {
 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
             logger.info("queried player is : " + JSON.stringify(player));
             gameDao.getGameInfo({name: gameName}, function (getGameErr, game) {
-                logger.info(getGameErr.code);
-                logger.info(game);
                 if (getGameErr.code === errorCode.SUCCESS.code && game !== null && game.length > 0) {
+
                     var board = {
                         gameName: gameName,
                         minPlayer: game[0].minPlayer,
@@ -55,8 +54,8 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                     callback(errorCode.FAILED, null);
                 }
             });
-        } else { // player的值为null
-            logger.info("get player failed.")
+        } else {
+            logger.info("get player failed.");
             callback(errorCode.FAILED, null);
         }
     });
@@ -130,11 +129,11 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
     };
     boardDao.getBoard(condition, function (getBoardErr, boards) {
         if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null && boards.length > 0) {
-            logger.info("query board list: " + condition + " succeed");
+            logger.info("query board list: " + JSON.stringify(condition) + " succeed");
             callback(getBoardErr, boards); //
         } else {
             // board not exist
-            logger.error("query board list:" + condition + " failed.");
+            logger.error("query board list:" + JSON.stringify(condition) + " failed.");
             callback(errorCode.FAILED, null);
         }
     });
