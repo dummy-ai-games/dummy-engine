@@ -29,6 +29,7 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
 
     // query create name from tb: players
     var playerCon = {phoneNumber: creator};
+    logger.info("get player with conditions : " + JSON.stringify(playerCon));
     playerDao.getPlayer(playerCon, function (getPlayerErr, player) {
 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
