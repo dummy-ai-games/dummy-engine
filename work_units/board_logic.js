@@ -3,14 +3,23 @@
  * 2017-12-01
  */
 
+require('../poem/configuration/constants');
 var logger = require('../poem/logging/logger4js').helper;
 var boardDao = require('../models/board_dao');
 var gameDao = require('../models/game_dao');
-var playerDao = require('../models/player_dao')
-var ErrorCode = require('../constants/error_code.js');
-var errorCode = new ErrorCode();
+var playerDao = require('../models/player_dao');
+
 var stringUtil = require('../poem/utils/string_utils');
 var dateUtil = require('../poem/utils/date_utils');
+
+var PlayerAuth = require('../authority/player_auth.js');
+var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
+
+var ErrorCode = require('../constants/error_code.js');
+var errorCode = new ErrorCode();
+
+var Enums = require('../constants/enums.js');
+var enums = new Enums();
 
 
 exports.createBoardWorkUnit = function (creator, gameName, callback) {
@@ -61,7 +70,6 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
     });
 };
 
-
 exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
     var condition = {
         ticket: ticket,
@@ -90,7 +98,6 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
     });
 
 };
-
 
 /**
  * get board instance by ticket, gameName
@@ -135,6 +142,32 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
             // board not exist
             logger.error("query board list:" + JSON.stringify(condition) + " failed.");
             callback(errorCode.FAILED, null);
+        }
+    });
+};
+
+exports.isCreatorBoardWorkUnit = function(token, ticket, callback) {
+    playerAuth.getAuthInfo(token, function(getValueErr, value) {
+        if(getValueErr.code !== errorCode.SUCCESS.code) {
+            callback(getValueErr, null);
+        } else {
+            var conditions = {
+                creator: value,
+                ticket: ticket,
+                $or:[
+                    {status : enums.GAME_STATUS_STANDBY},
+                    {status : enums.GAME_STATUS_PREPARING},
+                    {status : enums.GAME_STATUS_RUNNING}
+                ]
+            };
+            boardDao.getBoard(conditions, function(getBoardErr, boards) {
+                if (errorCode.SUCCESS.code === getBoardErr.code && null != boards && boards.length > 0) {
+                    var board = boards[0];
+                    callback(errorCode.SUCCESS, board);
+                } else {
+                    callback(errorCode.FAILED, null);
+                }
+            });
         }
     });
 };

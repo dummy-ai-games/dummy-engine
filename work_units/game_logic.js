@@ -3,11 +3,11 @@
  * 2017-12-02
  */
 
+require('../poem/configuration/constants');
 var logger = require('../poem/logging/logger4js').helper;
 var gameDao = require('../models/game_dao');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
-
 
 exports.createGameWorkUnit = function (gameName, minPlayer, maxPlayer, callback) {
     var game = {
