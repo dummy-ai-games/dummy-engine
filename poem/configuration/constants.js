@@ -1,11 +1,11 @@
-/**
- * Created by dummy team
+/*
+ * Created by Strawmanbobi
  * 2014-08-30
  */
 
 // global constants describes the ability sets of the POEM framework
 
-global.VERSION = "0.0.1";
+global.VERSION = "0.0.5";
 global.ICODE = "PoEM V0.0.5";
 
 // runtime environment
@@ -76,3 +76,8 @@ global.SOCKET_0_ADDRESS = "http://localhost";
 global.REDIS_HOST = "127.0.0.1";
 global.REDIS_PORT = "6379";
 global.REDIS_PASSWORD = "";
+
+global.SMS_ACCESSKEY_ID = "";
+global.SMS_ACCESSKEY_SEC = "";
+global.SMS_SIGN_NAME = "";
+global.SMS_TEMP_NAME = "";

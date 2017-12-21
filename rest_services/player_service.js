@@ -166,3 +166,14 @@ exports.getPhoneNumberByToken = function (req, res) {
         res.end();
     });
 };
+
+// just for test
+var SmsSender = require('../poem/sms/sms_sender');
+exports.testSms = function (req, res) {
+    var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
+    sender.sendVerifyKey('18652006398', '123456', function(error) {
+
+    });
+    res.end();
+};
+
