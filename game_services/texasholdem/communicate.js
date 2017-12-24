@@ -713,7 +713,6 @@ SkyRTC.prototype.stopGame = function (tableNumber, token) {
                     that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_FINISHED);
                     delete that.table[tableNumber];
                     logger.info('remove table ' + tableNumber + ' timeout');
-
                 }
 
                 message = {
