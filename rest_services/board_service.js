@@ -36,9 +36,6 @@ exports.updateBoard = function (req, res) {
     var ticket = req.body.ticket;
     var gameName = req.body.gameName;
     var newBoard = req.body.newBoard;
-    logger.info(ticket);
-    logger.info(gameName);
-    logger.info(newBoard);
 
     var boardResponse = new BoardResponse();
     boardLogic.updateBoardWorkUnit(ticket, gameName, newBoard, function (updateBoardErr, board) {
