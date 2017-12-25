@@ -44,10 +44,10 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                             {status: enums.GAME_STATUS_RUNNING}
                         ]
                     };
-                    boardDao.getBoard(getBoardConditions, function (getBoardErr, board) {
+                    boardDao.getBoard(getBoardConditions, function (getBoardErr, boards) {
                         // get board info by {creator, gameName}
                         if (errorCode.SUCCESS.code === getBoardErr.code) { // get board succeed
-                            if (board === null || board.length === 0) {
+                            if (boards === null || boards.length === 0) {
                                 // create board
                                 var board = {
                                     gameName: gameName,
@@ -74,8 +74,9 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                                 });
                             } else {
                                 // creator cannot create multiple board that status is preparing(0) or active(1)
+                                var board = boards[0];
                                 logger.info("a creator can't create multiple active boards");
-                                callback(errorCode.MULTI_ACTIVE_BOARD_CREATED, null);
+                                callback(errorCode.MULTI_ACTIVE_BOARD_CREATED, board);
                             }
                         } else { // get board failed
                             logger.info('get board failed.');
@@ -177,7 +178,7 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
  *                  callback(errorCode.FAILED, null);
  */
 exports.listActiveBoardsWorkUnit = function (gameName, callback) {
-    var condition = {
+    var conditions = {
         gameName: gameName,
         $or: [
             {status: enums.GAME_STATUS_STANDBY},
@@ -185,13 +186,13 @@ exports.listActiveBoardsWorkUnit = function (gameName, callback) {
             {status: enums.GAME_STATUS_RUNNING}
         ]
     };
-    boardDao.getBoard(condition, function (getBoardErr, boards) {
+    boardDao.getBoard(conditions, function (getBoardErr, boards) {
         if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null && boards.length > 0) {
-            logger.info("query board list: " + JSON.stringify(condition) + " succeed");
-            callback(getBoardErr, boards); //
+            logger.info("query board list: " + JSON.stringify(conditions) + " succeed");
+            callback(getBoardErr, boards);
         } else {
             // board not exist
-            logger.error("query board list:" + JSON.stringify(condition) + " failed.");
+            logger.error("query board list:" + JSON.stringify(conditions) + " failed.");
             callback(errorCode.FAILED, null);
         }
     });
