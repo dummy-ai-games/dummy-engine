@@ -8,6 +8,7 @@ var logger = require('../poem/logging/logger4js').helper;
 var playerDao = require('../models/player_dao');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
+var SmsSender = require('../poem/sms/sms_sender');
 
 var PlayerAuth = require('../authority/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
@@ -112,5 +113,17 @@ exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
         } else {
             callback(getValueErr, value);
         }
+    });
+};
+
+exports.sendVerifyKeyWorkUnit = function (phoneNumber, verificationCode, callback) {
+    var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
+    sender.sendVerifyKey(phoneNumber, verificationCode, function (sendErr) {
+        if (sendErr === errorCode.SUCCESS.code) {
+            logger.info("send verification succeed in player_logic.");
+        } else {
+            logger.info("send verification fail in player_logic.");
+        }
+        callback(sendErr);
     });
 };

@@ -12,4 +12,4 @@ app.post("/players/login", playerService.login);
 app.post("/players/isLogin", playerService.validateUserToken);
 app.post("/players/getPhoneByToken", playerService.getPhoneNumberByToken);
 
-app.get("/players/testSms", playerService.testSms);
+app.post("/players/sendSms", playerService.sendSms);

@@ -6,10 +6,11 @@ var logger = require('../poem/logging/logger4js').helper;
 var PlayerResponse = require('../responses/player_response');
 var playerLogic = require('../work_units/player_logic');
 var encrypt = require('../poem/crypto/encrypt');
+var string_utils = require('../poem/utils/string_utils');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var StringResponse = require('../responses/string_response');
-
+var ServiceResponse = require('../responses/service_response');
 var PlayerAuth = require('../authority/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
@@ -20,46 +21,60 @@ exports.signup = function (req, res) {
     var player = req.body;
 
     var playerResponse = new PlayerResponse();
-    playerLogic.registerWorkUnit(player, function (registerErr, result) {
-        playerResponse.status = registerErr;
-        if (registerErr.code === errorCode.SUCCESS.code && null !== result && result.ops.length > 0) {
-            // generate token and save to cache
-            var token,
-                key,
-                ttl = 24 * 60 * 60 * 14,
-                timeStamp,
-                player;
 
-            player = result.ops[0];
-            timeStamp = new Date().getTime();
-            token = MD5.MD5(player.password + timeStamp);
-            key = player.phoneNumber;
+    // check if verificationCode is right
+    playerAuth.getAuthInfo(player.phoneNumber,function(getValueErr, verifyCode){
+        if (getValueErr.code === errorCode.SUCCESS.code && null !== verifyCode && verifyCode === player.smsCode){
+            //验证码正确，允许注册
+            logger.info("verification code is right");
+            playerLogic.registerWorkUnit(player, function (registerErr, result) {
+                playerResponse.status = registerErr;
+                if (registerErr.code === errorCode.SUCCESS.code && null !== result && result.ops.length > 0) {
+                    // generate token and save to cache
+                    var token,
+                        key,
+                        ttl = 24 * 60 * 60 * 14,
+                        timeStamp,
+                        player;
 
-            var key_token = token;
-            var value_phone = key;
-            // 将(token, phoneNumber)作为键值对
-            playerAuth.setAuthInfo(key_token, value_phone, ttl, function (setPlayerAuthErr) {
-                if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-                    player.token = key_token;
-                    delete player.password;
-                    playerResponse.status = errorCode.SUCCESS;
-                    playerResponse.entity = player;
-                    res.send(playerResponse);
-                    res.end();
+                    player = result.ops[0];
+                    timeStamp = new Date().getTime();
+                    token = MD5.MD5(player.password + timeStamp);
+                    key = player.phoneNumber;
+
+                    var key_token = token;
+                    var value_phone = key;
+                    // 将(token, phoneNumber)作为键值对
+                    playerAuth.setAuthInfo(key_token, value_phone, ttl, function (setPlayerAuthErr) {
+                        if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
+                            player.token = key_token;
+                            delete player.password;
+                            playerResponse.status = errorCode.SUCCESS;
+                            playerResponse.entity = player;
+                            res.send(playerResponse);
+                            res.end();
+                        } else {
+                            playerResponse.status = errorCode.FAILED;
+                            playerResponse.entity = null;
+                            res.send(playerResponse);
+                            res.end();
+                        }
+                    });
                 } else {
                     playerResponse.status = errorCode.FAILED;
                     playerResponse.entity = null;
                     res.send(playerResponse);
                     res.end();
                 }
+
             });
-        } else {
+        }else{
+            //验证码不对
             playerResponse.status = errorCode.FAILED;
             playerResponse.entity = null;
             res.send(playerResponse);
             res.end();
         }
-
     });
 };
 
@@ -167,13 +182,37 @@ exports.getPhoneNumberByToken = function (req, res) {
     });
 };
 
-// just for test
-var SmsSender = require('../poem/sms/sms_sender');
-exports.testSms = function (req, res) {
-    var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
-    sender.sendVerifyKey('18652006398', '123456', function(error) {
 
-    });
-    res.end();
+exports.sendSms = function (req, res) {
+    var phoneNumber = req.body.phoneNumber;
+    var verificationCode = string_utils.genVerificationCode(0,6) //生成6位数字验证码
+    var ttl = 5 * 60;
+    var serviceResponse = new ServiceResponse();
+    // 将(phoneNumber, verificationCode)作为键值对,存入redis，有效期5min
+    playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
+        if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
+            logger.info("save verificationCode to redis succeed.");
+            // begin send message
+            playerLogic.sendVerifyKeyWorkUnit(phoneNumber,verificationCode, function (sendErr) {
+                console.log(JSON.stringify(sendErr));
+                if (sendErr === errorCode.SUCCESS.code) {
+                    logger.info("send message succeed in player_service");
+                    serviceResponse.cause = "send message succeed";
+                } else {
+                    logger.info("send message fail in player_service.");
+                    serviceResponse.cause = "send message fail";
+                }
+                serviceResponse.status = sendErr;
+                res.send(serviceResponse);
+                res.end();
+            });
+        } else {
+            logger.info("save verificationCode to redis fail.");
+            serviceResponse.status = setPlayerAuthErr;
+            serviceResponse.cause = "send message fail";
+            res.send(serviceResponse);
+            res.end();
+        }
+     });
 };
 
