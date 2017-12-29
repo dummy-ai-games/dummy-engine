@@ -9,7 +9,6 @@ var playerService = require('../rest_services/player_service.js');
 
 app.post("/players/signup", playerService.signup);
 app.post("/players/login", playerService.login);
-app.post("/players/isLogin", playerService.validateUserToken);
-app.post("/players/getPhoneByToken", playerService.getPhoneNumberByToken);
-
-app.post("/players/sendSms", playerService.sendSms);
+app.post("/players/is_login", playerService.validateUserToken);
+app.post("/players/get_player_by_token", playerService.getPlayerByToken);
+app.post("/players/send_sms", playerService.sendSms);

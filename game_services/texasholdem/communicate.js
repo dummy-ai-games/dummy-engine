@@ -45,7 +45,6 @@ function SkyRTC(tableNumber) {
     this.ipArray = {};
     this.gameName = enums.GAME_TEXAS_HOLDEM;
 
-
     this.on('__join', function (data, socket) {
         var that = this;
         var phoneNumber = data.phoneNumber;
@@ -66,7 +65,7 @@ function SkyRTC(tableNumber) {
         }
 
         socket.token = token;
-
+        logger.info('phoneNumber = ' + phoneNumber + ', password = ' + password);
         if (phoneNumber && password) {
             playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {

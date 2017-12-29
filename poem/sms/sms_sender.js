@@ -25,7 +25,7 @@ var SmsSender = function(_accessKey, _accessSecret, _signName, _tempName) {
     this.smsClient = new SMSClient({accessKeyId : _accessKey, secretAccessKey: _accessSecret});
 };
 
-//fasong
+
 SmsSender.prototype.sendVerifyKey = function(phoneNumber, verifyKey, callback) {
     this.smsClient.sendSMS({
         PhoneNumbers: phoneNumber, //短信接收号码

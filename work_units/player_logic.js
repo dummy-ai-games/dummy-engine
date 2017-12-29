@@ -14,11 +14,6 @@ var PlayerAuth = require('../authority/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
 
-/**
- * register function
- * @param player: Json format player info
- * @param callback: {errorCode.PLAYER_EXIST, errorCode.SUCCESS, errorCode.FAILED}
- */
 exports.registerWorkUnit = function (player, callback) {
     var conditions = {
         phoneNumber: player.phoneNumber
@@ -81,7 +76,7 @@ exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
     playerDao.getPlayer(conditions, function (getPlayerErr, players) {
         logger.info("get players result : " + JSON.stringify(getPlayerErr) + ", " + JSON.stringify(players));
         if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
-            logger.info("player: " + phoneNumber + "exist");
+            logger.info("player: " + phoneNumber + " exist");
             callback(errorCode.SUCCESS, players);
         } else {
             // user not exist
@@ -101,11 +96,6 @@ exports.verifyTokenWorkUnit = function (key, value, callback) {
     });
 };
 
-/**
- * get phoneNumber by token
- * @param token
- * @param callback
- */
 exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
     playerAuth.getAuthInfo(token, function (getValueErr, value) {
         if (getValueErr.code !== errorCode.SUCCESS.code) {
@@ -115,6 +105,7 @@ exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
         }
     });
 };
+
 
 exports.sendVerifyKeyWorkUnit = function (phoneNumber, verificationCode, callback) {
     var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
