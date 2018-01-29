@@ -32,6 +32,7 @@ exports.signup = function (req, res) {
         if (getValueErr.code === errorCode.SUCCESS.code && null !== verifyCode && verifyCode === player.smsCode) {
             //验证码正确，允许注册
             logger.info("verification code is right");
+            delete player.smsCode; //删除player的smsCode属性
             playerLogic.registerWorkUnit(player, function (registerErr, result) {
                 playerResponse.status = registerErr;
                 if (registerErr.code === errorCode.SUCCESS.code && null !== result && result.ops.length > 0) {
@@ -65,6 +66,12 @@ exports.signup = function (req, res) {
                             res.end();
                         }
                     });
+                }else if(registerErr.code === errorCode.PLAYER_EXIST.code){
+                    playerResponse.status = errorCode.PLAYER_EXIST;
+                    playerResponse.entity = null;
+                    res.send(playerResponse);
+                    res.end();
+
                 } else {
                     playerResponse.status = errorCode.FAILED;
                     playerResponse.entity = null;
@@ -75,7 +82,7 @@ exports.signup = function (req, res) {
             });
         } else {
             //验证码不对
-            playerResponse.status = errorCode.FAILED;
+            playerResponse.status = errorCode.WRONG_VERIFICATION_CODE;
             playerResponse.entity = null;
             res.send(playerResponse);
             res.end();
@@ -127,7 +134,7 @@ exports.login = function (req, res) {
                 }
             });
         } else {
-            playerResponse.status = errorCode.FAILED;
+            playerResponse.status = errorCode.LOGIN_FAILURE;
             playerResponse.entity = null;
             res.send(playerResponse);
             res.end();

@@ -52,10 +52,12 @@ exports.createPlayer = function (player, callback) {
  * @param callback: succeed, failed
  */
 exports.getPlayer = function (conditions, callback) {
+    logger.info(JSON.stringify(conditions));
     db.collection('player', function (err, playerCollection) {
         if (!err) {
             playerCollection.find(conditions).toArray(function (err, result) {
                 if (!err) {
+                    logger.info(JSON.stringify(result));
                     callback(errorCode.SUCCESS, result);
                 } else {
                     logger.error("get player error : " + err);

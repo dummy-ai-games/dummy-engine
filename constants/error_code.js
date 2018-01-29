@@ -12,10 +12,9 @@ function ErrorCode() {
         code: 2,
         cause: 'Session timeout or token illegal'
     };
-
     this.FAILED = {
         code: -1,
-        cause: "Generic error"
+        cause: "System encountered an error, please try again later."
     };
     this.WRONG_ENV = {
         code: -2,
@@ -28,12 +27,21 @@ function ErrorCode() {
 
     this.PLAYER_EXIST = {
         code: 1,
-        cause: "Player existed"
+        cause: "Player already exist."
     };
+
+    this.WRONG_VERIFICATION_CODE = {
+        code: -4,
+        cause: "Wrong Verification Code."
+    }
 
     this.MULTI_ACTIVE_BOARD_CREATED = {
         code: 1,
         cause: "multi active boards in a game are created by a player "
+    }
+    this.LOGIN_FAILURE ={
+        code: -5,
+        cause:"Wrong phoneNumber or password."
     }
 }
 
