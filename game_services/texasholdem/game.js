@@ -805,10 +805,10 @@ function checkForWinner(table) {
     allInPlayer = checkForAllInPlayer(table, winners);
 
     if (allInPlayer.length > 0) {
-        minBets = table.game.roundBets[winners[0]];
+        minBets = table.game.roundBets[allInPlayer[0]];
         for (j = 1; j < allInPlayer.length; j += 1) {
-            if (table.game.roundBets[winners[j]] !== 0 && table.game.roundBets[winners[j]] < minBets) {
-                minBets = table.game.roundBets[winners[j]];
+            if (table.game.roundBets[allInPlayer[j]] !== 0 && table.game.roundBets[allInPlayer[j]] < minBets) {
+                minBets = table.game.roundBets[allInPlayer[j]];
             }
         }
         part = parseInt(minBets);
