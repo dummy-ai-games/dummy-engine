@@ -6,7 +6,7 @@
 require('../poem/configuration/constants');
 
 var Admin = require('../models/admin_dao.js');
-var AdminAuth = require('../authority/player_auth.js');
+var AdminAuth = require('../authentication/player_auth.js');
 var MD5 = require('../poem/crypto/md5.js');
 var StringUtils = require('../poem/utils/string_utils.js');
 

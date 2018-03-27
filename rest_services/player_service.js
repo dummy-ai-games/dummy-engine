@@ -11,7 +11,7 @@ var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var StringResponse = require('../responses/string_response');
 var ServiceResponse = require('../responses/service_response');
-var PlayerAuth = require('../authority/player_auth.js');
+var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
 var MD5 = require('../poem/crypto/md5.js');

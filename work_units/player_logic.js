@@ -10,9 +10,8 @@ var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var SmsSender = require('../poem/sms/sms_sender');
 
-var PlayerAuth = require('../authority/player_auth.js');
+var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
-
 
 exports.registerWorkUnit = function (player, callback) {
     var conditions = {
@@ -86,7 +85,6 @@ exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
     });
 };
 
-
 exports.verifyTokenWorkUnit = function (key, value, callback) {
     playerAuth.validateAuthInfo(key, value, function (validatePlayerAuthErr, result) {
         if (validatePlayerAuthErr.code !== errorCode.SUCCESS.code) {
@@ -105,7 +103,6 @@ exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
         }
     });
 };
-
 
 exports.sendVerifyKeyWorkUnit = function (phoneNumber, verificationCode, callback) {
     var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
