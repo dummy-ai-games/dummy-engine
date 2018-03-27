@@ -6,7 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "@alicloud/sms-sdk": "^1.0.2",
+    "@alicloud/sms-sdk": "^1.0.8",
     "async": "^2.1.4",
     "body-parser": "^1.13.2",
     "bson": "^1.0.4",

@@ -6,7 +6,7 @@ var logger = require('../poem/logging/logger4js').helper;
 var PlayerResponse = require('../responses/player_response');
 var playerLogic = require('../work_units/player_logic');
 var encrypt = require('../poem/crypto/encrypt');
-var string_utils = require('../poem/utils/string_utils');
+var stringUtils = require('../poem/utils/string_utils');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var StringResponse = require('../responses/string_response');
@@ -222,7 +222,7 @@ exports.getPlayerByToken = function (req, res) {
  */
 exports.sendSms = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
-    var verificationCode = string_utils.genVerificationCode(0, 6);
+    var verificationCode = stringUtils.genVerificationCode(0, 6);
     var ttl = 5 * 60;
     var serviceResponse = new ServiceResponse();
     playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
