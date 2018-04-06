@@ -51,10 +51,18 @@ function SkyRTC(tableNumber) {
         var phoneNumber = data.phoneNumber;
         var password = data.password;
         var ticket = data.ticket;
+        var port = data.port;
         var isHuman = data.isHuman || false;
         var token = data.token;
 
-        logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + ticket);
+        logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + ticket + ' on ' + port);
+
+        if (!ticket || !port || port !== LISTEN_PORT) {
+            logger.error('invalid ticket or port');
+            socket.close();
+            return;
+        }
+
         if (phoneNumber && password) {
             logger.info('human joined');
             socket.isHuman = isHuman;
@@ -62,7 +70,7 @@ function SkyRTC(tableNumber) {
             logger.info('AI joined');
             socket.tableNumber = ticket;
         } else {
-            logger.info('user is invalid, close its socket');
+            logger.error('user is invalid, close its socket');
             socket.close();
             return;
         }
