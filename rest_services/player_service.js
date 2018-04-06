@@ -152,7 +152,6 @@ exports.validateUserToken = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
     var key_token = req.body.token;
 
-
     var playerResponse = new PlayerResponse();
     playerLogic.verifyTokenWorkUnit(key_token, phoneNumber, function (validateTokenErr, result) {
         if (errorCode.SUCCESS.code !== validateTokenErr.code) { //不存在该token，
@@ -161,7 +160,7 @@ exports.validateUserToken = function (req, res) {
             playerResponse.entity = null;
             res.send(playerResponse);
             res.end();
-        } else { //存在该id,token, 返回用户信息
+        } else { //存在该id, token, 返回用户信息
             playerLogic.getPlayerByPhoneNumberWorkUnit(phoneNumber, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code && null !== players) {
                     var player = players[0];

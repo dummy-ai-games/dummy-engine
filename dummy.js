@@ -22,6 +22,9 @@ var app = module.exports = express();
 
 var httpServer = require('http').createServer(app);
 var httpPort = normalizePort(process.argv[2] || LISTEN_PORT);
+
+LISTEN_PORT = httpPort;
+
 httpServer.listen(httpPort);
 
 var tableNumber;

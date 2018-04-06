@@ -41,6 +41,18 @@ exports.genVerificationCode = function (start, end) {
     }).join('')
 };
 
+exports.getHashCode = function (str, caseSensitive) {
+    if(!caseSensitive){
+        str = str.toLowerCase();
+    }
+    var hash = 1315423911, i, ch;
+    for (i = str.length - 1; i >= 0; i--) {
+        ch = str.charCodeAt(i);
+        hash ^= ((hash << 5) + ch + (hash >> 2));
+    }
+
+    return (hash & 0x7FFFFFFF);
+};
 
 function rnd() {
     var today = new Date();
@@ -57,4 +69,3 @@ function isNumber() {
     var r = /^[0-9]*[1-9][0-9]*$/;
     return r.test(str);
 }
-

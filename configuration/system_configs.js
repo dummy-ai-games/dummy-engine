@@ -23,6 +23,8 @@ exports.setupEnvironment = function () {
         SMS_ACCESSKEY_SEC = "SOweQ8UVwCwPr2NC8EC89EOeKJc5Um";
         SMS_TEMP_NAME = "SMS_117522803";
         SMS_SIGN_NAME = "大米AI编程平台";
+        MULTIPLE_INSTANCE = 100;
+        BASE_PORT = 9000;
     } else if (enums.APP_PRODUCTION_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
@@ -36,6 +38,8 @@ exports.setupEnvironment = function () {
         SMS_ACCESSKEY_SEC = "SOweQ8UVwCwPr2NC8EC89EOeKJc5Um";
         SMS_TEMP_NAME = "SMS_117522803";
         SMS_SIGN_NAME = "大米AI编程平台";
+        MULTIPLE_INSTANCE = 100;
+        BASE_PORT = 9000;
     } else if (enums.APP_USERDEBUG_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
@@ -49,5 +53,7 @@ exports.setupEnvironment = function () {
         SMS_ACCESSKEY_SEC = "SOweQ8UVwCwPr2NC8EC89EOeKJc5Um";
         SMS_TEMP_NAME = "SMS_117522803";
         SMS_SIGN_NAME = "大米AI编程平台";
+        MULTIPLE_INSTANCE = 100;
+        BASE_PORT = 9000;
     }
 };

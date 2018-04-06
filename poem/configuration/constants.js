@@ -81,3 +81,7 @@ global.SMS_ACCESSKEY_ID = "";
 global.SMS_ACCESSKEY_SEC = "";
 global.SMS_SIGN_NAME = "";
 global.SMS_TEMP_NAME = "";
+
+// multiple instance
+global.MULTIPLE_INSTANCE = 100;
+global.BASE_PORT = 9000;

@@ -23,20 +23,26 @@ var Enums = require('../constants/enums.js');
 var enums = new Enums();
 
 
-exports.createBoardWorkUnit = function (creator, gameName, callback) {
+exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) {
     var currentTime = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
     var ticket = stringUtil.randomChar(30);
 
     // query create name from tb: players
-    var playerCon = {phoneNumber: creator};
-    logger.info("get player with conditions : " + JSON.stringify(playerCon));
-    playerDao.getPlayer(playerCon, function (getPlayerErr, player) {
+    var playerCon = {
+        phoneNumber: creatorPhoneNumber,
+        status: 1
+    };
+    playerDao.getPlayer(playerCon, function (getPlayerErr, players) {
 
-        if (getPlayerErr.code === errorCode.SUCCESS.code && null !== player && player.length > 0) { // player != null
+        if (getPlayerErr.code === errorCode.SUCCESS.code && null !== players && players.length > 0) {
+            var port = players[0].instance;
+            var creatorName = players[0].playerName;
+            logger.info('creator phoneNumber = ' + creatorPhoneNumber);
+            logger.info('creator name = ' + creatorName);
             gameDao.getGameInfo({name: gameName}, function (getGameErr, game) { // game != nulls
                 if (getGameErr.code === errorCode.SUCCESS.code && game !== null && game.length > 0) {
                     var getBoardConditions = {
-                        creator: creator,
+                        creator: creatorPhoneNumber,
                         gameName: gameName,
                         $or: [
                             {status: enums.GAME_STATUS_STANDBY},
@@ -53,14 +59,15 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                                     gameName: gameName,
                                     minPlayer: game[0].minPlayer,
                                     maxPlayer: game[0].maxPlayer,
-                                    currentPlayer: [creator], //?
+                                    currentPlayer: [],
                                     status: 0,
-                                    creator: creator,
-                                    creatorName: player[0].name, // add createName
+                                    creator: creatorPhoneNumber,
+                                    creatorName: creatorName,
                                     createTime: currentTime,
                                     updateTime: currentTime,
                                     ticket: ticket,
-                                    type: 0
+                                    type: 0,
+                                    port: port
                                 };
                                 boardDao.createBoard(board, function (createBoardErr, result) {
                                     if (createBoardErr.code === errorCode.SUCCESS.code && null !== result.ops &&
@@ -84,12 +91,12 @@ exports.createBoardWorkUnit = function (creator, gameName, callback) {
                         }
                     });
                 } else { // get game failed
-                    logger.info('get game failed.');
+                    logger.info('get game failed');
                     callback(errorCode.FAILED, null);
                 }
             });
         } else {
-            logger.info("get player failed.");
+            logger.info("get player failed, or an unregistered player is trying to create board");
             callback(errorCode.FAILED, null);
         }
     });
@@ -130,10 +137,11 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
  * @param callback: callback(errorCode.SUCCESS, board)
  *                  callback(errorCode.FAILED, null)
  */
-exports.getBoardByTicketWorkUnit = function (ticket, gameName, callback) {
+exports.getBoardByTicketWorkUnit = function (ticket, gameName, port, callback) {
     var condition = {
         ticket: ticket,
-        gameName: gameName
+        gameName: gameName,
+        port: port
     };
     boardDao.getBoard(condition, function (getBoardErr, board) {
         if (getBoardErr.code === errorCode.SUCCESS.code && board !== null && board.length > 0) {

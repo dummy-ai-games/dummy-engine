@@ -6,6 +6,8 @@
 var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
+
+require('../../poem/configuration/constants');
 var poker = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
 var boardLogic = require('../../work_units/board_logic.js');
@@ -20,7 +22,6 @@ var ErrorCode = require('../../constants/error_code.js');
 
 var enums = new Enums();
 var errorCode = new ErrorCode();
-
 
 var errorCb = function (rtc) {
     return function (error) {
@@ -49,15 +50,17 @@ function SkyRTC(tableNumber) {
         var that = this;
         var phoneNumber = data.phoneNumber;
         var password = data.password;
-        var table = data.ticket;
+        var ticket = data.ticket;
         var isHuman = data.isHuman || false;
         var token = data.token;
 
-        logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + table);
+        logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + ticket);
         if (phoneNumber && password) {
+            logger.info('human joined');
             socket.isHuman = isHuman;
-        } else if (table) {
-            socket.tableNumber = table;
+        } else if (ticket) {
+            logger.info('AI joined');
+            socket.tableNumber = ticket;
         } else {
             logger.info('user is invalid, close its socket');
             socket.close();
@@ -69,10 +72,11 @@ function SkyRTC(tableNumber) {
         if (phoneNumber && password) {
             playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, boards) {
+                    boardLogic.getBoardByTicketWorkUnit(ticket, that.gameName, LISTEN_PORT,
+                        function (getBoardErr, boards) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var board = boards[0];
-                            var tableNumber = table;
+                            var tableNumber = ticket;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
                                 var playerName = players[0].name;
                                 if (that.players[playerName]) {
@@ -110,20 +114,19 @@ function SkyRTC(tableNumber) {
                                         logger.info('update game to stand by');
                                         that.updateBoard(socket.tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
                                     } else {
-                                        socket.close();
                                         logger.info('player : ' + playerName + ' can not join because no empty place');
+                                        socket.close();
                                     }
                                 } else {
-                                    socket.close();
                                     logger.info('player : ' + playerName + ' can not join because game has started');
+                                    socket.close();
                                 }
-
                             } else {
-                                logger.info('ticket : ' + table + ' is wrong');
+                                logger.info('ticket : ' + ticket + ' is wrong');
+                                socket.close();
                             }
-
                         } else {
-                            logger.info('ticket ' + table + ' not exist');
+                            logger.info('ticket ' + ticket + ' on port ' + LISTEN_PORT + ' not exist');
                             socket.close();
                         }
                     });
