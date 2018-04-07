@@ -65,7 +65,15 @@ Cache.prototype.get = function(key, isBuffer, callback) {
 };
 
 Cache.prototype.delete = function(key, callback) {
-    callback(errorCode.SUCCESS);
+    this.redisClient.del(key, function(err) {
+        if(err) {
+            logger.error("Redis del value failed with key " + key);
+            this.redisClient.end();
+            callback(errorCode.FAILED);
+        } else {
+            callback(errorCode.SUCCESS);
+        }
+    });
 };
 
 module.exports = Cache;

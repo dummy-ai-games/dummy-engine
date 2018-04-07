@@ -17,7 +17,6 @@ var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
 var MD5 = require('../poem/crypto/md5.js');
 
-
 /**
  * player sign up
  * @param req
@@ -153,9 +152,10 @@ exports.validateUserToken = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
     var key_token = req.body.token;
 
+    logger.info('check if user logged in : ' + phoneNumber + ', ' + key_token);
     var playerResponse = new PlayerResponse();
     playerLogic.verifyTokenWorkUnit(key_token, phoneNumber, function (validateTokenErr, result) {
-        if (errorCode.SUCCESS.code !== validateTokenErr.code) { //不存在该token，
+        if (errorCode.SUCCESS.code !== validateTokenErr.code) {
             logger.info("invalid id and token.");
             playerResponse.status = validateTokenErr;
             playerResponse.entity = null;
@@ -243,3 +243,35 @@ exports.sendSms = function (req, res) {
     });
 };
 
+/**
+ * sign player out
+ * @param req
+ * @param res
+ */
+exports.signOut = function (req, res) {
+    var phoneNumber = req.body.phoneNumber;
+    var token = req.body.token;
+
+    logger.info("sign out for " + phoneNumber + ", " + token);
+    var serviceResponse = new ServiceResponse();
+    playerAuth.deleteAuthInfo(phoneNumber, function (deletePhoneNumberErr) {
+        if (deletePhoneNumberErr.code === errorCode.SUCCESS.code) {
+            logger.info("phone Number " + phoneNumber + " as key deleted");
+            playerAuth.deleteAuthInfo(token, function (deleteTokenErr) {
+                if (deleteTokenErr.code === errorCode.SUCCESS.code) {
+                    logger.info("token " + token + " as key deleted");
+                } else {
+                    logger.warn("token " + token + " as key delete failed");
+                }
+                serviceResponse.status = errorCode.SUCCESS;
+                res.send(serviceResponse);
+                res.end();
+            });
+        } else {
+            logger.error("phone Number " + phoneNumber + " as key delete failed");
+            serviceResponse.status = errorCode.FAILED;
+            res.send(serviceResponse);
+            res.end();
+        }
+    });
+};
