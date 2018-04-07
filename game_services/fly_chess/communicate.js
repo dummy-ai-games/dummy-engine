@@ -6,13 +6,14 @@
 var UUID = require('node-uuid');
 var events = require('events');
 var util = require('util');
+
+require('../../poem/configuration/constants');
+
 var flyChess = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
 var boardLogic = require('../../work_units/board_logic.js');
 
-
 var DEFAULT_GAME_OVER_DELAY = 1000;
-
 
 var logger = require('../../poem/logging/logger4js').helper;
 
@@ -60,7 +61,7 @@ function SkyRTC(tableNumber) {
         if (phoneNumber && password) {
             playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, players) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
-                    boardLogic.getBoardByTicketWorkUnit(table, that.gameName, function (getBoardErr, boards) {
+                    boardLogic.getBoardByTicketWorkUnit(table, that.gameName, LISTEN_PORT, function (getBoardErr, boards) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var tableNumber = table;
                             var board = boards[0];
@@ -431,7 +432,7 @@ SkyRTC.prototype.prepareGame = function (tableNumber, token) {
         return;
     }
 
-    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, LISTEN_PORT, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
             playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
@@ -578,7 +579,7 @@ SkyRTC.prototype.stopGame = function (tableNumber, token) {
         return;
     }
 
-    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, LISTEN_PORT, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
             playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
@@ -620,7 +621,7 @@ SkyRTC.prototype.endGame = function (tableNumber, token) {
         return;
     }
 
-    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, LISTEN_PORT, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
             playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {

@@ -17,7 +17,7 @@ var errorCode = new ErrorCode();
  *      phoneNumber(string)(primary key)
  *      password(string)
  *      avatar(string)
- *      role(int): 0-player, 1-admin
+ *      role(int): 0-player, 1-admin, 2-virtual
  *      status(int): 0-active, 1-deleted
  */
 

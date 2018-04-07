@@ -8,6 +8,7 @@ var events = require('events');
 var util = require('util');
 
 require('../../poem/configuration/constants');
+
 var poker = require('./game.js');
 var playerLogic = require('../../work_units/player_logic.js');
 var boardLogic = require('../../work_units/board_logic.js');
@@ -536,7 +537,7 @@ SkyRTC.prototype.prepareGame = function (ticket, token) {
         return;//prevent concurrent start operation
     }
 
-    boardLogic.getBoardByTicketWorkUnit(ticket, that.gameName, function (getBoardErr, boards) {
+    boardLogic.getBoardByTicketWorkUnit(ticket, that.gameName, LISTEN_PORT, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
             playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
@@ -706,7 +707,7 @@ SkyRTC.prototype.stopGame = function (tableNumber, token) {
     if (that.table[tableNumber] && that.table[tableNumber].countDown !== 3) {
         return;
     }
-    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, LISTEN_PORT, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
             playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
@@ -748,7 +749,7 @@ SkyRTC.prototype.endGame = function (tableNumber, token) {
         return;
     }
 
-    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, function (getBoardErr, boards) {
+    boardLogic.getBoardByTicketWorkUnit(tableNumber, that.gameName, LISTEN_PORT, function (getBoardErr, boards) {
         if (errorCode.SUCCESS.code === getBoardErr.code) {
             var board = boards[0];
             playerLogic.getPhoneNumberByTokenWorkUnit(token, function (getValueErr, phoneNumber) {
