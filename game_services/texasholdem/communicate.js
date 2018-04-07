@@ -57,7 +57,7 @@ function SkyRTC(tableNumber) {
 
         logger.info('on __join, phoneNumber = ' + phoneNumber + ', ticket = ' + ticket + ' on ' + port);
 
-        if (!ticket || !port || port !== LISTEN_PORT) {
+        if (!ticket || !port || port != LISTEN_PORT) {
             logger.error('invalid ticket or port');
             socket.close();
             return;
@@ -409,7 +409,6 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
 
     var message;
 
-    // TODO: to make clear how the Live and Player UI would be affected by aliens join and left
     for (var guest in that.guests) {
         if (that.guests[guest].tableNumber === tableNumber) {
             message = {

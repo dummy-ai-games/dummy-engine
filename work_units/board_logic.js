@@ -36,7 +36,7 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== players && players.length > 0) {
             var port = players[0].instance;
-            var creatorName = players[0].playerName;
+            var creatorName = players[0].name;
             logger.info('creator phoneNumber = ' + creatorPhoneNumber);
             logger.info('creator name = ' + creatorName);
             gameDao.getGameInfo({name: gameName}, function (getGameErr, game) { // game != nulls
