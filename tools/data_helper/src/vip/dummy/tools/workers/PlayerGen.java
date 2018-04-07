@@ -41,7 +41,7 @@ public class PlayerGen {
         }
     };
 
-    public boolean generatePlayers() {
+    public boolean generatePlayers(boolean dummy) {
         MongoDatabase database;
         MongoCollection<Document> collection;
         try {
@@ -80,21 +80,32 @@ public class PlayerGen {
                 player.setMailStatus(1);
                 player.setInstance((int)(phoneNumber % this.instanceCount));
 
-                Document playerDoc = new Document("name", player.getName())
-                        .append("studentName", player.getStudentName())
-                        .append("phoneNumber", player.getPhoneNumber())
-                        .append("verificationCode", player.getVerificationCode())
-                        .append("mail", player.getMail())
-                        .append("education", player.getEducation())
-                        .append("profession", player.getProfession())
-                        .append("university", player.getUniversity())
-                        .append("graduateDate", player.getGraduateDate())
-                        .append("password", player.getPassword())
-                        .append("passwordPlain", player.getPasswordPlain())
-                        .append("role", player.getRole())
-                        .append("status", player.getStatus())
-                        .append("mailStatus", player.getMailStatus())
-                        .append("instance", player.getInstance());
+                Document playerDoc = new Document();
+                if (dummy) {
+                    playerDoc.append("name", player.getName())
+                            .append("phoneNumber", player.getPhoneNumber())
+                            .append("password", player.getPassword())
+                            .append("passwordPlain", player.getPasswordPlain())
+                            .append("role", player.getRole())
+                            .append("status", player.getStatus())
+                            .append("instance", player.getInstance());
+                } else {
+                    playerDoc.append("name", player.getName())
+                            .append("studentName", player.getStudentName())
+                            .append("phoneNumber", player.getPhoneNumber())
+                            .append("verificationCode", player.getVerificationCode())
+                            .append("mail", player.getMail())
+                            .append("education", player.getEducation())
+                            .append("profession", player.getProfession())
+                            .append("university", player.getUniversity())
+                            .append("graduateDate", player.getGraduateDate())
+                            .append("password", player.getPassword())
+                            .append("passwordPlain", player.getPasswordPlain())
+                            .append("role", player.getRole())
+                            .append("status", player.getStatus())
+                            .append("mailStatus", player.getMailStatus())
+                            .append("instance", player.getInstance());
+                }
 
                 System.out.println("player " + player.getName() + ", " + player.getPhoneNumber() +
                         ", " + player.getInstance() + " has been added");
