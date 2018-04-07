@@ -73,9 +73,12 @@ exports.listBoards = function (req, res) {
  */
 exports.listActiveBoards = function (req, res) {
     var gameName = req.body.gameName;
+    var from = req.body.from || 0;
+    var count = req.body.count || 0;
+    var searchName = req.body.searchName;
 
     var boardResponse = new BoardResponse();
-    boardLogic.listActiveBoardsWorkUnit(gameName, function (listBoardsErr, boards) {
+    boardLogic.listActiveBoardsWorkUnit(gameName, from, count, searchName, function (listBoardsErr, boards) {
         boardResponse.status = listBoardsErr;
         boardResponse.entity = boards;
         res.send(boardResponse);

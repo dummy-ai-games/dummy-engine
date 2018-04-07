@@ -94,3 +94,25 @@ exports.getBoard = function (condition, callback) {
     });
 };
 
+exports.listBoards = function (condition, from, count, callback) {
+    db.collection('board', function (err, boardCollection) {
+        if (!err) {
+            boardCollection.find(condition, {}, {
+                "limit": parseInt(count),
+                "skip": parseInt(from),
+                "sort": [['createTime','desc']]
+            }).toArray(function (err, result) {
+                if (!err) {
+                    logger.info("list boards by condition " + JSON.stringify(condition) + " succeed." + JSON.stringify(result));
+                    callback(errorCode.SUCCESS, result); //return board array
+                } else {
+                    logger.error("list boards by condition: " + JSON.stringify(condition) + " occur error." + err);
+                    callback(errorCode.FAILED, null);
+                }
+            });
+        } else {
+            logger.error("get board collection error. " + err);
+            callback(errorCode.FAILED, null);
+        }
+    });
+};

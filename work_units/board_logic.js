@@ -103,6 +103,7 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
 };
 
 exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
+    var date = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
     var condition = {
         ticket: ticket,
         gameName: gameName
@@ -110,7 +111,7 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
     var newBoard = {
         currentPlayer: newBoard.currentPlayer,
         status: parseInt(newBoard.status),
-        updateTime: newBoard.updateTime,
+        updateTime: date,
         type: parseInt(newBoard.type)
     };
 
@@ -128,7 +129,6 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
             callback(errorCode.FAILED, null);
         }
     });
-
 };
 
 /**
@@ -185,17 +185,35 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
  * @param callback: callback(errorCode.SUCCEED, board)
  *                  callback(errorCode.FAILED, null);
  */
-exports.listActiveBoardsWorkUnit = function (gameName, callback) {
-    var conditions = {
-        gameName: gameName,
-        $or: [
-            {status: enums.GAME_STATUS_STANDBY},
-            {status: enums.GAME_STATUS_PREPARING},
-            {status: enums.GAME_STATUS_RUNNING}
-        ]
-    };
-    boardDao.getBoard(conditions, function (getBoardErr, boards) {
-        if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null && boards.length > 0) {
+exports.listActiveBoardsWorkUnit = function (gameName, from, count, searchName, callback) {
+    var conditions = null;
+
+    if (searchName) {
+        conditions = {
+            gameName: gameName,
+            $or: [
+                {status: enums.GAME_STATUS_STANDBY},
+                {status: enums.GAME_STATUS_PREPARING},
+                {status: enums.GAME_STATUS_RUNNING}
+            ],
+            $or: [
+                {creator: searchName},
+                {creatorName: searchName}
+            ]
+        };
+    } else {
+        conditions = {
+            gameName: gameName,
+            $or: [
+                {status: enums.GAME_STATUS_STANDBY},
+                {status: enums.GAME_STATUS_PREPARING},
+                {status: enums.GAME_STATUS_RUNNING}
+            ]
+        };
+    }
+
+    boardDao.listBoards(conditions, from, count, function (getBoardErr, boards) {
+        if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null) {
             logger.info("query board list: " + JSON.stringify(conditions) + " succeed");
             callback(getBoardErr, boards);
         } else {
