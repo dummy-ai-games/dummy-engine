@@ -1,6 +1,5 @@
 package vip.dummy.tools.workers;
 
-import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
@@ -21,32 +20,27 @@ import static com.mongodb.client.model.Filters.eq;
  */
 public class PlayerGen {
     private String dbHost;
+    private String dbPort;
     private String dbUser;
     private String dbPassword;
     private int playerCount;
     private int instanceCount;
 
-    public PlayerGen(String dbHost, String dbUser, String dbPassword, int playerCount, int instanceCount) {
+    public PlayerGen(String dbHost, String dbPort, String dbUser, String dbPassword, int playerCount, int instanceCount) {
         this.dbHost = dbHost;
+        this.dbPort = dbPort;
         this.dbUser = dbUser;
         this.dbPassword = dbPassword;
         this.playerCount = playerCount;
         this.instanceCount = instanceCount;
     }
 
-    private Block<Document> printBlock = new Block<Document>() {
-        @Override
-        public void apply(final Document document) {
-            System.out.println(document.toJson());
-        }
-    };
-
     public boolean generatePlayers(boolean dummy) {
         MongoDatabase database;
         MongoCollection<Document> collection;
         try {
             String connectionString = "mongodb://" + dbUser + ":" + dbPassword + "@" +
-                    dbHost + ":27017/?authSource=dummy_game";
+                    dbHost + ":" + dbPort + "/?authSource=dummy_game";
             System.out.println(connectionString);
             MongoClientURI clientURI = new MongoClientURI(connectionString);
             MongoClient mongoClient = new MongoClient(clientURI);
@@ -64,8 +58,8 @@ public class PlayerGen {
             for (int i = 0; i < this.playerCount; i++) {
                 long phoneNumber = basePhoneNumber + i;
                 Player player = new Player();
-                player.setName("测试" + i);
-                player.setStudentName("学生" + i);
+                player.setName("Player" + i);
+                player.setStudentName("Student" + i);
                 player.setPhoneNumber(Long.toString(phoneNumber));
                 player.setVerificationCode("");
                 player.setMail(player.getPhoneNumber() + "@dummy.vip");

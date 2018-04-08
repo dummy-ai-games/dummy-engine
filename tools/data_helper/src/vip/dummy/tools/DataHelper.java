@@ -19,34 +19,36 @@ public class DataHelper {
 
             switch(mFunction) {
                 case FUNCTION_GEN_PLAYER: {
-                    if (6 != args.length) {
+                    if (7 != args.length) {
                         System.out.println("invalid parameter");
                         System.out.println("Please call this method like DataHelper [function_code = 0] " +
-                                "[db_host] [db_user] [db_password] [player_count] [instance_count]");
+                                "[db_host] [db_port] [db_user] [db_password] [player_count] [instance_count]");
                         return;
                     }
                     String dbHost = args[1];
-                    String dbUser = args[2];
-                    String dbPassword = args[3];
-                    int playerCount = Integer.parseInt(args[4]);
-                    int instanceCount = Integer.parseInt(args[5]);
-                    PlayerGen playerGen = new PlayerGen(dbHost, dbUser, dbPassword, playerCount, instanceCount);
+                    String dbPort = args[2];
+                    String dbUser = args[3];
+                    String dbPassword = args[4];
+                    int playerCount = Integer.parseInt(args[5]);
+                    int instanceCount = Integer.parseInt(args[6]);
+                    PlayerGen playerGen = new PlayerGen(dbHost, dbPort, dbUser, dbPassword, playerCount, instanceCount);
                     playerGen.generatePlayers(false);
                     break;
                 }
                 case FUNCTION_GEN_DUMMIES: {
-                    if (6 != args.length) {
+                    if (7 != args.length) {
                         System.out.println("invalid parameter");
                         System.out.println("Please call this method like DataHelper [function_code = 0] " +
-                                "[db_host] [db_user] [db_password] [player_count] [instance_count]");
+                                "[db_host] [db_port] [db_user] [db_password] [player_count] [instance_count]");
                         return;
                     }
                     String dbHost = args[1];
-                    String dbUser = args[2];
-                    String dbPassword = args[3];
-                    int playerCount = Integer.parseInt(args[4]);
-                    int instanceCount = Integer.parseInt(args[5]);
-                    PlayerGen playerGen = new PlayerGen(dbHost, dbUser, dbPassword, playerCount, instanceCount);
+                    String dbPort = args[2];
+                    String dbUser = args[3];
+                    String dbPassword = args[4];
+                    int playerCount = Integer.parseInt(args[5]);
+                    int instanceCount = Integer.parseInt(args[6]);
+                    PlayerGen playerGen = new PlayerGen(dbHost, dbPort, dbUser, dbPassword, playerCount, instanceCount);
                     playerGen.generatePlayers(true);
                     break;
                 }

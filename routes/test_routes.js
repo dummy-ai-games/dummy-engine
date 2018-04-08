@@ -6,5 +6,4 @@
 var app = require('../dummy.js');
 var testService = require('../rest_services/test_service');
 
-
 app.get("/test/heart_beat", testService.heartBeat);
