@@ -50,7 +50,7 @@ function init(socket) {
     );
 };
 
-exports.listen = function (server, tableNumber, tablePort) {
+exports.listen = function (server) {
     var SkyRTCServer;
     if (typeof server === 'number') {
         SkyRTCServer = new WebSocketServer({

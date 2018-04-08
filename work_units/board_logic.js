@@ -11,7 +11,6 @@ var playerDao = require('../models/player_dao');
 
 var stringUtil = require('../poem/utils/string_utils');
 var dateUtil = require('../poem/utils/date_utils');
-var commonUtil = require('../poem/utils/common_utils');
 
 var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);

@@ -27,12 +27,7 @@ LISTEN_PORT = httpPort;
 
 httpServer.listen(httpPort);
 
-var tableNumber;
-if (process.argv.length > 3) {
-    tableNumber = process.argv[3] + "";
-}
-
-var SkyRTC = require('./game_services/communication.js').listen(httpServer, tableNumber);
+var SkyRTC = require('./game_services/communication.js').listen(httpServer);
 
 function normalizePort(val) {
     var port = parseInt(val, 10);

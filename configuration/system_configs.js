@@ -13,6 +13,7 @@ exports.setupEnvironment = function () {
     if (undefined === typeof env || null === env || "" === env || enums.APP_DEVELOPMENT_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
+        MONGO_DB_SERVER_PORT = "27017";
         MONGO_DB_NAME = "dummy_game";
         MONGO_DB_USER = 'admin';
         MONGO_DB_PASSWORD = '123456';
@@ -27,13 +28,14 @@ exports.setupEnvironment = function () {
         BASE_PORT = 9000;
     } else if (enums.APP_PRODUCTION_MODE === env) {
         LISTEN_PORT = "8080";
-        MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
+        MONGO_DB_SERVER_ADDRESS = "dds-bp14fcae2f0f39641.mongodb.rds.aliyuncs.com";
+        MONGO_DB_SERVER_PORT = "3717";
         MONGO_DB_NAME = "dummy_game";
-        MONGO_DB_USER = 'admin';
-        MONGO_DB_PASSWORD = '123456';
-        REDIS_HOST = "r-bp1a37af93df7844.redis.rds.aliyuncs.com";
+        MONGO_DB_USER = 'root';
+        MONGO_DB_PASSWORD = 'Trend2018';
+        REDIS_HOST = "r-bp17a783a9b5b184.redis.rds.aliyuncs.com";
         REDIS_PORT = "6379";
-        REDIS_PASSWORD = "IRext1234";
+        REDIS_PASSWORD = "Trend2018";
         SMS_ACCESSKEY_ID = "T82nbipHSESmHzd8";
         SMS_ACCESSKEY_SEC = "SOweQ8UVwCwPr2NC8EC89EOeKJc5Um";
         SMS_TEMP_NAME = "SMS_117522803";
@@ -43,6 +45,7 @@ exports.setupEnvironment = function () {
     } else if (enums.APP_USERDEBUG_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
+        MONGO_DB_SERVER_PORT = "27017";
         MONGO_DB_NAME = "dummy_game";
         MONGO_DB_USER = 'admin';
         MONGO_DB_PASSWORD = '123456';
