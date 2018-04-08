@@ -29,6 +29,7 @@ exports.registerWorkUnit = function (player, callback) {
         } else {
             // player dose not exist, create one
             logger.info("player not exist, create a new one");
+            player.status = 1;
             playerDao.createPlayer(player, function (createPlayerErr, result) {
                 logger.info("create player result = " + JSON.stringify(createPlayerErr) + ", " + JSON.stringify(result));
                 if (errorCode.SUCCESS.code === createPlayerErr.code && null !== result.ops &&

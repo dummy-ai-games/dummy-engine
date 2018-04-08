@@ -1,6 +1,5 @@
 package vip.dummy.tools.workers;
 
-import com.mongodb.Block;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
@@ -33,13 +32,6 @@ public class PlayerGen {
         this.playerCount = playerCount;
         this.instanceCount = instanceCount;
     }
-
-    private Block<Document> printBlock = new Block<Document>() {
-        @Override
-        public void apply(final Document document) {
-            System.out.println(document.toJson());
-        }
-    };
 
     public boolean generatePlayers(boolean dummy) {
         MongoDatabase database;
