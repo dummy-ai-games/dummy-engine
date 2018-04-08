@@ -13,6 +13,8 @@ var SmsSender = require('../poem/sms/sms_sender');
 var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
+var stringUtils = require('../poem/utils/string_utils.js');
+
 exports.registerWorkUnit = function (player, callback) {
     var conditions = {
         phoneNumber: player.phoneNumber
@@ -29,7 +31,10 @@ exports.registerWorkUnit = function (player, callback) {
         } else {
             // player dose not exist, create one
             logger.info("player not exist, create a new one");
+
+            // completed player properties for multiple instance enhancement
             player.status = 1;
+            player.instance = BASE_PORT + (stringUtils.getHashCode(player.phoneNumber, false) % MULTIPLE_INSTANCE);
             playerDao.createPlayer(player, function (createPlayerErr, result) {
                 logger.info("create player result = " + JSON.stringify(createPlayerErr) + ", " + JSON.stringify(result));
                 if (errorCode.SUCCESS.code === createPlayerErr.code && null !== result.ops &&
