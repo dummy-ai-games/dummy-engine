@@ -47,7 +47,7 @@ function init(socket) {
             }
         }
     );
-};
+}
 
 exports.listen = function (server) {
     var SkyRTCServer;

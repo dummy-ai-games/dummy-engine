@@ -187,7 +187,7 @@ function SkyRTC(tableNumber) {
                     player.reloadCount++;
                     poker.logGame(tableNum, 'player: ' + playerName + ', reload success');
                 } else {
-                    poker.logGame(tableNum, 'player: ' + playerName + ',  had used all reload chance');
+                    poker.logGame(tableNum, 'player: ' + playerName + ', had used all reload chance');
                 }
             }
         }
@@ -679,7 +679,6 @@ SkyRTC.prototype.startGame = function (tableNumber) {
                 'error_code': 1
             }
         };
-
         that.broadcastInGuests(message);
         that.broadcastInPlayers(message);
         that.table[tableNumber].StartGame();
@@ -768,7 +767,6 @@ SkyRTC.prototype.endGame = function (tableNumber, token) {
                     that.updateBoard(tableNumber, that.getTablePlayer(tableNumber), enums.GAME_STATUS_ENDED);
                     delete that.table[tableNumber];
                     logger.info('remove table ' + tableNumber + ' timeout');
-
                 }
 
                 // TODO: send game over to frontend, broadcast __game_over to Players and Lives
