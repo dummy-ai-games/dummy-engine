@@ -28,7 +28,7 @@ exports.createBoard = function (req, res) {
 
 
 /**
- * update a board by ticket,gameName and new board value
+ * update a board by ticket, gameName and new board value
  * @param req
  * @param res
  */
@@ -109,7 +109,7 @@ exports.isCreatorBoard = function (req, res) {
 
 // for testing
 /*
-exports.getBoardByTicket = function (req,res){
+exports.getBoardByTicket = function (req,res) {
     var ticket = req.body.ticket;
     var gameName = req.body.game_name;
 
@@ -122,5 +122,3 @@ exports.getBoardByTicket = function (req,res){
     });
 };
 */
-
-

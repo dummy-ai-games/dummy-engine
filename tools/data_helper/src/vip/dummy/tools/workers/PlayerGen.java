@@ -72,7 +72,7 @@ public class PlayerGen {
                 player.setRole(2);
                 player.setStatus(1);
                 player.setMailStatus(1);
-                player.setInstance((int)(phoneNumber % this.instanceCount));
+                player.setInstance(9000 + (int)(phoneNumber % this.instanceCount));
 
                 Document playerDoc = new Document();
                 if (dummy) {

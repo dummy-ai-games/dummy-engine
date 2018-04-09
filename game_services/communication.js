@@ -38,7 +38,6 @@ function init(socket) {
                             break;
                         default:
                             break;
-
                     }
                 } else {
                     logger.info("parameter is null, ignore it");
