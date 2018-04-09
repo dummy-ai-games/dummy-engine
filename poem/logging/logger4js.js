@@ -13,9 +13,9 @@ var helper = helper || {};
 exports.helper = helper;
 
 var logRoot = "./logs/";
-var userDebugLogFolder = "user_debug/";
-var devLogFolder = "dev/";
-var productionLogFolder = "production/";
+var userDebugLogFolder = "user_debug/" + LISTEN_PORT + "/";
+var devLogFolder = "dev/" + LISTEN_PORT + "/";
+var productionLogFolder = "production/" + LISTEN_PORT + "/";
 
 var logFile = "common.log";
 
