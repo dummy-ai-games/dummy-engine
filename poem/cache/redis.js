@@ -20,7 +20,7 @@ var Cache = function(_host, _port, _user, _password) {
     // initialize client according to run-time ENV
     // in _user indicates the redis instance:token pair value
     if(null != _password) {
-        logger.info("Redis needs authorization");
+        logger.info("Redis needs authentication");
         this.redisClient.auth(_password, redis.print);
     }
     logger.info("Redis client connected");

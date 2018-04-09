@@ -8,6 +8,9 @@ var constants = require('./poem/configuration/constants');
 var systemConfig = require('./configuration/system_configs');
 systemConfig.setupEnvironment();
 
+// initialize listen port
+LISTEN_PORT = process.argv[2] || LISTEN_PORT;
+
 var playerLogic = require("./work_units/player_logic.js");
 var ErrorCode = require("./constants/error_code");
 var errorCode = new ErrorCode();
@@ -21,9 +24,8 @@ var flash = require('connect-flash');
 var app = module.exports = express();
 
 var httpServer = require('http').createServer(app);
-var httpPort = normalizePort(process.argv[2] || LISTEN_PORT);
+var httpPort = normalizePort(LISTEN_PORT);
 
-LISTEN_PORT = httpPort;
 
 httpServer.listen(httpPort);
 
