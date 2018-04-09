@@ -140,7 +140,7 @@ exports.getBoardByTicketWorkUnit = function (ticket, gameName, port, callback) {
     var condition = {
         ticket: ticket,
         gameName: gameName,
-        port: port
+        port: parseInt(port)
     };
     boardDao.getBoard(condition, function (getBoardErr, board) {
         if (getBoardErr.code === errorCode.SUCCESS.code && board !== null && board.length > 0) {
