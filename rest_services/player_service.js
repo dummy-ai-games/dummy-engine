@@ -225,18 +225,27 @@ exports.sendSms = function (req, res) {
     var verificationCode = stringUtils.genVerificationCode(0, 6);
     var ttl = 5 * 60;
     var serviceResponse = new ServiceResponse();
-    playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
-        if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-            logger.info("save verificationCode to redis succeed.");
-            // begin send message
-            playerLogic.sendVerifyKeyWorkUnit(phoneNumber, verificationCode, function (sendErr) {
-                serviceResponse.status = sendErr;
-                res.send(serviceResponse);
-                res.end();
+
+    playerLogic.getPlayerByPhoneNumberWorkUnit(phoneNumber, function(getPlayerErr, player) {
+        if (errorCode.SUCCESS !== getPlayerErr || null === player) {
+            playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
+                if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
+                    logger.info("save verificationCode to redis succeed.");
+                    // begin send message
+                    playerLogic.sendVerifyKeyWorkUnit(phoneNumber, verificationCode, function (sendErr) {
+                        serviceResponse.status = sendErr;
+                        res.send(serviceResponse);
+                        res.end();
+                    });
+                } else {
+                    logger.info("save verificationCode to redis fail.");
+                    serviceResponse.status = setPlayerAuthErr;
+                    res.send(serviceResponse);
+                    res.end();
+                }
             });
         } else {
-            logger.info("save verificationCode to redis fail.");
-            serviceResponse.status = setPlayerAuthErr;
+            serviceResponse.status = errorCode.PLAYER_EXIST;
             res.send(serviceResponse);
             res.end();
         }

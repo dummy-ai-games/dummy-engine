@@ -36,6 +36,7 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== players && players.length > 0) {
             var port = players[0].instance;
             var creatorName = players[0].name;
+            var creatorRealName = players[0].studentName;
             logger.info('creator phoneNumber = ' + creatorPhoneNumber);
             logger.info('creator name = ' + creatorName);
             gameDao.getGameInfo({name: gameName}, function (getGameErr, game) { // game != nulls
@@ -62,6 +63,7 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
                                     status: 0,
                                     creator: creatorPhoneNumber,
                                     creatorName: creatorName,
+                                    creatorRealName: creatorRealName,
                                     createTime: currentTime,
                                     updateTime: currentTime,
                                     ticket: ticket,
@@ -190,14 +192,17 @@ exports.listActiveBoardsWorkUnit = function (gameName, from, count, searchName, 
     if (searchName) {
         conditions = {
             gameName: gameName,
-            $or: [
-                {status: enums.GAME_STATUS_STANDBY},
-                {status: enums.GAME_STATUS_PREPARING},
-                {status: enums.GAME_STATUS_RUNNING}
-            ],
-            $or: [
-                {creator: searchName},
-                {creatorName: searchName}
+            $and: [
+                {$or: [
+                    {status: enums.GAME_STATUS_STANDBY},
+                    {status: enums.GAME_STATUS_PREPARING},
+                    {status: enums.GAME_STATUS_RUNNING}
+                ]},
+                {$or: [
+                    {creator: searchName},
+                    {creatorName: searchName},
+                    {creatorRealName: searchName}
+                ]}
             ]
         };
     } else {
