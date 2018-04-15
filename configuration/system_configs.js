@@ -22,8 +22,8 @@ exports.setupEnvironment = function () {
         REDIS_PASSWORD = null;
         SMS_ACCESSKEY_ID = "T82nbipHSESmHzd8";
         SMS_ACCESSKEY_SEC = "SOweQ8UVwCwPr2NC8EC89EOeKJc5Um";
-        SMS_TEMP_NAME = "SMS_117522803";
-        SMS_SIGN_NAME = "大米AI编程平台";
+        SMS_TEMP_NAME = "SMS_130914111";
+        SMS_SIGN_NAME = "趋势科技";
         MULTIPLE_INSTANCE = 100;
         BASE_PORT = 9000;
     } else if (enums.APP_PRODUCTION_MODE === env) {
@@ -38,8 +38,8 @@ exports.setupEnvironment = function () {
         REDIS_PASSWORD = "Trend2018";
         SMS_ACCESSKEY_ID = "T82nbipHSESmHzd8";
         SMS_ACCESSKEY_SEC = "SOweQ8UVwCwPr2NC8EC89EOeKJc5Um";
-        SMS_TEMP_NAME = "SMS_117522803";
-        SMS_SIGN_NAME = "大米AI编程平台";
+        SMS_TEMP_NAME = "SMS_130914111";
+        SMS_SIGN_NAME = "趋势科技";
         MULTIPLE_INSTANCE = 100;
         BASE_PORT = 9000;
     } else if (enums.APP_USERDEBUG_MODE === env) {
@@ -54,8 +54,8 @@ exports.setupEnvironment = function () {
         REDIS_PASSWORD = null;
         SMS_ACCESSKEY_ID = "T82nbipHSESmHzd8";
         SMS_ACCESSKEY_SEC = "SOweQ8UVwCwPr2NC8EC89EOeKJc5Um";
-        SMS_TEMP_NAME = "SMS_117522803";
-        SMS_SIGN_NAME = "大米AI编程平台";
+        SMS_TEMP_NAME = "SMS_130914111";
+        SMS_SIGN_NAME = "趋势科技";
         MULTIPLE_INSTANCE = 100;
         BASE_PORT = 9000;
     }

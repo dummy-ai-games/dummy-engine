@@ -8,22 +8,6 @@ var logger = require('../poem/logging/logger4js').helper;
 var ErrorCode = require('../constants/error_code');
 var errorCode = new ErrorCode();
 
-/**
- * board
- * Fields:
- *      gameName (string): 指明该桌是什么游戏，游戏名称
- *      minPlayer (int): 等于Game的minPlayer
- *      maxPlayer (int): 等于Game的maxPlayer
- *      currentPlayer (array): 一个数组，当前已经加入的玩家
- *      status (int): 0-准备中，1-进行中，2-结束
- *      creator (string): 创建者的手机号
- *      creatorName (string): 创建者的名字  // newly add
- *      createTime (string): 该board实例创建时间
- *      updateTime (string): 更新时间
- *      ticket (string) (primary key): 供程序加入的私密串号
- *      type (int): 0-公开游戏(default)，2-私密游戏
- */
-
 exports.createBoard = function (board, callback) {
     db.collection('board', function (err, boardCollection) {
         if (err) {
@@ -43,21 +27,15 @@ exports.createBoard = function (board, callback) {
     });
 };
 
-/**
- * update board instance with newBoard value by condition
- * @param condition: {ticket: ticket_value}
- * @param newBoard: Board entity
- * @param callback
- */
-exports.updateBoard = function (condition, newBoard, callback) {
+exports.updateBoard = function (conditions, newBoard, callback) {
     db.collection('board', function (err, boardCollection) {
         if (!err) {
-            boardCollection.update(condition, {$set: newBoard}, function (err, result) {
+            boardCollection.update(conditions, {$set: newBoard}, function (err, result) {
                 if (!err) {
-                    logger.info("update board by condition " + condition + " succeed.");
+                    logger.info("update board by conditions " + conditions + " successfully");
                     callback(errorCode.SUCCESS, result);
                 } else {
-                    logger.error("update board by condition: " + condition + " occur error." + err);
+                    logger.error("update board by conditions: " + conditions + " failed: " + err);
                     callback(errorCode.FAILED, null);
                 }
             });
@@ -69,21 +47,16 @@ exports.updateBoard = function (condition, newBoard, callback) {
 
 };
 
-/**
- * get board info by condition
- * @param condition: Json format
- * @param callback: callback(errorCode.SUCCESS, result)
- *                  callback(errorCode.FAILED, nulls)
- */
-exports.getBoard = function (condition, callback) {
+exports.getBoard = function (conditions, callback) {
     db.collection('board', function (err, boardCollection) {
         if (!err) {
-            boardCollection.find(condition).toArray(function (err, result) {
+            boardCollection.find(conditions).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("get board by condition " + JSON.stringify(condition) + " succeed." + JSON.stringify(result));
+                    logger.info("get board by conditions " + JSON.stringify(conditions) +
+                        " successfully" + JSON.stringify(result));
                     callback(errorCode.SUCCESS, result); //return board array
                 } else {
-                    logger.error("get board by condition: " + JSON.stringify(condition) + " occur error." + err);
+                    logger.error("get board by conditions: " + JSON.stringify(conditions) + " failed: " + err);
                     callback(errorCode.FAILED, null);
                 }
             });
@@ -94,19 +67,20 @@ exports.getBoard = function (condition, callback) {
     });
 };
 
-exports.listBoards = function (condition, from, count, callback) {
+exports.listBoards = function (conditions, from, count, callback) {
     db.collection('board', function (err, boardCollection) {
         if (!err) {
-            boardCollection.find(condition, {}, {
+            boardCollection.find(conditions, {}, {
                 "limit": parseInt(count),
                 "skip": parseInt(from),
                 "sort": [['createTime','desc']]
             }).toArray(function (err, result) {
                 if (!err) {
-                    logger.info("list boards by condition " + JSON.stringify(condition) + " succeed." + JSON.stringify(result));
+                    logger.info("list boards by conditions " + JSON.stringify(conditions) +
+                        " successfully" + JSON.stringify(result));
                     callback(errorCode.SUCCESS, result); //return board array
                 } else {
-                    logger.error("list boards by condition: " + JSON.stringify(condition) + " occur error." + err);
+                    logger.error("list boards by conditions: " + JSON.stringify(conditions) + " failed: " + err);
                     callback(errorCode.FAILED, null);
                 }
             });

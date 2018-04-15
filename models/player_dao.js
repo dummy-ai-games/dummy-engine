@@ -21,12 +21,6 @@ var errorCode = new ErrorCode();
  *      status(int): 0-active, 1-deleted
  */
 
-
-/**
- * create a new player to player table
- * @param player:{player object}
- * @param callback: succeed, failed
- */
 exports.createPlayer = function (player, callback) {
     db.collection('player', function (err, playerCollection) {
         if (err) {
@@ -46,13 +40,7 @@ exports.createPlayer = function (player, callback) {
     });
 };
 
-/**
- * query player in player table
- * @param condition: {phoneNumber:'123', password:'*****'}
- * @param callback: succeed, failed
- */
 exports.getPlayer = function (conditions, callback) {
-    logger.info(JSON.stringify(conditions));
     db.collection('player', function (err, playerCollection) {
         if (!err) {
             playerCollection.find(conditions).toArray(function (err, result) {
@@ -61,6 +49,25 @@ exports.getPlayer = function (conditions, callback) {
                     callback(errorCode.SUCCESS, result);
                 } else {
                     logger.error("get player error : " + err);
+                    callback(errorCode.FAILED, null);
+                }
+            });
+        } else {
+            logger.error("get player collection error : " + err);
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
+exports.updatePlayer = function (conditions, newPlayer, callback) {
+    db.collection('player', function (err, playerCollection) {
+        if (!err) {
+            playerCollection.update(conditions, {$set: newPlayer}, function (err, result) {
+                if (!err) {
+                    logger.info("update player by conditions " + conditions + " successfully");
+                    callback(errorCode.SUCCESS, result);
+                } else {
+                    logger.error("update board by conditions: " + conditions + " failed: " + err);
                     callback(errorCode.FAILED, null);
                 }
             });

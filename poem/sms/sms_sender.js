@@ -28,19 +28,18 @@ var SmsSender = function(_accessKey, _accessSecret, _signName, _tempName) {
 
 SmsSender.prototype.sendVerifyKey = function(phoneNumber, verifyKey, callback) {
     this.smsClient.sendSMS({
-        PhoneNumbers: phoneNumber, //短信接收号码
-        SignName: this.signName, //短信签名
-        TemplateCode: this.tempName, //短信模板ID
-        TemplateParam: '{"code": "' + verifyKey + '"}' //短信模板变量替换
+        PhoneNumbers: phoneNumber,
+        SignName: this.signName,
+        TemplateCode: this.tempName,
+        TemplateParam: '{"code": "' + verifyKey + '"}'
     }).then(function (res) {
         let {Code} = res;
-        // res = {"Message":"OK","RequestId":"216DD330-950B-4661-8CFE-C1EA23E5B013","BizId":"661522914297787872^0","Code":"OK"}
         console.log(Code);
         if (Code === 'OK') {
-            // 处理返回参数
             callback(errorCode.SUCCESS);
         }
     }, function (err) {
+        console.log(err);
         callback(errorCode.FAILED);
     });
 };
