@@ -30,7 +30,7 @@ exports.signIn = function (req, res) {
     var password = req.body.password;
 
     var playerResponse = new PlayerResponse();
-    playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, player) {
+    playerLogic.validatePlayerWorkUnit(phoneNumber, password, function (getPlayerErr, player) {
         playerResponse.status = getPlayerErr;
         playerResponse.entity = player;
         res.send(playerResponse);

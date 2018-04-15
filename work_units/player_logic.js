@@ -20,7 +20,7 @@ exports.registerWorkUnit = function (player, callback) {
     var conditions = {
         phoneNumber: player.phoneNumber
     };
-    playerDao.getPlayer(conditions, function (getPlayerErr, players) {
+    playerDao.getPlayers(conditions, function (getPlayerErr, players) {
         if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
             callback(errorCode.PLAYER_EXIST, null);
         } else {
@@ -78,10 +78,20 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
         password: password
     };
 
-    playerDao.getPlayer(conditions, function (getPlayerErr, players) {
+    playerDao.getPlayers(conditions, function (getPlayerErr, players) {
+        callback(getPlayerErr, players);
+    });
+};
+
+exports.validatePlayerWorkUnit = function (phoneNumber, password, callback) {
+    var conditions = {
+        phoneNumber: phoneNumber,
+        password: password
+    };
+
+    playerDao.getPlayers(conditions, function (getPlayerErr, players) {
         if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
             var player = players[0];
-            // generate token and save to cache
             var token,
                 ttl = 24 * 60 * 60 * 14,
                 timeStamp;
@@ -110,7 +120,7 @@ exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
     var conditions = {
         phoneNumber: phoneNumber
     };
-    playerDao.getPlayer(conditions, function (getPlayerErr, players) {
+    playerDao.getPlayers(conditions, function (getPlayerErr, players) {
         if (getPlayerErr.code === errorCode.SUCCESS.code && players !== null && players.length > 0) {
             var player = players[0];
             callback(errorCode.SUCCESS, player);
@@ -166,7 +176,7 @@ exports.sendSmsForUpdateWorkUnit = function (phoneNumber, callback) {
     var conditions = {
         phoneNumber: phoneNumber
     };
-    playerDao.getPlayer(conditions, function(getPlayerErr, players) {
+    playerDao.getPlayers(conditions, function(getPlayerErr, players) {
         if (errorCode.SUCCESS.code === getPlayerErr.code && null != players && players.length > 0) {
             var verificationCode = stringUtils.genVerificationCode(0, 6);
             var ttl = 5 * 60;
@@ -198,7 +208,7 @@ exports.resetPasswordWorkUnit = function (phoneNumber, verificationCode, passwor
         phoneNumber: phoneNumber
     };
 
-    playerDao.getPlayer(conditions, function(getPlayerErr, players) {
+    playerDao.getPlayers(conditions, function(getPlayerErr, players) {
         if (errorCode.SUCCESS.code === getPlayerErr.code && null != players && players.length > 0) {
             var player = players[0];
             playerAuth.getAuthInfo(player.phoneNumber, function (getValueErr, verifyCode) {

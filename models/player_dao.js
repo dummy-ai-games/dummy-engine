@@ -40,7 +40,7 @@ exports.createPlayer = function (player, callback) {
     });
 };
 
-exports.getPlayer = function (conditions, callback) {
+exports.getPlayers = function (conditions, callback) {
     db.collection('player', function (err, playerCollection) {
         if (!err) {
             playerCollection.find(conditions).toArray(function (err, result) {

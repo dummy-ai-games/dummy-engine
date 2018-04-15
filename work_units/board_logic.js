@@ -31,7 +31,7 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
         phoneNumber: creatorPhoneNumber,
         status: 1
     };
-    playerDao.getPlayer(playerCon, function (getPlayerErr, players) {
+    playerDao.getPlayers(playerCon, function (getPlayerErr, players) {
 
         if (getPlayerErr.code === errorCode.SUCCESS.code && null !== players && players.length > 0) {
             var port = players[0].instance;
@@ -50,7 +50,7 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
                             {status: enums.GAME_STATUS_RUNNING}
                         ]
                     };
-                    boardDao.getBoard(getBoardConditions, function (getBoardErr, boards) {
+                    boardDao.getBoards(getBoardConditions, function (getBoardErr, boards) {
                         // get board info by {creator, gameName}
                         if (errorCode.SUCCESS.code === getBoardErr.code) { // get board succeed
                             if (boards === null || boards.length === 0) {
@@ -144,7 +144,7 @@ exports.getBoardByTicketWorkUnit = function (ticket, gameName, port, callback) {
         gameName: gameName,
         port: parseInt(port)
     };
-    boardDao.getBoard(condition, function (getBoardErr, board) {
+    boardDao.getBoards(condition, function (getBoardErr, board) {
         if (getBoardErr.code === errorCode.SUCCESS.code && board !== null && board.length > 0) {
             logger.info("the board that ticket = " + ticket + " exist in db");
             callback(getBoardErr, board);
@@ -168,7 +168,7 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
         status: parseInt(status),
         gameName: gameName
     };
-    boardDao.getBoard(condition, function (getBoardErr, boards) {
+    boardDao.getBoards(condition, function (getBoardErr, boards) {
         if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null && boards.length > 0) {
             logger.info("query board list: " + JSON.stringify(condition) + " succeed");
             callback(getBoardErr, boards); //
@@ -242,7 +242,7 @@ exports.isCreatorBoardWorkUnit = function (token, ticket, callback) {
                     {status: enums.GAME_STATUS_RUNNING}
                 ]
             };
-            boardDao.getBoard(conditions, function (getBoardErr, boards) {
+            boardDao.getBoards(conditions, function (getBoardErr, boards) {
                 logger.info("getBoardErr = " + JSON.stringify(getBoardErr) + ", boards = " + JSON.stringify(boards));
                 if (errorCode.SUCCESS.code === getBoardErr.code && null !== boards && boards.length > 0) {
                     var board = boards[0];

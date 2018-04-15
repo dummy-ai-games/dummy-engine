@@ -47,7 +47,7 @@ exports.updateBoard = function (conditions, newBoard, callback) {
 
 };
 
-exports.getBoard = function (conditions, callback) {
+exports.getBoards = function (conditions, callback) {
     db.collection('board', function (err, boardCollection) {
         if (!err) {
             boardCollection.find(conditions).toArray(function (err, result) {
