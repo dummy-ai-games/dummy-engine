@@ -6,7 +6,6 @@
 var logger = require('../poem/logging/logger4js').helper;
 var PlayerResponse = require('../responses/player_response');
 var playerLogic = require('../work_units/player_logic');
-var stringUtils = require('../poem/utils/string_utils');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var ServiceResponse = require('../responses/service_response');
@@ -40,10 +39,10 @@ exports.signIn = function (req, res) {
 
 exports.validateSignIn = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
-    var key_token = req.body.token;
+    var token = req.body.token;
 
     var playerResponse = new PlayerResponse();
-    playerLogic.verifyTokenWorkUnit(key_token, phoneNumber, function (validateTokenErr, result) {
+    playerLogic.verifyTokenWorkUnit(token, phoneNumber, function (validateTokenErr, result) {
         if (errorCode.SUCCESS.code !== validateTokenErr.code) {
             playerResponse.status = validateTokenErr;
             playerResponse.entity = null;
@@ -52,7 +51,7 @@ exports.validateSignIn = function (req, res) {
         } else {
             playerLogic.getPlayerByPhoneNumberWorkUnit(phoneNumber, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code && null !== player) {
-                    player.token = key_token;
+                    player.token = token;
                     delete player.password;
                     playerResponse.status = errorCode.SUCCESS;
                     playerResponse.entity = player;
