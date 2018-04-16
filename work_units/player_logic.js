@@ -78,8 +78,6 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
         password: password
     };
 
-    logger.info('getPlayer for communication : ' + JSON.stringify(conditions));
-
     playerDao.getPlayers(conditions, function (getPlayerErr, players) {
         if (errorCode.SUCCESS.code === getPlayerErr.code && null !== players && players.length > 0) {
             var player = players[0];
@@ -110,6 +108,7 @@ exports.validatePlayerWorkUnit = function (phoneNumber, password, callback) {
             playerAuth.setAuthInfo(keyToken, valuePhoneNumber, ttl, function (setPlayerAuthErr) {
                 if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
                     player.token = keyToken;
+                    delete player.password;
                     callback(errorCode.SUCCESS, player);
                 } else {
                     callback(errorCode.FAILED, null);
