@@ -78,12 +78,14 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
         password: password
     };
 
+    logger.info('getPlayer for communication : ' + JSON.stringify(conditions));
+
     playerDao.getPlayers(conditions, function (getPlayerErr, players) {
         if (errorCode.SUCCESS.code === getPlayerErr.code && null !== players && players.length > 0) {
             var player = players[0];
             callback(getPlayerErr, player);
         } else {
-            callback(errorCode.SUCCESS, null);
+            callback(errorCode.FAILED, null);
         }
     });
 };
