@@ -110,7 +110,6 @@ exports.validatePlayerWorkUnit = function (phoneNumber, password, callback) {
             playerAuth.setAuthInfo(keyToken, valuePhoneNumber, ttl, function (setPlayerAuthErr) {
                 if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
                     player.token = keyToken;
-                    delete player.password;
                     callback(errorCode.SUCCESS, player);
                 } else {
                     callback(errorCode.FAILED, null);
