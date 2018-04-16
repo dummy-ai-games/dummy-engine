@@ -79,7 +79,12 @@ exports.getPlayerWorkUnit = function (phoneNumber, password, callback) {
     };
 
     playerDao.getPlayers(conditions, function (getPlayerErr, players) {
-        callback(getPlayerErr, players);
+        if (errorCode.SUCCESS.code === getPlayerErr.code && null !== players && players.length > 0) {
+            var player = players[0];
+            callback(getPlayerErr, player);
+        } else {
+            callback(errorCode.SUCCESS, null);
+        }
     });
 };
 

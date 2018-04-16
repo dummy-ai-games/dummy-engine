@@ -79,7 +79,7 @@ function SkyRTC(tableNumber) {
         socket.token = token;
         logger.info('phoneNumber = ' + phoneNumber + ', password = ' + password);
         if (phoneNumber && password) {
-            playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, players) {
+            playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code) {
                     boardLogic.getBoardByTicketWorkUnit(ticket, that.gameName, LISTEN_PORT,
                         function (getBoardErr, boards) {
@@ -87,7 +87,7 @@ function SkyRTC(tableNumber) {
                             var board = boards[0];
                             var tableNumber = ticket;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
-                                var playerName = players[0].name;
+                                var playerName = player.name;
                                 if (that.players[playerName]) {
                                     that.players[playerName].isReplace = true;
                                     that.players[playerName].close();
