@@ -157,7 +157,7 @@ exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
 
 exports.sendSmsWorkUnit = function (phoneNumber, callback) {
     var verificationCode = stringUtils.genVerificationCode(0, 6);
-    var ttl = 5 * 60;
+    var ttl = 1 * 60;
 
     playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
         if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
