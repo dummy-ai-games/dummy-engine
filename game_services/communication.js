@@ -6,7 +6,7 @@
 var WebSocketServer = require('ws').Server;
 var logger = require('../poem/logging/logger4js').helper;
 var PokerGame = require("./texasholdem/communicate.js");
-var FlyChess = require("./fly_chess/communicate.js");
+// var FlyChess = require("./fly_chess/communicate.js");
 var games = {};
 var Enums = require('../constants/enums.js');
 var enums = new Enums();

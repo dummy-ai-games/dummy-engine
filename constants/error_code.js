@@ -16,7 +16,7 @@ function ErrorCode() {
 
     this.FAILED = {
         code: -1,
-        cause: "System encountered an error, please try again later."
+        cause: "System encountered an error, please try again later"
     };
 
     this.WRONG_ENV = {
@@ -41,17 +41,17 @@ function ErrorCode() {
 
     this.WRONG_VERIFICATION_CODE = {
         code: -6,
-        cause: "Wrong Verification Code."
+        cause: "Wrong Verification Code"
     };
 
     this.MULTI_ACTIVE_BOARD_CREATED = {
         code: -7,
-        cause: "multi active boards in a game are created by a player "
+        cause: "multi active boards in a game are created by a player"
     };
 
     this.LOGIN_FAILURE = {
         code: -8,
-        cause:"Wrong phoneNumber or password."
+        cause:"Wrong phoneNumber or password"
     };
 }
 

@@ -16,6 +16,9 @@ var boardLogic = require('../../work_units/board_logic.js');
 var DEFAULT_GAME_OVER_DELAY = 1000;
 var IP_CONSTRAINT = false;
 
+var DUMMY_PHONE_NUMBER = '00000000000';
+var DUMMY_PASSWORD = '000000';
+
 var logger = require('../../poem/logging/logger4js').helper;
 
 var Enums = require('../../constants/enums.js');
@@ -65,8 +68,13 @@ function SkyRTC(tableNumber) {
         }
 
         if (phoneNumber && password) {
-            logger.info('human joined');
-            socket.isHuman = isHuman;
+            if (phoneNumber === DUMMY_PHONE_NUMBER || password === DUMMY_PASSWORD) {
+                logger.info('dummy joined');
+                socket.isDummy = true;
+            } else {
+                logger.info('human joined');
+                socket.isHuman = isHuman;
+            }
         } else if (ticket) {
             logger.info('AI joined');
             socket.tableNumber = ticket;
@@ -80,15 +88,22 @@ function SkyRTC(tableNumber) {
         logger.info('phoneNumber = ' + phoneNumber + ', password = ' + password);
         if (phoneNumber && password) {
             playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, player) {
-                if (errorCode.SUCCESS.code === getPlayerErr.code) {
+                if (errorCode.SUCCESS.code === getPlayerErr.code || socket.isDummy) {
                     boardLogic.getBoardByTicketWorkUnit(ticket, that.gameName, LISTEN_PORT,
                         function (getBoardErr, boards) {
                         if (errorCode.SUCCESS.code === getBoardErr.code) {
                             var board = boards[0];
                             var tableNumber = ticket;
                             if (!that.tableNumber || tableNumber === that.tableNumber) {
-                                var playerName = player.name;
+                                var playerName;
+                                // dummies can be cloned
+                                if (socket.isDummy) {
+                                    playerName = 'dummy';
+                                } else {
+                                    playerName = player.name;
+                                }
                                 if (that.players[playerName]) {
+                                    // multiple players in a single board is forbidden
                                     that.players[playerName].isReplace = true;
                                     that.players[playerName].close();
                                 }
