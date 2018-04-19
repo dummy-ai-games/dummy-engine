@@ -16,6 +16,8 @@ var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 var stringUtils = require('../poem/utils/string_utils.js');
 var MD5 = require('../poem/crypto/md5');
 
+var RETRY_SMS_MAX_TIMES = 5;
+
 exports.registerWorkUnit = function (player, callback) {
     var conditions = {
         phoneNumber: player.phoneNumber
@@ -155,36 +157,25 @@ exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
     });
 };
 
-exports.sendSmsWorkUnit = function (phoneNumber, callback) {
-    var verificationCode = stringUtils.genVerificationCode(0, 6);
-    var ttl = 1 * 60;
+exports.sendSmsWorkUnit = function (ip, phoneNumber, callback) {
+    var smsRequestedTimes = 0;
+    var smsLimitKey = 'mreg_' + ip;
 
-    playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
-        if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
-            sender.sendVerifyKey(phoneNumber, verificationCode, function (sendErr) {
-                if (sendErr === errorCode.SUCCESS.code) {
-                    logger.info("send verification code successfully");
-                    callback(errorCode.SUCCESS);
-                } else {
-                    logger.info("send verification code failed");
-                    callback(errorCode.FAILED);
-                }
-            });
-        } else {
+    playerAuth.getAuthInfo(smsLimitKey, function (getValueErr, ipHits) {
+        if (getValueErr.code === errorCode.SUCCESS.code &&
+            null !== ipHits &&
+            parseInt(ipHits) > RETRY_SMS_MAX_TIMES) {
+            logger.info('too many time this IP requested to send SMS');
             callback(errorCode.FAILED);
-        }
-    });
-};
-
-exports.sendSmsForUpdateWorkUnit = function (phoneNumber, callback) {
-    var conditions = {
-        phoneNumber: phoneNumber
-    };
-    playerDao.getPlayers(conditions, function(getPlayerErr, players) {
-        if (errorCode.SUCCESS.code === getPlayerErr.code && null != players && players.length > 0) {
+        } else {
+            if (errorCode.SUCCESS.code !== getValueErr.code || null === ipHits) {
+                smsRequestedTimes = 1;
+            } else {
+                smsRequestedTimes = parseInt(ipHits) + 1;
+            }
             var verificationCode = stringUtils.genVerificationCode(0, 6);
-            var ttl = 5 * 60;
+            var ttl = 60;
+
             playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
                 if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
                     var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
@@ -192,6 +183,10 @@ exports.sendSmsForUpdateWorkUnit = function (phoneNumber, callback) {
                         if (sendErr === errorCode.SUCCESS.code) {
                             logger.info("send verification code successfully");
                             callback(errorCode.SUCCESS);
+                            ttl = 10 * 60;
+                            playerAuth.setAuthInfo(smsLimitKey, smsRequestedTimes, ttl, function (setPlayerAuthErr) {
+                                logger.info('record SMS requested times done');
+                            });
                         } else {
                             logger.info("send verification code failed");
                             callback(errorCode.FAILED);
@@ -201,9 +196,58 @@ exports.sendSmsForUpdateWorkUnit = function (phoneNumber, callback) {
                     callback(errorCode.FAILED);
                 }
             });
+        }
+    });
+};
+
+exports.sendSmsForUpdateWorkUnit = function (ip, phoneNumber, callback) {
+    var smsRequestedTimes = 0;
+    var smsLimitKey = 'ureg_' + ip;
+
+    playerAuth.getAuthInfo(smsLimitKey, function (getValueErr, ipHits) {
+        if (getValueErr.code === errorCode.SUCCESS.code &&
+            null !== ipHits &&
+            parseInt(ipHits) > RETRY_SMS_MAX_TIMES) {
+            logger.info('too many time this IP requested to send SMS');
+            callback(errorCode.FAILED);
         } else {
-            logger.error("player: " + phoneNumber + " does not exist");
-            callback(errorCode.PLAYER_NOT_EXIST);
+            if (errorCode.SUCCESS.code !== getValueErr.code || null === ipHits) {
+                smsRequestedTimes = 1;
+            } else {
+                smsRequestedTimes = parseInt(ipHits) + 1;
+            }
+            var conditions = {
+                phoneNumber: phoneNumber
+            };
+            playerDao.getPlayers(conditions, function(getPlayerErr, players) {
+                if (errorCode.SUCCESS.code === getPlayerErr.code && null != players && players.length > 0) {
+                    var verificationCode = stringUtils.genVerificationCode(0, 6);
+                    var ttl = 60;
+                    playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
+                        if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
+                            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
+                            sender.sendVerifyKey(phoneNumber, verificationCode, function (sendErr) {
+                                if (sendErr === errorCode.SUCCESS.code) {
+                                    logger.info("send verification code successfully");
+                                    callback(errorCode.SUCCESS);
+                                    ttl = 10 * 60;
+                                    playerAuth.setAuthInfo(smsLimitKey, smsRequestedTimes, ttl, function (setPlayerAuthErr) {
+                                        logger.info('record SMS requested times done');
+                                    });
+                                } else {
+                                    logger.info("send verification code failed");
+                                    callback(errorCode.FAILED);
+                                }
+                            });
+                        } else {
+                            callback(errorCode.FAILED);
+                        }
+                    });
+                } else {
+                    logger.error("player: " + phoneNumber + " does not exist");
+                    callback(errorCode.PLAYER_NOT_EXIST);
+                }
+            });
         }
     });
 };

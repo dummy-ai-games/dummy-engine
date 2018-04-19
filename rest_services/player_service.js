@@ -97,10 +97,10 @@ exports.getPlayerByToken = function (req, res) {
 
 exports.sendSms = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
     var serviceResponse = new ServiceResponse();
-
-    playerLogic.sendSmsWorkUnit(phoneNumber, function(sendSmsErr) {
+    playerLogic.sendSmsWorkUnit(ip, phoneNumber, function(sendSmsErr) {
         serviceResponse.status = sendSmsErr;
         res.send(serviceResponse);
         res.end();
@@ -109,10 +109,12 @@ exports.sendSms = function (req, res) {
 
 exports.sendSmsForUpdate = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
     var serviceResponse = new ServiceResponse();
 
-    playerLogic.sendSmsForUpdateWorkUnit(phoneNumber, function(sendSmsErr) {
+    logger.info('send sms for update request');
+    playerLogic.sendSmsForUpdateWorkUnit(ip, phoneNumber, function(sendSmsErr) {
         serviceResponse.status = sendSmsErr;
         res.send(serviceResponse);
         res.end();
