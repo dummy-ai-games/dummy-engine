@@ -15,6 +15,7 @@ var boardLogic = require('../../work_units/board_logic.js');
 
 var DEFAULT_GAME_OVER_DELAY = 1000;
 var IP_CONSTRAINT = false;
+var ALLOW_PLAYER_CLONE = false;
 
 var DUMMY_PHONE_NUMBER = '00000000000';
 var DUMMY_PASSWORD = '000000';
@@ -98,14 +99,21 @@ function SkyRTC(tableNumber) {
                                 var playerName;
                                 // dummies can be cloned
                                 if (socket.isDummy) {
-                                    playerName = 'dummy';
+                                    if (undefined === that.dummyCount) {
+                                        that.dummyCount = 0;
+                                    } else {
+                                        that.dummyCount++;
+                                    }
+                                    playerName = 'dummy' + that.dummyCount;
                                 } else {
                                     playerName = player.name;
                                 }
                                 if (that.players[playerName]) {
-                                    // multiple players in a single board is forbidden
-                                    that.players[playerName].isReplace = true;
-                                    that.players[playerName].close();
+                                    if (!ALLOW_PLAYER_CLONE) {
+                                        // multiple players in a single board is forbidden
+                                        that.players[playerName].isReplace = true;
+                                        that.players[playerName].close();
+                                    }
                                 }
                                 var exitPlayerTableNum = that.exitPlayers[playerName];
                                 if (exitPlayerTableNum !== undefined) {
@@ -1069,6 +1077,9 @@ SkyRTC.prototype.exitHandle = function (socket) {
             that.exitPlayers[socket.id] = socket.tableNumber;
             that.players[socket.id] = null;
             poker.logGame(tableNumber, 'player: ' + socket.id + ', exit!!');
+        }
+        if (socket.isDummy) {
+            that.dummyCount--;
         }
         that.removeSocket(socket);
     }
