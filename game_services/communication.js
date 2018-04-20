@@ -2,11 +2,11 @@
  * Created by dummy team
  * 2017-07-22
  */
-
+var rateLimit = require('ws-rate-limit')('10s', 100);
 var WebSocketServer = require('ws').Server;
 var logger = require('../poem/logging/logger4js').helper;
 var PokerGame = require("./texasholdem/communicate.js");
-// var FlyChess = require("./fly_chess/communicate.js");
+
 var games = {};
 var Enums = require('../constants/enums.js');
 var enums = new Enums();
@@ -29,13 +29,6 @@ function init(socket) {
                             pokerGame.socketJoin(socket);
                             pokerGame.emit(json.eventName, json.data, socket);
                             break;
-                        case enums.GAME_FLY_CHESS:
-                            var flyChess = games[gameType];
-                            if (!flyChess)
-                                flyChess = games[gameType] = new FlyChess.SkyRTC();
-                            flyChess.socketJoin(socket);
-                            flyChess.emit(json.eventName, json.data, socket);
-                            break;
                         default:
                             break;
                     }
@@ -47,6 +40,10 @@ function init(socket) {
             }
         }
     );
+
+    socket.on('limited', function(data) {
+        socket.close();
+    });
 }
 
 exports.listen = function (server) {
@@ -62,6 +59,8 @@ exports.listen = function (server) {
     }
 
     SkyRTCServer.on('connection', function (socket, req) {
+        rateLimit(socket);
+
         var ip = req.connection.remoteAddress || req.socket.remoteAddress || socket._socket.remoteAddress;
         socket.ip = ip;
         init(socket);

@@ -27,6 +27,7 @@
     "request": "^2.79.0",
     "serve-favicon": "^2.3.0",
     "ua-parser-js": "^0.7.12",
-    "ws": "^3.2.0"
+    "ws": "^3.2.0",
+    "ws-rate-limit": "0.0.0"
   }
 }

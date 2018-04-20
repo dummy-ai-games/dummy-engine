@@ -1089,15 +1089,18 @@ SkyRTC.prototype.socketJoin = function (socket) {
     var that = this;
     socket.id = UUID.v4();
 
-    socket.on('message', function (data) {
+    socket.on('message',
+        function (data) {
             try {
                 var json = JSON.parse(data);
                 if (json.eventName) {
                     that.emit(json.eventName, json.data, socket);
                 } else {
-                    that.emit('socket_message', socket, data);
+                    socket.close();
+                    // that.emit('socket_message', socket, data);
                 }
             } catch (e) {
+                socket.close();
                 logger.error(e.message);
             }
         }
