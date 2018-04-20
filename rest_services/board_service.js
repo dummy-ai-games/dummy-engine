@@ -6,13 +6,9 @@
 var logger = require('../poem/logging/logger4js').helper;
 var BoardResponse = require('../responses/board_response');
 var BoolResponse = require('../responses/bool_response');
+var PlayerResponse = require('../responses/player_response');
 var boardLogic = require('../work_units/board_logic');
 
-/**
- * create a new board instance by creator with phoneNumber, gameName
- * @param req
- * @param res
- */
 exports.createBoard = function (req, res) {
     var creator = req.body.phoneNumber;
     var gameName = req.body.gameName;
@@ -26,12 +22,6 @@ exports.createBoard = function (req, res) {
     });
 };
 
-
-/**
- * update a board by ticket, gameName and new board value
- * @param req
- * @param res
- */
 exports.updateBoard = function (req, res) {
     var ticket = req.body.ticket;
     var gameName = req.body.gameName;
@@ -46,12 +36,6 @@ exports.updateBoard = function (req, res) {
     });
 };
 
-
-/**
- * list boards by status, gameName
- * @param req
- * @param res
- */
 exports.listBoards = function (req, res) {
     var status = req.body.status;
     var gameName = req.body.gameName;
@@ -65,12 +49,6 @@ exports.listBoards = function (req, res) {
     });
 };
 
-
-/**
- * list boards by status, gameName
- * @param req
- * @param res
- */
 exports.listActiveBoards = function (req, res) {
     var gameName = req.body.gameName;
     var from = req.body.from || 0;
@@ -86,12 +64,6 @@ exports.listActiveBoards = function (req, res) {
     });
 };
 
-
-/**
- * to confirm it is a creator board
- * @param req
- * @param res
- */
 exports.isCreatorBoard = function (req, res) {
     var token = req.body.token;
     var ticket = req.body.ticket;
@@ -106,6 +78,17 @@ exports.isCreatorBoard = function (req, res) {
     });
 };
 
+exports.listBoardPlayers = function (req, res) {
+    var boardInstance = req.query.instance;
+
+    var playerResponse = new PlayerResponse();
+    boardLogic.listBoardPlayersWorkUnit(boardInstance, function (getBoardErr, result) {
+        playerResponse.status = getBoardErr;
+        playerResponse.entity = result;
+        res.send(playerResponse);
+        res.end();
+    });
+};
 
 // for testing
 /*

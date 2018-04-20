@@ -45,7 +45,6 @@ exports.getPlayers = function (conditions, callback) {
         if (!err) {
             playerCollection.find(conditions).toArray(function (err, result) {
                 if (!err) {
-                    logger.info(JSON.stringify(result));
                     callback(errorCode.SUCCESS, result);
                 } else {
                     logger.error("get player error : " + err);

@@ -21,6 +21,7 @@ var errorCode = new ErrorCode();
 var Enums = require('../constants/enums.js');
 var enums = new Enums();
 
+var async = require('async');
 
 exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) {
     var currentTime = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
@@ -132,12 +133,6 @@ exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
     });
 };
 
-/**
- * get board instance by ticket, gameName
- * @param ticket: unique id for a board
- * @param callback: callback(errorCode.SUCCESS, board)
- *                  callback(errorCode.FAILED, null)
- */
 exports.getBoardByTicketWorkUnit = function (ticket, gameName, port, callback) {
     var condition = {
         ticket: ticket,
@@ -156,13 +151,6 @@ exports.getBoardByTicketWorkUnit = function (ticket, gameName, port, callback) {
     });
 };
 
-/**
- * list boards by status, gameName
- * @param status: 0-准备中，1-进行中，2-结束
- * @param gameName: game name
- * @param callback: callback(errorCode.SUCCEED, board)
- *                  callback(errorCode.FAILED, null);
- */
 exports.listBoardsWorkUnit = function (status, gameName, callback) {
     var condition = {
         status: parseInt(status),
@@ -180,12 +168,6 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
     });
 };
 
-/**
- * list active boards by gameName
- * @param gameName: game name
- * @param callback: callback(errorCode.SUCCEED, board)
- *                  callback(errorCode.FAILED, null);
- */
 exports.listActiveBoardsWorkUnit = function (gameName, from, count, searchName, callback) {
     var conditions = null;
 
@@ -242,9 +224,9 @@ exports.isCreatorBoardWorkUnit = function (token, ticket, callback) {
                     {status: enums.GAME_STATUS_RUNNING}
                 ]
             };
-            boardDao.getBoards(conditions, function (getBoardErr, boards) {
-                logger.info("getBoardErr = " + JSON.stringify(getBoardErr) + ", boards = " + JSON.stringify(boards));
-                if (errorCode.SUCCESS.code === getBoardErr.code && null !== boards && boards.length > 0) {
+            boardDao.getBoards(conditions, function (getBoardsErr, boards) {
+                logger.info("getBoardsErr = " + JSON.stringify(getBoardsErr) + ", boards = " + JSON.stringify(boards));
+                if (errorCode.SUCCESS.code === getBoardsErr.code && null !== boards && boards.length > 0) {
                     var board = boards[0];
                     callback(errorCode.SUCCESS, true);
                 } else {
@@ -254,3 +236,70 @@ exports.isCreatorBoardWorkUnit = function (token, ticket, callback) {
         }
     });
 };
+
+exports.listBoardPlayersWorkUnit = function (instance, callback) {
+    var conditions = {
+        port: parseInt(instance),
+        $or: [
+            {status: enums.GAME_STATUS_STANDBY},
+            {status: enums.GAME_STATUS_PREPARING},
+            {status: enums.GAME_STATUS_RUNNING}
+        ]
+    };
+
+    boardDao.getBoards(conditions, function (getBoardsErr, boards) {
+        if (errorCode.SUCCESS.code === getBoardsErr.code && null !== boards && boards.length > 0) {
+            var affectedPlayers = [];
+            for (var i = 0; i < boards.length; i++) {
+                var board = boards[i];
+                var players = board.currentPlayer;
+                if (null !== players) {
+                    for (var p = 0; p < players.length; p++) {
+                        if (!isPlayerAlreadyIn(affectedPlayers, players[p])) {
+                            affectedPlayers.push(players[p]);
+                        }
+                    }
+                }
+            }
+            var returnPlayers = [];
+            async.eachSeries(affectedPlayers, function (affectedPlayer, innerCallback) {
+                var innerConditions = {
+                    name: affectedPlayer.playerName
+                };
+                playerDao.getPlayers(innerConditions, function(getPlayersErr, players) {
+                    if (errorCode.SUCCESS.code === getPlayersErr.code && null !== players && players.length > 0) {
+                        var realPlayer = players[0];
+                        returnPlayers.push({
+                            name: realPlayer.name,
+                            studentName: realPlayer.studentName,
+                            phoneNumber: realPlayer.phoneNumber,
+                            mail: realPlayer.mail,
+                            university: realPlayer.university
+                        });
+                        innerCallback();
+                    } else {
+                        innerCallback();
+                    }
+                });
+            }, function (err) {
+                callback(errorCode.SUCCESS, returnPlayers);
+            });
+        } else {
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
+// helper functions
+function isPlayerAlreadyIn(players, player) {
+    if (players) {
+        for (var i = 0; i < players.length; i++) {
+            if (players[i].playerName === player.playerName) {
+                return true;
+            }
+        }
+        return false;
+    } else {
+        return false;
+    }
+}

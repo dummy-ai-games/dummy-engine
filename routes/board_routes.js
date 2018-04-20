@@ -13,4 +13,6 @@ app.post("/board/list_boards", boardService.listBoards);
 app.post("/board/list_active_boards", boardService.listActiveBoards);
 app.post("/board/is_creator_board", boardService.isCreatorBoard);
 
+app.get("/board/list_board_players", boardService.listBoardPlayers);
+
 //app.post("/board/get_board_by_ticket",boardService.getBoardByTicket); //for testing
