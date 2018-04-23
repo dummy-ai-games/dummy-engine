@@ -183,10 +183,6 @@ exports.sendSmsWorkUnit = function (ip, phoneNumber, callback) {
                         if (sendErr === errorCode.SUCCESS.code) {
                             logger.info("send verification code successfully");
                             callback(errorCode.SUCCESS);
-                            ttl = 10 * 60;
-                            playerAuth.setAuthInfo(smsLimitKey, smsRequestedTimes, ttl, function (setPlayerAuthErr) {
-                                logger.info('record SMS requested times done');
-                            });
                         } else {
                             logger.info("send verification code failed");
                             callback(errorCode.FAILED);
