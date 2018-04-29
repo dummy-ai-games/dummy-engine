@@ -367,13 +367,23 @@ SkyRTC.prototype.updateBoard = function (ticket, tablePlayers, status) {
         };
         players.push(player);
     }
-    var newBoard = {
-        ticket: ticket,
-        currentPlayer: players,
-        status: status,
-        updateTime:new Date().getTime(),
-        type: 0
-    };
+    var newBoard;
+    if (undefined !== status && null !== status) {
+        newBoard = {
+            ticket: ticket,
+            currentPlayer: players,
+            status: status,
+            updateTime:new Date().getTime(),
+            type: 0
+        };
+    } else {
+        newBoard = {
+            ticket: ticket,
+            currentPlayer: players,
+            updateTime:new Date().getTime(),
+            type: 0
+        };
+    }
     boardLogic.updateBoardWorkUnit(ticket, that.gameName, newBoard, function (updateBoardErr, board) {
         if (errorCode.SUCCESS.code === updateBoardErr.code) {
             logger.info("update board success");
@@ -409,7 +419,6 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
     var cards = {};
     var tableAndPlayer = [];
     var playerData = {};
-
 
     logger.info('notify join, tableNumber = ' + tableNumber);
     for (var playerName in that.players) {
@@ -551,7 +560,7 @@ SkyRTC.prototype.notifyLeft = function (tableNumber) {
     }
 
     // do not update board to standby
-    // that.updateBoard(tableNumber, tablePlayers, enums.GAME_STATUS_STANDBY);
+    that.updateBoard(tableNumber, tablePlayers);
 };
 
 SkyRTC.prototype.prepareGame = function (ticket, token) {
@@ -1077,9 +1086,6 @@ SkyRTC.prototype.exitHandle = function (socket) {
             that.exitPlayers[socket.id] = socket.tableNumber;
             that.players[socket.id] = null;
             poker.logGame(tableNumber, 'player: ' + socket.id + ', exit!!');
-        }
-        if (socket.isDummy) {
-            that.dummyCount--;
         }
         that.removeSocket(socket);
     }

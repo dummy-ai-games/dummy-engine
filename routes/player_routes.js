@@ -14,3 +14,5 @@ app.post("/players/sign_out", playerService.signOut);
 app.post("/players/reset_password", playerService.resetPassword);
 app.post("/players/validate_sign_in", playerService.validateSignIn);
 app.post("/players/get_player_by_token", playerService.getPlayerByToken);
+
+app.get("/players/player_active_stats", playerService.playerActiveStats);

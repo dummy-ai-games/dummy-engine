@@ -6,8 +6,14 @@
 require('../poem/configuration/constants');
 var logger = require('../poem/logging/logger4js').helper;
 var playerDao = require('../models/player_dao');
+var boardDao = require('../models/board_dao');
+
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
+
+var Enums = require('../constants/enums.js');
+var enums = new Enums();
+
 var SmsSender = require('../poem/sms/sms_sender');
 
 var PlayerAuth = require('../authentication/player_auth.js');
@@ -157,6 +163,47 @@ exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
     });
 };
 
+exports.getPlayerActiveStatsWorkUnit = function(callback) {
+    var playerStats = [];
+    playerDao.getPlayers(null, function(getPlayersErr, players) {
+        if (errorCode.SUCCESS.code === getPlayersErr.code && null !== players) {
+            for (var i = 0; i < players.length; i++) {
+                playerStats[i] = new Object();
+                playerStats[i].player = players[i];
+                playerStats[i].stats = 0;
+                logger.info("constructed player stats for " + playerStats[i].player.name);
+            }
+
+            var conditions = {
+                $or: [
+                    {status: enums.GAME_STATUS_RUNNING},
+                    {status: enums.GAME_STATUS_FINISHED},
+                    {status: enums.GAME_STATUS_ENDED}
+                ]
+            };
+            boardDao.getBoards(conditions, function(getBoardsErr, boards) {
+                if (errorCode.SUCCESS.code === getBoardsErr.code && null !== boards) {
+                    // make stats according to board history
+                    for (var i = 0; i < boards.length; i++) {
+                        var board = boards[i];
+                        var boardPlayers = board.currentPlayer;
+                        if (null !== boardPlayers) {
+                            for (var j = 0; j < boardPlayers.length; j++) {
+                                findAndStat(playerStats, boardPlayers[j]);
+                            }
+                        }
+                    }
+                    callback(errorCode.SUCCESS, playerStats);
+                } else {
+                    callback(errorCode.FAILED, null);
+                }
+            });
+        } else {
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
 exports.sendSmsWorkUnit = function (ip, phoneNumber, callback) {
     var smsRequestedTimes = 0;
     var smsLimitKey = 'mreg_' + ip;
@@ -257,3 +304,20 @@ exports.resetPasswordWorkUnit = function (phoneNumber, verificationCode, passwor
         }
     });
 };
+
+// helper function
+function findAndStat(playerStats, player) {
+    if (null !== playerStats) {
+        for (var i = 0; i < playerStats.length; i++) {
+            if (null !== playerStats[i].player && playerStats[i].player.name === player.playerName) {
+                if (undefined === playerStats[i].stats || null === playerStats[i].stats) {
+                    playerStats[i].stats = 1;
+                } else {
+                    playerStats[i].stats++;
+                }
+                return playerStats;
+            }
+        }
+    }
+    return playerStats;
+}

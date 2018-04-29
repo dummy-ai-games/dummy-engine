@@ -104,18 +104,22 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
     });
 };
 
-exports.updateBoardWorkUnit = function (ticket, gameName, newBoard, callback) {
+exports.updateBoardWorkUnit = function (ticket, gameName, board, callback) {
     var date = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
     var condition = {
         ticket: ticket,
         gameName: gameName
     };
+
     var newBoard = {
-        currentPlayer: newBoard.currentPlayer,
-        status: parseInt(newBoard.status),
+        currentPlayer: board.currentPlayer,
         updateTime: date,
-        type: parseInt(newBoard.type)
+        type: parseInt(board.type)
     };
+
+    if (undefined !== board.status && null !== board.status) {
+        newBoard.status = board.status;
+    }
 
     logger.info("board currentPlayer:" + JSON.stringify(newBoard.currentPlayer));
     logger.info("board status:" + newBoard.status);
@@ -255,7 +259,7 @@ exports.listBoardPlayersWorkUnit = function (instance, callback) {
                 var players = board.currentPlayer;
                 if (null !== players) {
                     for (var p = 0; p < players.length; p++) {
-                        if (!isPlayerAlreadyIn(affectedPlayers, players[p])) {
+                        if (true === players[p].isOnline && !isPlayerAlreadyIn(affectedPlayers, players[p])) {
                             affectedPlayers.push(players[p]);
                         }
                     }

@@ -5,6 +5,8 @@
 
 var logger = require('../poem/logging/logger4js').helper;
 var PlayerResponse = require('../responses/player_response');
+var ActiveStatsResponse = require('../responses/active_stats_response');
+
 var playerLogic = require('../work_units/player_logic');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
@@ -92,6 +94,16 @@ exports.getPlayerByToken = function (req, res) {
                 res.end();
             });
         }
+    });
+};
+
+exports.playerActiveStats = function (req, res) {
+    var activeStatsResponse = new ActiveStatsResponse();
+    playerLogic.getPlayerActiveStatsWorkUnit(function (getPlayerActiveStatsErr, playerActiveStats) {
+        activeStatsResponse.status = getPlayerActiveStatsErr;
+        activeStatsResponse.entity = playerActiveStats;
+        res.send(activeStatsResponse);
+        res.end();
     });
 };
 
