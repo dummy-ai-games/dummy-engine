@@ -205,40 +205,23 @@ exports.getPlayerActiveStatsWorkUnit = function(callback) {
 };
 
 exports.sendSmsWorkUnit = function (ip, phoneNumber, callback) {
-    var smsRequestedTimes = 0;
-    var smsLimitKey = 'mreg_' + ip;
+    var verificationCode = stringUtils.genVerificationCode(0, 6);
+    var ttl = 60;
 
-    playerAuth.getAuthInfo(smsLimitKey, function (getValueErr, ipHits) {
-        if (getValueErr.code === errorCode.SUCCESS.code &&
-            null !== ipHits &&
-            parseInt(ipHits) > RETRY_SMS_MAX_TIMES) {
-            logger.info('too many time this IP requested to send SMS');
-            callback(errorCode.FAILED);
-        } else {
-            if (errorCode.SUCCESS.code !== getValueErr.code || null === ipHits) {
-                smsRequestedTimes = 1;
-            } else {
-                smsRequestedTimes = parseInt(ipHits) + 1;
-            }
-            var verificationCode = stringUtils.genVerificationCode(0, 6);
-            var ttl = 60;
-
-            playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
-                if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-                    var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
-                    sender.sendVerifyKey(phoneNumber, verificationCode, function (sendErr) {
-                        if (sendErr === errorCode.SUCCESS.code) {
-                            logger.info("send verification code successfully");
-                            callback(errorCode.SUCCESS);
-                        } else {
-                            logger.info("send verification code failed");
-                            callback(errorCode.FAILED);
-                        }
-                    });
+    playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
+        if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
+            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
+            sender.sendVerifyKey(phoneNumber, verificationCode, function (sendErr) {
+                if (sendErr === errorCode.SUCCESS.code) {
+                    logger.info("send verification code successfully");
+                    callback(errorCode.SUCCESS);
                 } else {
+                    logger.info("send verification code failed");
                     callback(errorCode.FAILED);
                 }
             });
+        } else {
+            callback(errorCode.FAILED);
         }
     });
 };
@@ -258,10 +241,6 @@ exports.sendSmsForUpdateWorkUnit = function (ip, phoneNumber, callback) {
                         if (sendErr === errorCode.SUCCESS.code) {
                             logger.info("send verification code successfully");
                             callback(errorCode.SUCCESS);
-                            ttl = 10 * 60;
-                            playerAuth.setAuthInfo(smsLimitKey, smsRequestedTimes, ttl, function (setPlayerAuthErr) {
-                                logger.info('record SMS requested times done');
-                            });
                         } else {
                             logger.info("send verification code failed");
                             callback(errorCode.FAILED);
