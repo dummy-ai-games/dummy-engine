@@ -53,13 +53,13 @@ public class PlayerGen {
             System.out.println("virtual players deleted");
 
             // insert virtual players
-            long basePhoneNumber = 13700000000L;
+            long basePhoneNumber = 10000000000L;
             List<Document> documents = new ArrayList<Document>();
             for (int i = 0; i < this.playerCount; i++) {
                 long phoneNumber = basePhoneNumber + i;
                 Player player = new Player();
                 player.setName("Player" + i);
-                player.setStudentName("Student" + i);
+                player.setStudentName("Dummy" + i);
                 player.setPhoneNumber(Long.toString(phoneNumber));
                 player.setVerificationCode("");
                 player.setMail(player.getPhoneNumber() + "@dummy.vip");

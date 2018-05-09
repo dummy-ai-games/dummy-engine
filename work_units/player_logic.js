@@ -144,6 +144,21 @@ exports.getPlayerByPhoneNumberWorkUnit = function (phoneNumber, callback) {
     });
 };
 
+exports.getRandomDummyWorkUnit = function (callback) {
+    var conditions = {
+        role: 2
+    };
+    playerDao.getPlayers(conditions, function(getPlayersErr, players) {
+        if (errorCode.SUCCESS.code === getPlayersErr.code && null != players && players.length > 0) {
+            var randIndex = Math.floor((Math.random() * players.length));
+            var player = players[randIndex];
+            callback(errorCode.SUCCESS, player);
+        } else {
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
 exports.verifyTokenWorkUnit = function (key, value, callback) {
     playerAuth.validateAuthInfo(key, value, function (validatePlayerAuthErr, result) {
         if (validatePlayerAuthErr.code !== errorCode.SUCCESS.code) {

@@ -97,6 +97,17 @@ exports.getPlayerByToken = function (req, res) {
     });
 };
 
+exports.getRandomDummy = function (req, res) {
+    logger.info("get random dummy entry");
+    var playerResponse = new PlayerResponse();
+    playerLogic.getRandomDummyWorkUnit(function (getRandomDummyErr, dummy) {
+        playerResponse.status = getRandomDummyErr;
+        playerResponse.entity = dummy;
+        res.send(playerResponse);
+        res.end();
+    });
+};
+
 exports.playerActiveStats = function (req, res) {
     var activeStatsResponse = new ActiveStatsResponse();
     playerLogic.getPlayerActiveStatsWorkUnit(function (getPlayerActiveStatsErr, playerActiveStats) {

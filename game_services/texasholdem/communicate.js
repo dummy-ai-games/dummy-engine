@@ -17,6 +17,7 @@ var DEFAULT_GAME_OVER_DELAY = 1000;
 var IP_CONSTRAINT = false;
 var ALLOW_PLAYER_CLONE = false;
 
+// legacy multiple dummies
 var DUMMY_PHONE_NUMBER = '00000000000';
 var DUMMY_PASSWORD = '000000';
 
