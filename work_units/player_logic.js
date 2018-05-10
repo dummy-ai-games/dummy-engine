@@ -190,11 +190,13 @@ exports.getPlayerActiveStatsWorkUnit = function(callback) {
             }
 
             var conditions = {
+                /*
                 $or: [
                     {status: enums.GAME_STATUS_RUNNING},
                     {status: enums.GAME_STATUS_FINISHED},
                     {status: enums.GAME_STATUS_ENDED}
                 ]
+                */
             };
             boardDao.getBoards(conditions, function(getBoardsErr, boards) {
                 if (errorCode.SUCCESS.code === getBoardsErr.code && null !== boards) {
