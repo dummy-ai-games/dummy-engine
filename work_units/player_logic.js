@@ -180,7 +180,7 @@ exports.getPhoneNumberByTokenWorkUnit = function (token, callback) {
 
 exports.getPlayerActiveStatsWorkUnit = function(callback) {
     var playerStats = [];
-    playerDao.getPlayers(null, function(getPlayersErr, players) {
+    playerDao.getPlayers({ role : 0 }, function(getPlayersErr, players) {
         if (errorCode.SUCCESS.code === getPlayersErr.code && null !== players) {
             for (var i = 0; i < players.length; i++) {
                 playerStats[i] = new Object();
@@ -202,9 +202,10 @@ exports.getPlayerActiveStatsWorkUnit = function(callback) {
                     for (var i = 0; i < boards.length; i++) {
                         var board = boards[i];
                         var boardPlayers = board.currentPlayer;
+                        findAndStatByCreator(playerStats, board.creator);
                         if (null !== boardPlayers) {
                             for (var j = 0; j < boardPlayers.length; j++) {
-                                findAndStat(playerStats, boardPlayers[j]);
+                                findAndStatByPlayerList(playerStats, boardPlayers[j]);
                             }
                         }
                     }
@@ -300,10 +301,28 @@ exports.resetPasswordWorkUnit = function (phoneNumber, verificationCode, passwor
 };
 
 // helper function
-function findAndStat(playerStats, player) {
+function findAndStatByPlayerList(playerStats, player) {
     if (null !== playerStats) {
         for (var i = 0; i < playerStats.length; i++) {
-            if (null !== playerStats[i].player && playerStats[i].player.name === player.playerName) {
+            if (null !== playerStats[i].player &&
+                playerStats[i].player.name === player.playerName) {
+                if (undefined === playerStats[i].stats || null === playerStats[i].stats) {
+                    playerStats[i].stats = 1;
+                } else {
+                    playerStats[i].stats++;
+                }
+                return playerStats;
+            }
+        }
+    }
+    return playerStats;
+}
+
+function findAndStatByCreator(playerStats, creator) {
+    if (null !== playerStats) {
+        for (var i = 0; i < playerStats.length; i++) {
+            if (null !== playerStats[i].player &&
+                playerStats[i].player.phoneNumber === creator) {
                 if (undefined === playerStats[i].stats || null === playerStats[i].stats) {
                     playerStats[i].stats = 1;
                 } else {
