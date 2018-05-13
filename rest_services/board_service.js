@@ -36,6 +36,19 @@ exports.updateBoard = function (req, res) {
     });
 };
 
+exports.deleteBoard = function (req, res) {
+    var token = req.body.token;
+    var ticket = req.body.ticket;
+
+    var serviceResponse = new ServiceResponse();
+    boardLogic.deleteBoardWorkUnit(token, ticket, function (deleteBoardErr, result) {
+        serviceResponse.status = deleteBoardErr;
+        serviceResponse.entity = result;
+        res.send(serviceResponse);
+        res.end();
+    });
+};
+
 exports.listBoards = function (req, res) {
     var status = req.body.status;
     var gameName = req.body.gameName;
@@ -68,7 +81,6 @@ exports.isCreatorBoard = function (req, res) {
     var token = req.body.token;
     var ticket = req.body.ticket;
 
-    logger.info("isCreatorBoard call, token = " + token + ", ticket = " + ticket);
     var boolResponse = new BoolResponse();
     boardLogic.isCreatorBoardWorkUnit(token, ticket, function (getBoardErr, result) {
         boolResponse.status = getBoardErr;

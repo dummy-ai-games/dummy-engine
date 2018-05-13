@@ -229,12 +229,36 @@ exports.isCreatorBoardWorkUnit = function (token, ticket, callback) {
                 ]
             };
             boardDao.getBoards(conditions, function (getBoardsErr, boards) {
-                logger.info("getBoardsErr = " + JSON.stringify(getBoardsErr) + ", boards = " + JSON.stringify(boards));
                 if (errorCode.SUCCESS.code === getBoardsErr.code && null !== boards && boards.length > 0) {
                     var board = boards[0];
                     callback(errorCode.SUCCESS, true);
                 } else {
                     callback(errorCode.SUCCESS, false);
+                }
+            });
+        }
+    });
+};
+
+exports.deleteBoardWorkUnit = function (token, ticket, callback) {
+    playerAuth.getAuthInfo(token, function (getValueErr, value) {
+        if (getValueErr.code !== errorCode.SUCCESS.code) {
+            callback(getValueErr, null);
+        } else {
+            var conditions = {
+                creator: value,
+                ticket: ticket,
+                $or: [
+                    {status: enums.GAME_STATUS_STANDBY},
+                    {status: enums.GAME_STATUS_PREPARING},
+                    {status: enums.GAME_STATUS_RUNNING}
+                ]
+            };
+            boardDao.deleteBoard(conditions, function (getBoardsErr) {
+                if (errorCode.SUCCESS.code === getBoardsErr.code) {
+                    callback(errorCode.SUCCESS);
+                } else {
+                    callback(errorCode.FAILED);
                 }
             });
         }

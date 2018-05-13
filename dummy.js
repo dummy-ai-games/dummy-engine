@@ -68,6 +68,7 @@ console.log('dummy engine is running, listening on port ' + httpPort);
 var authenticationURLList = [
     '/board/create_board',
     '/board/update_board',
+    '/board/delete_board',
     '/board/is_creator_board',
     '/game/create_game'
 ];

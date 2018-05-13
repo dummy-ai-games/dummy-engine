@@ -40,11 +40,29 @@ exports.updateBoard = function (conditions, newBoard, callback) {
                 }
             });
         } else {
-            logger.error("get board collection error. " + err);
+            logger.error("update board collection error. " + err);
             callback(errorCode.FAILED, null);
         }
     });
+};
 
+exports.deleteBoard = function (conditions, callback) {
+    db.collection('board', function (err, boardCollection) {
+        if (!err) {
+            boardCollection.deleteOne(conditions, function (err) {
+                if (!err) {
+                    logger.info("delete board by conditions " + conditions + " successfully");
+                    callback(errorCode.SUCCESS);
+                } else {
+                    logger.error("delete board by conditions: " + conditions + " failed: " + err);
+                    callback(errorCode.FAILED);
+                }
+            });
+        } else {
+            logger.error("delete board collection error. " + err);
+            callback(errorCode.FAILED);
+        }
+    });
 };
 
 exports.getBoards = function (conditions, callback) {
