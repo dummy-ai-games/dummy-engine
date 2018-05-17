@@ -119,6 +119,15 @@ exports.tagPlayersToMatch = function (req, res) {
     });
 };
 
+exports.grouping = function (req, res) {
+    var serviceResponse = new ServiceResponse();
+    playerLogic.groupingWorkUnit(function (groupingErr) {
+        serviceResponse.status = groupingErr;
+        res.send(serviceResponse);
+        res.end();
+    });
+};
+
 exports.playerActiveStats = function (req, res) {
     var activeStatsResponse = new ActiveStatsResponse();
     playerLogic.getPlayerActiveStatsWorkUnit(function (getPlayerActiveStatsErr, playerActiveStats) {

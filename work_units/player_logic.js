@@ -266,7 +266,7 @@ exports.groupingWorkUnit = function(callback) {
     var conditions = {
         role: 0,
         status: 1,
-        stats: { $gte: CONTESTANTS_MIN_ACTIVE }
+        activeStats: { $gte: CONTESTANTS_MIN_ACTIVE }
     };
     contestantDao.getContestants(conditions, function(countContestantsErr, contestants) {
         if (errorCode.SUCCESS.code === countContestantsErr.code) {
@@ -281,6 +281,8 @@ exports.groupingWorkUnit = function(callback) {
             // initialize added players contestantCount for each table slot
             for (var i = 0; i < tableCount; i++) {
                 playersInTable[i] = 0;
+                tables[i] = new Object();
+                tables[i].tableNumber = i + 1;
                 tables[i].players = new Array();
             }
 
@@ -340,25 +342,18 @@ exports.groupingWorkUnit = function(callback) {
                             }
 
                             // step 7: have some debug
+                            for (var i = 0; i < tableCount; i++) {
+                                logger.info("=== table : " + i);
+                                var tablePlayers = tables[i].players;
+                                for (var j = 0; j < tablePlayers.length; j++) {
+                                    logger.info("player : " + JSON.stringify(tablePlayers[j]));
+                                }
+                            }
 
+                            callback(errorCode.SUCCESS);
                         } else {
                             logger.error("create dummies failed, abort grouping");
                             callback(errorCode.FAILED);
-                        }
-                    });
-
-
-                    // create match tables
-                    var table = {
-                        tableNumber: 1,
-                        status: 1
-                    };
-                    tableDao.createTable(table, function(createTableErr) {
-                        if (errorCode.SUCCESS.code === createTableErr.code) {
-                            logger.info("create table : " + table.tableNumber + " successfully, add players");
-                            for (var i = 0; i < PLAYER_PER_BOARD; i++) {
-                                contestants[playersInTable].tableNumber =
-                            }
                         }
                     });
                 } else {
