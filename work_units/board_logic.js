@@ -8,8 +8,10 @@ var logger = require('../poem/logging/logger4js').helper;
 var boardDao = require('../models/board_dao');
 var gameDao = require('../models/game_dao');
 var playerDao = require('../models/player_dao');
+var tableDao = require('../models/table_dao');
+var contestantDao = require('../models/contestant_dao');
 
-var stringUtil = require('../poem/utils/string_utils');
+var stringUtils = require('../poem/utils/string_utils');
 var dateUtil = require('../poem/utils/date_utils');
 
 var PlayerAuth = require('../authentication/player_auth.js');
@@ -25,7 +27,7 @@ var async = require('async');
 
 exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) {
     var currentTime = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-    var ticket = stringUtil.randomChar(30);
+    var ticket = stringUtils.randomChar(30);
 
     // query create name from tb: players
     var playerCon = {

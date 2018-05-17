@@ -102,6 +102,15 @@ exports.listBoardPlayers = function (req, res) {
     });
 };
 
+exports.grouping = function (req, res) {
+    var serviceResponse = new ServiceResponse();
+    boardLogic.groupingWorkUnit(function (groupingErr) {
+        serviceResponse.status = groupingErr;
+        res.send(serviceResponse);
+        res.end();
+    });
+};
+
 // for testing
 /*
 exports.getBoardByTicket = function (req,res) {

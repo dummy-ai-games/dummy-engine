@@ -21,18 +21,15 @@ exports.randomNumber = function (l) {
     return tmp;
 };
 
+exports.randomDigital = function(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+};
+
 exports.validateEmail = function (email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 };
 
-/**
- * 生成数字验证码(end-start位随机数字)
- * @param start: a number
- * @param end: a number
- * @returns {string}: verification code
- * eg: genVerificationCode(0,6), then returns XXXXXX  (X:0~9)
- */
 exports.genVerificationCode = function (start, end) {
     var array = [];
     for (var i = start; i < end; ++i) array.push(i);

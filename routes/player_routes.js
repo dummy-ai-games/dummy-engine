@@ -16,4 +16,8 @@ app.post("/players/validate_sign_in", playerService.validateSignIn);
 app.post("/players/get_player_by_token", playerService.getPlayerByToken);
 app.post("/players/get_random_dummy", playerService.getRandomDummy);
 
+// for match
+app.post("/players/tag_players_to_match", playerService.tagPlayersToMatch);
+
 app.get("/players/player_active_stats", playerService.playerActiveStats);
+

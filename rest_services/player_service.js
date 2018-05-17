@@ -11,6 +11,7 @@ var playerLogic = require('../work_units/player_logic');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var ServiceResponse = require('../responses/service_response');
+var IntegerResponse = require('../responses/integer_response');
 var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
@@ -98,12 +99,22 @@ exports.getPlayerByToken = function (req, res) {
 };
 
 exports.getRandomDummy = function (req, res) {
-    logger.info("get random dummy entry");
     var playerResponse = new PlayerResponse();
     playerLogic.getRandomDummyWorkUnit(function (getRandomDummyErr, dummy) {
         playerResponse.status = getRandomDummyErr;
         playerResponse.entity = dummy;
         res.send(playerResponse);
+        res.end();
+    });
+};
+
+exports.tagPlayersToMatch = function (req, res) {
+    var integerResponse = new IntegerResponse();
+
+    playerLogic.tagPlayersWorkUnit(function (tagPlayersErr, tagedPlayersCount) {
+        integerResponse.status = tagPlayersErr;
+        integerResponse.entity = tagedPlayersCount;
+        res.send(integerResponse);
         res.end();
     });
 };
