@@ -261,7 +261,8 @@ exports.groupingWorkUnit = function(callback) {
     var playersInTable = [];
     var dummyAdded = 0;
     var contestantAdded = 0;
-    var tables = [];
+    var contestants = [];
+    var allContestants = [];
 
     // step 1: get all AI contestants
     var conditions = {
@@ -269,8 +270,9 @@ exports.groupingWorkUnit = function(callback) {
         status: 1,
         activeStats: { $gte: CONTESTANTS_MIN_ACTIVE }
     };
-    contestantDao.getContestants(conditions, function(countContestantsErr, contestants) {
+    contestantDao.getContestants(conditions, function(countContestantsErr, findContestants) {
         if (errorCode.SUCCESS.code === countContestantsErr.code) {
+            contestants = findContestants;
             var contestantCount = contestants.length;
             logger.info("available constants contestantCount : " + contestantCount);
 
@@ -282,9 +284,6 @@ exports.groupingWorkUnit = function(callback) {
             // initialize added players contestantCount for each table slot
             for (var i = 0; i < tableCount; i++) {
                 playersInTable[i] = 0;
-                tables[i] = new Object();
-                tables[i].tableNumber = i + 1;
-                tables[i].players = new Array();
             }
 
             // step3 : generate dummy players
@@ -320,9 +319,12 @@ exports.groupingWorkUnit = function(callback) {
                             // step 4: scatter dummies into different tables
                             var currentTable = 0;
                             while (dummyAdded < robotCount) {
-                                tables[currentTable].players[playersInTable[currentTable]] = dummies[dummyAdded];
-                                playersInTable[currentTable]++;
-                                dummyAdded++;
+                                if (playersInTable[currentTable] < PLAYER_PER_BOARD) {
+                                    dummies[dummyAdded].tableNumber = currentTable + 1;
+                                    allContestants.push(dummies[dummyAdded]);
+                                    playersInTable[currentTable]++;
+                                    dummyAdded++;
+                                }
                                 currentTable++;
                                 if (currentTable >= tableCount) {
                                     currentTable = 0;
@@ -336,8 +338,8 @@ exports.groupingWorkUnit = function(callback) {
                             currentTable = 0;
                             while (contestantAdded < contestantCount) {
                                 if (playersInTable[currentTable] < PLAYER_PER_BOARD) {
-                                    tables[currentTable].players[playersInTable[currentTable]] =
-                                        contestants[contestantAdded];
+                                    contestants[contestantAdded].tableNumber = currentTable + 1;
+                                    allContestants.push(contestants[contestantAdded]);
                                     playersInTable[currentTable]++;
                                     contestantAdded++;
                                 }
@@ -347,35 +349,62 @@ exports.groupingWorkUnit = function(callback) {
                                 }
                             }
 
-                            // step 7: update players with tableNumber
-                            for (var i = 0; i < tableCount; i++) {
-                                logger.info("build up table : " + (i + 1));
-                                var table = {
-                                    tableNumber: i + 1
-                                };
-                                tableDao.createTable(table, function(createTableErr) {
-                                    if (errorCode.SUCCESS.code === createTableErr.code) {
-                                        var tablePlayers = tables[table.tableNumber - 1].players;
-                                        for (var j = 0; j < tablePlayers.length; j++) {
-                                            var newContestant = tablePlayers[j];
-                                            newContestant.tableNumber = table.tableNumber;
-
-                                            contestantDao.updateContestant({ phoneNumber: newContestant.phoneNumber }, newContestant,
-                                                function(updateContestantErr) {
+                            // step 7: re-create tables
+                            tableDao.clearTables(function(clearTablesErr) {
+                                if (errorCode.SUCCESS.code === clearTablesErr.code) {
+                                    logger.info("clear tables done, re-create tables");
+                                    var newTables = [];
+                                    for (var i = 0; i < tableCount; i++) {
+                                        newTables[i] = {
+                                            tableNumber : (i + 1)
+                                        }
+                                    }
+                                    var createTablesSuccess = true;
+                                    async.eachSeries(newTables, function (table, innerCallback) {
+                                        tableDao.createTable(table, function(createTableError) {
+                                            if (errorCode.SUCCESS.code === createTableError.code) {
+                                                innerCallback();
+                                            } else {
+                                                createTablesSuccess = false;
+                                                innerCallback();
+                                            }
+                                        });
+                                    }, function (err) {
+                                        if (createTablesSuccess) {
+                                            // step 8: update contestants with table number
+                                            logger.info("re-create tables successfully, " +
+                                                "update contestants with tableNumber");
+                                            var updateContestantsSuccess = true;
+                                            async.eachSeries(allContestants, function (contestant, innerCallback) {
+                                                contestantDao.updateContestant({phoneNumber: contestant.phoneNumber}, contestant, function(updateContestantErr) {
                                                     if (errorCode.SUCCESS.code === updateContestantErr.code) {
-                                                        logger.info("contestant has been grouped to table : " + table.tableNumber);
+                                                        logger.info("contestant : " + contestant.phoneNumber + " has been grouped to table " + contestant.tableNumber);
+                                                        innerCallback();
                                                     } else {
-                                                        logger.error("contestant failed grouped to table : " + table.tableNumber);
+                                                        logger.error("contestant : " + contestant.phoneNumber + " failed to group");
+                                                        updateContestantsSuccess = false;
+                                                        innerCallback();
                                                     }
                                                 });
+                                            }, function (err) {
+                                                if (updateContestantsSuccess) {
+                                                    logger.info("grouping contestants all done!");
+                                                    callback(errorCode.SUCCESS);
+                                                } else {
+                                                    logger.error("grouping contestants failed");
+                                                    callback(errorCode.FAILED);
+                                                }
+                                            });
+                                        } else {
+                                            logger.error("create tables failed, abort grouping");
+                                            callback(errorCode.FAILED);
                                         }
-                                    } else {
-                                        logger.error("create table " + table.tableNumber + " failed, please correct manually");
-                                    }
-                                });
-                            }
-
-                            callback(errorCode.SUCCESS);
+                                    });
+                                } else {
+                                    logger.error("clear tables failed, abort grouping");
+                                    callback(errorCode.FAILED);
+                                }
+                            });
                         } else {
                             logger.error("create dummies failed, abort grouping");
                             callback(errorCode.FAILED);
