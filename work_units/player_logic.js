@@ -331,10 +331,12 @@ exports.groupingWorkUnit = function(callback) {
                             // step 6: add contestants into each table
                             currentTable = 0;
                             while (contestantAdded < contestantCount) {
-                                tables[currentTable].players[playersInTable[currentTable]] =
-                                    contestants[contestantAdded];
-                                playersInTable[currentTable]++;
-                                contestantAdded++;
+                                if (playersInTable[currentTable] < PLAYER_PER_BOARD) {
+                                    tables[currentTable].players[playersInTable[currentTable]] =
+                                        contestants[contestantAdded];
+                                    playersInTable[currentTable]++;
+                                    contestantAdded++;
+                                }
                                 currentTable++;
                                 if (currentTable >= tableCount) {
                                     currentTable = 0;
