@@ -51,6 +51,12 @@ exports.getHashCode = function (str, caseSensitive) {
     return (hash & 0x7FFFFFFF);
 };
 
+exports.paddingNumber = function (n, width, z) {
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+};
+
 function rnd() {
     var today = new Date();
     var seed = today.getTime();

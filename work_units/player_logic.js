@@ -7,6 +7,7 @@ require('../poem/configuration/constants');
 var logger = require('../poem/logging/logger4js').helper;
 var playerDao = require('../models/player_dao');
 var boardDao = require('../models/board_dao');
+var tableDao = require('../models/table_dao');
 var contestantDao = require('../models/contestant_dao');
 
 var ErrorCode = require('../constants/error_code.js');
@@ -292,6 +293,9 @@ exports.groupingWorkUnit = function(callback) {
                 var dummy = {
                     playerName: stringUtils.randomChar(16),
                     displayName: "大米" + i,
+                    name: "大米" + i,
+                    phoneNumber: "" + stringUtils.paddingNumber(i, 11),
+                    password: "e031de87fdb996244327af1223071767",
                     role: 2
                 };
                 dummies.push(dummy);
@@ -299,18 +303,18 @@ exports.groupingWorkUnit = function(callback) {
             contestantDao.deleteContestant({ role: 2 }, function(deleteContestantErr) {
                 if (errorCode.SUCCESS.code === deleteContestantErr.code) {
                     logger.info("clear dummies successfully, re-create dummies");
-                    var creatDummySuccess = true;
+                    var createDummySuccess = true;
                     async.eachSeries(dummies, function (dummy, innerCallback) {
                         contestantDao.createContestant(dummy, function(createContestantErr) {
                             if (errorCode.SUCCESS.code === createContestantErr.code) {
                                 innerCallback();
                             } else {
-                                creatDummySuccess = false;
+                                createDummySuccess = false;
                                 innerCallback();
                             }
                         });
                     }, function (err) {
-                        if (creatDummySuccess) {
+                        if (createDummySuccess) {
                             logger.info("create dummies successfully, continue grouping");
 
                             // step 4: scatter dummies into different tables
@@ -343,13 +347,32 @@ exports.groupingWorkUnit = function(callback) {
                                 }
                             }
 
-                            // step 7: have some debug
+                            // step 7: update players with tableNumber
                             for (var i = 0; i < tableCount; i++) {
-                                logger.info("=== table : " + i);
-                                var tablePlayers = tables[i].players;
-                                for (var j = 0; j < tablePlayers.length; j++) {
-                                    logger.info("player : " + JSON.stringify(tablePlayers[j]));
-                                }
+                                logger.info("build up table : " + (i + 1));
+                                var table = {
+                                    tableNumber: i + 1
+                                };
+                                tableDao.createTable(table, function(createTableErr) {
+                                    if (errorCode.SUCCESS.code === createTableErr.code) {
+                                        var tablePlayers = tables[table.tableNumber - 1].players;
+                                        for (var j = 0; j < tablePlayers.length; j++) {
+                                            var newContestant = tablePlayers[j];
+                                            newContestant.tableNumber = table.tableNumber;
+
+                                            contestantDao.updateContestant({ phoneNumber: newContestant.phoneNumber }, newContestant,
+                                                function(updateContestantErr) {
+                                                    if (errorCode.SUCCESS.code === updateContestantErr.code) {
+                                                        logger.info("contestant has been grouped to table : " + table.tableNumber);
+                                                    } else {
+                                                        logger.error("contestant failed grouped to table : " + table.tableNumber);
+                                                    }
+                                                });
+                                        }
+                                    } else {
+                                        logger.error("create table " + table.tableNumber + " failed, please correct manually");
+                                    }
+                                });
                             }
 
                             callback(errorCode.SUCCESS);

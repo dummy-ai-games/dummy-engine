@@ -25,12 +25,12 @@ exports.getContestants = function (conditions, callback) {
                 if (!err) {
                     callback(errorCode.SUCCESS, results);
                 } else {
-                    logger.error('get players error : ' + err);
+                    logger.error('get contestant error : ' + err);
                     callback(errorCode.FAILED, null);
                 }
             });
         } else {
-            logger.error('get collection player failed : ' + err);
+            logger.error('get collection contestant failed : ' + err);
             callback(errorCode.FAILED, null);
         }
     });
@@ -43,12 +43,12 @@ exports.countContestants = function (conditions, callback) {
                 if (!err) {
                     callback(errorCode.SUCCESS, count);
                 } else {
-                    logger.error('count players error : ' + err);
+                    logger.error('count contestant error : ' + err);
                     callback(errorCode.FAILED, 0);
                 }
             });
         } else {
-            logger.error('get collection player failed : ' + err);
+            logger.error('get collection contestant failed : ' + err);
             callback(errorCode.FAILED, 0);
         }
     });
@@ -61,12 +61,12 @@ exports.listContestants = function (callback) {
                 if (!err) {
                     callback(errorCode.SUCCESS, results);
                 } else {
-                    logger.error('get all players error : ' + err);
+                    logger.error('get all contestant error : ' + err);
                     callback(errorCode.FAILED, null);
                 }
             });
         } else {
-            logger.error('get collection player failed : ' + err);
+            logger.error('get collection contestant failed : ' + err);
             callback(errorCode.FAILED, null);
         }
     });
@@ -87,12 +87,12 @@ exports.getAllTables = function (callback) {
                     }
                     callback(errorCode.SUCCESS, tables);
                 } else {
-                    logger.error('get all tables error : ' + err);
+                    logger.error('get all contestant error : ' + err);
                     callback(errorCode.FAILED, null);
                 }
             });
         } else {
-            logger.error('get collection player failed : ' + err);
+            logger.error('get collection contestant failed : ' + err);
             callback(errorCode.FAILED, null);
         }
     });
@@ -110,7 +110,7 @@ exports.createContestant = function (player, callback) {
                 }
             });
         } else {
-            logger.error('get collection player failed : ' + err);
+            logger.error('get collection contestant failed : ' + err);
             callback(errorCode.FAILED);
         }
     });
@@ -134,7 +134,7 @@ exports.updateContestant = function(conditions, newPlayer, callback) {
                 }
             });
         } else {
-            logger.error('get collection player failed : ' + err);
+            logger.error('get collection contestant failed : ' + err);
             callback(errorCode.FAILED);
         }
     });
