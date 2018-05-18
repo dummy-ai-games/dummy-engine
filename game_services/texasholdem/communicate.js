@@ -87,7 +87,6 @@ function SkyRTC(tableNumber) {
         }
 
         socket.token = token;
-        logger.info('phoneNumber = ' + phoneNumber + ', password = ' + password);
         if (phoneNumber && password) {
             playerLogic.getPlayerWorkUnit(phoneNumber, password, function (getPlayerErr, player) {
                 if (errorCode.SUCCESS.code === getPlayerErr.code || socket.isDummy) {

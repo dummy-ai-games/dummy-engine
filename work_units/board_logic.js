@@ -320,6 +320,12 @@ exports.listBoardPlayersWorkUnit = function (instance, callback) {
     });
 };
 
+exports.listTablesWorkUnit = function (callback) {
+    tableDao.listTables(function(listTablesErr, tables) {
+        callback(listTablesErr, tables);
+    });
+};
+
 // helper functions
 function isPlayerAlreadyIn(players, player) {
     if (players) {

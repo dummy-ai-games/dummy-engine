@@ -214,7 +214,7 @@ exports.tagPlayersWorkUnit = function(callback) {
                                     if (errorCode.SUCCESS.code === getPlayersErr.code &&
                                         null !== players && players.length > 0) {
                                         var contestant = players[0];
-                                        contestant.playerName = stringUtils.randomChar(16);
+                                        contestant.password = stringUtils.randomChar(16);
                                         contestant.displayName = contestant.name;
                                         contestant.activeStats = playerStat.stats;
                                         contestantDao.createContestant(contestant, function(createContestantErr) {
@@ -290,11 +290,10 @@ exports.groupingWorkUnit = function(callback) {
             var dummies = [];
             for (var i = 0; i < robotCount; i++) {
                 var dummy = {
-                    playerName: stringUtils.randomChar(16),
                     displayName: "大米" + i,
                     name: "大米" + i,
                     phoneNumber: "" + stringUtils.paddingNumber(i, 11),
-                    password: "e031de87fdb996244327af1223071767",
+                    password: stringUtils.randomChar(16),
                     role: 2
                 };
                 dummies.push(dummy);
@@ -485,13 +484,34 @@ exports.getPlayerActiveStatsWorkUnit = function(callback) {
     });
 };
 
+exports.getContestantsWorkUnit = function(callback) {
+    var conditions = {
+        role: 0,
+        status: 1,
+        activeStats: { $gte: CONTESTANTS_MIN_ACTIVE }
+    };
+    contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
+        callback(getContestantsErr, contestants);
+    });
+};
+
+exports.getKanbanContestantsWorkUnit = function(tableNumber, callback) {
+    var conditions = {
+        status: 1,
+        tableNumber: parseInt(tableNumber)
+    };
+    contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
+        callback(getContestantsErr, contestants);
+    });
+};
+
 exports.sendSmsWorkUnit = function (ip, phoneNumber, callback) {
     var verificationCode = stringUtils.genVerificationCode(0, 6);
     var ttl = 60;
 
     playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
         if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
+            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME);
             sender.sendVerifyKey(phoneNumber, verificationCode, function (sendErr) {
                 if (sendErr === errorCode.SUCCESS.code) {
                     logger.info("send verification code successfully");
@@ -517,7 +537,7 @@ exports.sendSmsForUpdateWorkUnit = function (ip, phoneNumber, callback) {
             var ttl = 60;
             playerAuth.setAuthInfo(phoneNumber, verificationCode, ttl, function (setPlayerAuthErr) {
                 if (setPlayerAuthErr.code === errorCode.SUCCESS.code) {
-                    var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME, SMS_TEMP_NAME);
+                    var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME);
                     sender.sendVerifyKey(phoneNumber, verificationCode, function (sendErr) {
                         if (sendErr === errorCode.SUCCESS.code) {
                             logger.info("send verification code successfully");
@@ -534,6 +554,32 @@ exports.sendSmsForUpdateWorkUnit = function (ip, phoneNumber, callback) {
         } else {
             logger.error("player: " + phoneNumber + " does not exist");
             callback(errorCode.PLAYER_NOT_EXIST);
+        }
+    });
+};
+
+exports.sendMatchSmsWorkUnit = function(callback) {
+    var conditions = {
+        role: 0,
+        status: 1,
+        activeStats: { $gte: CONTESTANTS_MIN_ACTIVE }
+    };
+    contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
+        if (errorCode.SUCCESS.code === getContestantsErr.code && null !== contestants && contestants.length > 0) {
+            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME);
+            for (var i = 0; i < contestants.length; i++) {
+                var contestant = contestants[i];
+                sender.sendMatchNotice(contestant.phoneNumber, contestant.password, function(sendMatchNoticeErr) {
+                    if (errorCode.SUCCESS.code === sendMatchNoticeErr.code) {
+                        logger.info("send sms successfully");
+                    } else {
+                        logger.info("send sms failed");
+                    }
+                });
+            }
+        } else {
+            logger.info("get contestants failed, do not send match notification sms");
+            callback(errorCode.FAILED);
         }
     });
 };

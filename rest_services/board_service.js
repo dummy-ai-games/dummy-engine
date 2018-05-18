@@ -7,6 +7,7 @@ var logger = require('../poem/logging/logger4js').helper;
 var BoardResponse = require('../responses/board_response');
 var BoolResponse = require('../responses/bool_response');
 var PlayerResponse = require('../responses/player_response');
+var TablesResponse = require('../responses/tables_response');
 var boardLogic = require('../work_units/board_logic');
 
 exports.createBoard = function (req, res) {
@@ -98,6 +99,16 @@ exports.listBoardPlayers = function (req, res) {
         playerResponse.status = getBoardErr;
         playerResponse.entity = result;
         res.send(playerResponse);
+        res.end();
+    });
+};
+
+exports.listMatchTables = function (req, res) {
+    var tablesResponse = new TablesResponse();
+    boardLogic.listTablesWorkUnit(function (getTablesErr, result) {
+        tablesResponse.status = getTablesErr;
+        tablesResponse.entity = result;
+        res.send(tablesResponse);
         res.end();
     });
 };

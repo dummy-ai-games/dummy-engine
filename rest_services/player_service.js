@@ -3,8 +3,8 @@
  * 2017-11-26
  */
 
-var logger = require('../poem/logging/logger4js').helper;
 var PlayerResponse = require('../responses/player_response');
+var PlayersResponse = require('../responses/players_response');
 var ActiveStatsResponse = require('../responses/active_stats_response');
 
 var playerLogic = require('../work_units/player_logic');
@@ -14,6 +14,8 @@ var ServiceResponse = require('../responses/service_response');
 var IntegerResponse = require('../responses/integer_response');
 var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
+
+var logger = require('../poem/logging/logger4js').helper;
 
 exports.signUp = function (req, res) {
     var player = req.body;
@@ -138,6 +140,28 @@ exports.playerActiveStats = function (req, res) {
     });
 };
 
+exports.getContestants = function (req, res) {
+    var playersResponse = new PlayersResponse();
+    playerLogic.getContestantsWorkUnit(function (getContestantsErr, contestants) {
+        playersResponse.status = getContestantsErr;
+        playersResponse.entity = contestants;
+        res.send(playersResponse);
+        res.end();
+    });
+};
+
+exports.getKanbanContestants = function (req, res) {
+    var tableNumber = req.query.table_number;
+
+    var playersResponse = new PlayersResponse();
+    playerLogic.getKanbanContestantsWorkUnit(tableNumber, function (getContestantsErr, contestants) {
+        playersResponse.status = getContestantsErr;
+        playersResponse.entity = contestants;
+        res.send(playersResponse);
+        res.end();
+    });
+};
+
 exports.sendSms = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -159,6 +183,15 @@ exports.sendSmsForUpdate = function (req, res) {
     logger.info('send sms for update request');
     playerLogic.sendSmsForUpdateWorkUnit(ip, phoneNumber, function(sendSmsErr) {
         serviceResponse.status = sendSmsErr;
+        res.send(serviceResponse);
+        res.end();
+    });
+};
+
+exports.sendMatchSms = function (req, res) {
+    var serviceResponse = new ServiceResponse();
+    playerLogic.sendMatchSmsWorkUnit(function (sendMatchSmsErr) {
+        serviceResponse.status = sendMatchSmsErr;
         res.send(serviceResponse);
         res.end();
     });

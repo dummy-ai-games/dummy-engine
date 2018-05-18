@@ -19,19 +19,39 @@ var accessKey;
 var accessSecret;
 var smsClient;
 
+var VERIFICATION_CODE_TEMP = "SMS_132395300";
+var MATCH_NOTICE_TEMP = "SMS_135041865";
+
 var SmsSender = function(_accessKey, _accessSecret, _signName, _tempName) {
     this.signName = _signName;
-    this.tempName = _tempName;
     this.smsClient = new SMSClient({accessKeyId : _accessKey, secretAccessKey: _accessSecret});
 };
-
 
 SmsSender.prototype.sendVerifyKey = function(phoneNumber, verifyKey, callback) {
     this.smsClient.sendSMS({
         PhoneNumbers: phoneNumber,
         SignName: this.signName,
-        TemplateCode: this.tempName,
+        TemplateCode: VERIFICATION_CODE_TEMP,
         TemplateParam: '{"code": "' + verifyKey + '"}'
+    }).then(function (res) {
+        let {Code} = res;
+        console.log(Code);
+        if (Code === 'OK') {
+            callback(errorCode.SUCCESS);
+        }
+    }, function (err) {
+        console.log(err);
+        callback(errorCode.FAILED);
+    });
+};
+
+// TODO: Decouple sms sender from sms business
+SmsSender.prototype.sendMatchNotice = function(phoneNumber, passcode, callback) {
+    this.smsClient.sendSMS({
+        PhoneNumbers: phoneNumber,
+        SignName: this.signName,
+        TemplateCode: MATCH_NOTICE_TEMP,
+        TemplateParam: '{"code": "' + passcode + '"}'
     }).then(function (res) {
         let {Code} = res;
         console.log(Code);

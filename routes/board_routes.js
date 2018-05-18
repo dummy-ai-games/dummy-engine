@@ -15,5 +15,6 @@ app.post("/board/list_active_boards", boardService.listActiveBoards);
 app.post("/board/is_creator_board", boardService.isCreatorBoard);
 
 app.get("/board/list_board_players", boardService.listBoardPlayers);
+app.get("/board/list_match_tables", boardService.listMatchTables);
 
 //app.post("/board/get_board_by_ticket",boardService.getBoardByTicket); //for testing

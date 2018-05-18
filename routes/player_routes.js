@@ -19,6 +19,8 @@ app.post("/players/get_random_dummy", playerService.getRandomDummy);
 // for match
 app.post("/players/tag_players_to_match", playerService.tagPlayersToMatch);
 app.post("/players/grouping", playerService.grouping);
+app.post("/players/send_match_sms", playerService.sendMatchSms);
 
 app.get("/players/player_active_stats", playerService.playerActiveStats);
-
+app.get("/players/get_contestants", playerService.getContestants);
+app.get("/players/get_kanban_contestants", playerService.getKanbanContestants);
