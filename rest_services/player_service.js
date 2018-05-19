@@ -156,7 +156,11 @@ exports.getKanbanContestants = function (req, res) {
     var playersResponse = new PlayersResponse();
     playerLogic.getKanbanContestantsWorkUnit(tableNumber, function (getContestantsErr, contestants) {
         playersResponse.status = getContestantsErr;
-        playersResponse.entity = contestants;
+        // a little tweak on response data
+        playersResponse.entity = {
+            tableNumber: tableNumber,
+            contestants: contestants
+        };
         res.send(playersResponse);
         res.end();
     });

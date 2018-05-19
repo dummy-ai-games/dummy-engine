@@ -215,6 +215,7 @@ exports.tagPlayersWorkUnit = function(callback) {
                                         null !== players && players.length > 0) {
                                         var contestant = players[0];
                                         contestant.password = stringUtils.randomChar(16);
+                                        contestant.playerName = contestant.name;
                                         contestant.displayName = contestant.name;
                                         contestant.activeStats = playerStat.stats;
                                         contestantDao.createContestant(contestant, function(createContestantErr) {
@@ -291,10 +292,15 @@ exports.groupingWorkUnit = function(callback) {
             for (var i = 0; i < robotCount; i++) {
                 var dummy = {
                     displayName: "大米" + i,
-                    name: "大米" + i,
+                    playerName: "Dummy" + i,
+                    studentName: "大米" + i,
+                    name: "Dummy",
                     phoneNumber: "" + stringUtils.paddingNumber(i, 11),
                     password: stringUtils.randomChar(16),
-                    role: 2
+                    role: 2,
+                    status: 1,
+                    university: 'Trend University',
+                    activeStats: 0,
                 };
                 dummies.push(dummy);
             }
