@@ -9,7 +9,6 @@ var boardDao = require('../models/board_dao');
 var gameDao = require('../models/game_dao');
 var playerDao = require('../models/player_dao');
 var tableDao = require('../models/table_dao');
-var contestantDao = require('../models/contestant_dao');
 
 var stringUtils = require('../poem/utils/string_utils');
 var dateUtil = require('../poem/utils/date_utils');

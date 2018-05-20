@@ -25,6 +25,7 @@ exports.setupEnvironment = function () {
         SMS_SIGN_NAME = "趋势科技";
         MULTIPLE_INSTANCE = 100;
         BASE_PORT = 9000;
+        MATCH_SERVER_PORT = 8081;
     } else if (enums.APP_PRODUCTION_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_SERVER_ADDRESS = "dds-bp14fcae2f0f39641.mongodb.rds.aliyuncs.com";
@@ -40,6 +41,7 @@ exports.setupEnvironment = function () {
         SMS_SIGN_NAME = "趋势科技";
         MULTIPLE_INSTANCE = 100;
         BASE_PORT = 9000;
+        MATCH_SERVER_PORT = 8081;
     } else if (enums.APP_USERDEBUG_MODE === env) {
         LISTEN_PORT = "8080";
         MONGO_DB_SERVER_ADDRESS = "127.0.0.1";
@@ -55,5 +57,6 @@ exports.setupEnvironment = function () {
         SMS_SIGN_NAME = "趋势科技";
         MULTIPLE_INSTANCE = 100;
         BASE_PORT = 9000;
+        MATCH_SERVER_PORT = 8081;
     }
 };

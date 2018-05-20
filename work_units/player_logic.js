@@ -22,6 +22,7 @@ var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
 var stringUtils = require('../poem/utils/string_utils.js');
+var dateUtil = require('../poem/utils/date_utils');
 var MD5 = require('../poem/crypto/md5');
 
 var async = require('async');
@@ -291,10 +292,10 @@ exports.groupingWorkUnit = function(callback) {
             var dummies = [];
             for (var i = 0; i < robotCount; i++) {
                 var dummy = {
-                    displayName: "大米" + i,
+                    displayName: "Dummy" + i,
                     playerName: "Dummy" + i,
-                    studentName: "大米" + i,
-                    name: "Dummy",
+                    studentName: "Dummy" + i,
+                    name: "Dummy" + i,
                     phoneNumber: "" + stringUtils.paddingNumber(i, 11),
                     password: stringUtils.randomChar(16),
                     role: 2,
@@ -360,8 +361,21 @@ exports.groupingWorkUnit = function(callback) {
                                     logger.info("clear tables done, re-create tables");
                                     var newTables = [];
                                     for (var i = 0; i < tableCount; i++) {
+                                        var date =
                                         newTables[i] = {
-                                            tableNumber : (i + 1)
+                                            tableNumber : (i + 1),
+                                            gameName: "texas_holdem",
+                                            minPlayer: 3,
+                                            maxPlayer: 10,
+                                            status: enums.GAME_STATUS_STANDBY,
+                                            creator: 'dummy-engine',
+                                            creatorName: 'dummy-engine',
+                                            creatorRealName: 'dummy-engine',
+                                            createTime: dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"),
+                                            updateTime: dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"),
+                                            ticket: stringUtils.randomChar(30),
+                                            type: 0,
+                                            port: MATCH_SERVER_PORT
                                         }
                                     }
                                     var createTablesSuccess = true;

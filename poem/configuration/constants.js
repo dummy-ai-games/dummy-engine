@@ -86,3 +86,6 @@ global.SMS_TEMP_NAME = "";
 // multiple instance
 global.MULTIPLE_INSTANCE = 100;
 global.BASE_PORT = 9000;
+
+// match platform
+global.MATCH_SERVER_PORT = 8081;
