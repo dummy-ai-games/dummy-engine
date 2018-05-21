@@ -215,7 +215,10 @@ exports.tagPlayersWorkUnit = function(callback) {
                                     if (errorCode.SUCCESS.code === getPlayersErr.code &&
                                         null !== players && players.length > 0) {
                                         var contestant = players[0];
-                                        contestant.password = stringUtils.randomChar(16);
+                                        var passwordPlain = stringUtils.randomChar(16);
+                                        var passwordHash = MD5.MD5(passwordPlain);
+                                        contestant.passwordPlain = passwordPlain;
+                                        contestant.password = passwordHash;
                                         contestant.playerName = contestant.name;
                                         contestant.displayName = contestant.name;
                                         contestant.activeStats = playerStat.stats;
@@ -291,13 +294,16 @@ exports.groupingWorkUnit = function(callback) {
             // step3 : generate dummy players
             var dummies = [];
             for (var i = 0; i < robotCount; i++) {
+                var passwordPlain = stringUtils.randomChar(16);
+                var passwordHash = MD5.MD5(passwordPlain);
                 var dummy = {
                     displayName: "Dummy" + i,
                     playerName: "Dummy" + i,
                     studentName: "Dummy" + i,
                     name: "Dummy" + i,
                     phoneNumber: "" + stringUtils.paddingNumber(i, 11),
-                    password: stringUtils.randomChar(16),
+                    passwordPlain: passwordPlain,
+                    password: passwordHash,
                     role: 2,
                     status: 1,
                     university: 'Trend University',
@@ -511,6 +517,11 @@ exports.getContestantsWorkUnit = function(callback) {
         activeStats: { $gte: CONTESTANTS_MIN_ACTIVE }
     };
     contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
+        if (null != contestants && contestants.length > 0) {
+            for (var i = 0; i < contestants.length; i++) {
+                contestants.password = '';
+            }
+        }
         callback(getContestantsErr, contestants);
     });
 };
@@ -521,6 +532,11 @@ exports.getKanbanContestantsWorkUnit = function(tableNumber, callback) {
         tableNumber: parseInt(tableNumber)
     };
     contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
+        if (null != contestants && contestants.length > 0) {
+            for (var i = 0; i < contestants.length; i++) {
+                contestants.password = '';
+            }
+        }
         callback(getContestantsErr, contestants);
     });
 };
