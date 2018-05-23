@@ -53,6 +53,16 @@ function ErrorCode() {
         code: -8,
         cause:"Wrong phoneNumber or password"
     };
+
+    this.FETCH_PASSCODE_EXCEEDED_LIMIT = {
+        code: -9,
+        cause:"Fetch passcode execeeded limit"
+    };
+
+    this.USER_NOT_ACTIVE = {
+        code: -10,
+        cause:"User not active"
+    };
 }
 
 module.exports = ErrorCode;

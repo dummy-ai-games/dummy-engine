@@ -31,6 +31,7 @@ var async = require('async');
 var CONTESTANTS_MIN_ACTIVE = 1;
 var PLAYER_PER_BOARD = 10;
 var SHUFFLE_PLAYER_TIMES = 1000;
+var PASSCODE_FETCH_TIME_MAX = 3;
 
 var RETRY_SMS_MAX_TIMES = 5;
 
@@ -215,7 +216,7 @@ exports.tagPlayersWorkUnit = function(callback) {
                                     if (errorCode.SUCCESS.code === getPlayersErr.code &&
                                         null !== players && players.length > 0) {
                                         var contestant = players[0];
-                                        var passwordPlain = stringUtils.randomChar(16);
+                                        var passwordPlain = stringUtils.genVerificationCode(0, 6);
                                         var passwordHash = MD5.MD5(passwordPlain);
                                         contestant.passwordPlain = passwordPlain;
                                         contestant.password = passwordHash;
@@ -294,7 +295,7 @@ exports.groupingWorkUnit = function(callback) {
             // step3 : generate dummy players
             var dummies = [];
             for (var i = 0; i < robotCount; i++) {
-                var passwordPlain = stringUtils.randomChar(16);
+                var passwordPlain = stringUtils.genVerificationCode(0, 6);
                 var passwordHash = MD5.MD5(passwordPlain);
                 var dummy = {
                     displayName: "Dummy" + i,
@@ -602,19 +603,77 @@ exports.sendMatchSmsWorkUnit = function(callback) {
     };
     contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
         if (errorCode.SUCCESS.code === getContestantsErr.code && null !== contestants && contestants.length > 0) {
-            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME);
+            var phoneNumbers = [];
+            var sendCodes = [];
+            var signNames = [];
             for (var i = 0; i < contestants.length; i++) {
                 var contestant = contestants[i];
-                sender.sendMatchNotice(contestant.phoneNumber, contestant.password, function(sendMatchNoticeErr) {
-                    if (errorCode.SUCCESS.code === sendMatchNoticeErr.code) {
-                        logger.info("send sms successfully");
-                    } else {
-                        logger.info("send sms failed");
-                    }
+                phoneNumbers.push(contestant.phoneNumber);
+                signNames.push(SMS_SIGN_NAME);
+                sendCodes.push({
+                    code: contestant.passwordPlain
                 });
             }
+
+            var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME);
+            sender.sendMatchNotices(JSON.stringify(phoneNumbers), JSON.stringify(signNames),
+                JSON.stringify(sendCodes), function(sendMatchNoticeErr) {
+                if (errorCode.SUCCESS.code === sendMatchNoticeErr) {
+                    logger.info("send sms successfully");
+                } else {
+                    logger.info("send sms failed");
+                }
+            });
+            callback(errorCode.SUCCESS);
         } else {
             logger.info("get contestants failed, do not send match notification sms");
+            callback(errorCode.FAILED);
+        }
+    });
+};
+
+exports.fetchPasscodeWorkUnit = function(phoneNumber, callback) {
+    var conditions = {
+        phoneNumber: phoneNumber,
+        role: 0,
+        status: 1
+    };
+    contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
+        if (errorCode.SUCCESS.code === getContestantsErr.code && null !== contestants && contestants.length > 0) {
+            var contestant = contestants[0];
+            if (contestant.activeStats >= CONTESTANTS_MIN_ACTIVE) {
+                if (!contestant.passcodeFetched || contestant.passcodeFetched < PASSCODE_FETCH_TIME_MAX) {
+                    var sender = new SmsSender(SMS_ACCESSKEY_ID, SMS_ACCESSKEY_SEC, SMS_SIGN_NAME);
+                    sender.sendMatchNotice(phoneNumber, contestant.passwordPlain, function (sendErr) {
+                        if (sendErr === errorCode.SUCCESS.code) {
+                            logger.info("send passcode successfully for : " + phoneNumber);
+                            if (undefined === contestant.passcodeFetched || null === contestant.passcodeFetched) {
+                                contestant.passcodeFetched = 1;
+                            } else {
+                                contestant.passcodeFetched++;
+                            }
+
+                            contestantDao.updateContestant(conditions, contestant, function(updateContestantErr) {
+                                logger.info("contestant passcode fetched updated to " + contestant.passcodeFetched +
+                                    " : " + updateContestantErr.code);
+                                callback(errorCode.SUCCESS);
+                            });
+
+                        } else {
+                            logger.info("send passcode failed for : " + phoneNumber);
+                            callback(errorCode.FAILED);
+                        }
+                    });
+                } else {
+                    logger.info("contestant : " + phoneNumber + " has been fetched passcode more than 3 times");
+                    callback(errorCode.FETCH_PASSCODE_EXCEEDED_LIMIT);
+                }
+            } else {
+                logger.info("contestant : " + phoneNumber + " is not active, do not fetch passcode for him");
+                callback(errorCode.USER_NOT_ACTIVE);
+            }
+        } else {
+            logger.info("contestant : " + phoneNumber + " does not exist");
             callback(errorCode.FAILED);
         }
     });
@@ -639,7 +698,6 @@ exports.resetPasswordWorkUnit = function (phoneNumber, verificationCode, passwor
                     callback(errorCode.WRONG_VERIFICATION_CODE);
                 }
             });
-
         } else {
             logger.error("player: " + phoneNumber + " not exist");
             callback(errorCode.PLAYER_NOT_EXIST);

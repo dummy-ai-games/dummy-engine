@@ -70,7 +70,8 @@ var authenticationURLList = [
     '/board/update_board',
     '/board/delete_board',
     '/board/is_creator_board',
-    '/game/create_game'
+    '/game/create_game',
+    '/player/fetch_passcode'
 ];
 
 function tokenValidation (req, res, next) {

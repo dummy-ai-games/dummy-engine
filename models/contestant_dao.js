@@ -123,7 +123,8 @@ exports.updateContestant = function(conditions, newPlayer, callback) {
                 $set: {
                     playerName: newPlayer.playerName,
                     displayName: newPlayer.displayName,
-                    tableNumber: newPlayer.tableNumber
+                    tableNumber: newPlayer.tableNumber,
+                    passcodeFetched: newPlayer.passcodeFetched
                 }
             }, function (err, result) {
                 if (!err) {

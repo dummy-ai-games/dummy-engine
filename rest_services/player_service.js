@@ -201,6 +201,18 @@ exports.sendMatchSms = function (req, res) {
     });
 };
 
+exports.fetchPasscode = function (req, res) {
+    var phoneNumber = req.headers["phone-number"] || req.body.phoneNumber;
+    var token = req.headers["token"] || req.body.token;
+
+    var serviceResponse = new ServiceResponse();
+    playerLogic.fetchPasscodeWorkUnit(phoneNumber, function (fetchPasscodeErr) {
+        serviceResponse.status = fetchPasscodeErr;
+        res.send(serviceResponse);
+        res.end();
+    });
+};
+
 exports.signOut = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
     var token = req.body.token;

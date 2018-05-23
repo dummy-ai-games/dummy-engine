@@ -27,12 +27,32 @@ var SmsSender = function(_accessKey, _accessSecret, _signName, _tempName) {
     this.smsClient = new SMSClient({accessKeyId : _accessKey, secretAccessKey: _accessSecret});
 };
 
+// TODO: Decouple sms sender from sms business
 SmsSender.prototype.sendVerifyKey = function(phoneNumber, verifyKey, callback) {
     this.smsClient.sendSMS({
         PhoneNumbers: phoneNumber,
         SignName: this.signName,
         TemplateCode: VERIFICATION_CODE_TEMP,
         TemplateParam: '{"code": "' + verifyKey + '"}'
+    }).then(function (res) {
+        let {Code} = res;
+        console.log(Code);
+        if (Code === 'OK') {
+            callback(errorCode.SUCCESS);
+        }
+    }, function (err) {
+        console.log(err);
+        callback(errorCode.FAILED);
+    });
+};
+
+// TODO: Decouple sms sender from sms business
+SmsSender.prototype.sendMatchNotices = function(phoneNumbers, signNames, params, callback) {
+    this.smsClient.sendBatchSMS({
+        PhoneNumberJson: phoneNumbers,
+        SignNameJson: signNames,
+        TemplateCode: MATCH_NOTICE_TEMP,
+        TemplateParamJson: params,
     }).then(function (res) {
         let {Code} = res;
         console.log(Code);
