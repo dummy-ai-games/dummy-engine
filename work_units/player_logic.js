@@ -513,7 +513,6 @@ exports.getPlayerActiveStatsWorkUnit = function(callback) {
 
 exports.getContestantsWorkUnit = function(callback) {
     var conditions = {
-        role: 0,
         status: 1,
         activeStats: { $gte: CONTESTANTS_MIN_ACTIVE }
     };
