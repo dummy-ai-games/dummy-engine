@@ -111,23 +111,40 @@ exports.getRandomDummy = function (req, res) {
 };
 
 exports.tagPlayersToMatch = function (req, res) {
+    var adminPassword = req.query.password;
+
     var integerResponse = new IntegerResponse();
 
-    playerLogic.tagPlayersWorkUnit(function (tagPlayersErr, tagedPlayersCount) {
-        integerResponse.status = tagPlayersErr;
-        integerResponse.entity = tagedPlayersCount;
+    if (adminPassword !== 'ghostcicy') {
+        integerResponse.status = errorCode.FAILED;
+        integerResponse.entity = 0;
         res.send(integerResponse);
         res.end();
-    });
+    } else {
+        playerLogic.tagPlayersWorkUnit(function (tagPlayersErr, tagedPlayersCount) {
+            integerResponse.status = tagPlayersErr;
+            integerResponse.entity = tagedPlayersCount;
+            res.send(integerResponse);
+            res.end();
+        });
+    }
 };
 
 exports.grouping = function (req, res) {
+    var adminPassword = req.query.password;
     var serviceResponse = new ServiceResponse();
-    playerLogic.groupingWorkUnit(function (groupingErr) {
-        serviceResponse.status = groupingErr;
+
+    if (adminPassword !== 'ghostcicy') {
+        serviceResponse.status = errorCode.FAILED;
         res.send(serviceResponse);
         res.end();
-    });
+    } else {
+        playerLogic.groupingWorkUnit(function (groupingErr) {
+            serviceResponse.status = groupingErr;
+            res.send(serviceResponse);
+            res.end();
+        });
+    }
 };
 
 exports.playerActiveStats = function (req, res) {
@@ -141,13 +158,23 @@ exports.playerActiveStats = function (req, res) {
 };
 
 exports.getContestants = function (req, res) {
+    var adminPassword = req.query.password;
     var playersResponse = new PlayersResponse();
-    playerLogic.getContestantsWorkUnit(function (getContestantsErr, contestants) {
-        playersResponse.status = getContestantsErr;
-        playersResponse.entity = contestants;
+
+    if (adminPassword !== 'ghostcicy') {
+        playersResponse.status = errorCode.FAILED;
+        playersResponse.entity = null;
         res.send(playersResponse);
         res.end();
-    });
+    } else {
+        playerLogic.getContestantsWorkUnit(function (getContestantsErr, contestants) {
+            playersResponse.status = getContestantsErr;
+            playersResponse.entity = contestants;
+            res.send(playersResponse);
+            res.end();
+        });
+    }
+
 };
 
 exports.getKanbanContestants = function (req, res) {

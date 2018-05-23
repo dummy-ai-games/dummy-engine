@@ -535,6 +535,9 @@ exports.getKanbanContestantsWorkUnit = function(tableNumber, callback) {
         if (null != contestants && contestants.length > 0) {
             for (var i = 0; i < contestants.length; i++) {
                 contestants.password = '';
+                contestants.passwordPlain = '';
+                contestants.mail = '';
+                contestants.phoneNumber = '';
             }
         }
         callback(getContestantsErr, contestants);
