@@ -415,7 +415,7 @@ SkyRTC.prototype.sendMessage = function (socket, message) {
 SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
     var that = this;
     var tablePlayers = [];
-    var tableDatas;
+    var tableData;
     var cards = {};
     var tableAndPlayer = [];
     var playerData = {};
@@ -435,8 +435,8 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
     }
 
     if (that.table[tableNumber] && that.table[tableNumber].status === enums.GAME_STATUS_RUNNING) {
-        tableDatas = poker.getBasicData(that.table[tableNumber]);
-        tableDatas.table.currentPlayer =
+        tableData = poker.getBasicData(that.table[tableNumber]);
+        tableData.table.currentPlayer =
             that.table[tableNumber].players[that.table[tableNumber].currentPlayer].playerName;
     }
 
@@ -449,7 +449,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
                 'data': {
                     'tableNumber': tableNumber,
                     'players': tablePlayers,
-                    'basicData': tableDatas
+                    'basicData': tableData
                 }
             };
             if (that.table[tableNumber])
@@ -460,11 +460,11 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
         }
     }
 
-    if (tableDatas) {
-        for (var i = 0; i < tableDatas.players.length; i++) {
-            cards[tableDatas.players[i].playerName] = tableDatas.players[i].cards;
-            delete tableDatas.players[i].cards;
-            playerData[tableDatas.players[i].playerName] = tableDatas.players[i];
+    if (tableData) {
+        for (var i = 0; i < tableData.players.length; i++) {
+            cards[tableData.players[i].playerName] = tableData.players[i].cards;
+            delete tableData.players[i].cards;
+            playerData[tableData.players[i].playerName] = tableData.players[i];
         }
     }
 
@@ -485,7 +485,7 @@ SkyRTC.prototype.notifyJoin = function (tableNumber, maxPlayer) {
                 'data': {
                     'tableNumber': tableNumber,
                     'players': tablePlayers,
-                    'basicData': tableDatas
+                    'basicData': tableData
                 }
             };
             if (that.table[tableNumber])

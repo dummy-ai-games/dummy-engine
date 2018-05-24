@@ -174,14 +174,17 @@ exports.getContestants = function (req, res) {
             res.end();
         });
     }
-
 };
 
 exports.getKanbanContestants = function (req, res) {
     var tableNumber = req.query.table_number;
+    var adminPassword = req.query.password;
+
+
+    console.log('get kanban contestants with admin password = ' + adminPassword);
 
     var playersResponse = new PlayersResponse();
-    playerLogic.getKanbanContestantsWorkUnit(tableNumber, function (getContestantsErr, contestants) {
+    playerLogic.getKanbanContestantsWorkUnit(tableNumber, adminPassword, function (getContestantsErr, contestants) {
         playersResponse.status = getContestantsErr;
         // a little tweak on response data
         playersResponse.entity = {

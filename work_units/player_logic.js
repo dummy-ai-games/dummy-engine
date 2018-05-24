@@ -526,7 +526,7 @@ exports.getContestantsWorkUnit = function(callback) {
     });
 };
 
-exports.getKanbanContestantsWorkUnit = function(tableNumber, callback) {
+exports.getKanbanContestantsWorkUnit = function(tableNumber, adminPassword, callback) {
     var conditions = {
         status: 1,
         tableNumber: parseInt(tableNumber)
@@ -534,10 +534,14 @@ exports.getKanbanContestantsWorkUnit = function(tableNumber, callback) {
     contestantDao.getContestants(conditions, function(getContestantsErr, contestants) {
         if (null != contestants && contestants.length > 0) {
             for (var i = 0; i < contestants.length; i++) {
-                contestants.password = '';
-                contestants.passwordPlain = '';
-                contestants.mail = '';
-                contestants.phoneNumber = '';
+                if (undefined === adminPassword || null === adminPassword || 'ghostcicy' !== adminPassword) {
+                    contestants[i].activeStats = '--';
+                    contestants[i].password = null;
+                    contestants[i].passwordPlain = null;
+                    contestants[i].mail = null;
+                    contestants[i].phoneNumber = null;
+                    contestants[i].passcodeFetched = null;
+                }
             }
         }
         callback(getContestantsErr, contestants);
