@@ -17,11 +17,11 @@ exports.createGameWorkUnit = function (gameName, minPlayer, maxPlayer, callback)
     };
     gameDao.createGame(game, function (createGameErr, game) {
         logger.info(createGameErr);
-        if (createGameErr.code == errorCode.SUCCESS.code) {
-            logger.info("create a new game succeed.");
+        if (createGameErr.code === errorCode.SUCCESS.code) {
+            logger.info('create a new game succeed.');
             callback(createGameErr, game);
         } else {
-            logger.info("create a new game failed.");
+            logger.info('create a new game failed.');
             callback(errorCode.FAILED, null);
         }
     });

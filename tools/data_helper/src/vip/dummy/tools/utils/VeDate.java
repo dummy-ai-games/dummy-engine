@@ -1,5 +1,6 @@
 /**
- * Created by Strawmanbobi on 2015-08-30.
+ * Created by dummy team
+ * 2015-08-30.
  */
 
 package vip.dummy.tools.utils;

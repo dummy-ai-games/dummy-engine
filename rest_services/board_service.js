@@ -102,29 +102,3 @@ exports.listBoardPlayers = function (req, res) {
         res.end();
     });
 };
-
-exports.listMatchTables = function (req, res) {
-    var tablesResponse = new TablesResponse();
-    boardLogic.listTablesWorkUnit(function (getTablesErr, result) {
-        tablesResponse.status = getTablesErr;
-        tablesResponse.entity = result;
-        res.send(tablesResponse);
-        res.end();
-    });
-};
-
-// for testing
-/*
-exports.getBoardByTicket = function (req,res) {
-    var ticket = req.body.ticket;
-    var gameName = req.body.game_name;
-
-    var boardResponse = new BoardResponse();
-    boardLogic.getBoardByTicketWorkUnit(ticket,gameName, function (getBoardErr, board) {
-        boardResponse.status = getBoardErr;
-        boardResponse.entity = board;
-        res.send(boardResponse);
-        res.end();
-    });
-};
-*/

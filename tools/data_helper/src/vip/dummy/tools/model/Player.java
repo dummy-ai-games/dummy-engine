@@ -2,7 +2,7 @@ package vip.dummy.tools.model;
 
 
 /**
- * Created by strawmanbobi
+ * Created by dummy team
  * 2018-04-07
  *
  * player model

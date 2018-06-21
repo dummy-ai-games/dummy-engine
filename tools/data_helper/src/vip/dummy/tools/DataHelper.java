@@ -3,7 +3,7 @@ package vip.dummy.tools;
 import vip.dummy.tools.workers.PlayerGen;
 
 /**
- * Created by strawmanbobi
+ * Created by dummy team
  * 2018-04-07
  *
  * tools for dummy

@@ -84,7 +84,7 @@ global.SMS_SIGN_NAME = "";
 global.SMS_TEMP_NAME = "";
 
 // multiple instance
-global.MULTIPLE_INSTANCE = 100;
+global.MULTIPLE_INSTANCE = 20;
 global.BASE_PORT = 9000;
 
 // match platform

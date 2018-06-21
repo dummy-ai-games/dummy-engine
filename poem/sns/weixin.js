@@ -1,5 +1,6 @@
 /**
- * Created by strawmanbobi on 2014-11-12.
+ * Created by strawmanbobi
+ * 2014-11-12.
  */
 
 var crypto = require('crypto');

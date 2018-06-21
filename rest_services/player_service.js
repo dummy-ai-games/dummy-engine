@@ -4,14 +4,11 @@
  */
 
 var PlayerResponse = require('../responses/player_response');
-var PlayersResponse = require('../responses/players_response');
-var ActiveStatsResponse = require('../responses/active_stats_response');
 
 var playerLogic = require('../work_units/player_logic');
 var ErrorCode = require('../constants/error_code.js');
 var errorCode = new ErrorCode();
 var ServiceResponse = require('../responses/service_response');
-var IntegerResponse = require('../responses/integer_response');
 var PlayerAuth = require('../authentication/player_auth.js');
 var playerAuth = new PlayerAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
@@ -110,92 +107,6 @@ exports.getRandomDummy = function (req, res) {
     });
 };
 
-exports.tagPlayersToMatch = function (req, res) {
-    var adminPassword = req.query.password;
-
-    var integerResponse = new IntegerResponse();
-
-    if (adminPassword !== 'ghostcicy') {
-        integerResponse.status = errorCode.FAILED;
-        integerResponse.entity = 0;
-        res.send(integerResponse);
-        res.end();
-    } else {
-        playerLogic.tagPlayersWorkUnit(function (tagPlayersErr, tagedPlayersCount) {
-            integerResponse.status = tagPlayersErr;
-            integerResponse.entity = tagedPlayersCount;
-            res.send(integerResponse);
-            res.end();
-        });
-    }
-};
-
-exports.grouping = function (req, res) {
-    var adminPassword = req.query.password;
-    var serviceResponse = new ServiceResponse();
-
-    if (adminPassword !== 'ghostcicy') {
-        serviceResponse.status = errorCode.FAILED;
-        res.send(serviceResponse);
-        res.end();
-    } else {
-        playerLogic.groupingWorkUnit(function (groupingErr) {
-            serviceResponse.status = groupingErr;
-            res.send(serviceResponse);
-            res.end();
-        });
-    }
-};
-
-exports.playerActiveStats = function (req, res) {
-    var activeStatsResponse = new ActiveStatsResponse();
-    playerLogic.getPlayerActiveStatsWorkUnit(function (getPlayerActiveStatsErr, playerActiveStats) {
-        activeStatsResponse.status = getPlayerActiveStatsErr;
-        activeStatsResponse.entity = playerActiveStats;
-        res.send(activeStatsResponse);
-        res.end();
-    });
-};
-
-exports.getContestants = function (req, res) {
-    var adminPassword = req.query.password;
-    var playersResponse = new PlayersResponse();
-
-    if (adminPassword !== 'ghostcicy') {
-        playersResponse.status = errorCode.FAILED;
-        playersResponse.entity = null;
-        res.send(playersResponse);
-        res.end();
-    } else {
-        playerLogic.getContestantsWorkUnit(function (getContestantsErr, contestants) {
-            playersResponse.status = getContestantsErr;
-            playersResponse.entity = contestants;
-            res.send(playersResponse);
-            res.end();
-        });
-    }
-};
-
-exports.getKanbanContestants = function (req, res) {
-    var tableNumber = req.query.table_number;
-    var adminPassword = req.query.password;
-
-
-    console.log('get kanban contestants with admin password = ' + adminPassword);
-
-    var playersResponse = new PlayersResponse();
-    playerLogic.getKanbanContestantsWorkUnit(tableNumber, adminPassword, function (getContestantsErr, contestants) {
-        playersResponse.status = getContestantsErr;
-        // a little tweak on response data
-        playersResponse.entity = {
-            tableNumber: tableNumber,
-            contestants: contestants
-        };
-        res.send(playersResponse);
-        res.end();
-    });
-};
-
 exports.sendSms = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -222,27 +133,6 @@ exports.sendSmsForUpdate = function (req, res) {
     });
 };
 
-exports.sendMatchSms = function (req, res) {
-    var serviceResponse = new ServiceResponse();
-    playerLogic.sendMatchSmsWorkUnit(function (sendMatchSmsErr) {
-        serviceResponse.status = sendMatchSmsErr;
-        res.send(serviceResponse);
-        res.end();
-    });
-};
-
-exports.fetchPasscode = function (req, res) {
-    var phoneNumber = req.headers["phone-number"] || req.body.phoneNumber;
-    var token = req.headers["token"] || req.body.token;
-
-    var serviceResponse = new ServiceResponse();
-    playerLogic.fetchPasscodeWorkUnit(phoneNumber, function (fetchPasscodeErr) {
-        serviceResponse.status = fetchPasscodeErr;
-        res.send(serviceResponse);
-        res.end();
-    });
-};
-
 exports.signOut = function (req, res) {
     var phoneNumber = req.body.phoneNumber;
     var token = req.body.token;
@@ -250,12 +140,12 @@ exports.signOut = function (req, res) {
     var serviceResponse = new ServiceResponse();
     playerAuth.deleteAuthInfo(phoneNumber, function (deletePhoneNumberErr) {
         if (deletePhoneNumberErr.code === errorCode.SUCCESS.code) {
-            logger.info("phone Number " + phoneNumber + " as key deleted");
+            logger.info('phone Number ' + phoneNumber + ' as key deleted');
             playerAuth.deleteAuthInfo(token, function (deleteTokenErr) {
                 if (deleteTokenErr.code === errorCode.SUCCESS.code) {
-                    logger.info("token " + token + " as key deleted");
+                    logger.info('token ' + token + ' as key deleted');
                 } else {
-                    logger.warn("token " + token + " as key delete failed");
+                    logger.warn('token ' + token + ' as key delete failed');
                 }
                 serviceResponse.status = errorCode.SUCCESS;
                 res.send(serviceResponse);

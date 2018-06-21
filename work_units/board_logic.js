@@ -8,7 +8,6 @@ var logger = require('../poem/logging/logger4js').helper;
 var boardDao = require('../models/board_dao');
 var gameDao = require('../models/game_dao');
 var playerDao = require('../models/player_dao');
-var tableDao = require('../models/table_dao');
 
 var stringUtils = require('../poem/utils/string_utils');
 var dateUtil = require('../poem/utils/date_utils');
@@ -25,7 +24,7 @@ var enums = new Enums();
 var async = require('async');
 
 exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) {
-    var currentTime = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+    var currentTime = dateUtil.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
     var ticket = stringUtils.randomChar(30);
 
     // query create name from tb: players
@@ -75,17 +74,17 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
                                 boardDao.createBoard(board, function (createBoardErr, result) {
                                     if (createBoardErr.code === errorCode.SUCCESS.code && null !== result.ops &&
                                         result.ops.length > 0) {
-                                        logger.info("create board succeed.");
+                                        logger.info('create board succeed.');
                                         callback(createBoardErr, board);
                                     } else {
-                                        logger.info("create board failed.");
+                                        logger.info('create board failed.');
                                         callback(errorCode.FAILED, null);
                                     }
                                 });
                             } else {
                                 // creator cannot create multiple board that status is preparing(0) or active(1)
                                 var board = boards[0];
-                                logger.info("a creator can't create multiple active boards");
+                                logger.info('a creator can not create multiple active boards');
                                 callback(errorCode.MULTI_ACTIVE_BOARD_CREATED, board);
                             }
                         } else { // get board failed
@@ -99,14 +98,14 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
                 }
             });
         } else {
-            logger.info("get player failed, or an unregistered player is trying to create board");
+            logger.info('get player failed, or an unregistered player is trying to create board');
             callback(errorCode.FAILED, null);
         }
     });
 };
 
 exports.updateBoardWorkUnit = function (ticket, gameName, board, callback) {
-    var date = dateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+    var date = dateUtil.formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss');
     var condition = {
         ticket: ticket,
         gameName: gameName
@@ -122,17 +121,17 @@ exports.updateBoardWorkUnit = function (ticket, gameName, board, callback) {
         newBoard.status = board.status;
     }
 
-    logger.info("board currentPlayer:" + JSON.stringify(newBoard.currentPlayer));
-    logger.info("board status:" + newBoard.status);
-    logger.info("board update time:" + newBoard.updateTime);
-    logger.info("board type:" + newBoard.type);
+    logger.info('board currentPlayer:' + JSON.stringify(newBoard.currentPlayer));
+    logger.info('board status:' + newBoard.status);
+    logger.info('board update time:' + newBoard.updateTime);
+    logger.info('board type:' + newBoard.type);
 
     boardDao.updateBoard(condition, newBoard, function (updateBoardErr, board) {
         if (updateBoardErr.code === errorCode.SUCCESS.code) {
-            logger.info("update board by ticket:" + ticket + ",gameName:" + gameName + " succeed.");
+            logger.info('update board by ticket:' + ticket + ',gameName:' + gameName + ' succeed.');
             callback(updateBoardErr, newBoard);
         } else {
-            logger.info("update board by ticket:" + ticket + ",gameName:" + gameName + " failed.");
+            logger.info('update board by ticket:' + ticket + ',gameName:' + gameName + ' failed.');
             callback(errorCode.FAILED, null);
         }
     });
@@ -146,11 +145,11 @@ exports.getBoardByTicketWorkUnit = function (ticket, gameName, port, callback) {
     };
     boardDao.getBoards(condition, function (getBoardErr, board) {
         if (getBoardErr.code === errorCode.SUCCESS.code && board !== null && board.length > 0) {
-            logger.info("the board that ticket = " + ticket + " exist in db");
+            logger.info('the board that ticket = ' + ticket + ' exist in db');
             callback(getBoardErr, board);
         } else {
             // board not exist
-            logger.info("board that ticket = : " + ticket + " not exist in db.");
+            logger.info('board that ticket = : ' + ticket + ' not exist in db.');
             callback(errorCode.FAILED, null);
         }
     });
@@ -163,11 +162,11 @@ exports.listBoardsWorkUnit = function (status, gameName, callback) {
     };
     boardDao.getBoards(condition, function (getBoardErr, boards) {
         if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null && boards.length > 0) {
-            logger.info("query board list: " + JSON.stringify(condition) + " succeed");
+            logger.info('query board list: ' + JSON.stringify(condition) + ' succeed');
             callback(getBoardErr, boards); //
         } else {
             // board not exist
-            logger.error("query board list:" + JSON.stringify(condition) + " failed.");
+            logger.error('query board list:' + JSON.stringify(condition) + ' failed.');
             callback(errorCode.FAILED, null);
         }
     });
@@ -205,11 +204,11 @@ exports.listActiveBoardsWorkUnit = function (gameName, from, count, searchName, 
 
     boardDao.listBoards(conditions, from, count, function (getBoardErr, boards) {
         if (getBoardErr.code === errorCode.SUCCESS.code && boards !== null) {
-            logger.info("query board list: " + JSON.stringify(conditions) + " succeed");
+            logger.info('query board list: ' + JSON.stringify(conditions) + ' succeed');
             callback(getBoardErr, boards);
         } else {
             // board not exist
-            logger.error("query board list:" + JSON.stringify(conditions) + " failed.");
+            logger.error('query board list:' + JSON.stringify(conditions) + ' failed.');
             callback(errorCode.FAILED, null);
         }
     });
@@ -316,12 +315,6 @@ exports.listBoardPlayersWorkUnit = function (instance, callback) {
         } else {
             callback(errorCode.FAILED, null);
         }
-    });
-};
-
-exports.listTablesWorkUnit = function (callback) {
-    tableDao.listTables(function(listTablesErr, tables) {
-        callback(listTablesErr, tables);
     });
 };
 

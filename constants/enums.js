@@ -20,6 +20,9 @@ function Enums() {
 
     this.GAME_TEXAS_HOLDEM = "texas_holdem";
     this.GAME_FLY_CHESS = "fly_chess";
+
+    this.ROLE_PLAYER = 0;
+    this.ROLE_ADMIN = 1;
 }
 
 module.exports = Enums;
