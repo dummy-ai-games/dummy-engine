@@ -40,8 +40,8 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
             var creatorRealName = players[0].studentName;
             logger.info('creator phoneNumber = ' + creatorPhoneNumber);
             logger.info('creator name = ' + creatorName);
-            gameDao.getGameInfo({name: gameName}, function (getGameErr, game) { // game != nulls
-                if (getGameErr.code === errorCode.SUCCESS.code && game !== null && game.length > 0) {
+            gameDao.getGameInfo({name: gameName}, function (getGameErr, games) {
+                if (getGameErr.code === errorCode.SUCCESS.code && games !== null && games.length > 0) {
                     var getBoardConditions = {
                         creator: creatorPhoneNumber,
                         gameName: gameName,
@@ -58,8 +58,8 @@ exports.createBoardWorkUnit = function (creatorPhoneNumber, gameName, callback) 
                                 // create board
                                 var board = {
                                     gameName: gameName,
-                                    minPlayer: game[0].minPlayer,
-                                    maxPlayer: game[0].maxPlayer,
+                                    minPlayer: games[0].minPlayer,
+                                    maxPlayer: games[0].maxPlayer,
                                     currentPlayer: [],
                                     status: 0,
                                     creator: creatorPhoneNumber,
