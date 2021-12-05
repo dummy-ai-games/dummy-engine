@@ -10,14 +10,14 @@ install mongo DB (above version 3.4)
 
 Run mongo client, create admin, grant permission and initialize poker game
     
-    > use the_game;
-    switched to db the_game
+    > use dummy_game;
+    switched to db dummy_game
     > db.createUser(
       {
           user: "admin",
           pwd: "123456",
           roles: [
-             { role: "readWrite", db: "the_game" }
+             { role: "readWrite", db: "dummy_game" }
           ]
       });
     > db.game.insertOne(

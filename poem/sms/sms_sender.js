@@ -15,7 +15,7 @@ var Enums = require('../configuration/enums');
 var errorCode = new ErrorCode();
 var enums = new Enums();
 
-var VERIFICATION_CODE_TEMP = "SMS_132395300";
+var VERIFICATION_CODE_TEMP = "SMS_117522803";
 
 var SmsSender = function(_accessKey, _accessSecret, _signName, _tempName) {
     this.signName = _signName;
