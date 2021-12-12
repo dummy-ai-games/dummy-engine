@@ -19,11 +19,11 @@ exports.setupEnvironment = function () {
         MONGO_DB_PASSWORD = '123456';
         REDIS_HOST = "127.0.0.1";
         REDIS_PORT = "6379";
-        REDIS_PASSWORD = "Dummygame2018";
+        REDIS_PASSWORD = null;
         SMS_ACCESSKEY_ID = "LTAI4FzGkpjBREEMK8wGAyUr";
         SMS_ACCESSKEY_SEC = "RGS71yfskgmZ4xdEu9C7UATfu6F5wp";
         SMS_SIGN_NAME = "大米AI编程平台";
-        MULTIPLE_INSTANCE = 20;
+        MULTIPLE_INSTANCE = 100;
         BASE_PORT = 9000;
     } else if (enums.APP_DEVELOPMENT_MODE === env) {
         LISTEN_PORT = "8080";
